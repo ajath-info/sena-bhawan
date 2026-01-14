@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add New Course - ARMY HRMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      min-height: 72px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .logo-text h1 { font-size: 18px; font-weight: 700; }
+    .logo-text p { font-size: 11px; color: #52b788; }
+
+    .sidebar-nav { flex: 1; padding: 16px 0; }
+
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #52b788;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* ================= MAIN CONTENT ================= */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left h2 { font-size: 22px; font-weight: 700; }
+    .header-left p {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: #f1f3f5;
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      background: white;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-secondary {
+      background: white;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-primary {
+      background: #1b4332;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item">🏠 Dashboard</a>
+      <a href="/dashboard-officers.html" class="nav-item">🏠 Dashboard Officers</a>
+      <a href="/dashboard-training.html" class="nav-item">🏠 Dashboard Training</a>
+      <a href="/filter.html" class="nav-item">🔍 Master Filter & Search</a>
+
+      <div class="nav-section-title">Administration</div>
+      <a href="/role-permmissoon.html" class="nav-item">🔐 Role & Permissions</a>
+
+      <div class="nav-section-title">Masters</div>
+      <a href="/course-master.html" class="nav-item active">📚 Course Master</a>
+      <a href="/grade-awards.html" class="nav-item">📝 Grade & Awards</a>
+      <a href="/course-schedule.html" class="nav-item">📅 Course Schedule</a>
+      <a href="/location-master.html" class="nav-item">📍 Location Master</a>
+      <a href="/rank-master.html" class="nav-item">🏅 Rank Master</a>
+      <a href="/unit-master.html" class="nav-item">🛡️ Unit Master</a>
+
+      <div class="nav-section-title">Forms</div>
+      <a href="/personnel-form.html" class="nav-item">👤 Personnel Data Form</a>
+      <a href="/coursepanel.html" class="nav-item">📋 Course Panel</a>
+      <a href="/course-posting-form.html" class="nav-item">📝 Course & Posting Form</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+        <div>🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <header class="header">
+      <div class="header-left">
+        <h2>Add New Course</h2>
+        <p>Enter details to create a new course</p>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="form-card">
+
+        <div class="section-title">Course Details</div>
+
+        <!-- Course Name -->
+        <div class="input-group">
+          <label>Course Name *</label>
+          <input id="courseName" type="text" placeholder="Enter course name" />
+        </div>
+
+        <!-- Location -->
+        <div class="input-group">
+          <label>Course Location *</label>
+          <input id="courseLocation" type="text" placeholder="Enter posting location" />
+        </div>
+
+        <!-- Duration -->
+        <div class="input-group">
+          <label>Duration *</label>
+          <input id="courseDuration" type="number" placeholder="Duration in Weeks" />
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary" id="submitCourse">Next</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  document.getElementById("submitCourse").addEventListener("click", function () {
+
+    const courseData = {
+      courseName: document.getElementById("courseName").value.trim(),
+      location: document.getElementById("courseLocation").value.trim(),
+      duration: parseInt(document.getElementById("courseDuration").value.trim())
+    };
+
+    if (!courseData.courseName || !courseData.location || isNaN(courseData.duration)) {
+      alert("Please fill all fields correctly!");
+      return;
+    }
+
+    fetch("http://localhost:6060/api/course", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(courseData)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("API error");
+      return response.json();
+    })
+    .then(data => {
+      alert("Course Added Successfully!");
+
+      // Redirecting to Course Master page
+      window.location.href = "/course-master.html";
+    })
+    .catch(error => {
+      console.error(error);
+      alert("Failed to add course. Check API.");
+    });
+  });
+</script>
+
+</body>
+</html>

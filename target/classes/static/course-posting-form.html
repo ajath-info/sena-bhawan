@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Course & Posting Form - ARMY HRMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+
+      height: 100vh;
+      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-x: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      min-height: 72px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: #52b788;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+    }
+
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .user-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-info .role {
+      font-size: 12px;
+      color: #52b788;
+    }
+
+
+    /* ================= MAIN ================= */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+    }
+
+    .header h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* ================= CARDS ================= */
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    /* ================= OFFICER CARD ================= */
+    .officer-card {
+      background: #1f5f46;
+      color: white;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .officer-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .officer-info h4 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .officer-info p {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    /* ================= TABS ================= */
+    .tabs {
+      display: flex;
+      gap: 24px;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+  padding-bottom: 10px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  border-bottom: 3px solid #1b4332;
+  color: #1b4332;
+}
+
+
+	  /* ================= TAB FIX ================= */
+
+/* Remove browser focus/active underline interference */
+.tab {
+  outline: none;
+  user-select: none;
+}
+
+/* Prevent :active or :focus from controlling underline */
+.tab:focus,
+.tab:active {
+  border-bottom-color: transparent !important;
+}
+
+/* Single source of truth */
+.tab.active {
+  border-bottom: 3px solid #1b4332;
+  color: #1b4332;
+}
+
+
+    /* ================= TABLE ================= */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #6b7280;
+      background: #f9fafb;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: white;
+      font-size: 13px;
+    }
+
+    .icon-btn.edit { color: #2563eb; }
+    .icon-btn.delete { color: #ef4444; }
+
+    /* ================= UPLOAD ================= */
+    .upload-box {
+      border: 2px dashed #d1d5db;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    /* ================= REMARK ================= */
+    .remark-box {
+      background: #fff7ed;
+      border-left: 4px solid #f59e0b;
+      padding: 12px;
+      font-size: 13px;
+      margin-top: 12px;
+      border-radius: 6px;
+    }
+
+	  /* ================= BUTTON SYSTEM ================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease,
+              border-color 0.15s ease,
+              box-shadow 0.15s ease,
+              transform 0.05s ease;
+}
+
+/* PRIMARY (Save) */
+.btn-primary {
+  background: #1b4332;
+  color: #ffffff;
+  border-color: #1b4332;
+}
+
+.btn-primary:hover {
+  background: #16372a;
+  border-color: #16372a;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* SECONDARY (Cancel / Preview) */
+.btn-secondary {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* SMALL VARIANT (used earlier in form) */
+.btn-small {
+  padding: 8px 14px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+#postingTab,
+#courseTab {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+#paramountPreview {
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item ">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Officers</span>
+      </a>
+
+      <a href="/dashboard-training.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Training</span>
+      </a>
+
+      <a href="/filter.html" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
+
+      <div class="nav-section-title">Administration</div>
+
+      <a href="/role-permmissoon.html" class="nav-item">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
+
+      <!-- <a href="/user-management.html" class="nav-item">
+        <div class="nav-icon">👥</div>
+        <span>User Management</span>
+      </a> -->
+
+      <div class="nav-section-title">Masters</div>
+
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
+
+      <a href="/grade-awards.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
+
+      <a href="/course-schedule.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
+
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
+
+      <!-- <a href="/command-master.html" class="nav-item">
+        <div class="nav-icon">🚩</div>
+        <span>Command Master</span>
+      </a> -->
+
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
+
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
+
+      <div class="nav-section-title">Forms</div>
+
+      <a href="/personnel-form.html" class="nav-item active">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
+
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+        <div>🚪</div>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div class="header">
+      <h2>Course & Posting Form</h2>
+      <p>Update Course and Posting Details</p>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Officer Selection -->
+      <div class="card">
+        <div class="section-title">Officer Selection</div>
+        <label>Select Army Number *</label>
+        <select id="officerSelect">
+          <option value="">Select Army No</option>
+        </select>
+        <div id="officerDetails" style="display:none"></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="posting">Posting Details</div>
+        <div class="tab" data-tab="course">Course Details</div>
+      </div>
+
+      <!-- POSTING TAB -->
+      <div class="card" id="postingTab">
+        <div class="section-title">Previous Postings</div>
+        <table>
+          <thead>
+          <tr>
+            <th>S.No</th><th>Unit</th><th>Location</th><th>Command</th>
+            <th>Appointment</th><th>From</th><th>To</th><th>Duration</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="previousPostingsBody"></tbody>
+        </table>
+
+        <div class="section-title" style="margin-top:20px">Add New Posting</div>
+
+        <div class="form-grid">
+          <div>
+            <label>Unit Name *</label>
+            <input id="postingUnit" placeholder="e.g. 15 RAJPUT">
+          </div>
+
+          <div>
+            <label>Location *</label>
+            <input id="postingLocation" placeholder="e.g. Delhi Cantt">
+          </div>
+
+          <div>
+            <label>Command *</label>
+            <input id="postingCommand" placeholder="e.g. Western Command">
+          </div>
+
+          <div>
+            <label>From Date *</label>
+            <input id="postingFrom" type="date">
+          </div>
+
+          <div>
+            <label>To Date</label>
+            <input id="postingTo" type="date">
+          </div>
+
+          <div class="full">
+            <label>Appointment *</label>
+            <input id="postingAppointment" placeholder="e.g. Company Commander">
+          </div>
+
+          <div class="full">
+            <label>Remarks</label>
+            <textarea id="postingRemarks" placeholder="Posting remarks"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COURSE TAB -->
+      <div class="card" id="courseTab" style="display:none">
+        <div class="section-title">Previous Courses</div>
+        <table>
+          <thead>
+          <tr>
+            <th>S.No</th><th>Course</th><th>From</th><th>To</th>
+            <th>Duration</th><th>Grade</th><th>Actions</th>
+          </tr>
+          </thead>
+          <tbody id="previousCoursesBody"></tbody>
+        </table>
+
+        <div class="section-title" style="margin-top:20px">Add New Course</div>
+
+        <div class="form-grid">
+
+          <div>
+            <label>Course ID *</label>
+            <select id="courseId">
+              <option value="">Select Course</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Course Serial No *</label>
+            <input id="courseSerialNo" placeholder="e.g. COI-1343243">
+          </div>
+
+          <div>
+            <label>From Date *</label>
+            <input id="courseFrom" type="date">
+          </div>
+
+          <div>
+            <label>To Date *</label>
+            <input id="courseTo" type="date">
+          </div>
+
+          <div>
+            <label>Grading *</label>
+            <input id="courseGrading" placeholder="A+, A, B+">
+          </div>
+
+          <div class="full">
+            <label>Remarks</label>
+            <textarea id="courseRemarks" placeholder="Course remarks"></textarea>
+          </div>
+
+          <div>
+            <label>Letter No</label>
+            <input id="courseLetterNo" placeholder="AHQ/2024/COURSE/5678">
+          </div>
+
+          <div>
+            <label>Letter Date</label>
+            <input id="courseLetterDate" type="date">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card" id="paramountPreview" style="display:none;border:2px solid #fbbf24;background:#fffbeb">
+        <div class="section-title">
+          Paramount Card Preview
+          <span style="float:right;font-size:12px;color:#92400e">Auto-Updated</span>
+        </div>
+
+        <div class="officer-card" id="paramountContent"
+             style="background:#ecfdf5;color:#065f46">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:12px">
+        <button class="btn btn-secondary">Cancel</button>
+        <button class="btn btn-secondary" id="previewParamountBtn">
+          👁 Preview Paramount Card
+        </button>
+        <button class="btn btn-primary" id="saveBtn">Save Details</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const PERSONNEL_API="http://localhost:6060/api/personnel";
+  const FULL_API="http://localhost:6060/personnel-full-details";
+  const SAVE_API="http://localhost:6060/personnel-full-details/save";
+
+  const officerSelect=document.getElementById("officerSelect");
+  const officerDetails=document.getElementById("officerDetails");
+  const postingsBody=document.getElementById("previousPostingsBody");
+  const coursesBody=document.getElementById("previousCoursesBody");
+
+  let personnel=[];
+
+  /* Load personnel */
+  fetch(PERSONNEL_API).then(r=>r.json()).then(d=>{
+    personnel=d;
+    d.forEach(p=>{
+      const o=document.createElement("option");
+      o.value=p.id;
+      o.textContent=`${p.armyNo} - ${p.fullName}`;
+      officerSelect.appendChild(o);
+    });
+  });
+
+  /* On select */
+  officerSelect.addEventListener("change",()=>{
+    const id=officerSelect.value;
+    if(!id){officerDetails.style.display="none";return;}
+    const o=personnel.find(p=>p.id==id);
+    officerDetails.style.display="flex";
+    officerDetails.className="officer-card";
+    officerDetails.innerHTML=`<div class="officer-avatar">👤</div>
+      <div class="officer-info">
+        <h4>${o.rank} ${o.fullName}</h4>
+        <p>Army No: ${o.armyNo}</p>
+        <p>DOB: ${o.dateOfBirth}</p>
+      </div>`;
+    loadDetails(id);
+  });
+
+  /* Load postings & courses */
+  function loadDetails(id){
+    fetch(`${FULL_API}/${id}`).then(r=>r.json()).then(d=>{
+      render(postingsBody,d.postingDetails||[],true);
+      render(coursesBody,d.courseDetails||[],false);
+    });
+  }
+
+
+function render(tbody, list, isPosting) {
+  tbody.innerHTML = "";
+
+  if (!list.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="${isPosting ? 9 : 7}" style="text-align:center;color:#6b7280">
+          No data found
+        </td>
+      </tr>`;
+    return;
+  }
+
+  list.forEach((x, i) => {
+    if (isPosting) {
+      tbody.insertAdjacentHTML("beforeend", `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${x.unitName}</td>
+          <td>${x.location}</td>
+          <td>${x.command}</td>
+          <td>${x.appointment}</td>
+          <td>${fmt(x.fromDate)}</td>
+          <td>${fmt(x.toDate)}</td>
+          <td>${x.duration || "-"}</td>
+          <td class="actions">
+            <div class="icon-btn delete">🗑️</div>
+          </td>
+        </tr>
+      `);
+    } else {
+      /* ✅ COURSE RENDERING — FIX IS HERE */
+      tbody.insertAdjacentHTML("beforeend", `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${x.courseName || "-"}</td>
+          <td>${fmt(x.fromDate)}</td>
+          <td>${fmt(x.toDate)}</td>
+          <td>${x.duration || "-"}</td>
+          <td>${x.grading || "-"}</td>
+          <td class="actions">
+            <div class="icon-btn delete">🗑️</div>
+          </td>
+        </tr>
+      `);
+    }
+  });
+}
+
+  /* Save */
+  document.getElementById("saveBtn").onclick=()=>{
+    if(!officerSelect.value)return alert("Select officer");
+    fetch(SAVE_API,{
+      method:"POST",
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        personnelId:Number(officerSelect.value),
+        postingDetails: postingUnit.value? [{
+          unitName:postingUnit.value,
+          location:postinglocation.value,
+          command:postingType.value,
+          appointment:postingAppointment.value,
+          fromDate:postingFrom.value,
+          toDate:postingTo.value,
+          remarks:postingRemarks.value,
+          documentPath:"/docs/posting.pdf"
+        }]:[],
+        courseDetails: courseId.value ? [{
+  courseId: Number(courseId.value), // ← srno goes here
+  courseSerialNo: courseSerialNo.value,
+  fromDate: courseFrom.value,
+  toDate: courseTo.value,
+  grading: courseGrading.value,
+  remarks: courseRemarks.value,
+  letterNo: courseLetterNo.value,
+  letterDate: courseLetterDate.value,
+  gradeCardPath: "/docs/grade.pdf",
+  supportingDocumentPath: "/docs/support.pdf"
+}] : []
+      })
+    }).then(r=>r.ok?alert("Saved successfully"):alert("Save failed"));
+  };
+
+  /* Tabs */
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      postingTab.style.display=t.dataset.tab==="posting"?"block":"none";
+      courseTab.style.display=t.dataset.tab==="course"?"block":"none";
+    };
+  });
+</script>
+
+<script>
+  const previewBtn = document.getElementById("previewParamountBtn");
+  const previewCard = document.getElementById("paramountPreview");
+  const previewContent = document.getElementById("paramountContent");
+
+  /* date formatter */
+  function fmt(d) {
+    if (!d) return "Present";
+    return new Date(d).toLocaleDateString("en-GB");
+  }
+
+  previewBtn.addEventListener("click", async () => {
+    const isVisible = previewCard.style.display === "block";
+
+    /* HIDE MODE */
+    if (isVisible) {
+      previewCard.style.display = "none";
+      previewBtn.innerHTML = "👁 Preview Paramount Card";
+      return;
+    }
+
+    /* SHOW MODE */
+    const personnelId = officerSelect.value;
+    if (!personnelId) {
+      alert("Please select an Army Number first");
+      return;
+    }
+
+    const officer = personnel.find(p => p.id == personnelId);
+    if (!officer) {
+      alert("Officer not found");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${FULL_API}/${personnelId}`);
+      const data = await res.json();
+
+      const latestPosting = data.postingDetails?.slice(-1)[0];
+      const latestCourse  = data.courseDetails?.slice(-1)[0];
+
+      previewContent.innerHTML = `
+        <div class="officer-avatar">👤</div>
+        <div class="officer-info">
+          <h4>${officer.rank} ${officer.fullName}</h4>
+
+          <p>Army No: ${officer.armyNo} | Rank: ${officer.rank}</p>
+          <p>DOB: ${fmt(officer.dateOfBirth)} | DOC: ${fmt(officer.dateOfCommission)}</p>
+
+          ${latestPosting ? `
+          <div style="margin-top:10px;background:#d1fae5;padding:10px;border-radius:6px">
+            <strong>Current Posting:</strong><br>
+            ${latestPosting.unitName}, ${latestPosting.location}
+            – ${latestPosting.appointment}<br>
+            <small>
+              ${fmt(latestPosting.fromDate)} to ${fmt(latestPosting.toDate)}
+              | ${latestPosting.command}
+            </small>
+          </div>` : ""}
+
+          ${latestCourse ? `
+          <div style="margin-top:10px;background:#e0f2fe;padding:10px;border-radius:6px">
+            <strong>Latest Course:</strong><br>
+            Course ID: ${latestCourse.courseId}<br>
+            <small>
+              ${fmt(latestCourse.fromDate)} to ${fmt(latestCourse.toDate)}
+              | Grade ${latestCourse.grading}
+            </small>
+          </div>` : ""}
+
+          <div style="margin-top:10px;background:#fef3c7;padding:10px;border-radius:6px">
+            <strong>Latest Remark:</strong><br>
+            ${latestPosting?.remarks || latestCourse?.remarks || "No remarks available"}
+          </div>
+        </div>
+      `;
+
+      previewCard.style.display = "block";
+      previewCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      previewBtn.innerHTML = "🙈 Hide Paramount Card";
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load Paramount Card data");
+    }
+  });
+</script>
+<script>
+  const COURSE_API = "http://localhost:6060/api/course";
+  const courseSelect = document.getElementById("courseId");
+
+  /* Load course master */
+  fetch(COURSE_API)
+    .then(res => res.json())
+    .then(courses => {
+      courses.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.srno;                 // ✅ value = srno
+        opt.textContent = c.courseName;     // ✅ label = courseName
+        courseSelect.appendChild(opt);
+      });
+    })
+    .catch(err => {
+      console.error("Failed to load courses", err);
+    });
+</script>
+
+</body>
+
+</html>

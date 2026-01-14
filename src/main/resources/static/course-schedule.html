@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Schedule - ARMY HRMS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+    }
+    .nav-item {
+      text-decoration: none;
+      color: white;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .logo-text p {
+      font-size: 11px;
+      color: #52b788;
+    }
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .menu-icon span {
+      width: 100%;
+      height: 2px;
+      background: white;
+      border-radius: 2px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 0;
+    }
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      border-left: 4px solid transparent;
+    }
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      font-size: 18px;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .user-info {
+      flex: 1;
+    }
+    .user-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .user-info .role {
+      font-size: 12px;
+      color: #52b788;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+    .header-left h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .header-left p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .header-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .form-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .form-label .required {
+      color: #ef4444;
+    }
+    .form-input,
+    .form-select {
+      padding: 12px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+    }
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: #1b4332;
+      color: white;
+    }
+    .btn-secondary {
+      background: white;
+      color: #1b4332;
+      border: 2px solid #1b4332;
+    }
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+
+    .course-info-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #93c5fd;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .course-info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .course-info-item {
+    }
+    .course-info-label {
+      font-size: 12px;
+      color: #1e40af;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .course-info-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+    }
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -32px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      border: 4px solid #1b4332;
+      z-index: 1;
+    }
+    .timeline-dot.current {
+      border-color: #10b981;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+    .timeline-dot.upcoming {
+      border-color: #3b82f6;
+      background: white;
+    }
+    .timeline-dot.completed {
+      border-color: #6b7280;
+      background: #6b7280;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+      }
+    }
+
+    .timeline-content {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .timeline-content.current {
+      border-color: #10b981;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+    .timeline-content.upcoming {
+      border-color: #3b82f6;
+    }
+    .timeline-content.completed {
+      background: #f9fafb;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .timeline-year {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1b4332;
+    }
+    .timeline-status {
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .timeline-status.current {
+      background: #d1fae5;
+      color: #10b981;
+    }
+    .timeline-status.upcoming {
+      background: #dbeafe;
+      color: #3b82f6;
+    }
+    .timeline-status.completed {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .timeline-dates {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .date-box {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+    .date-label {
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .date-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .timeline-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .meta-item strong {
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    .data-table thead {
+      background: #f9fafb;
+    }
+    .data-table th {
+      padding: 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #6b7280;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .data-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 14px;
+    }
+    .data-table tbody tr:hover {
+      background: #f9fafb;
+    }
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: #d1fae5;
+      color: #10b981;
+    }
+    .badge-info {
+      background: #dbeafe;
+      color: #3b82f6;
+    }
+    .badge-warning {
+      background: #fef3c7;
+      color: #f59e0b;
+    }
+    .badge-gray {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      background: white;
+      transition: all 0.2s;
+    }
+    .icon-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .icon-btn.edit {
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
+    .icon-btn.delete {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+    .icon-btn.view {
+      color: #10b981;
+      border-color: #10b981;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #86efac;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #065f46;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #047857;
+      margin-top: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Officers</span>
+      </a>
+
+      <a href="/dashboard-training.html" class="nav-item ">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Training</span>
+      </a>
+
+      <a href="/filter.html" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
+
+      <div class="nav-section-title">Administration</div>
+
+      <a href="/role-permmissoon.html" class="nav-item">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
+
+      <!-- <a href="/user-management.html" class="nav-item">
+        <div class="nav-icon">👥</div>
+        <span>User Management</span>
+      </a> -->
+
+      <div class="nav-section-title">Masters</div>
+
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
+
+      <a href="/grade-awards.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
+
+      <a href="/course-schedule.html" class="nav-item active">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
+
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
+
+      <!-- <a href="/command-master.html" class="nav-item">
+        <div class="nav-icon">🚩</div>
+        <span>Command Master</span>
+      </a> -->
+
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
+
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
+
+      <div class="nav-section-title">Forms</div>
+
+      <a href="/personnel-form.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
+
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+        <div>🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="header">
+      <div class="header-left">
+        <h2>Course Schedule Management</h2>
+        <p>Plan and manage course schedules across years</p>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary">
+          <span>📊</span>
+          Export Calendar
+        </button>
+        <button class="btn btn-primary" onclick="openAddSchedule()">
+          <span>➕</span>
+          Add New Schedule
+        </button>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="form-container">
+        <!-- Course Selection -->
+        <div class="section-card">
+          <div class="section-title">
+            <span>🎯 Select Course</span>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label"
+              >Course Name <span class="required">*</span></label
+              >
+              <select class="form-select" id="courseSelect">
+                <option value="">Select Course</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Course Information Box -->
+          <div class="course-info-box">
+            <div
+                    style="
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #1e40af;
+                    margin-bottom: 16px;
+                  "
+            >
+              📚 Course Details
+            </div>
+            <div class="course-info-grid">
+              <div class="course-info-item">
+                <div class="course-info-label">Location</div>
+                <div class="course-info-value" id="ci-location">-</div>
+              </div>
+              <div class="course-info-item">
+                <div class="course-info-label">Duration</div>
+                <div class="course-info-value" id="ci-duration">-</div>
+              </div>
+              <div class="course-info-item">
+                <div class="course-info-label">Course Strength</div>
+                <div class="course-info-value" id="ci-strength">-</div>
+              </div>
+              <div class="course-info-item">
+                <div class="course-info-label">Institute</div>
+                <div class="course-info-value" id="ci-institute">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistics -->
+          <div class="stats-row">
+            <div class="stat-box" data-filter="all" id="stat-total">
+              <div class="stat-value" id="count-total">0</div>
+              <div class="stat-label">Total Schedules</div>
+            </div>
+            <div data-filter="current" id="stat-current"
+                 class="stat-box"
+                 style="
+                    background: linear-gradient(
+                      135deg,
+                      #dbeafe 0%,
+                      #bfdbfe 100%
+                    );
+                    border-color: #93c5fd;
+                  "
+            >
+              <div class="stat-value" id="count-current">0</div>
+              <div class="stat-label">Current Batch</div>
+            </div>
+            <div data-filter="upcoming" id="stat-upcoming"
+                 class="stat-box"
+                 style="
+                    background: linear-gradient(
+                      135deg,
+                      #fef3c7 0%,
+                      #fde68a 100%
+                    );
+                    border-color: #fbbf24;
+                  "
+            >
+              <div class="stat-value" id="count-upcoming">0</div>
+              <div class="stat-label">Upcoming Batches</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Schedule History Timeline -->
+        <div class="section-card">
+          <div class="section-title">
+  <span id="scheduleTitle">
+    📅 Schedule History
+  </span>
+
+            <span
+                    id="scheduleTotal"
+                    style="font-size: 13px; font-weight: 600; color: #6b7280"
+            >
+    Total: 0 Batches
+  </span>
+          </div>
+
+          <div class="timeline" id="scheduleTimeline"></div>
+
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    loadCourses();
+  });
+
+  async function loadCourses() {
+    const courseSelect = document.getElementById("courseSelect");
+
+    try {
+      const response = await fetch("http://localhost:6060/api/course");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch courses");
+      }
+
+      const courses = await response.json();
+
+      // Clear existing options except first
+      courseSelect.innerHTML = `<option value="">Select Course</option>`;
+
+      courses.forEach(course => {
+        const option = document.createElement("option");
+        option.value = course.srno;          // 👈 value = srno
+        option.textContent = course.courseName; // 👈 label = courseName
+        courseSelect.appendChild(option);
+      });
+
+    } catch (error) {
+      console.error("Error loading courses:", error);
+      alert("Unable to load course list");
+    }
+  }
+</script>
+<script>
+  const courseSelect = document.getElementById("courseSelect");
+  const timelineEl = document.getElementById("scheduleTimeline");
+
+  let fullScheduleData = [];
+
+  courseSelect.addEventListener("change", () => {
+    const srno = courseSelect.value;
+    if (!srno) return resetView();
+    loadCourseSummary(srno);
+  });
+
+  async function loadCourseSummary(srno) {
+    try {
+      const res = await fetch(
+        `http://localhost:6060/api/courseschedule/course/${srno}/summary`
+      );
+      if (!res.ok) throw new Error("Summary API failed");
+
+      const data = await res.json();
+
+      // Store schedules globally for filtering
+      fullScheduleData = data.courseSchedule;
+
+      renderCourseDetails(data.courseDetails);
+      renderStats(data.courseCount);
+      renderTimeline(fullScheduleData);
+
+       updateScheduleHeader(
+    data.courseDetails.courseName,
+    data.courseCount.totalschedule
+  );
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load course summary");
+    }
+  }
+
+  function updateScheduleHeader(courseName, total) {
+    const titleEl = document.getElementById("scheduleTitle");
+    const totalEl = document.getElementById("scheduleTotal");
+
+    titleEl.textContent = `📅 Schedule History - ${courseName}`;
+    totalEl.textContent = `Total: ${total} Batches`;
+  }
+
+  /* ---------------- COURSE DETAILS ---------------- */
+  function renderCourseDetails(details) {
+    document.getElementById("ci-location").textContent = details.location;
+    document.getElementById("ci-duration").textContent =
+      details.duration + " Weeks";
+    document.getElementById("ci-strength").textContent = "40";
+    document.getElementById("ci-institute").textContent = details.courseName;
+  }
+
+  /* ---------------- STATS ---------------- */
+  function renderStats(count) {
+    document.getElementById("count-total").textContent =
+      count.totalschedule;
+    document.getElementById("count-current").textContent =
+      count.currentbatch;
+    document.getElementById("count-upcoming").textContent =
+      count.upcoming;
+  }
+
+  /* ---------------- FILTER HANDLERS ---------------- */
+  document.querySelectorAll(".stat-box").forEach(box => {
+    box.addEventListener("click", () => {
+      const filter = box.dataset.filter;
+
+      if (filter === "all") {
+        renderTimeline(fullScheduleData);
+      } else {
+        const filtered = fullScheduleData.filter(s =>
+          getStatus(s) === filter
+        );
+        renderTimeline(filtered);
+      }
+    });
+  });
+
+  /* ---------------- TIMELINE ---------------- */
+  function renderTimeline(schedules) {
+    timelineEl.innerHTML = "";
+
+    schedules.forEach(item => {
+      const status = getStatus(item);
+
+      timelineEl.insertAdjacentHTML("beforeend", `
+        <div class="timeline-item">
+          <div class="timeline-dot ${status}"></div>
+          <div class="timeline-content ${status}">
+            <div class="timeline-header">
+              <div class="timeline-year">${item.year}</div>
+              <div class="timeline-status ${status}">
+                ${labelFor(status)}
+              </div>
+            </div>
+
+            <div class="timeline-dates">
+              <div class="date-box">
+                <div class="date-label">From</div>
+                <div class="date-value">${fmt(item.startDate)}</div>
+              </div>
+              <div class="date-box">
+                <div class="date-label">To</div>
+                <div class="date-value">${fmt(item.endDate)}</div>
+              </div>
+            </div>
+
+            <div class="timeline-meta">
+              <div class="meta-item">📊 <strong>Strength:</strong> ${item.courseStrength}</div>
+              <div class="meta-item">📍 <strong>Venue:</strong> ${item.venue}</div>
+              <div class="meta-item">🎯 <strong>Batch:</strong> ${item.batchNumber}</div>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+  }
+
+  /* ---------------- HELPERS ---------------- */
+  function getStatus(item) {
+    const today = new Date();
+    const start = new Date(item.startDate);
+    const end = new Date(item.endDate);
+
+    if (today < start) return "upcoming";
+    if (today > end) return "completed";
+    return "current";
+  }
+
+  function labelFor(status) {
+    if (status === "current") return "Current Batch";
+    if (status === "upcoming") return "Upcoming";
+    return "Completed";
+  }
+
+  function fmt(date) {
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
+
+  function resetView() {
+    timelineEl.innerHTML = "";
+  }
+
+  function openAddSchedule() {
+    window.location.href = "/add-new-schedule.html";
+  }
+</script>
+
+</body>
+</html>

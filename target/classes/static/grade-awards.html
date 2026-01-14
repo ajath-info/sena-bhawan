@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Completion - Grade Update</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+    }
+    .nav-item {
+        text-decoration: none;
+        color: white;
+      }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .logo-text p {
+      font-size: 11px;
+      color: #52b788;
+    }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 0;
+    }
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      border-left: 4px solid transparent;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      font-size: 18px;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .user-info {
+      flex: 1;
+    }
+    .user-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .user-info .role {
+      font-size: 12px;
+      color: #52b788;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+    .header-left h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .header-left p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* Course Info Card */
+    .course-info-card {
+      background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .course-info-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .course-info-subtitle {
+      font-size: 14px;
+      color: #95d5b2;
+      margin-bottom: 16px;
+    }
+    .course-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .course-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .course-info-label {
+      font-size: 12px;
+      color: #95d5b2;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .course-info-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Alert Box */
+    .alert-box {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: start;
+      gap: 16px;
+    }
+    .alert-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .alert-content {
+      flex: 1;
+    }
+    .alert-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    .alert-text {
+      font-size: 14px;
+      color: #78350f;
+    }
+
+    /* Grading Table */
+    .grading-section {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1b4332;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .grading-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .grading-table thead {
+      background: #f9fafb;
+    }
+    .grading-table th {
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .grading-table td {
+      padding: 16px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .grading-table tr:last-child td {
+      border-bottom: none;
+    }
+    .grading-table tr:hover {
+      background: #f9fafb;
+    }
+    .officer-name {
+      font-weight: 600;
+      color: #1b4332;
+    }
+    .army-no {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-graded {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .grade-input {
+      padding: 8px 12px;
+      border: 2px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      width: 100px;
+      text-align: center;
+    }
+    .grade-input:focus {
+      outline: none;
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+    .grade-select {
+      padding: 8px 12px;
+      border: 2px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      background: white;
+      cursor: pointer;
+    }
+    .grade-select:focus {
+      outline: none;
+      border-color: #1b4332;
+    }
+    .instructor-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #1b4332;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #2d6a4f;
+    }
+    .btn-success {
+      background: #16a34a;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+    .btn-secondary {
+      background: white;
+      color: #6b7280;
+      border: 2px solid #d1d5db;
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding-top: 20px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .grade-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .grade-badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .instructor-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #dcfce7;
+      color: #166534;
+    }
+    .view-toggle {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 8px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: #1b4332;
+      color: white;
+    }
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Officers</span>
+      </a>
+
+      <a href="/dashboard-training.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Training</span>
+      </a>
+
+      <a href="/filter.html" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
+
+      <div class="nav-section-title">Administration</div>
+
+      <a href="/role-permmissoon.html" class="nav-item">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
+
+      <!-- <a href="/user-management.html" class="nav-item">
+        <div class="nav-icon">👥</div>
+        <span>User Management</span>
+      </a> -->
+
+      <div class="nav-section-title">Masters</div>
+
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
+
+      <a href="/grade-awards.html" class="nav-item active">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
+
+      <a href="/course-schedule.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
+
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
+
+      <!-- <a href="/command-master.html" class="nav-item">
+        <div class="nav-icon">🚩</div>
+        <span>Command Master</span>
+      </a> -->
+
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
+
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
+
+      <div class="nav-section-title">Forms</div>
+
+      <a href="/personnel-form.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
+
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+        <div>🚪</div>
+      </div>
+    </div>
+  </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <div class="header-left">
+          <h2>Course Completion - Grade Update</h2>
+          <p>Update grades and instructor awards for completed courses</p>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <!-- Course Info -->
+        <div class="course-info-card">
+          <div class="course-info-title">Mountain Warfare Course</div>
+          <div class="course-info-subtitle">Course Code: MWC-2025-09 | Status: Completed</div>
+          <div class="course-info-grid">
+            <div class="course-info-item">
+              <div class="course-info-label">Duration</div>
+              <div class="course-info-value">01 Sep 2025 - 30 Sep 2025</div>
+            </div>
+            <div class="course-info-item">
+              <div class="course-info-label">Location</div>
+              <div class="course-info-value">HAWS, Gulmarg</div>
+            </div>
+            <div class="course-info-item">
+              <div class="course-info-label">Total Participants</div>
+              <div class="course-info-value">5 Officers</div>
+            </div>
+            <div class="course-info-item">
+              <div class="course-info-label">Completion Date</div>
+              <div class="course-info-value">30 Sep 2025</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert-box">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Grade Update Required</div>
+            <div class="alert-text">
+              This course has been completed. Please update grades and instructor awards for all participants. 
+              These grades will be visible in both the admin panel and individual officer course records.
+            </div>
+          </div>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-view="grading">
+            <span>📝</span>
+            Grade Update Form
+          </button>
+          <button class="toggle-btn" data-view="panel">
+            <span>📊</span>
+            Panel List View (With Grades)
+          </button>
+        </div>
+
+        <!-- Grading Form View -->
+        <div id="gradingView" class="view-section active">
+          <div class="grading-section">
+            <div class="section-title">
+              <span>📝</span>
+              Update Grades & Awards
+            </div>
+
+            <table class="grading-table">
+              <thead>
+                <tr>
+                  <th>Sr No</th>
+                  <th>Officer Details</th>
+                  <th>Unit</th>
+                  <th>Panel Position</th>
+                  <th>Grade</th>
+                  <th>Instructor Award</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <div class="officer-name">Major Rajesh Kumar Singh</div>
+                    <div class="army-no">IC-12345</div>
+                  </td>
+                  <td>2 RAJPUT</td>
+                  <td>Detailed #1</td>
+                  <td>
+                    <select class="grade-select" data-officer="IC-12345">
+                      <option value="">Select Grade</option>
+                      <option value="A+">A+</option>
+                      <option value="A" selected>A</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B">B</option>
+                      <option value="B-">B-</option>
+                      <option value="C+">C+</option>
+                      <option value="C">C</option>
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" checked data-officer="IC-12345" />
+                  </td>
+                  <td><span class="status-badge status-graded">Graded</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    <div class="officer-name">Captain Vikram Sharma</div>
+                    <div class="army-no">IC-67890</div>
+                  </td>
+                  <td>11 GORKHA RIFLES</td>
+                  <td>Detailed #2</td>
+                  <td>
+                    <select class="grade-select" data-officer="IC-67890">
+                      <option value="">Select Grade</option>
+                      <option value="A+">A+</option>
+                      <option value="A">A</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B" selected>B</option>
+                      <option value="B-">B-</option>
+                      <option value="C+">C+</option>
+                      <option value="C">C</option>
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-67890" />
+                  </td>
+                  <td><span class="status-badge status-graded">Graded</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    <div class="officer-name">Lieutenant Arun Patel</div>
+                    <div class="army-no">IC-54321</div>
+                  </td>
+                  <td>1 PARA (SF)</td>
+                  <td>Reserve #1 → Detailed</td>
+                  <td>
+                    <select class="grade-select" data-officer="IC-54321">
+                      <option value="">Select Grade</option>
+                      <option value="A+">A+</option>
+                      <option value="A">A</option>
+                      <option value="A-" selected>A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B">B</option>
+                      <option value="B-">B-</option>
+                      <option value="C+">C+</option>
+                      <option value="C">C</option>
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-54321" />
+                  </td>
+                  <td><span class="status-badge status-graded">Graded</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    <div class="officer-name">Captain Rahul Gupta</div>
+                    <div class="army-no">IC-44444</div>
+                  </td>
+                  <td>3 GORKHA RIFLES</td>
+                  <td>Detailed #3</td>
+                  <td>
+                    <select class="grade-select" data-officer="IC-44444">
+                      <option value="" selected>Select Grade</option>
+                      <option value="A+">A+</option>
+                      <option value="A">A</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B">B</option>
+                      <option value="B-">B-</option>
+                      <option value="C+">C+</option>
+                      <option value="C">C</option>
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-44444" />
+                  </td>
+                  <td><span class="status-badge status-pending">Pending</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    <div class="officer-name">Lieutenant Sanjay Reddy</div>
+                    <div class="army-no">IC-55555</div>
+                  </td>
+                  <td>RAJPUTANA RIFLES</td>
+                  <td>Detailed #4</td>
+                  <td>
+                    <select class="grade-select" data-officer="IC-55555">
+                      <option value="" selected>Select Grade</option>
+                      <option value="A+">A+</option>
+                      <option value="A">A</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B">B</option>
+                      <option value="B-">B-</option>
+                      <option value="C+">C+</option>
+                      <option value="C">C</option>
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-55555" />
+                  </td>
+                  <td><span class="status-badge status-pending">Pending</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="form-actions">
+              <button class="btn btn-secondary">
+                <span>❌</span>
+                Cancel
+              </button>
+              <button class="btn btn-success" onclick="saveGrades()">
+                <span>💾</span>
+                Save All Grades
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel List View (With Grades) -->
+        <div id="panelView" class="view-section">
+          <div class="grading-section">
+            <div class="section-title">
+              <span>📊</span>
+              Panel List - Course Completion Report
+            </div>
+
+            <table class="grading-table">
+              <thead>
+                <tr>
+                  <th>Sr No</th>
+                  <th>Officer Details</th>
+                  <th>Unit</th>
+                  <th>Panel Position</th>
+                  <th>Final Grade</th>
+                  <th>Instructor Award</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>
+                    <div class="officer-name">Major Rajesh Kumar Singh</div>
+                    <div class="army-no">IC-12345</div>
+                  </td>
+                  <td>2 RAJPUT</td>
+                  <td>Detailed #1</td>
+                  <td>
+                    <div class="grade-display">
+                      <span class="grade-badge">Grade: A</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="instructor-badge">⭐ Instructor</span>
+                  </td>
+                  <td>Excellent Performance</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>
+                    <div class="officer-name">Captain Vikram Sharma</div>
+                    <div class="army-no">IC-67890</div>
+                  </td>
+                  <td>11 GORKHA RIFLES</td>
+                  <td>Detailed #2</td>
+                  <td>
+                    <div class="grade-display">
+                      <span class="grade-badge">Grade: B</span>
+                    </div>
+                  </td>
+                  <td>—</td>
+                  <td>Good Performance</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>
+                    <div class="officer-name">Lieutenant Arun Patel</div>
+                    <div class="army-no">IC-54321</div>
+                  </td>
+                  <td>1 PARA (SF)</td>
+                  <td>Reserve #1 → Detailed</td>
+                  <td>
+                    <div class="grade-display">
+                      <span class="grade-badge">Grade: A-</span>
+                    </div>
+                  </td>
+                  <td>—</td>
+                  <td>Very Good Performance</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>
+                    <div class="officer-name">Captain Rahul Gupta</div>
+                    <div class="army-no">IC-44444</div>
+                  </td>
+                  <td>3 GORKHA RIFLES</td>
+                  <td>Detailed #3</td>
+                  <td>
+                    <span class="status-badge status-pending">Grade Pending</span>
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>
+                    <div class="officer-name">Lieutenant Sanjay Reddy</div>
+                    <div class="army-no">IC-55555</div>
+                  </td>
+                  <td>RAJPUTANA RIFLES</td>
+                  <td>Detailed #4</td>
+                  <td>
+                    <span class="status-badge status-pending">Grade Pending</span>
+                  </td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="form-actions">
+              <button class="btn btn-primary">
+                <span>📥</span>
+                Download Report (PDF)
+              </button>
+              <button class="btn btn-primary">
+                <span>📊</span>
+                Export to Excel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // View Toggle
+    const toggleBtns = document.querySelectorAll('.toggle-btn');
+    const viewSections = {
+      grading: document.getElementById('gradingView'),
+      panel: document.getElementById('panelView')
+    };
+
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Remove active class from all buttons
+        toggleBtns.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+
+        // Hide all views
+        Object.values(viewSections).forEach(section => {
+          section.classList.remove('active');
+        });
+
+        // Show selected view
+        const viewName = this.dataset.view;
+        viewSections[viewName].classList.add('active');
+      });
+    });
+
+    // Track grade changes
+    const gradeData = {};
+
+    document.querySelectorAll('.grade-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const officerId = this.dataset.officer;
+        const grade = this.value;
+        
+        if (!gradeData[officerId]) {
+          gradeData[officerId] = {};
+        }
+        gradeData[officerId].grade = grade;
+
+        // Update status badge
+        const row = this.closest('tr');
+        const statusBadge = row.querySelector('.status-badge');
+        if (grade) {
+          statusBadge.textContent = 'Graded';
+          statusBadge.className = 'status-badge status-graded';
+        }
+      });
+    });
+
+    document.querySelectorAll('.instructor-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const officerId = this.dataset.officer;
+        
+        if (!gradeData[officerId]) {
+          gradeData[officerId] = {};
+        }
+        gradeData[officerId].instructor = this.checked;
+      });
+    });
+
+    // Save grades function
+    function saveGrades() {
+    const selects = document.querySelectorAll('.grade-select');
+    for (let s of selects) {
+      if (!s.value) {
+        alert('⚠️ Please grade all officers.');
+        return;
+      }
+    }
+
+    console.log('Grades:', gradeData);
+    alert('✅ Grades saved successfully!');
+  }
+</script>
+
+</body>
+</html>

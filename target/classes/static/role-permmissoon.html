@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Role & Permissions - ARMY HRMS</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f1f3f5;
+        color: #1f2937;
+      }
+      .nav-item {
+        text-decoration: none;
+        color: white;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      .sidebar {
+        width: 256px;
+        background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 72px;
+      }
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: #ffb703;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .logo-text h1 {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .logo-text p {
+        font-size: 11px;
+        color: #52b788;
+      }
+      .menu-icon {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .menu-icon span {
+        width: 100%;
+        height: 2px;
+        background: white;
+        border-radius: 2px;
+      }
+      .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 0;
+      }
+      .nav-section-title {
+        padding: 16px 20px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #52b788;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        color: white;
+        border-left: 4px solid transparent;
+      }
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: #ffb703;
+        font-weight: 600;
+      }
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 18px;
+      }
+      .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #2d6a4f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .user-info {
+        flex: 1;
+      }
+      .user-info .name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .user-info .role {
+        font-size: 12px;
+        color: #52b788;
+      }
+
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .header {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 72px;
+      }
+      .header-left h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .header-left p {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .content-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+      }
+      .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .role-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .role-card:hover {
+        border-color: #1b4332;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+      .role-card.selected {
+        border-color: #1b4332;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      }
+
+      .role-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .role-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .role-icon.blue {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      }
+      .role-icon.green {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      }
+      .role-icon.purple {
+        background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+      }
+      .role-icon.orange {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      }
+      .role-icon.red {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      }
+      .role-icon.pink {
+        background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+      }
+
+      .role-info {
+        flex: 1;
+      }
+      .role-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 4px;
+      }
+      .role-subtitle {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .role-stats {
+        display: flex;
+        gap: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .role-stat {
+        flex: 1;
+      }
+      .role-stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1b4332;
+      }
+      .role-stat-label {
+        font-size: 11px;
+        color: #6b7280;
+        text-transform: uppercase;
+      }
+
+      .permissions-section {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .permission-category {
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .permission-category:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .category-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        cursor: pointer;
+      }
+      .category-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: #f9fafb;
+      }
+      .category-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+        flex: 1;
+      }
+      .category-toggle {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .permission-item:hover {
+        background: #f0fdf4;
+      }
+      .permission-item.active {
+        background: #d1fae5;
+      }
+
+      .permission-checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .permission-checkbox.checked {
+        background: #1b4332;
+        border-color: #1b4332;
+        color: white;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      .permission-label {
+        font-size: 13px;
+        color: #1f2937;
+        font-weight: 500;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: #1b4332;
+        color: white;
+      }
+      .btn-secondary {
+        background: white;
+        color: #1b4332;
+        border: 2px solid #1b4332;
+      }
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .badge-success {
+        background: #d1fae5;
+        color: #10b981;
+      }
+      .badge-warning {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+    </style>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Officers</span>
+      </a>
+
+      <a href="/dashboard-training.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Training</span>
+      </a>
+
+      <a href="/filter.html" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
+
+      <div class="nav-section-title">Administration</div>
+
+      <a href="/role-permmissoon.html" class="nav-item active">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
+
+      <!-- <a href="/user-management.html" class="nav-item">
+        <div class="nav-icon">👥</div>
+        <span>User Management</span>
+      </a> -->
+
+      <div class="nav-section-title">Masters</div>
+
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
+
+      <a href="/grade-awards.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
+
+      <a href="/course-schedule.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
+
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
+
+      <!-- <a href="/command-master.html" class="nav-item">
+        <div class="nav-icon">🚩</div>
+        <span>Command Master</span>
+      </a> -->
+
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
+
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
+
+      <div class="nav-section-title">Forms</div>
+
+      <a href="/personnel-form.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
+
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+        <div>🚪</div>
+      </div>
+    </div>
+  </aside>
+
+      <main class="main-content">
+        <header class="header">
+          <div class="header-left">
+            <h2>Role & Permissions Management</h2>
+            <p>Configure access control for different user roles</p>
+          </div>
+        </header>
+
+        <div class="content-area">
+          <div class="page-container">
+            <!-- Roles Grid -->
+            <div style="margin-bottom: 32px">
+              <h3
+                style="font-size: 18px; font-weight: 700; margin-bottom: 16px"
+              >
+                Select Role to Configure
+              </h3>
+              <div class="roles-grid">
+                <!-- Col PLG -->
+                <a href="col-plg-dashboard.html" class="role-link">
+                  <div class="role-card selected">
+                    <div class="role-header">
+                      <div class="role-icon blue">👔</div>
+                      <div class="role-info">
+                        <div class="role-title">Col PLG</div>
+                        <div class="role-subtitle">Planning Division</div>
+                      </div>
+                    </div>
+                    <div class="role-stats">
+                      <div class="role-stat">
+                        <div class="role-stat-value">8</div>
+                        <div class="role-stat-label">Users</div>
+                      </div>
+                      <div class="role-stat">
+                        <div class="role-stat-value">45</div>
+                        <div class="role-stat-label">Permissions</div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+
+                <!-- G1 PLG -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon green">📋</div>
+                    <div class="role-info">
+                      <div class="role-title">G1 PLG</div>
+                      <div class="role-subtitle">Personnel Planning</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">12</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">38</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Unit Login -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon purple">🛡️</div>
+                    <div class="role-info">
+                      <div class="role-title">Unit Login</div>
+                      <div class="role-subtitle">Unit Level Access</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">156</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">25</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Individual Login -->
+                <a href="figma_individual_dashboard.html" class="role-link">
+                  <div class="role-card">
+                    <div class="role-header">
+                      <div class="role-icon orange">👤</div>
+                      <div class="role-info">
+                        <div class="role-title">Individual Login</div>
+                        <div class="role-subtitle">Self Service Portal</div>
+                      </div>
+                    </div>
+                    <div class="role-stats">
+                      <div class="role-stat">
+                        <div class="role-stat-value">1245</div>
+                        <div class="role-stat-label">Users</div>
+                      </div>
+                      <div class="role-stat">
+                        <div class="role-stat-value">12</div>
+                        <div class="role-stat-label">Permissions</div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+
+                <!-- Clerk Login -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon red">✍️</div>
+                    <div class="role-info">
+                      <div class="role-title">Clerk Login</div>
+                      <div class="role-subtitle">Data Entry & Support</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">45</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">32</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Training Establishment -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon pink">🎓</div>
+                    <div class="role-info">
+                      <div class="role-title">Training Establishment</div>
+                      <div class="role-subtitle">Course Management</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">28</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">35</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Brig PPP & OL -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon blue">⭐</div>
+                    <div class="role-info">
+                      <div class="role-title">Brig PPP & OL</div>
+                      <div class="role-subtitle">Policy & Operations</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">6</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">48</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ADG CP & PM -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon green">🎖️</div>
+                    <div class="role-info">
+                      <div class="role-title">ADG CP & PM</div>
+                      <div class="role-subtitle">Career Planning</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">4</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">52</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- System Admin -->
+                <div class="role-card">
+                  <div class="role-header">
+                    <div class="role-icon purple">🔐</div>
+                    <div class="role-info">
+                      <div class="role-title">System Admin</div>
+                      <div class="role-subtitle">Full Access</div>
+                    </div>
+                  </div>
+                  <div class="role-stats">
+                    <div class="role-stat">
+                      <div class="role-stat-value">2</div>
+                      <div class="role-stat-label">Users</div>
+                    </div>
+                    <div class="role-stat">
+                      <div class="role-stat-value">ALL</div>
+                      <div class="role-stat-label">Permissions</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Permissions Section -->
+            <div class="permissions-section">
+              <div class="section-title">
+                <span>🔐 Permissions for Col PLG</span>
+                <div style="display: flex; gap: 8px">
+                  <button class="btn btn-secondary btn-small">
+                    Reset to Default
+                  </button>
+                  <button class="btn btn-primary btn-small">
+                    <span>💾</span>
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dashboard Access -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">📊</div>
+                  <div class="category-title">Dashboard & Analytics</div>
+                  <div class="category-toggle">8/10 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Dashboard</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Statistics</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Export Reports</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Charts</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Command Distribution</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Delete Analytics</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Recent Activities</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Filter Data</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Personnel Management -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">👥</div>
+                  <div class="category-title">Personnel Management</div>
+                  <div class="category-toggle">6/8 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Personnel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Add Personnel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Edit Personnel</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Delete Personnel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Details</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Export Personnel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Filter Search</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Bulk Operations</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Management -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">🎓</div>
+                  <div class="category-title">Course & Training</div>
+                  <div class="category-toggle">9/10 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Courses</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Add Course</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Edit Course</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Schedule Course</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Generate Panel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Nominate Officers</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Mark Attendance</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Results</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Generate Letter</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Delete Course</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Posting & Transfer -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">📍</div>
+                  <div class="category-title">Posting & Transfer</div>
+                  <div class="category-toggle">7/8 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Postings</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Create Posting</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Edit Posting</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Transfer Request</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Approve Transfer</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Generate Order</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View History</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Cancel Posting</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Masters & Configuration -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">⚙️</div>
+                  <div class="category-title">Masters & Configuration</div>
+                  <div class="category-toggle">5/8 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Masters</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Add Records</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Edit Masters</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">Delete Masters</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Unit Master</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Location Master</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">System Settings</div>
+                  </div>
+                  <div class="permission-item">
+                    <div class="permission-checkbox"></div>
+                    <div class="permission-label">User Management</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reports & Documents -->
+              <div class="permission-category">
+                <div class="category-header">
+                  <div class="category-icon">📄</div>
+                  <div class="category-title">Reports & Documents</div>
+                  <div class="category-toggle">6/6 selected</div>
+                </div>
+                <div class="permissions-grid">
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">View Reports</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Generate Reports</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Export PDF</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Export Excel</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Print Documents</div>
+                  </div>
+                  <div class="permission-item active">
+                    <div class="permission-checkbox checked">✓</div>
+                    <div class="permission-label">Share Reports</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div
+              style="
+                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                border: 2px solid #93c5fd;
+                border-radius: 12px;
+                padding: 24px;
+                margin-top: 24px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <div>
+                  <div
+                    style="
+                      font-size: 16px;
+                      font-weight: 700;
+                      color: #1e40af;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    Permission Summary
+                  </div>
+                  <div style="font-size: 14px; color: #1e3a8a">
+                    Total <strong>45 out of 58</strong> permissions enabled for
+                    Col PLG role
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px">
+                  <button class="btn btn-secondary">
+                    <span>↩️</span>
+                    Cancel
+                  </button>
+                  <button class="btn btn-primary">
+                    <span>✓</span>
+                    Save & Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

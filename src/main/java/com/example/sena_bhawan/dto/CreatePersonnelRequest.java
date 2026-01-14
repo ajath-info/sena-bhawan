@@ -1,0 +1,74 @@
+package com.example.sena_bhawan.dto;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public class CreatePersonnelRequest {
+
+    // PERSONNEL FIELDS
+    public String armyNo;
+    public String rank;
+    public String fullName;
+    public LocalDate dateOfCommission;
+    public LocalDate dateOfSeniority;
+    public LocalDate dateOfBirth;
+    public String placeOfBirth;
+    public String officerImage;
+
+    public String nrs;
+    public String religion;
+    public String aadhaarNumber;
+    public String panCard;
+    public String maritalStatus;
+    public String cdaAccountNo;
+
+    public String permanentAddress;
+    public String city;
+    public String district;
+    public String state;
+    public String pinCode;
+
+    public String mobileNumber;
+    public String alternateMobile;
+    public String emailAddress;
+
+    public Short medicalS;
+    public Short medicalH;
+    public Short medicalA;
+    public Short medicalP;
+    public Short medicalE;
+
+    // CHILD LISTS
+    public List<DecorationDTO> decorations;
+    public List<QualificationDTO> qualifications;
+    public List<AdditionalQualificationDTO> additionalQualifications;
+    public List<FamilyDTO> family;
+
+
+    // CHILD DTOs
+    public static class DecorationDTO {
+        public String decorationName;
+        public LocalDate awardDate;
+        public String citation;
+    }
+
+    public static class QualificationDTO {
+        public String qualification;
+        public String institution;
+        public Integer yearOfCompletion;
+        public String gradePercentage;
+    }
+
+    public static class AdditionalQualificationDTO {
+        public String qualification;
+        public String issuingAuthority;
+        public Integer year;
+        public LocalDate validity;
+    }
+
+    public static class FamilyDTO {
+        public String name;
+        public String relationship;
+        public String contactNumber;
+    }
+}

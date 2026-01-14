@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - ARMY HRMS</title>
+
+  <!-- Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #f1f3f5;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary-dark: #1b4332;
+      --primary-dark-2:#081c15;
+      --accent: #52b788;
+      --gold: #ffb703;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --input-border: #e6e9ef;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: var(--bg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:980px;
+      display:grid;
+      grid-template-columns: 340px 1fr;
+      gap:28px;
+    }
+
+    .brand-panel{
+      background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-dark-2) 100%);
+      color:white;
+      border-radius: var(--radius);
+      padding:28px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .brand-top{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .logo-icon{
+      width:56px;
+      height:56px;
+      border-radius:10px;
+      background:var(--gold);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:20px;
+      color:#08120a;
+    }
+
+    .brand-text h1{
+      font-size:20px;
+      margin:0;
+    }
+
+    .brand-text p{
+      font-size:12px;
+      margin:4px 0 0;
+      color:#9be6b8;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius: var(--radius);
+      padding:28px;
+      border:1px solid var(--border);
+      box-shadow: 0 8px 28px rgba(15,23,42,0.06);
+    }
+
+    .card h2{
+      margin:0 0 6px;
+      font-size:18px;
+      color:var(--primary-dark);
+    }
+
+    .sub{
+      margin:0 0 18px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid var(--input-border);
+      font-size:14px;
+    }
+
+    .row{margin-bottom:14px}
+
+    .btn{
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      background:var(--primary-dark);
+      color:white;
+    }
+
+    .error{
+      margin-top:10px;
+      font-size:13px;
+      color:#ef4444;
+      display:none;
+    }
+
+    @media (max-width:900px){
+      .wrap{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- Left branding -->
+  <aside class="brand-panel">
+    <div class="brand-top">
+      <div class="logo-icon">🛡️</div>
+      <div class="brand-text">
+        <h1>ARMY HRMS</h1>
+        <p>भारतीय सेना</p>
+      </div>
+    </div>
+
+    <div style="margin-top:auto;font-size:14px;">
+      Secure access to personnel dashboard
+    </div>
+  </aside>
+
+  <!-- Login card -->
+  <section class="card">
+    <h2>Sign in to ARMY HRMS</h2>
+    <p class="sub">Enter your credentials to continue</p>
+
+    <form id="loginForm" onsubmit="return handleLogin(event)">
+      <div class="row">
+        <label>Username</label>
+        <input id="username" type="text" required />
+      </div>
+
+      <div class="row">
+        <label>Password</label>
+        <input id="password" type="password" required />
+      </div>
+
+      <button class="btn" type="submit">Sign in</button>
+
+      <div id="error" class="error"></div>
+    </form>
+  </section>
+</div>
+
+<script>
+  const errorEl = document.getElementById('error');
+  const usernameEl = document.getElementById('username');
+  const passwordEl = document.getElementById('password');
+
+  function handleLogin(e){
+    e.preventDefault();
+    errorEl.style.display = 'none';
+
+    const username = usernameEl.value.trim();
+    const password = passwordEl.value;
+
+    fetch('/login', {
+      method: 'POST',
+      credentials: 'same-origin',   // 🔴 REQUIRED
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+              if(status === 200){
+                window.location.href = '/dashboard-new.html';
+              } else {
+                errorEl.textContent = body.error || 'Invalid credentials';
+                errorEl.style.display = 'block';
+              }
+            })
+            .catch(() => {
+              errorEl.textContent = 'Server error. Try again.';
+              errorEl.style.display = 'block';
+            });
+
+    return false;
+  }
+
+  usernameEl.focus();
+</script>
+</body>
+</html>
