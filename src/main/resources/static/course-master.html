@@ -316,7 +316,7 @@
 
       <div class="nav-section-title">Masters</div>
 
-      <a href="/course-master.html" class="nav-item active">
+      <a href="/course-master.html" class="nav-item">
         <div class="nav-icon">📚</div>
         <span>Course Master</span>
       </a>
@@ -361,6 +361,21 @@
       <a href="/coursepanel.html" class="nav-item">
         <div class="nav-icon">📋</div>
         <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/orbat.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Orbit Generation Form</span>
+      </a>
+
+      <a href="/add-new-user.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>New User Form</span>
+      </a>
+
+      <a href="/legal-disciplinary.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Legal And Disciplinary Form</span>
       </a>
 
       <a href="/course-posting-form.html" class="nav-item">
@@ -484,6 +499,20 @@
   function openAddCourse() {
     window.location.href = "/addcourse.html";
   }
+
+  (function () {
+  const currentPage = location.pathname.split('/').pop(); // Get the filename from the URL
+  const menuLinks = document.querySelectorAll('.sidebar-nav a'); // Select all menu links
+
+  menuLinks.forEach(link => {
+    const linkPath = link.getAttribute('href').split('/').pop(); // Extract the filename from the link
+    console.log (currentPage );
+    console.log (linkPath );
+    if (currentPage === linkPath) {
+      link.classList.add('active'); // Add 'active' class directly to <a>
+    }
+  });
+})();
 </script>
 
 </body>
