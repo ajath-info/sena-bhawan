@@ -4,7 +4,50 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="" />
+    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseMasterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseMasterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/LocationMasterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/LocationMasterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseMasterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseMasterService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/LocationMasterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/LocationMasterService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/CourseMasterServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/CourseMasterServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/LocationMasterServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/LocationMasterServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/location-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/location-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseMasterController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseMasterController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/LocationMasterController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/LocationMasterController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PersonnelRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PersonnelRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseMasterService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseMasterService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/LocationMasterService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/LocationMasterService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseMasterServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseMasterServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/LocationMasterServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/LocationMasterServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/Col-PLG-Dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/Col-PLG-Dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/add-new-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/add-new-schedule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/addcourse.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/addcourse.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/addlocation.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/addlocation.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/course-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/course-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/course-posting-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/course-posting-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/course-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/course-schedule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/coursepanel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/dashboard-new.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-officers.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/dashboard-officers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-training.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/dashboard-training.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/figma_individual_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/figma_individual_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/filter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/grade-awards.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/grade-awards.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/location-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/location-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/personnel-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/rank-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/rank-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/role-permmissoon.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/role-permmissoon.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/unit-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/unit-master.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,6 +62,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -30,6 +76,9 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="37rrFdilCjvX8tF8yFAJdsw92xD" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -45,10 +94,12 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.SenaBhawanApplication.executor": "Run",
+    "git-widget-placeholder": "dev-harsh",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Harsh/Desktop/New folder/sena-bhawan",
+    "last_opened_file_path": "C:/Users/Harsh/Desktop/sena-bhawan",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

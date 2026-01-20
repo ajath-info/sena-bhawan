@@ -409,7 +409,7 @@
 
             <div class="header-right">
                 <div class="search-box">
-                    <input type="text" placeholder="Search rank..." />
+<!--                    <input type="text" placeholder="Search rank..." />-->
                 </div>
             </div>
         </header>
@@ -421,7 +421,7 @@
                 <!-- CARD HEADER -->
                 <div class="card-header">
                     <span class="badge">Rank</span>
-                    <button class="btn-primary">+ Add rank</button>
+<!--                    <button class="btn-primary">+ Add rank</button>-->
                 </div>
 
                 <!-- TABLE -->
@@ -430,78 +430,51 @@
                     <tr>
                         <th>S.No</th>
                         <th>Rank Name</th>
-                        <th>personel</th>
-                        <th>Action</th>
-                        <!--                        <th>Action</th>-->
+                        <th>personnel</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Officers</td>
-                        <!--                        <td>Wellington, Tamil Nadu</td>-->
-                        <td>1345</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>2</td>
-                        <td>JCOs</td>
-                        <!--                        <td>Shimla, Himachal Pradesh</td>-->
-                        <td>2890</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>3</td>
-                        <td>NCOs</td>
-                        <!--                        <td>Belgaum, Karnataka</td>-->
-                        <td>4134</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>4</td>
-                        <td>Soldiers</td>
-                        <!--                        <td>Jabalpur, Madhya Pradesh</td>-->
-                        <td>4200</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-
-
-
-
-
-
-
+                    <tbody id="rankTableBody">
+                    <!-- Dynamic rows here -->
                     </tbody>
-
-
-
-
-
-
                 </table>
-
             </div>
         </div>
-
     </main>
 
 
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        loadRankMaster();
+    });
+
+    function loadRankMaster() {
+        fetch("http://localhost:6060/api/ranks/master")
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById("rankTableBody");
+                tbody.innerHTML = "";
+
+                let serial = 1;
+
+                data.forEach(item => {
+                    const tr = document.createElement("tr");
+
+                    tr.innerHTML = `
+                        <td>${serial++}</td>
+                        <td>${item.rank}</td>
+                        <td>${item.personnelCount}</td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                console.error("Error loading ranks:", err);
+                alert("Failed to load rank information.");
+            });
+    }
+</script>
+
 </body>
 </html>

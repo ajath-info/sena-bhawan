@@ -469,34 +469,87 @@
 
   // ===================== LIST =====================
   function loadLocationList() {
-    fetch(API)
-            .then(res => res.json())
-            .then(data => {
-              tableBody.innerHTML = "";
+  fetch(API)
+    .then(res => res.json())
+    .then(data => {
+      tableBody.innerHTML = "";
 
-              if (!data || data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5">No locations found</td></tr>`;
-                return;
-              }
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4">No locations found</td></tr>`;
+        return;
+      }
 
-              data.forEach((loc, index) => {
-                tableBody.innerHTML += `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${loc.locationName || "-"}</td>
-              <td>${loc.state || "-"}</td>
-              <td class="actions">
-                <div class="icon-btn edit">✏️</div>
-                <div class="icon-btn delete">🗑️</div>
-              </td>
-            </tr>
-          `;
-              });
-            })
-            .catch(err => {
-              tableBody.innerHTML = `<tr><td colspan="5">Failed to load locations</td></tr>`;
-            });
+      data.forEach((loc, index) => {
+  tableBody.innerHTML += `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${loc.locationName || "-"}</td>
+      <td>${loc.state || "-"}</td>
+      <td class="actions">
+        <div class="icon-btn edit" onclick="editLocation(${loc.srno})">✏️</div>
+        <div class="icon-btn delete" onclick="deleteLocation(${loc.srno})">🗑️</div>
+      </td>
+    </tr>
+  `;
+});
+
+    })
+    .catch(err => {
+      tableBody.innerHTML = `<tr><td colspan="4">Failed to load locations</td></tr>`;
+    });
+}
+
+
+  /* ========== DELETE LOCATION ========== */
+  function deleteLocation(srno) {
+  if (!confirm("Are you sure you want to delete this location?")) return;
+
+  fetch(`${API}/${srno}`, { method: "DELETE" })
+    .then(res => {
+      if (!res.ok) {
+        alert("Failed to delete location");
+        return;
+      }
+      alert("Location deleted successfully");
+      loadLocationList();
+      loadLocationCount();
+    })
+    .catch(() => alert("Server error while deleting"));
+}
+
+
+
+
+
+  /* ========== EDIT Location ========== */
+  function editLocation(srno) {
+  const newLocationName = prompt("Enter new Location Name:");
+  const newState = prompt("Enter new State:");
+
+  if (!newLocationName || !newState) {
+    alert("All fields are required!");
+    return;
   }
+
+  const payload = {
+    locationName: newLocationName,
+    state: newState
+  };
+
+  fetch(`${API}/${srno}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(() => {
+      alert("Location updated successfully");
+      loadLocationList();
+    })
+    .catch(() => alert("Failed to update Location"));
+}
+
+
 
   // ===================== ADD LOCATION BUTTON =====================
   function openAddLocation() {

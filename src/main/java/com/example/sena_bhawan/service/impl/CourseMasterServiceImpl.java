@@ -50,4 +50,8 @@ public class CourseMasterServiceImpl implements CourseMasterService {
         return repository.save(existing);
     }
 
+    public void delete(Integer srno) {
+        repository.deleteById(srno);
+    }
+
 }

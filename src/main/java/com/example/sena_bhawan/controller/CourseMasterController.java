@@ -55,5 +55,10 @@ public class CourseMasterController {
         return service.updateCourse(srno, course);
     }
 
+    @DeleteMapping("/{srno}")
+    public String delete(@PathVariable Integer srno) {
+        service.delete(srno);
+        return "Course deleted successfully";
+    }
 
 }

@@ -12,7 +12,7 @@
 
     html, body {
       height: 100%;
-      overflow: hidden; /* ✅ VERY IMPORTANT */
+      overflow: hidden;
     }
 
     body {
@@ -24,7 +24,7 @@
     .container {
       display: flex;
       height: 100vh;
-      overflow: hidden; /* ✅ prevent global scroll */
+      overflow: hidden;
     }
 
     /* ================= SIDEBAR ================= */
@@ -34,9 +34,8 @@
       color: white;
       display: flex;
       flex-direction: column;
-
       height: 100vh;
-      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-y: auto;
       overflow-x: hidden;
       flex-shrink: 0;
     }
@@ -141,13 +140,14 @@
       color: #52b788;
     }
 
+
     /* ================= MAIN CONTENT ================= */
     .main-content {
       flex: 1;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      overflow: hidden; /* ✅ isolate scrolling */
+      overflow: hidden;
     }
 
     .header {
@@ -189,7 +189,7 @@
     .content-area {
       flex: 1;
       padding: 24px;
-      overflow-y: auto; /* ✅ main content scroll */
+      overflow-y: auto;
       background: #f1f3f5;
     }
 
@@ -262,6 +262,7 @@
 
     .icon-btn.edit { color: #3b82f6; border-color: #3b82f6; }
     .icon-btn.delete { color: #ef4444; border-color: #ef4444; }
+
   </style>
 </head>
 
@@ -279,94 +280,33 @@
         </div>
       </div>
     </div>
+
     <nav class="sidebar-nav">
       <div class="nav-section-title">Main Menu</div>
 
-      <a href="/dashboard-new.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard</span>
-      </a>
-
-      <a href="/dashboard-officers.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Officers</span>
-      </a>
-
-      <a href="/dashboard-training.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Training</span>
-      </a>
-
-      <a href="/filter.html" class="nav-item">
-        <div class="nav-icon">🔍</div>
-        <span>Master Filter & Search</span>
-      </a>
+      <a href="/dashboard-new.html" class="nav-item"><div class="nav-icon">🏠</div><span>Dashboard</span></a>
+      <a href="/dashboard-officers.html" class="nav-item"><div class="nav-icon">🏠</div><span>Dashboard Officers</span></a>
+      <a href="/dashboard-training.html" class="nav-item"><div class="nav-icon">🏠</div><span>Dashboard Training</span></a>
+      <a href="/filter.html" class="nav-item"><div class="nav-icon">🔍</div><span>Master Filter & Search</span></a>
 
       <div class="nav-section-title">Administration</div>
-
-      <a href="/role-permmissoon.html" class="nav-item">
-        <div class="nav-icon">🔐</div>
-        <span>Role & Permissions</span>
-      </a>
-
-      <!-- <a href="/user-management.html" class="nav-item">
-        <div class="nav-icon">👥</div>
-        <span>User Management</span>
-      </a> -->
+      <a href="/role-permmissoon.html" class="nav-item"><div class="nav-icon">🔐</div><span>Role & Permissions</span></a>
 
       <div class="nav-section-title">Masters</div>
-
-      <a href="/course-master.html" class="nav-item active">
-        <div class="nav-icon">📚</div>
-        <span>Course Master</span>
-      </a>
-
-      <a href="/grade-awards.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Grade & Awards</span>
-      </a>
-
-      <a href="/course-schedule.html" class="nav-item">
-        <div class="nav-icon">📅</div>
-        <span>Course Schedule</span>
-      </a>
-
-      <a href="/location-master.html" class="nav-item">
-        <div class="nav-icon">📍</div>
-        <span>Location Master</span>
-      </a>
-
-      <!-- <a href="/command-master.html" class="nav-item">
-        <div class="nav-icon">🚩</div>
-        <span>Command Master</span>
-      </a> -->
-
-      <a href="/rank-master.html" class="nav-item">
-        <div class="nav-icon">🏅</div>
-        <span>Rank Master</span>
-      </a>
-
-      <a href="/unit-master.html" class="nav-item">
-        <div class="nav-icon">🛡️</div>
-        <span>Unit Master</span>
-      </a>
+      <a href="/course-master.html" class="nav-item active"><div class="nav-icon">📚</div><span>Course Master</span></a>
+      <a href="/grade-awards.html" class="nav-item"><div class="nav-icon">📝</div><span>Grade & Awards</span></a>
+      <a href="/course-schedule.html" class="nav-item"><div class="nav-icon">📅</div><span>Course Schedule</span></a>
+      <a href="/location-master.html" class="nav-item"><div class="nav-icon">📍</div><span>Location Master</span></a>
+      <a href="/rank-master.html" class="nav-item"><div class="nav-icon">🏅</div><span>Rank Master</span></a>
+      <a href="/unit-master.html" class="nav-item"><div class="nav-icon">🛡️</div><span>Unit Master</span></a>
 
       <div class="nav-section-title">Forms</div>
-
-      <a href="/personnel-form.html" class="nav-item">
-        <div class="nav-icon">👤</div>
-        <span>Personnel Data Form</span>
-      </a>
-
-      <a href="/coursepanel.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>Course Panel Generation</span>
-      </a>
-
-      <a href="/course-posting-form.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Course & Posting Form</span>
-      </a>
+      <a href="/personnel-form.html" class="nav-item"><div class="nav-icon">👤</div><span>Personnel Form</span></a>
+      <a href="/coursepanel.html" class="nav-item"><div class="nav-icon">📋</div><span>Course Panel</span></a>
+      <a href="/orbat.html" class="nav-item"><div class="nav-icon">📋</div><span>Orbit</span></a>
+      <a href="/add-new-user.html" class="nav-item"><div class="nav-icon">📋</div><span>New User</span></a>
+      <a href="/legal-disciplinary.html" class="nav-item"><div class="nav-icon">📋</div><span>Legal & Disciplinary</span></a>
+      <a href="/course-posting-form.html" class="nav-item"><div class="nav-icon">📝</div><span>Course & Posting</span></a>
     </nav>
 
     <div class="sidebar-footer">
@@ -382,8 +322,8 @@
   </aside>
 
 
-  <main class="main-content">
 
+  <main class="main-content">
     <header class="header">
       <div class="header-left">
         <h2>Course Master</h2>
@@ -427,6 +367,8 @@
   </main>
 </div>
 
+
+
 <!-- ============= API SCRIPT =============== -->
 <script>
   const tableBody = document.getElementById("courseTable");
@@ -439,51 +381,122 @@
     loadCourseList();
   };
 
+  /* ========== LOAD COURSE COUNT ========== */
   function loadCourseCount() {
     fetch(API + "/count")
-            .then(res => res.json())
-            .then(count => {
-              courseCountEl.textContent = count + " Courses";
-            })
-            .catch(() => {
-              courseCountEl.textContent = "0 Courses";
-            });
+      .then(res => res.json())
+      .then(count => {
+        courseCountEl.textContent = count + " Courses";
+      })
+      .catch(() => {
+        courseCountEl.textContent = "0 Courses";
+      });
   }
 
+
+  /* ========== LOAD COURSE LIST ========== */
   function loadCourseList() {
     fetch(API)
-            .then(res => res.json())
-            .then(data => {
-              tableBody.innerHTML = "";
+      .then(res => res.json())
+      .then(data => {
+        tableBody.innerHTML = "";
 
-              if (!data || data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5">No courses found</td></tr>`;
-                return;
-              }
+        if (!data || data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="5">No courses found</td></tr>`;
+          return;
+        }
 
-              data.forEach((course, index) => {
-                tableBody.innerHTML += `
+        data.forEach((course, index) => {
+          tableBody.innerHTML += `
             <tr>
               <td>${index + 1}</td>
               <td>${course.courseName || "-"}</td>
               <td>${course.location || "-"}</td>
               <td>${course.duration || "-"}</td>
               <td class="actions">
-                <div class="icon-btn edit">✏️</div>
-                <div class="icon-btn delete">🗑️</div>
+                <div class="icon-btn edit" onclick="editCourse(${course.srno})">✏️</div>
+                <div class="icon-btn delete" onclick="deleteCourse(${course.srno})">🗑️</div>
               </td>
             </tr>
           `;
-              });
-            })
-            .catch(err => {
-              tableBody.innerHTML = `<tr><td colspan="5">Failed to load courses</td></tr>`;
-            });
+        });
+      })
+      .catch(err => {
+        tableBody.innerHTML = `<tr><td colspan="5">Failed to load courses</td></tr>`;
+      });
   }
 
+
+
+  /* ========== DELETE COURSE ========== */
+  function deleteCourse(srno) {
+    if (!confirm("Are you sure you want to delete this course?")) return;
+
+    fetch(`${API}/${srno}`, { method: "DELETE" })
+      .then(res => {
+        if (!res.ok) {
+          alert("Failed to delete course");
+          return;
+        }
+        alert("Course deleted successfully");
+        loadCourseList();
+        loadCourseCount();
+      })
+      .catch(() => alert("Server error while deleting"));
+  }
+
+
+
+  /* ========== EDIT COURSE ========== */
+  function editCourse(srno) {
+    const newName = prompt("Enter new Course Name:");
+    const newLocation = prompt("Enter new Location:");
+    const newDuration = prompt("Enter new Duration (weeks):");
+
+    if (!newName || !newLocation || !newDuration) {
+      alert("All fields are required!");
+      return;
+    }
+
+    const payload = {
+      courseName: newName,
+      location: newLocation,
+      duration: newDuration
+    };
+
+    fetch(`${API}/${srno}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(() => {
+        alert("Course updated successfully");
+        loadCourseList();
+      })
+      .catch(() => alert("Failed to update course"));
+  }
+
+
+
+  /* ========== ADD COURSE REDIRECT ========== */
   function openAddCourse() {
     window.location.href = "/addcourse.html";
   }
+
+
+  /* ========== HIGHLIGHT ACTIVE MENU ========== */
+  (function () {
+    const currentPage = location.pathname.split('/').pop();
+    const menuLinks = document.querySelectorAll('.sidebar-nav a');
+
+    menuLinks.forEach(link => {
+      const linkPath = link.getAttribute('href').split('/').pop();
+      if (currentPage === linkPath) {
+        link.classList.add('active');
+      }
+    });
+  })();
 </script>
 
 </body>

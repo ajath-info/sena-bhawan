@@ -363,6 +363,21 @@
         <span>Course Panel Generation</span>
       </a>
 
+        <a href="/orbat.html" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <span>Orbit Generation Form</span>
+        </a>
+
+        <a href="/add-new-user.html" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <span>New User Form</span>
+        </a>
+
+        <a href="/legal-disciplinary.html" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <span>Legal And Disciplinary Form</span>
+        </a>
+
       <a href="/course-posting-form.html" class="nav-item">
         <div class="nav-icon">📝</div>
         <span>Course & Posting Form</span>
@@ -415,81 +430,13 @@
                     <tr>
                         <th>S.No</th>
                         <th>Unit Name</th>
-                        <th>personel</th>
+                        <th>Location</th>
                         <th>Action</th>
-<!--                        <th>Action</th>-->
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2RAJPUT</td>
-<!--                        <td>Wellington, Tamil Nadu</td>-->
-                        <td>12</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td>2</td>
-                        <td>11 GORKHA RIFIELS</td>
-<!--                        <td>Shimla, Himachal Pradesh</td>-->
-                        <td>52</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>3</td>
-                        <td>1 PARA(SF)</td>
-<!--                        <td>Belgaum, Karnataka</td>-->
-                        <td>8</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>4</td>
-                        <td>3 GORKHA RIFILES</td>
-<!--                        <td>Jabalpur, Madhya Pradesh</td>-->
-                        <td>16</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>5</td>
-                        <td>RAJPUTANA RIFELES</td>
-<!--                        <td>Sonamarg, Jammu & Kashmir</td>-->
-                        <td>6</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-
-
-
-
-
-                    </tbody>
-
-
-
-
-
-
+                    <tbody></tbody>
                 </table>
-
             </div>
         </div>
 
@@ -497,5 +444,86 @@
 
 
 </div>
+<script>
+    const API_BASE = "http://localhost:6060/api/unit"; // change if needed
+
+    // Load units when page opens
+    document.addEventListener("DOMContentLoaded", loadUnits);
+
+    function loadUnits() {
+        fetch(API_BASE)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("tbody");
+                tbody.innerHTML = ""; // clear previous rows
+
+                data.forEach((unit, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${unit.unitName}</td>
+                            <td>${unit.location}</td>
+                            <td class="actions">
+                                <div class="icon-btn edit" onclick="editUnit(${unit.id})">✏️</div>
+                                <div class="icon-btn delete" onclick="deleteUnit(${unit.id})">🗑️</div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    // Add new unit
+    document.querySelector(".btn-primary").addEventListener("click", function () {
+        const unitName = prompt("Enter Unit Name:");
+        const location = prompt("Enter Location:");
+
+        if (!unitName || !location) {
+            alert("Unit Name and Location are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(API_BASE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    });
+
+    // Edit unit
+    function editUnit(id) {
+        const unitName = prompt("Enter new Unit Name:");
+        const location = prompt("Enter new Location:");
+
+        if (!unitName || !location) {
+            alert("All fields are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(`${API_BASE}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    }
+
+    // Delete unit
+    function deleteUnit(id) {
+        if (!confirm("Are you sure you want to delete this unit?")) return;
+
+        fetch(`${API_BASE}/${id}`, { method: "DELETE" })
+            .then(() => loadUnits());
+    }
+</script>
+
 </body>
 </html>
