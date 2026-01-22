@@ -34,7 +34,8 @@ public class UserPermissionService {
                     .add(new PermissionResponse(
                             row.getPermissionId(),
                             row.getLabel(),
-                            row.getAllowed()
+                            row.getAllowed(),
+                            row.getUrl()
                     ));
         }
 

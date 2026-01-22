@@ -59,6 +59,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
                     RolePermissionsResponse.PermissionDTO dto = new RolePermissionsResponse.PermissionDTO();
                     dto.setPermissionId(p.getId());
                     dto.setLabel(p.getLabel());
+                    dto.setUrl(p.getUrl());
                     dto.setAllowed(allowedMap.getOrDefault(p.getId(), false));
 
                     perms.add(dto);

@@ -19,4 +19,7 @@ public class Permission {
 
     private String code;
     private String label;
+
+    @Column(name = "url")
+    private String url;
 }

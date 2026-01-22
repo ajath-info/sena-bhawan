@@ -6,4 +6,5 @@ public interface UserPermissionProjection {
     Long getPermissionId();
     String getLabel();
     Boolean getAllowed();
+    String getUrl();
 }

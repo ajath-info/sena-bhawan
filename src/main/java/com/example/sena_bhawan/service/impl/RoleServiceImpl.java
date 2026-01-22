@@ -1,7 +1,9 @@
 package com.example.sena_bhawan.service.impl;
 
+import com.example.sena_bhawan.entity.Role;
 import com.example.sena_bhawan.entity.RoleMaster;
 import com.example.sena_bhawan.repository.RoleMasterRepository;
+import com.example.sena_bhawan.repository.RoleRepository;
 import com.example.sena_bhawan.service.RoleService;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +22,7 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleMaster> getAllRoles() {
         return roleRepo.findAll();
     }
+
+
 }
 

@@ -16,18 +16,19 @@ public interface UserPermissionRepository extends CrudRepository<UserMaster, Lon
         m.name AS moduleName,
         p.id AS permissionId,
         p.label AS label,
+        p.url AS url,
         bool_or(rp.allowed) AS allowed
     FROM modules m
     JOIN permissions p ON p.module_id = m.id
-    LEFT JOIN user_role_info uri 
-           ON uri.user_id = :userId
+    LEFT JOIN user_role_info uri ON uri.user_id = :userId
     LEFT JOIN role_permissions rp 
            ON rp.role_id = uri.role_id
           AND rp.permission_id = p.id
-    GROUP BY m.id, m.name, p.id, p.label
+    GROUP BY m.id, m.name, p.id, p.label, p.url
     ORDER BY m.id, p.id
 """, nativeQuery = true)
     List<UserPermissionProjection> getPermissionsForUser(Long userId);
+
 
 }
 

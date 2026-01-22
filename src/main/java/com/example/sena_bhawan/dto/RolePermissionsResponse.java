@@ -28,5 +28,6 @@ public class RolePermissionsResponse {
         private Long permissionId;
         private String label;
         private boolean allowed;
+        private String url;
     }
 }

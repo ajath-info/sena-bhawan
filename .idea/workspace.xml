@@ -5,17 +5,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/UserMasterRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/UserMasterRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/AdminService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/sena.backup" beforeDir="false" afterPath="$PROJECT_DIR$/db/sena.backup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PermissionResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PermissionResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/RolePermissionsResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/RolePermissionsResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/UserPermissionProjection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/UserPermissionProjection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/Permission.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/Permission.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/UserPermissionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/UserPermissionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/RoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/RoleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/UserPermissionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/UserPermissionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/RolePermissionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/RolePermissionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/RoleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/RoleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/add-new-user.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/add-new-user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-schedule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-officers.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-officers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-training.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-training.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/grade-awards.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/grade-awards.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/legal-disciplinary.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/legal-disciplinary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/location-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/location-master.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/AuthController$LoginRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/AuthController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/orbat.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/orbat.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/role-permmissoon.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/role-permmissoon.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/dashboard-new.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/static/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/static/login.html" afterDir="false" />
     </list>
@@ -28,8 +48,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="HTML File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -64,6 +84,7 @@
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -130,16 +151,5 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/AuthController.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
