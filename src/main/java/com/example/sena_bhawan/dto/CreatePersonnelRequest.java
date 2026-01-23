@@ -32,11 +32,7 @@ public class CreatePersonnelRequest {
     public String alternateMobile;
     public String emailAddress;
 
-    public Short medicalS;
-    public Short medicalH;
-    public Short medicalA;
-    public Short medicalP;
-    public Short medicalE;
+    public String medicalCategory;
 
     // CHILD LISTS
     public List<DecorationDTO> decorations;
@@ -47,10 +43,12 @@ public class CreatePersonnelRequest {
 
     // CHILD DTOs
     public static class DecorationDTO {
+        public String decorationCategory;
         public String decorationName;
         public LocalDate awardDate;
         public String citation;
     }
+
 
     public static class QualificationDTO {
         public String qualification;

@@ -63,11 +63,14 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setEmailAddress(req.emailAddress);
 
         // Medical
-        p.setMedicalS(req.medicalS);
-        p.setMedicalH(req.medicalH);
-        p.setMedicalA(req.medicalA);
-        p.setMedicalP(req.medicalP);
-        p.setMedicalE(req.medicalE);
+//        p.setMedicalS(req.medicalS);
+//        p.setMedicalH(req.medicalH);
+//        p.setMedicalA(req.medicalA);
+//        p.setMedicalP(req.medicalP);
+//        p.setMedicalE(req.medicalE);
+
+        p.setMedicalCategory(req.medicalCategory);
+
 
         p.setCreatedAt(LocalDateTime.now());
         p.setUpdatedAt(LocalDateTime.now());
@@ -76,8 +79,10 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         // Decorations
         p.setDecorations(
-                req.decorations.stream().map(d -> {
+                req.decorations
+                        .stream().map(d -> {
                     PersonnelDecorations deco = new PersonnelDecorations();
+                    deco.setDecorationCategory(d.decorationCategory);
                     deco.setDecorationName(d.decorationName);
                     deco.setAwardDate(d.awardDate);
                     deco.setCitation(d.citation);
