@@ -8,5 +8,7 @@ public interface PersonnelService {
 
     List<Personnel> getallPersonnels() ;
 
+    Personnel getPersonnelById(Long id);
+
     Long createPersonnel(CreatePersonnelRequest request);
 }

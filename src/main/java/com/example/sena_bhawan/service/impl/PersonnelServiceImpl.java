@@ -27,6 +27,12 @@ public class PersonnelServiceImpl implements PersonnelService {
     }
 
     @Override
+    public Personnel getPersonnelById(Long id) {
+        return personnelRepository.findById(id).orElse(null);
+    }
+
+
+    @Override
     @Transactional
     public Long createPersonnel(CreatePersonnelRequest req) {
 

@@ -61,7 +61,7 @@ public List<PanelOfficerDTO> getOfficers() {
             .map(personnel -> {
 
                 PostingDetails posting =
-                        postingDetailsRepository
+                        (PostingDetails) postingDetailsRepository
                                 .findTopByPersonnelIdOrderByFromDateDesc(personnel.getId())
                                 .orElse(null);
 

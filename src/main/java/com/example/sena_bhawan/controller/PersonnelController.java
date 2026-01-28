@@ -26,6 +26,21 @@ public class PersonnelController {
         return personnelService.getallPersonnels();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPersonnelById(@PathVariable Long id) {
+        Personnel personnel = personnelService.getPersonnelById(id);
+
+        if (personnel == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", "error");
+            error.put("message", "Personnel not found with ID: " + id);
+            return ResponseEntity.status(404).body(error);
+        }
+
+        return ResponseEntity.ok(personnel);
+    }
+
+
     @PostMapping("/add")
     public ResponseEntity<?> addPersonnel(@RequestBody CreatePersonnelRequest request) {
         Long id = personnelService.createPersonnel(request);

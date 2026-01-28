@@ -383,139 +383,47 @@
       font-weight: 700;
       margin-bottom: 8px;
       color: #1f2937;
+      .role-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.role-action-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.role-action-btn.edit {
+  background: #1b4332;
+  color: white;
+}
+
+.role-action-btn.edit:hover {
+  background: #14532d;
+}
+
+.role-action-btn.delete {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.role-action-btn.delete:hover {
+  background: #fecaca;
+}
+
     }
   </style>
 </head>
 <body>
 <div class="container">
-
-  <!-- SIDEBAR -->
-<!--  <aside class="sidebar">-->
-<!--    <div class="sidebar-header">-->
-<!--      <div class="logo-section">-->
-<!--        <div class="logo-icon">🛡️</div>-->
-<!--        <div class="logo-text">-->
-<!--          <h1>ARMY HRMS</h1>-->
-<!--          <p>भारतीय सेना</p>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <nav class="sidebar-nav">-->
-<!--      <div class="nav-section-title">Main Menu</div>-->
-
-<!--      <a href="/dashboard-new.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-officers.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Officers</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-training.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Training</span>-->
-<!--      </a>-->
-
-<!--      <a href="/filter.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔍</div>-->
-<!--        <span>Master Filter & Search</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Administration</div>-->
-
-<!--      <a href="/role-permmissoon.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔐</div>-->
-<!--        <span>Role & Permissions</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
-<!--        <div class="nav-icon">👥</div>-->
-<!--        <span>User Management</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <div class="nav-section-title">Masters</div>-->
-
-<!--      <a href="/course-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📚</div>-->
-<!--        <span>Course Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/grade-awards.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Grade & Awards</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-schedule.html" class="nav-item">-->
-<!--        <div class="nav-icon">📅</div>-->
-<!--        <span>Course Schedule</span>-->
-<!--      </a>-->
-
-<!--      <a href="/location-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📍</div>-->
-<!--        <span>Location Master</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🚩</div>-->
-<!--        <span>Command Master</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <a href="/rank-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏅</div>-->
-<!--        <span>Rank Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/unit-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🛡️</div>-->
-<!--        <span>Unit Master</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Forms</div>-->
-
-<!--      <a href="/personnel-form.html" class="nav-item active">-->
-<!--        <div class="nav-icon">👤</div>-->
-<!--        <span>Personnel Data Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/coursepanel.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Course Panel Generation</span>-->
-<!--      </a>-->
-
-<!--      <a href="/orbat.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Orbit Generation Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/add-new-user.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>New User Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/legal-disciplinary.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Legal And Disciplinary Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-posting-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Course & Posting Form</span>-->
-<!--      </a>-->
-<!--    </nav>-->
-
-<!--    <div class="sidebar-footer">-->
-<!--      <div class="user-profile">-->
-<!--        <div class="user-avatar">AD</div>-->
-<!--        <div class="user-info">-->
-<!--          <div class="name">Admin User</div>-->
-<!--          <div class="role">HQ Command</div>-->
-<!--        </div>-->
-<!--        <div>🚪</div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </aside>-->
 
   <div id="sidebar"></div>
 
@@ -673,25 +581,59 @@
       const card = document.createElement("div");
       card.className = "role-card";
       card.dataset.roleId = role.roleId;
+<!--      card.innerHTML = `-->
+<!--        <div class="role-header">-->
+<!--          <div class="role-icon ${style.color}">${style.icon}</div>-->
+<!--          <div class="role-info">-->
+<!--            <div class="role-title">${role.roleName}</div>-->
+<!--            <div class="role-subtitle">${role.subTitle}</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="role-stats">-->
+<!--          <div class="role-stat">-->
+<!--            <div class="role-stat-value">${role.userCount || 0}</div>-->
+<!--            <div class="role-stat-label">Users</div>-->
+<!--          </div>-->
+<!--          <div class="role-stat" data-permission-count="${role.roleId}">-->
+<!--            <div class="role-stat-value" id="permission-count-${role.roleId}">${role.allowedPermissionCount || 0}</div>-->
+<!--            <div class="role-stat-label">Permissions</div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      `;-->
+
       card.innerHTML = `
-        <div class="role-header">
-          <div class="role-icon ${style.color}">${style.icon}</div>
-          <div class="role-info">
-            <div class="role-title">${role.roleName}</div>
-            <div class="role-subtitle">${role.subTitle}</div>
-          </div>
-        </div>
-        <div class="role-stats">
-          <div class="role-stat">
-            <div class="role-stat-value">${role.userCount || 0}</div>
-            <div class="role-stat-label">Users</div>
-          </div>
-          <div class="role-stat" data-permission-count="${role.roleId}">
-            <div class="role-stat-value" id="permission-count-${role.roleId}">${role.allowedPermissionCount || 0}</div>
-            <div class="role-stat-label">Permissions</div>
-          </div>
-        </div>
-      `;
+  <div class="role-header">
+    <div class="role-icon ${style.color}">${style.icon}</div>
+    <div class="role-info">
+      <div class="role-title">${role.roleName}</div>
+      <div class="role-subtitle">${role.subTitle}</div>
+    </div>
+  </div>
+
+  <div class="role-stats">
+    <div class="role-stat">
+      <div class="role-stat-value">${role.userCount || 0}</div>
+      <div class="role-stat-label">Users</div>
+    </div>
+    <div class="role-stat" data-permission-count="${role.roleId}">
+      <div class="role-stat-value" id="permission-count-${role.roleId}">
+        ${role.allowedPermissionCount || 0}
+      </div>
+      <div class="role-stat-label">Permissions</div>
+    </div>
+  </div>
+
+  <!-- ⭐ NEW ACTION BUTTONS ⭐ -->
+  <div class="role-actions">
+    <button class="role-action-btn edit" onclick="openEditRoleModal(${role.roleId}); event.stopPropagation();">
+      ✏️ Edit
+    </button>
+    <button class="role-action-btn delete" onclick="openDeleteRoleModal(${role.roleId}); event.stopPropagation();">
+      🗑 Delete
+    </button>
+  </div>
+`;
+
 
       card.addEventListener("click", () => selectRole(card, role));
       rolesGrid.appendChild(card);
@@ -717,6 +659,87 @@
     permissionsContainer.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">Loading permissions...</div>';
     loadPermissions(role.roleId);
   }
+
+  function openEditRoleModal(roleId) {
+  selectedRoleId = roleId;
+
+  const role = roleCardsData.find(r => r.roleId === roleId);
+  if (!role) return alert("Role not found!");
+
+  document.getElementById("editRoleName").value = role.roleName;
+  document.getElementById("editRoleSubtitle").value = role.subTitle;
+
+  openModal("editRoleModal");
+}
+
+function updateRole() {
+  const name = document.getElementById("editRoleName").value.trim();
+  const subtitle = document.getElementById("editRoleSubtitle").value.trim();
+
+  if (!name) {
+    alert("Role name cannot be empty!");
+    return;
+  }
+
+  fetch(`http://localhost:6060/api/roles/${selectedRoleId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      roleName: name,
+      subTitle: subtitle
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Failed to update");
+    return res.json();
+  })
+  .then(updated => {
+    alert("✅ Role updated successfully!");
+    closeModal("editRoleModal");
+    loadRolesSummary();  // Refresh UI
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Could not update role");
+  });
+}
+
+
+function openDeleteRoleModal(roleId) {
+  selectedRoleId = roleId;
+  openModal("deleteRoleModal");
+}
+function deleteRole() {
+  if (!selectedRoleId) {
+    alert("No role selected!");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to delete this role?")) return;
+
+  fetch(`http://localhost:6060/api/roles/${selectedRoleId}`, {
+    method: "DELETE"
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Delete failed");
+    return res.text();
+  })
+  .then(msg => {
+    alert("🗑 Role deleted successfully!");
+
+    closeModal("deleteRoleModal");
+
+    selectedRoleId = null;
+
+    loadRolesSummary();   // refresh UI
+    permissionsSection.style.display = "none"; // hide permission panel
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Could not delete role");
+  });
+}
+
 
   // 4. Load permissions
   function loadPermissions(roleId) {
