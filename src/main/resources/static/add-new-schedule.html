@@ -458,6 +458,20 @@
           border-bottom: none;
         }
 
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+
         .badge {
           display: inline-block;
           padding: 4px 10px;
@@ -731,7 +745,7 @@
                             <input id="courseStrength"
                                    type="text"
                                    class="form-input"
-                                   value="30"
+
                                    placeholder="Number of seats"
                             />
                         </div>
@@ -740,9 +754,13 @@
                             <input id="venue"
                                    type="text"
                                    class="form-input"
-                                   value="Defence Services Staff College, Shimla"
-                                   placeholder="Course venue"
+
+                                   placeholder="Defence Services Staff College, Shimla"
                             />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Remarks</label>
+                            <textarea id="remarks" placeholder="Remarks"></textarea>
                         </div>
                     </div>
                     <div
@@ -759,6 +777,7 @@
                             Save Schedule
                         </button>
                     </div>
+
                 </div>
 
 
@@ -813,7 +832,8 @@
         startDate: document.getElementById("fromDate").value,  // ✔ matches DTO
         endDate: document.getElementById("toDate").value,      // ✔ matches DTO
         courseStrength: document.getElementById("courseStrength").value,
-        venue: document.getElementById("venue").value.trim()
+        venue: document.getElementById("venue").value.trim(),
+        remarks: document.getElementById("remarks").value.trim()
       };
 
       console.log("Sending payload:", payload);

@@ -67,16 +67,35 @@ public List<PanelOfficerDTO> getOfficers() {
 
                 return new PanelOfficerDTO(
                         personnel.getId(),
+
                         personnel.getFullName(),
                         personnel.getArmyNo(),
                         personnel.getRank(),
+
                         posting != null ? posting.getUnitName() : "NA",
                         posting != null ? posting.getCommand() : "NA",
-                        personnel.getDateOfSeniority()
+
+                        personnel.getDateOfCommission(),
+                        personnel.getDateOfSeniority(),
+                        personnel.getDateOfBirth(),
+
+                        personnel.getReligion(),
+                        personnel.getMaritalStatus(),
+                        personnel.getMedicalCategory(),
+
+
+                        personnel.getMobileNumber(),
+                        personnel.getEmailAddress(),
+
+                        personnel.getCity(),
+                        personnel.getState(),
+
+                        personnel.getOfficerImage()
                 );
             })
             .toList();
 }
+
 
 
 
@@ -137,5 +156,7 @@ public List<PanelOfficerDTO> getOfficers() {
 
         attendanceRepository.save(attendance);
     }
+
+
 }
 

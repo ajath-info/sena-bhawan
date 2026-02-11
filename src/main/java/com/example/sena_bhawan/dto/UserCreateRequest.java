@@ -14,6 +14,7 @@ public class UserCreateRequest {
 
     private String sosNo;
     private String unitName;
+    private String name;
 
     private List<Long> roleIds = new ArrayList<>();
 }

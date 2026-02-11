@@ -28,8 +28,6 @@ public class CourseScheduleController {
     public CourseScheduleController(CourseScheduleService service) {
         this.service = service;
     }
-//    private CourseScheduleServiceImpl service;
-//    private CourseScheduleService service;
 
     @PostMapping("/add")
     public CourseSchedule addSchedule(@RequestBody CreateCourseScheduleRequest request) {

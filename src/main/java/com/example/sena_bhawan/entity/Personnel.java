@@ -22,6 +22,9 @@ public class Personnel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "commission_type")
+    private String commissionType;
+
     private String armyNo;
     private String rank;
     private String fullName;
@@ -50,9 +53,24 @@ public class Personnel {
     private String mobileNumber;
     private String alternateMobile;
     private String emailAddress;
+    @Column(name = "nsg_mail")
+    private String nsgEmail;
 
     @Column(name = "medical_category")
     private String medicalCategory;
+    @Column(name = "med_date")
+    private LocalDate medicalDate;
+    @Column(name = "med_category")
+    private String injuryCategory;
+    @Column(name = "diagnosis")
+    private String diagnosis;
+    @Column(name = "review_date")
+    protected LocalDate reviewDate;
+    @Column(name = "restriction")
+    private String restriction;
+    @Column(name = "irs_transfer")
+    private String irsTransfer;
+
 
 
     private LocalDateTime createdAt;
@@ -75,4 +93,7 @@ public class Personnel {
     @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PersonnelFamily> familyMembers;
+
+    public Personnel(Long personnelId) {
+    }
 }

@@ -685,6 +685,132 @@
     color: white;
   }
 
+		/* ===== FILTER GRID (4 COLUMNS) ===== */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 8px;
+}
+
+/* Checkbox groups */
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.filter-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* Make inputs consistent */
+.filter-grid .form-input,
+.filter-grid .form-select {
+  height: 44px;
+}
+
+/* Full-width row */
+.filter-full {
+  grid-column: 1 / -1;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start; /* or flex-end */
+}
+
+.filter-actions button {
+  width: fit-content !important;
+  min-width: unset !important;
+  padding: 8px 18px !important;
+  font-size: 14px !important;
+  border-radius: 8px;
+}
+		/* ===== SCROLLABLE DATA TABLE ===== */
+
+/* Outer wrapper: controls scroll */
+.table-scroll-wrapper {
+  max-height: 420px;          /* vertical scroll height */
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+}
+
+/* Keep header visible while scrolling */
+.table-scroll-wrapper thead th {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  z-index: 2;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Prevent columns from shrinking */
+.data-table {
+  min-width: 1400px; /* adjust if you add more columns */
+}
+
+/* Long text cells (medical remarks etc.) */
+.data-table td {
+  vertical-align: top;
+}
+
+/* Optional: smoother scroll */
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+.data-table td:nth-child(13) {
+  max-width: 260px;
+  white-space: pre-line;
+}
+		.form-textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  color: #1f2937;
+  background: white;
+  resize: vertical;          /* allow up/down resize only */
+  line-height: 1.5;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #1b4332;
+  box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.15);
+}
+
+.form-textarea::placeholder {
+  color: #9ca3af;
+}
+
     </style>
 </head>
 <body>
@@ -937,18 +1063,177 @@
                         <span>🔍 Step 3: Apply Filters & Select Officers</span>
                         <span class="badge badge-info">Active</span>
                     </div>
+                    <div class="section-card">
+                        <div class="section-title">
+                            <span>🎯 Filters</span>
+                        </div>
 
-                    <!-- Filters (will wire later) -->
-                    <div style="margin-bottom: 20px">
-                        <label class="form-label" style="margin-bottom: 12px">Quick Filters</label>
-                        <div class="filter-chips">
-                            <div class="filter-chip active">🏅 Majors Only</div>
-                            <div class="filter-chip active">📅 Seniority: 2010-2015</div>
-                            <div class="filter-chip">📍 Western Command</div>
-                            <div class="filter-chip">🎓 JCC Completed</div>
-                            <div class="filter-chip">⭐ Outstanding ACR</div>
+                        <div class="filter-grid">
+
+                            <!-- Medical Category -->
+                            <div class="form-group">
+                                <label class="form-label">Medical Category</label>
+                                <select class="form-select" id="medical">
+                                    <option>All</option>
+                                    <option value="S1">S1</option>
+                                    <option value="H2">H2</option>
+                                    <option value="A3">A3</option>
+                                    <option value="P4">P4</option>
+                                    <option value="E5">E5</option>
+                                </select>
+                            </div>
+
+                            <!-- Course -->
+                            <div class="form-group">
+                                <label class="form-label">Course</label>
+                                <input class="form-input" name="course" placeholder="Put course name" value="" />
+                            </div>
+
+                            <!-- Course Date -->
+                            <div class="form-group">
+                                <label class="form-label">Course Date</label>
+                                <select class="form-select" id="courseDate">
+                                    <option>All</option>
+                                    <option value="Last 1 Month">Last 1 Month</option>
+                                    <option value="Last 3 Months">Last 3 Months</option>
+                                    <option value="Last 1 Year">Last 1 Year</option>
+                                </select>
+                            </div>
+
+                            <!-- Course Grading -->
+                            <div class="form-group">
+                                <label class="form-label">Course Grading</label>
+                                <select class="form-select" id="grading">
+                                    <option>All</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A">A</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B">B+</option>
+                                    <option value="B">B</option>
+                                    <option value="B-">B-</option>
+                                    <option value="C+">C+</option>
+                                    <option value="C">C</option>
+
+                                </select>
+                            </div>
+
+                            <!-- Posting Due -->
+                            <div class="form-group">
+                                <label class="form-label">Posting Due (Months)</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> 1</label>
+                                    <label><input type="checkbox"> 2</label>
+                                    <label><input type="checkbox"> 3</label>
+                                </div>
+                            </div>
+
+                            <!-- Command -->
+                            <div class="form-group">
+                                <label class="form-label">Command</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> Western</label>
+                                    <label><input type="checkbox"> Eastern</label>
+                                    <label><input type="checkbox"> Southern</label>
+                                    <label><input type="checkbox"> Northern</label>
+                                </div>
+                            </div>
+
+                            <!-- Corps -->
+                            <div class="form-group">
+                                <label class="form-label">Corps</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> 1 Corps</label>
+                                    <label><input type="checkbox"> 2 Corps</label>
+                                    <label><input type="checkbox"> 3 Corps</label>
+                                </div>
+                            </div>
+
+                            <!-- Units -->
+                            <div class="form-group">
+                                <label class="form-label">Units</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> 2 RAJPUT</label>
+                                    <label><input type="checkbox"> 1 PARA SF</label>
+                                    <label><input type="checkbox"> 3 GRENADIERS</label>
+
+                                </div>
+                            </div>
+
+                            <!-- Civil Qualification -->
+                            <div class="form-group">
+                                <label class="form-label">Civil Qualification</label>
+                                <input class="form-input" name="qualification" placeholder="Qualification" value="" />
+                            </div>
+
+                            <!-- Rank -->
+                            <div class="form-group">
+                                <label class="form-label">Rank</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> Major</label>
+                                    <label><input type="checkbox"> General</label>
+                                    <label><input type="checkbox"> Colonel</label>
+                                    <label><input type="checkbox"> Captain</label>
+
+                                </div>
+                            </div>
+
+                            <!-- Batch Year -->
+                            <div class="form-group">
+                                <label class="form-label">Batch Year</label>
+                                <div class="filter-options">
+                                    <label><input type="checkbox"> 2024</label>
+                                    <label><input type="checkbox"> 2025</label>
+                                    <label><input type="checkbox"> 2026</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                &nbsp;
+                            </div>
+
+                            <!-- Date of Commission -->
+                            <div class="form-group">
+                                <label class="form-label">Date of Commission From</label>
+                                <input type="date" name="commissionFrom" class="form-input" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Date of Commission To</label>
+                                <input type="date" name="commissionTo" class="form-input" />
+                            </div>
+
+                            <!-- Date of Seniority From -->
+                            <div class="form-group">
+                                <label class="form-label">Date of Seniority From</label>
+                                <input type="date" name="seniorityFrom" class="form-input" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Date of Seniority To</label>
+                                <input type="date" name="seniorityTo" class="form-input" />
+                            </div>
+
+                            <!-- Date of Birth From -->
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth From</label>
+                                <input type="date" name="dobFrom" class="form-input" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth To</label>
+                                <input type="date" name="dobTo" class="form-input" />
+                            </div>
+
+                            <!-- Apply Button -->
+                            <div class="filter-actions">
+                                <button class="btn btn-primary" id="applyFiltersBtn">
+                                    Apply Filters
+                                </button>
+                            </div>
+
                         </div>
                     </div>
+
 
                     <!-- Panel Summary -->
                     <div class="summary-box">
@@ -996,6 +1281,7 @@
                             </div>
 
                             <div style="display: flex; gap: 8px">
+                                <button class="footer-btn success" id="saveToDraft">Save Draft</button>
                                 <button class="btn btn-secondary" id="selectAllBtn" style="padding: 8px 16px">
                                     Select All
                                 </button>
@@ -1007,30 +1293,41 @@
 
                         <div
                                 style="
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        overflow: hidden;
-      "
+								background: white;
+								border: 1px solid #e5e7eb;
+								border-radius: 12px;
+								overflow: hidden;
+							  "
                         >
-                            <table class="data-table">
-                                <thead>
-                                <tr>
-                                    <th style="width: 50px">✓</th>
-                                    <th style="width: 60px">Ser No</th>
-                                    <th>Officer Name</th>
-                                    <th>Army No</th>
-                                    <th>Rank</th>
-                                    <th>Unit</th>
-                                    <th>Command</th>
-                                    <th>Date of Seniority</th>
-                                    <th>Attendance Status</th>
-                                </tr>
-                                </thead>
+                            <div class="table-scroll-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                    <tr>
+                                        <th>✓</th>
+                                        <th>Ser No</th>
+                                        <th>Officer</th>
+                                        <th>Rank</th>
+                                        <th>Unit</th>
+                                        <th>Command</th>
+                                        <th>Date of Commission</th>
+                                        <th>Date of Seniority</th>
+                                        <th>Date of Birth</th>
+                                        <th>Religion</th>
+                                        <th>Marital Status</th>
+                                        <th>Medical Category</th>
 
-                                <!-- JS WILL POPULATE ROWS -->
-                                <tbody id="officerTableBody"></tbody>
-                            </table>
+                                        <th>Mobile</th>
+                                        <th>Email</th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                        <th>Attendance Status</th>
+                                    </tr>
+                                    </thead>
+
+                                    <!-- JS WILL POPULATE ROWS -->
+                                    <tbody id="officerTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1046,35 +1343,80 @@
 
                     <!-- Officers Review Table -->
                     <div style="margin-top: 24px">
-                        <div
-                                style="
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        overflow: hidden;
-      "
-                        >
-                            <table class="data-table">
-                                <thead>
-                                <tr>
-                                    <th style="width: 60px">Ser No</th>
-                                    <th>Officer Name</th>
-                                    <th>Army No</th>
-                                    <th>Rank</th>
-                                    <th>Unit</th>
-                                    <th>Command</th>
-                                    <th>Date of Seniority</th>
-                                </tr>
-                                </thead>
+                        <div style="background: white;
+							border: 1px solid #e5e7eb;
+							border-radius: 12px;
+							overflow: hidden;
+						  ">
+                            <div class="table-scroll-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                    <tr>
+                                        <thead>
+                                    <tr>
+                                        <th>Ser No</th>
+                                        <th>Officer</th>
+                                        <th>Rank</th>
+                                        <th>Unit</th>
+                                        <th>Command</th>
+                                        <th>Date of Commission</th>
+                                        <th>Date of Seniority</th>
+                                        <th>Date of Birth</th>
+                                        <th>Religion</th>
+                                        <th>Marital Status</th>
+                                        <th>Medical Category</th>
+                                        <th>Mobile</th>
+                                        <th>Email</th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                    </tr>
+                                    </thead>
 
-                                <!-- JS WILL POPULATE FINAL APPROVAL LIST -->
-                                <tbody id="finalApprovalTableBody"></tbody>
-                            </table>
+                                    </tr>
+                                    </thead>
+
+                                    <!-- JS WILL POPULATE FINAL APPROVAL LIST -->
+                                    <tbody id="finalApprovalTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 25px">
+                        <div class="section-title">
+                            <span>🔍 Send Panel</span>
+                        </div>
+                        <div class="filter-grid">
+                            <div style="margin-top: 24px">
+                                <div class="form-group">
+                                    <label class="form-label">Send To</label>
+                                    <select class="form-select" id="sendToRole">
+                                        <option value="">-- Select Role --</option>
+                                    </select>
+                                </div>
+
+                                <!-- Course -->
+                                <div class="form-group"></div>
+                                <div class="form-group"></div>
+                                <div class="form-group"></div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Remarks</label>
+                                    <textarea
+                                            name="remarks"
+                                            rows="3"
+                                            class="form-textarea"
+                                            id="approvalRemark"
+                                            placeholder="Panel forwarded for approval"
+                                    ></textarea>                                </div>
+                                <div style="margin-top: 24px">
+                                    <button class="footer-btn success" id="sendToApproval">
+                                        Send for Approval
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-
 
                 <!-- Step 5: Generate Letter -->
                 <div class="section-card step-section" id="step-5">
@@ -1085,147 +1427,44 @@
 
                     <!-- Officers Selection Table -->
                     <div style="margin-top: 24px">
-
-
                         <div
                                 style="
-                    background: white;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 12px;
-                    overflow: hidden;
-                  "
+								background: white;
+								border: 1px solid #e5e7eb;
+								border-radius: 12px;
+								overflow: hidden;"
                         >
-                            <table class="data-table">
-                                <thead>
-                                <tr>
-                                    <th style="width: 60px">Ser No</th>
-                                    <th>Officer Name</th>
-                                    <th>Army No</th>
-                                    <th>Rank</th>
-                                    <th>Unit</th>
-                                    <th>Command</th>
-                                    <th>Date of Seniority</th>
-                                    <th>Letter Link</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
+                            <div class="table-scroll-wrapper">
+                                <table class="data-table">
 
-                                    <td><div class="ser-no">1</div></td>
-                                    <td>
-                                        <div class="officer-name">Maj Rajesh Kumar Singh</div>
-                                        <div class="officer-army-no">IC-12345</div>
-                                    </td>
-                                    <td>IC-12345</td>
-                                    <td><span class="badge badge-info">Major</span></td>
-                                    <td>15 RAJPUT</td>
-                                    <td>
-                                        <span class="badge badge-success">Western</span>
-                                    </td>
-                                    <td>15 Jun 2015</td>
-                                    <td>
-                                        <div class="attendance-toggle">
-                                            <div class="attendance-btn attending">
-                                                ✓ Genrate Letter
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
+                                    <thead>
+                                    <tr>
+                                        <thead>
+                                    <tr>
+                                        <th>Ser No</th>
+                                        <th>Officer</th>
+                                        <th>Rank</th>
+                                        <th>Unit</th>
+                                        <th>Command</th>
+                                        <th>Date of Commission</th>
+                                        <th>Date of Seniority</th>
+                                        <th>Date of Birth</th>
+                                        <th>Mobile</th>
+                                        <th>Email</th>
+                                        <th>City</th>
+                                        <th>State</th>
+                                        <th>Letter</th>
+                                    </tr>
+                                    </thead>
 
-                                    <td><div class="ser-no">2</div></td>
-                                    <td>
-                                        <div class="officer-name">Maj Amit Kumar Sharma</div>
-                                        <div class="officer-army-no">IC-23456</div>
-                                    </td>
-                                    <td>IC-23456</td>
-                                    <td><span class="badge badge-info">Major</span></td>
-                                    <td>22 GRENADIERS</td>
-                                    <td>
-                                        <span class="badge badge-warning">Northern</span>
-                                    </td>
-                                    <td>20 Dec 2014</td>
-                                    <td>
-                                        <div class="attendance-toggle">
-                                            <div class="attendance-btn attending">
-                                                ✓ Genrate Letter
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
-                                    <td><div class="ser-no">3</div></td>
-                                    <td>
-                                        <div class="officer-name">Maj Priya Verma</div>
-                                        <div class="officer-army-no">IC-34567</div>
-                                    </td>
-                                    <td>IC-34567</td>
-                                    <td><span class="badge badge-info">Major</span></td>
-                                    <td>9 PARA (SF)</td>
-                                    <td>
-                                        <span class="badge badge-success">Western</span>
-                                    </td>
-                                    <td>10 Jun 2015</td>
-                                    <td>
-                                        <div class="attendance-toggle">
-                                            <div class="attendance-btn attending">
-                                                ✓ Genrate Letter
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
 
-                                <tr>
-
-                                    <td>
-                                        <div class="ser-no" style="color: #6b7280">31</div>
-                                    </td>
-                                    <td>
-                                        <div class="officer-name" style="color: #6b7280">
-                                            Maj Arun Prakash
-                                        </div>
-                                        <div class="officer-army-no">IC-56789</div>
-                                    </td>
-                                    <td>IC-56789</td>
-                                    <td><span class="badge badge-info">Major</span></td>
-                                    <td>3 GORKHA</td>
-                                    <td>
-                                        <span class="badge badge-warning">Northern</span>
-                                    </td>
-                                    <td>12 Aug 2014</td>
-                                    <td>
-                                        <div class="attendance-toggle">
-                                            <div class="attendance-btn attending">
-                                                ✓ Genrate Letter
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-
-                                    <td><div class="ser-no">40</div></td>
-                                    <td>
-                                        <div class="officer-name">Maj Suresh Kumar</div>
-                                        <div class="officer-army-no">IC-67890</div>
-                                    </td>
-                                    <td>IC-67890</td>
-                                    <td><span class="badge badge-info">Major</span></td>
-                                    <td>15 RAJPUT</td>
-                                    <td>
-                                        <span class="badge badge-success">Western</span>
-                                    </td>
-                                    <td>25 Mar 2015</td>
-                                    <td>
-                                        <div class="attendance-toggle">
-                                            <div class="attendance-btn attending">
-                                                ✓ Genrate Letter
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1248,8 +1487,8 @@
 
                     <!-- RIGHT -->
                     <div class="footer-right">
-                        <button class="footer-btn secondary">Save Draft</button>
-                        <button class="footer-btn success">Send for Approval</button>
+                        <!--                        <button class="footer-btn secondary" id="saveToDraft">Save Draft</button>-->
+                        <!--                        <button class="footer-btn success">Send for Approval</button>-->
 
                         <div class="step-nav-btn" id="nextNav">
                             <div class="step-number">→</div>
@@ -1270,8 +1509,17 @@
     const TOTAL_STEPS = 5;
     let currentStep = 1;
 
+    /* ===============================
+               GLOBAL STATE (DECLARE FIRST!)
+            ================================ */
+            let officers = [];
+            let attendingSet = new Set();
+            const selectedSet = new Set(); // checkbox only
+            let nominatedSet = new Set();
+
     const prevNav = document.getElementById('prevNav');
     const nextNav = document.getElementById('nextNav');
+	const saveToDraft = document.getElementById('saveToDraft');
     const steps = document.querySelectorAll('.step');
     const sections = document.querySelectorAll('.step-section');
 
@@ -1302,24 +1550,85 @@
       prevNav.classList.toggle('disabled', currentStep === 1);
       nextNav.classList.toggle('disabled', currentStep === TOTAL_STEPS);
 
+      // LOAD STEP-4 DATA WHEN STEP-4 OPENS
+if (currentStep === 4) {
+  loadStep4Panel();
+}
+
+if (currentStep === 5) {
+  loadStep5Panel();
+}
       prevNav.classList.toggle('active', currentStep > 1);
       nextNav.classList.toggle('active', currentStep < TOTAL_STEPS);
     }
 
     // Bottom navigation
-    prevNav.addEventListener('click', () => {
-      if (currentStep > 1) {
-        currentStep--;
-        renderStep();
-      }
-    });
-
     nextNav.addEventListener('click', () => {
-      if (currentStep < TOTAL_STEPS) {
-        currentStep++;
-        renderStep();
-      }
+
+  /* ===============================
+     NORMAL NEXT
+  ================================ */
+  if (currentStep < TOTAL_STEPS) {
+    currentStep++;
+    renderStep();
+  }
+});
+
+saveToDraft.addEventListener('click', () => {
+  if (currentStep === 3) {
+    handleStep3Save();
+  }
+});
+
+function handleStep3Save() {
+  const scheduleId = sessionStorage.getItem("scheduleId");
+
+  if (!scheduleId) {
+    alert("Please select a course schedule first.");
+    return;
+  }
+
+  // IF NOTHING SELECTED → JUST MOVE ON
+  if (selectedSet.size === 0) {
+    console.log("No officers selected. Skipping save.");
+
+    currentStep++;
+    renderStep();
+    return;
+  }
+
+  // BUILD PAYLOAD
+  const nominations = Array.from(selectedSet).map(personnelId => ({
+    personnelId,
+    status: attendingSet.has(personnelId)
+      ? "ATTENDING"
+      : "NOT_ATTENDING"
+  }));
+
+  const payload = {
+    scheduleId: parseInt(scheduleId),
+    nominations
+  };
+
+  console.log("SAVING PANEL:", payload);
+
+  fetch("http://localhost:6060/api/course-panel/nomination", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to save panel");
+
+      alert("Panel saved successfully");
+      renderStep();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Personnel Already Exists");
     });
+}
+
 
     // Top step click
     steps.forEach((step, index) => {
@@ -1329,8 +1638,7 @@
       });
     });
 
-
-        document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
 
         const courseSelect = document.getElementById("courseSelect");
         const startDateInput = document.getElementById("courseStartDate");
@@ -1343,34 +1651,49 @@
         courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
 
         courses.forEach(course => {
-        const option = document.createElement("option");
-        option.value = course.courseId;   // 🔥 IMPORTANT
-        option.textContent = course.courseName;
-        option.dataset.startDate = course.startDate;
-        option.dataset.endDate = course.endDate;
-        courseSelect.appendChild(option);
-    });
+    const option = document.createElement("option");
+
+    //  scheduleId is PRIMARY now
+    option.value = course.scheduleId;
+
+    option.textContent =
+        `${course.courseName} (${course.startDate} → ${course.endDate})`;
+
+    option.dataset.courseId = course.courseId;
+    option.dataset.startDate = course.startDate;
+    option.dataset.endDate = course.endDate;
+
+    courseSelect.appendChild(option);
+});
+
     });
 
-        // 🔥 THIS IS THE FIX
+        // THIS IS THE FIX
         courseSelect.addEventListener("change", function () {
 
-        const selectedOption = this.options[this.selectedIndex];
-        const courseId = this.value;
+    const selectedOption = this.options[this.selectedIndex];
 
-        if (!courseId) {
-        startDateInput.value = "";
-        endDateInput.value = "";
-        resetStep2();
+    const scheduleId = this.value;
+    const courseId   = selectedOption.dataset.courseId;
+
+    if (!scheduleId) {
+        sessionStorage.clear();
         return;
     }
 
-        startDateInput.value = selectedOption.dataset.startDate;
-        endDateInput.value = selectedOption.dataset.endDate;
+    // STORE scheduleId for Step-3 save
+    sessionStorage.setItem("scheduleId", scheduleId);
 
-        // 🔥 CALL STEP-2 API
-        loadStep2PanelStrength(courseId);
-    });
+    // keep existing logic
+    document.getElementById("courseStartDate").value =
+        selectedOption.dataset.startDate;
+
+    document.getElementById("courseEndDate").value =
+        selectedOption.dataset.endDate;
+
+    // STEP-2 API still needs courseId
+    loadStep2PanelStrength(courseId);
+});
     });
 
 
@@ -1407,11 +1730,12 @@
                     `Panel size (${panelSize}) = Course strength (${courseStrength}) + Buffer (10).`;
 
                 /* ===============================
-                   🔥 STORE FOR STEP-3
+                   STORE FOR STEP-3
                 ================================ */
                 sessionStorage.setItem("courseStrength", courseStrength);
                 sessionStorage.setItem("panelSize", panelSize);
-                sessionStorage.setItem("bufferSize",courseStrength- panelSize);
+                sessionStorage.setItem("bufferSize", panelSize - courseStrength);
+
 
                 console.log(
                     "STEP2 STORED =>",
@@ -1422,54 +1746,12 @@
             })
             .catch(err => {
                 console.error(err);
-                logicText.innerText = "❌ Unable to load course strength";
+                logicText.innerText = "Unable to load course strength";
             });
     }
 
 
-    //     let courseStrength = 0;
-            //     let panelSize = 0;
-            //     const BUFFER = 10;
-            //
-            //     const courseStrengthEl = document.getElementById("courseStrength");
-            //     const panelSizeEl = document.getElementById("panelSize");
-            //     const plusBtn = document.getElementById("increasePanel");
-            //     const minusBtn = document.getElementById("decreasePanel");
-            //     const logicText = document.getElementById("logicText");
-            //
-            //     // 🔥 CALLED FROM STEP-1
-            //     function loadStep2PanelStrength(courseId) {
-            //
-            //     if (!courseId) {
-            //     console.warn("Course ID missing");
-            //     return;
-            // }
-            //
-            //     fetch(`http://localhost:6060/api/courseschedule/step2/${courseId}`)
-            //     .then(res => {
-            //     if (!res.ok) {
-            //     throw new Error("Failed to fetch panel strength");
-            // }
-            //     return res.json();
-            // })
-            //     .then(data => {
-            //
-            //     courseStrength = parseInt(data.courseStrength);
-            //     panelSize = data.panelSize;
-            //
-            //     courseStrengthEl.innerText = courseStrength;
-            //     panelSizeEl.innerText = panelSize;
-            //
-            //     logicText.innerText =
-            //     `Panel size (${panelSize}) = Course strength (${courseStrength}) + Buffer (10).`;
-            // })
-            //     .catch(err => {
-            //     console.error(err);
-            //     logicText.innerText = "❌ Unable to load course strength";
-            // });
-            // }
-
-                // ➕ Increase panel size
+     // ➕ Increase panel size
     plusBtn.addEventListener("click", () => {
         panelSize++;
         panelSizeEl.innerText = panelSize;
@@ -1488,38 +1770,9 @@
         }
     });
 
-    //     plusBtn.addEventListener("click", () => {
-            //     panelSize++;
-            //     panelSizeEl.innerText = panelSize;
-            // });
-            //
-            //     // ➖ Decrease (cannot go below course strength)
-            //     minusBtn.addEventListener("click", () => {
-            //     if (panelSize > courseStrength) {
-            //     panelSize--;
-            //     panelSizeEl.innerText = panelSize;
-            // }
-            // });
-
-
-
-
-
-
-
 
 
         document.addEventListener("DOMContentLoaded", function () {
-
-            /* ===============================
-               GLOBAL STATE (DECLARE FIRST!)
-            ================================ */
-            let officers = [];
-            let attendingSet = new Set();
-            const selectedSet = new Set(); // checkbox only
-            let nominatedSet = new Set();
-
-
             /* ===============================
                PANEL SUMMARY INIT
             ================================ */
@@ -1551,178 +1804,14 @@
                 }
             }
 
-            // function updateAttendingCount() {
-            //     if (panelAttend) {
-            //         panelAttend.innerText = attendingSet.size;
-            //     }
-            // }
-
             // safe call AFTER init
             updateAttendingCount();
 
-        // });
-
-
-        /* ===============================
-           ATTENDING LOGIC
-        =============================== */
-    // let attendingSet = new Set();
-    //
-    // function updateAttendingCount() {
-    //     document.getElementById("panelAttendingCount").innerText =
-    //         attendingSet.size;
-    // }
             function el(id) {
                 return document.getElementById(id);
             }
 
 
-
-            /* ===============================
-               FETCH OFFICERS (NO PAGINATION)
-            ================================ */
-        // function loadOfficers() {
-        //     fetch("http://localhost:6060/api/panel/officers")
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             officers = Array.isArray(data) ? data : [];
-        //             renderOfficerTable();
-        //         })
-        //         .catch(err => console.error("Officer load error", err));
-        // }
-        //
-        // /* ===============================
-        //    RENDER OFFICER TABLE
-        // ================================ */
-        // function renderOfficerTable() {
-        //     const tbody = el("officerTableBody");
-        //     if (!tbody) return;
-        //
-        //     tbody.innerHTML = "";
-        //
-        //     officers.forEach((o, index) => {
-        //         const isChecked = attendingSet.has(o.personnelId);
-        //
-        //         const row = document.createElement("tr");
-        //         row.innerHTML = `
-        //   <td>
-        //     <input type="checkbox"
-        //       ${isChecked ? "checked" : ""}
-        //       data-id="${o.personnelId}">
-        //   </td>
-        //   <td>${index + 1}</td>
-        //   <td>${o.fullName}</td>
-        //   <td>${o.armyNo}</td>
-        //   <td>${o.rank}</td>
-        //   <td>${o.unitName}</td>
-        //   <td>${o.command}</td>
-        //   <td>${o.dateOfSeniority ?? ""}</td>
-        //
-        // `;
-        //
-        //         row.querySelector("input").addEventListener("change", e => {
-        //             toggleAttendance(o.personnelId, e.target.checked);
-        //         });
-        //
-        //         tbody.appendChild(row);
-        //     });
-        // }
-        //
-        // /* ===============================
-        //    ATTENDANCE HANDLER
-        // ================================ */
-        // function toggleAttendance(personnelId, checked) {
-        //     checked
-        //         ? attendingSet.add(personnelId)
-        //         : attendingSet.delete(personnelId);
-        //
-        //     updateAttendingCount();
-        // }
-        //
-        // /* ===============================
-        //    SAVE ATTENDANCE (BULK)
-        // ================================ */
-        // function saveAttendanceBulk() {
-        //     const payload = Array.from(attendingSet).map(id => ({
-        //         personnelId: id,
-        //         status: "ATTENDING"
-        //     }));
-        //
-        //     fetch("http://localhost:6060/api/panel/attendance/bulk", {
-        //         method: "PUT",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(payload)
-        //     });
-        // }
-        //
-        // /* ===============================
-        //    ATTENDING COUNT
-        // ================================ */
-        // function updateAttendingCount() {
-        //     const elAttending = document.getElementById("panelAttendingCount");
-        //     if (elAttending) {
-        //         elAttending.innerText = attendingSet.size;
-        //     }
-        // }
-        //
-        // // function updateAttendingCount() {
-        // //     if (el("panelAttendingCount")) {
-        // //         el("panelAttendingCount").innerText = attendingSet.size;
-        // //     }
-        // // }
-        //
-        // /* ===============================
-        //    SELECT / DESELECT ALL
-        // ================================ */
-        // el("selectAllBtn")?.addEventListener("click", () => {
-        //     officers.forEach(o => attendingSet.add(o.personnelId));
-        //     renderOfficerTable();
-        //     updateAttendingCount();
-        // });
-        //
-        // el("deselectAllBtn")?.addEventListener("click", () => {
-        //     attendingSet.clear();
-        //     renderOfficerTable();
-        //     updateAttendingCount();
-        // });
-        //
-        // /* ===============================
-        //    MOVE TO STEP-4
-        // ================================ */
-        // el("sendForApprovalBtn")?.addEventListener("click", () => {
-        //     saveAttendanceBulk();
-        //     loadStep4();
-        //     el("step-3").style.display = "none";
-        //     el("step-4").style.display = "block";
-        // });
-        //
-        // /* ===============================
-        //    STEP-4 LOAD FINAL LIST
-        // ================================ */
-        // function loadStep4() {
-        //     fetch("http://localhost:6060/api/panel/attendance/all")
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             const tbody = el("finalApprovalTableBody");
-        //             if (!tbody) return;
-        //
-        //             tbody.innerHTML = "";
-        //             data.forEach((o, index) => {
-        //                 const row = document.createElement("tr");
-        //                 row.innerHTML = `
-        //       <td>${index + 1}</td>
-        //       <td>${o.fullName}</td>
-        //       <td>${o.armyNo}</td>
-        //       <td>${o.rank}</td>
-        //       <td>${o.unitName}</td>
-        //       <td>${o.command}</td>
-        //       <td>${o.dateOfSeniority ?? ""}</td>
-        //     `;
-        //                 tbody.appendChild(row);
-        //             });
-        //         });
-        // }
-        //
         // /* ===============================
         //    INITIAL LOAD
         // ================================ */
@@ -1741,76 +1830,110 @@
             /* ===============================
                RENDER TABLE
             ================================ */
-            function renderOfficerTable() {
-                const tbody = el("officerTableBody");
-                if (!tbody) return;
+			function renderOfficerTable() {
+  const tbody = document.getElementById("officerTableBody");
+  if (!tbody) return;
 
-                tbody.innerHTML = "";
+  tbody.innerHTML = "";
 
-                officers.forEach((o, index) => {
+  officers.forEach((o, index) => {
 
-                    const isSelected = selectedSet.has(o.personnelId);
-                    const isAttending = attendingSet.has(o.personnelId);
+    const isSelected  = selectedSet.has(o.personnelId);
+    const isAttending = attendingSet.has(o.personnelId);
 
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-          <td>
-            <input type="checkbox"
-              ${isSelected ? "checked" : ""}>
-          </td>
-          <td>${index + 1}</td>
-          <td>${o.fullName}</td>
-          <td>${o.armyNo}</td>
-          <td>${o.rank}</td>
-          <td>${o.unitName}</td>
-          <td>${o.command}</td>
-          <td>${o.dateOfSeniority ?? ""}</td>
-          <td>
-            <button class="btn ${isAttending ? "btn-success" : "btn-outline"}">
-              ✓ Attending
-            </button>
-            <button class="btn ${!isAttending ? "btn-danger" : "btn-outline"}">
-              ✗ Not Attending
-            </button>
-          </td>
-        `;
+    const row = document.createElement("tr");
 
-                    /* === Checkbox (SELECTION ONLY) === */
-                    row.querySelector("input").addEventListener("change", e => {
-                        e.target.checked
-                            ? selectedSet.add(o.personnelId)
-                            : selectedSet.delete(o.personnelId);
+    /* ✅ DATA ATTRIBUTES — MUST BE HERE */
+    row.dataset.medical = (o.medicalCategory || "").toUpperCase();
+    row.dataset.rank = (o.rank || "").toUpperCase();
+    row.dataset.unit = (o.unitName || "").toUpperCase();
+    row.dataset.command = (o.command || "").toUpperCase();
+    row.dataset.city = (o.city || "").toUpperCase();
+    row.dataset.state = (o.state || "").toUpperCase();
 
-                        el("selectedCount").innerText = selectedSet.size;
-                    });
+    row.innerHTML = `
+      <td><input type="checkbox" ${isSelected ? "checked" : ""}></td>
+      <td>${index + 1}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
+               style="width:36px;height:36px;border-radius:50%;object-fit:cover" />
+          <div>
+            <div style="font-weight:600">${o.fullName}</div>
+            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
+          </div>
+        </div>
+      </td>
+      <td>${o.rank || "-"}</td>
+      <td>${o.unitName || "-"}</td>
+      <td>${o.command || "-"}</td>
+      <td>${formatDate(o.dateOfCommission)}</td>
+      <td>${formatDate(o.dateOfSeniority)}</td>
+      <td>${formatDate(o.dateOfBirth)}</td>
+      <td>${o.religion || "-"}</td>
+      <td>${o.maritalStatus || "-"}</td>
+      <td>${o.medicalCategory || "-"}</td>
+      <td>${o.mobileNumber || "-"}</td>
+      <td>${o.emailAddress || "-"}</td>
+      <td>${o.city || "-"}</td>
+      <td>${o.state || "-"}</td>
+      <td>
+        <button class="btn ${isAttending ? "btn-success" : "btn-outline"}">
+          ✓ Attending
+        </button>
+        <button class="btn ${!isAttending ? "btn-danger" : "btn-outline"}">
+          ✗ Not Attending
+        </button>
+      </td>
+    `;
 
-                    /* === Attending button === */
-                    row.querySelector(".btn-success, .btn-outline")
-                        .addEventListener("click", () => {
-                            markAttending(o.personnelId, true);
-                        });
+    /* checkbox */
+    row.querySelector("input").addEventListener("change", e => {
+      e.target.checked
+        ? selectedSet.add(o.personnelId)
+        : selectedSet.delete(o.personnelId);
 
-                    /* === Not Attending button === */
-                    row.querySelector(".btn-danger, .btn-outline:last-child")
-                        .addEventListener("click", () => {
-                            markAttending(o.personnelId, false);
-                        });
+      el("selectedCount").innerText = selectedSet.size;
+    });
 
-                    tbody.appendChild(row);
-                });
-            }
+    /* attending */
+    row.querySelector(".btn-success, .btn-outline")
+      .addEventListener("click", () => {
+        markAttending(o.personnelId, true);
+      });
+
+    /* not attending */
+    row.querySelector(".btn-danger, .btn-outline:last-child")
+      .addEventListener("click", () => {
+        markAttending(o.personnelId, false);
+      });
+
+    tbody.appendChild(row);
+  });
+}
 
             /* ===============================
                ATTENDANCE HANDLER
             ================================ */
-            function markAttending(personnelId, attending) {
-                attending
-                    ? attendingSet.add(personnelId)
-                    : attendingSet.delete(personnelId);
+<!--            function markAttending(personnelId, attending) {-->
+<!--                attending-->
+<!--                    ? attendingSet.add(personnelId)-->
+<!--                    : attendingSet.delete(personnelId);-->
 
-                updateAttendingCount();
-                renderOfficerTable();
-            }
+<!--                updateAttendingCount();-->
+<!--                renderOfficerTable();-->
+<!--            }-->
+
+    function markAttending(personnelId, isAttending) {
+
+  if (isAttending) {
+    attendingSet.add(personnelId);
+  } else {
+    attendingSet.delete(personnelId);
+  }
+
+<!--  updateSummaryCounts(); // optional-->
+}
 
             /* ===============================
                PANEL SUMMARY
@@ -1894,16 +2017,361 @@
 
     });
 
+    /* ===============================
+   STEP-4 HELPERS (GLOBAL)
+================================ */
 
+function loadStep4Panel() {
+  const scheduleId = sessionStorage.getItem("scheduleId");
+
+  if (!scheduleId) return;
+
+  fetch(`http://localhost:6060/api/course-panel/nomination/${scheduleId}`)
+    .then(res => res.json())
+    .then(panelData => {
+
+      const personnelIds = panelData
+        .filter(p => p.attendanceStatus === "ATTENDING")
+        .map(p => p.personnelId);
+
+      if (personnelIds.length === 0) {
+        renderEmptyStep4();
+        return;
+      }
+
+      fetch("http://localhost:6060/api/panel/officers")
+        .then(res => res.json())
+        .then(allOfficers => {
+
+          const finalList = allOfficers.filter(o =>
+            personnelIds.includes(o.personnelId)
+          );
+
+          renderStep4Table(finalList); // ✅ now renders FULL columns
+        });
+    })
+    .catch(err => console.error("Step-4 error", err));
+}
+
+function loadStep5Panel() {
+
+  const scheduleId = sessionStorage.getItem("scheduleId");
+  if (!scheduleId) return;
+
+  fetch(`http://localhost:6060/api/course-panel/nomination/${scheduleId}`)
+    .then(res => res.json())
+    .then(panelData => {
+
+      const personnelIds = panelData
+        .filter(p => p.attendanceStatus === "ATTENDING")
+        .map(p => p.personnelId);
+
+      if (personnelIds.length === 0) {
+        renderEmptyStep5();
+        return;
+      }
+
+      fetch("http://localhost:6060/api/panel/officers")
+        .then(res => res.json())
+        .then(allOfficers => {
+
+          const finalList = allOfficers.filter(o =>
+            personnelIds.includes(o.personnelId)
+          );
+
+          renderStep5Table(finalList);
+        });
+    })
+    .catch(err => console.error("Step-5 error", err));
+}
+
+function renderEmptyStep5() {
+  const tbody = document.querySelector("#step-5 tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="17" style="text-align:center;color:#6b7280;padding:20px;">
+        No officers available for letter generation
+      </td>
+    </tr>
+  `;
+}
+
+
+function renderStep4Table(officers) {
+
+  const tbody = document.getElementById("finalApprovalTableBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (!Array.isArray(officers) || officers.length === 0) {
+    renderEmptyStep4();
+    return;
+  }
+
+  officers.forEach((o, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${index + 1}</td>
+
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <img
+            src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
+            style="width:36px;height:36px;border-radius:50%;object-fit:cover"
+          />
+          <div>
+            <div style="font-weight:600">${o.fullName}</div>
+            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
+          </div>
+        </div>
+      </td>
+
+      <td>${o.rank || "-"}</td>
+      <td>${o.unitName || "-"}</td>
+      <td>${o.command || "-"}</td>
+      <td>${formatDate(o.dateOfCommission)}</td>
+      <td>${formatDate(o.dateOfSeniority)}</td>
+      <td>${formatDate(o.dateOfBirth)}</td>
+      <td>${o.religion || "-"}</td>
+      <td>${o.maritalStatus || "-"}</td>
+      <td>${o.medicalCategory || "-"}</td>
+      <td>${o.mobileNumber || "-"}</td>
+      <td>${o.emailAddress || "-"}</td>
+      <td>${o.city || "-"}</td>
+      <td>${o.state || "-"}</td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+function renderEmptyStep4() {
+  const tbody = document.getElementById("finalApprovalTableBody");
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="7" style="text-align:center;color:#6b7280;padding:20px;">
+        No officers nominated for this schedule
+      </td>
+    </tr>
+  `;
+}
+
+
+function renderStep5Table(officers) {
+
+  const tbody = document.querySelector("#step-5 tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (!Array.isArray(officers) || officers.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="17" style="text-align:center;color:#6b7280;padding:20px;">
+          No officers available for letter generation
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  officers.forEach((o, index) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${index + 1}</td>
+
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <img
+            src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
+            style="width:36px;height:36px;border-radius:50%;object-fit:cover"
+          />
+          <div>
+            <div style="font-weight:600">${o.fullName}</div>
+            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
+          </div>
+        </div>
+      </td>
+
+      <td>${o.rank || "-"}</td>
+      <td>${o.unitName || "-"}</td>
+      <td>${o.command || "-"}</td>
+      <td>${formatDate(o.dateOfCommission)}</td>
+      <td>${formatDate(o.dateOfSeniority)}</td>
+      <td>${formatDate(o.dateOfBirth)}</td>
+      <td>${o.mobileNumber || "-"}</td>
+      <td>${o.emailAddress || "-"}</td>
+      <td>${o.city || "-"}</td>
+      <td>${o.state || "-"}</td>
+
+      <td>
+        <button class="attendance-btn attending">
+          ✓ Generate Letter
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-GB");
+}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      loadSendToRoles();
+    });
+
+    function loadSendToRoles() {
+      const select = document.getElementById("sendToRole");
+      if (!select) return;
+
+      fetch("http://localhost:6060/api/roles/summary")
+        .then(res => res.json())
+        .then(data => {
+
+          // Safety check
+          if (!Array.isArray(data)) return;
+
+          data.forEach(role => {
+            const option = document.createElement("option");
+            option.value = role.roleId;          // 🔥 value = roleId
+            option.textContent = role.roleName;  // 🔥 label = roleName
+            select.appendChild(option);
+          });
+        })
+        .catch(err => {
+          console.error("Failed to load roles", err);
+        });
+    }
+
+        document.getElementById("sendToApproval")?.addEventListener("click", () => {
+
+      const scheduleId = sessionStorage.getItem("scheduleId");
+      const roleId = document.getElementById("sendToRole")?.value;
+      const remark = document.getElementById("approvalRemark")?.value || "";
+
+      /* ===============================
+         BASIC VALIDATION
+      ================================ */
+      if (!scheduleId) {
+        alert("Schedule ID missing. Please select course first.");
+        return;
+      }
+
+      if (!roleId) {
+        alert("Please select a role to send approval.");
+        return;
+      }
+
+      /* ===============================
+         BUILD PAYLOAD
+      ================================ */
+      const payload = {
+        scheduleId: parseInt(scheduleId),
+        roleId: parseInt(roleId),
+        status: "pending",
+        remark: remark.trim()
+      };
+
+      console.log("Sending for approval:", payload);
+
+      /* ===============================
+         API CALL
+      ================================ */
+      fetch("http://localhost:6060/api/course-schedule-role-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to send for approval");
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Approval sent successfully", data);
+          alert("Panel sent for approval successfully.");
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Error while sending for approval.");
+        });
+
+    });
+
+
+document
+  .getElementById("applyFiltersBtn")
+  .addEventListener("click", applyFilters);
+
+function applyFilters() {
+
+  const medical = document.getElementById("medical").value.toUpperCase();
+  const grading = document.getElementById("grading").value.toUpperCase();
+
+  const selectedCommands = getCheckedValues("Command");
+  const selectedRanks = getCheckedValues("Rank");
+  const selectedUnits = getCheckedValues("Units");
+
+  const rows = document.querySelectorAll("#officerTableBody tr");
+
+  rows.forEach(row => {
+    let visible = true;
+
+    if (medical !== "ALL" && row.dataset.medical !== medical)
+      visible = false;
+
+    if (selectedCommands.length &&
+        !selectedCommands.includes(row.dataset.command))
+      visible = false;
+
+    if (selectedRanks.length &&
+        !selectedRanks.includes(row.dataset.rank))
+      visible = false;
+
+    if (selectedUnits.length &&
+        !selectedUnits.includes(row.dataset.unit))
+      visible = false;
+
+    row.style.display = visible ? "" : "none";
+  });
+
+  updateEligibleCount();
+}
+
+	function getCheckedValues(labelText) {
+  const group = [...document.querySelectorAll(".form-group")]
+    .find(g => g.querySelector(".form-label")?.innerText === labelText);
+
+  if (!group) return [];
+
+  return [...group.querySelectorAll("input[type='checkbox']:checked")]
+    .map(cb => cb.parentElement.innerText.trim().toUpperCase());
+}
+
+		  function updateEligibleCount() {
+  const rows = [...document.querySelectorAll("#officerTableBody tr")];
+  const visibleRows = rows.filter(r => r.style.display !== "none");
+
+  document.getElementById("totalEligible").innerText = visibleRows.length;
+}
 
 </script>
 
-
-
-
-
-
-
-
 </body>
 </html>
+

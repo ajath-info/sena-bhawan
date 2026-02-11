@@ -1,11 +1,11 @@
 package com.example.sena_bhawan.controller;
 
-import com.example.sena_bhawan.dto.CreatePersonnelRequest;
-import com.example.sena_bhawan.entity.CourseMaster;
+import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.service.PersonnelService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +41,12 @@ public class PersonnelController {
     }
 
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addPersonnel(@RequestBody CreatePersonnelRequest request) {
-        Long id = personnelService.createPersonnel(request);
+    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<?> addPersonnel(
+            @RequestPart("data") CreatePersonnelRequest request,
+            @RequestPart("image") MultipartFile image
+    ) {
+        Long id = personnelService.createPersonnel(request, image);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
@@ -53,9 +56,54 @@ public class PersonnelController {
         return ResponseEntity.ok(response);
     }
 
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPersonnel(@RequestBody CreatePersonnelRequest request) {
-//        Long id = personnelService.createPersonnel(request);
-//        return ResponseEntity.ok("Personnel created with ID: " + id);
-//    }
+    @PutMapping("/{id}/decorations")
+    public void updateDecorations(
+            @PathVariable Long id,
+            @RequestBody List<DecorationRequest> decorations
+    ) {
+        personnelService.updateDecorations(id, decorations);
+    }
+
+    @PutMapping("/{id}/qualifications")
+    public void updateQualifications(
+            @PathVariable Long id,
+            @RequestBody List<QualificationRequest> req
+    ) {
+        personnelService.updateQualifications(id, req);
+    }
+
+    @PutMapping("/{id}/additional-qualifications")
+    public void updateAdditionalQualifications(
+            @PathVariable Long id,
+            @RequestBody List<AdditionalQualificationRequest> req
+    ) {
+        personnelService.updateAdditionalQualifications(id, req);
+    }
+
+    @PutMapping("/{id}/family")
+    public void updateFamily(
+            @PathVariable Long id,
+            @RequestBody List<FamilyRequest> req
+    ) {
+        personnelService.updateFamily(id, req);
+    }
+
+    @PutMapping("/{id}/medical")
+    public void updateMedical(
+            @PathVariable Long id,
+            @RequestBody MedicalUpdateRequest req
+    ) {
+        personnelService.updateMedical(id, req);
+    }
+
+    @PutMapping("/personnel/{id}/basic")
+    public void updateBasicDetails(
+            @PathVariable Long id,
+            @RequestBody UpdatePersonnelRequest req
+    ) {
+        personnelService.updateBasicDetails(id, req);
+    }
+
+
+
 }

@@ -28,7 +28,7 @@ public class OrbatServiceImpl implements OrbatService {
         row.setLocation(req.getLocation());
         row.setSosNo(req.getSosNo());
         row.setPin(req.getPin());
-        row.setUnitName(null); // client requirement
+        row.setUnitName(req.getUnitName()); // client requirement
 
         // Fill parent names (same as your existing logic)
         if (req.getCommandId() != null) {

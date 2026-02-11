@@ -545,12 +545,16 @@
         <div class="upload-box">
           📷 Upload Officer Image<br>
           JPG / PNG, Max 2MB
+          <br><br>
+          <input type="file" id="officerImageFile" accept="image/*">
         </div>
+
 
         <!-- BASIC INFORMATION -->
         <div class="section">
           <div class="section-title">🧾 Basic Information</div>
           <div class="grid">
+            <div><label>Types of Commisiion *</label><input id="commission"></div>
             <div><label>Army No *</label><input id="armyNo"></div>
             <div><label>Rank *</label><input id="rank"></div>
             <div><label>Full Name *</label><input id="fullName"></div>
@@ -582,10 +586,21 @@
           <div class="section-title">🎖️ Service Details</div>
           <div class="grid">
             <div><label>NRS *</label><input id="nrs"></div>
-            <div><label>Religion *</label><input id="religion"></div>
+            <div><label>Religion *</label><select id="religion">
+              <option value="">Select Religion</option>
+              <option value="Hindu">Hindu</option>
+              <option value="Muslim">Muslim</option>
+              <option value="Sikhs">Sikhs</option>
+              <option value="Christian">Christian</option>
+            </select></div>
             <div><label>Aadhaar Number *</label><input id="aadhaarNumber"></div>
             <div><label>PAN Card *</label><input id="panCard"></div>
-            <div><label>Marital Status *</label><input id="maritalStatus"></div>
+            <div><label>Marital Status *</label><select id="maritalStatus">
+              <option value="">Select Religion</option>
+              <option value="Married">Married</option>
+              <option value="Unmarried">Unmarried</option>
+            </select></div>
+
             <div><label>CDA Account No *</label><input id="cdaAccountNo"></div>
           </div>
         </div>
@@ -621,6 +636,10 @@
             <div class="grid-1">
               <label>Email Address *</label>
               <input type="email" id="emailAddress">
+            </div>
+            <div class="grid-1">
+              <label>NSG Email *</label>
+              <input type="email" id="nsgEmail">
             </div>
           </div>
         </div>
@@ -693,6 +712,7 @@
         <div class="section">
           <div class="section-title">🩺 Medical Category</div>
 
+
           <div class="medical-category">
             <div class="medical-item">
               <span>S</span>
@@ -719,6 +739,18 @@
               <div class="medical-box" data-letter="E" data-value="5">5</div>
             </div>
           </div>
+
+          <div class="grid grid-1" style="margin-top:16px;">
+            <div>
+              <label>Medical Remarks</label>
+              <textarea
+                      id="medicalRemark"
+                      placeholder="Enter any medical observations, limitations, or remarks..."
+                      rows="3">
+              </textarea>
+            </div>
+          </div>
+
         </div>
 
 
@@ -941,6 +973,9 @@
   ======================================================= */
   let selectedMedicals = {};
 
+  document.addEventListener("DOMContentLoaded", () => {
+
+  // Medical category click handling
   document.querySelectorAll(".medical-box").forEach(box => {
     box.addEventListener("click", () => {
       const letter = box.dataset.letter;
@@ -956,6 +991,15 @@
     });
   });
 
+  // Load first rows
+  addDecoration(true);
+  addCivilQualification(true);
+  addAdditionalQualification(true);
+  addFamilyMember(true);
+
+});
+
+
   function getMedicalCategoryString() {
     return Object.keys(selectedMedicals)
       .sort()
@@ -969,93 +1013,106 @@
   ======================================================= */
   document.getElementById("savePersonnelBtn").addEventListener("click", async () => {
 
-    const payload = {
-      armyNo: armyNo.value,
-      rank: rank.value,
-      fullName: fullName.value,
-      dateOfCommission: dateOfCommission.value,
-      dateOfSeniority: dateOfSeniority.value,
-      dateOfBirth: dateOfBirth.value,
-      placeOfBirth: placeOfBirth.value,
-      officerImage: "image.jpg",
-      nrs: nrs.value,
-      religion: religion.value,
-      aadhaarNumber: aadhaarNumber.value,
-      panCard: panCard.value,
-      maritalStatus: maritalStatus.value,
-      cdaAccountNo: cdaAccountNo.value,
-      permanentAddress: permanentAddress.value,
-      city: city.value,
-      district: district.value,
-      state: state.value,
-      pinCode: pinCode.value,
-      mobileNumber: mobileNumber.value,
-      alternateMobile: alternateMobile.value,
-      emailAddress: emailAddress.value,
-      medicalCategory: getMedicalCategoryString(),
-      decorations: [],
-      qualifications: [],
-      additionalQualifications: [],
-      family: []
-    };
+  // ---------- BUILD PAYLOAD ----------
+  const payload = {
+    commission: commission.value,
+    armyNo: armyNo.value,
+    rank: rank.value,
+    fullName: fullName.value,
+    dateOfCommission: dateOfCommission.value,
+    dateOfSeniority: dateOfSeniority.value,
+    dateOfBirth: dateOfBirth.value,
+    placeOfBirth: placeOfBirth.value,
+    nrs: nrs.value,
+    religion: religion.value,
+    aadhaarNumber: aadhaarNumber.value,
+    panCard: panCard.value,
+    maritalStatus: maritalStatus.value,
+    cdaAccountNo: cdaAccountNo.value,
+    permanentAddress: permanentAddress.value,
+    city: city.value,
+    district: district.value,
+    state: state.value,
+    pinCode: pinCode.value,
+    mobileNumber: mobileNumber.value,
+    alternateMobile: alternateMobile.value,
+    emailAddress: emailAddress.value,
+    nsgEmmail: nsgEmail.value,
+    medicalCategory: getMedicalCategoryString(),
+    medicalRemark: document.getElementById("medicalRemark").value,
 
-    collectDecorationsIntoPayload(payload);
+    decorations: [],
+    qualifications: [],
+    additionalQualifications: [],
+    family: []
+  };
 
-    document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
-      const inputs = item.querySelectorAll("input");
-      payload.qualifications.push({
-        qualification: inputs[0].value,
-        institution: inputs[1].value,
-        yearOfCompletion: inputs[2].value,
-        gradePercentage: inputs[3].value
-      });
+  // ---------- COLLECT CHILD DATA ----------
+  collectDecorationsIntoPayload(payload);
+
+  document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.qualifications.push({
+      qualification: inputs[0].value,
+      institution: inputs[1].value,
+      yearOfCompletion: inputs[2].value,
+      gradePercentage: inputs[3].value
     });
-
-    document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
-      const inputs = item.querySelectorAll("input");
-      payload.additionalQualifications.push({
-        qualification: inputs[0].value,
-        issuingAuthority: inputs[1].value,
-        year: inputs[2].value,
-        validity: inputs[3].value
-      });
-    });
-
-    document.querySelectorAll("#family-container .repeater-item").forEach(item => {
-      const inputs = item.querySelectorAll("input");
-      payload.family.push({
-        name: inputs[0].value,
-        relationship: inputs[1].value,
-        contactNumber: ""
-      });
-    });
-
-    try {
-      const res = await fetch("http://localhost:6060/api/personnel/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error("API Error");
-
-      alert("Personnel saved successfully.");
-
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save personnel.");
-    }
-
   });
 
-
-  /* LOAD FIRST ROW AUTOMATICALLY */
-  document.addEventListener("DOMContentLoaded", () => {
-    addDecoration(true);
-    addCivilQualification(true);
-    addAdditionalQualification(true);
-    addFamilyMember(true);
+  document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.additionalQualifications.push({
+      qualification: inputs[0].value,
+      issuingAuthority: inputs[1].value,
+      year: inputs[2].value,
+      validity: inputs[3].value
+    });
   });
+
+  document.querySelectorAll("#family-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.family.push({
+      name: inputs[0].value,
+      relationship: inputs[1].value,
+      contactNumber: ""
+    });
+  });
+
+  // ---------- MULTIPART FORM ----------
+  const formData = new FormData();
+
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(payload)], { type: "application/json" })
+  );
+
+  const imageFile = document.getElementById("officerImageFile").files[0];
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+
+  // ---------- API CALL ----------
+  try {
+    const res = await fetch("http://localhost:6060/api/personnel/add", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) throw new Error("API Error");
+
+    alert("Personnel saved successfully.");
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save personnel.");
+  }
+
+});
+
+
+
+
 
 </script>
 

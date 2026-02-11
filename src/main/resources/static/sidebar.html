@@ -278,6 +278,49 @@
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
     }
+
+    .session-timer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #e5e7eb;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    .session-timer .label {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .session-timer .time {
+      font-size: 20px;
+      font-weight: 700;
+      color: #22c55e;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Warning state */
+    .session-timer.warning .time {
+      color: #f59e0b;
+    }
+
+    /* Danger state */
+    .session-timer.danger .time {
+      color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
     .logout-btn{
     cursor:pointer;
     color: #ffffff;
@@ -295,7 +338,6 @@
     }
     </style>
 
-<script src="auth.js"></script>
 
 <div class="container">
 
@@ -309,6 +351,11 @@
           <p>भारतीय सेना</p>
         </div>
       </div>
+    </div>
+
+    <div class="session-timer">
+      <span class="label">Session</span>
+      <span id="time" class="time">02:00</span>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-title">Main Menu</div>
@@ -362,10 +409,10 @@
         <span>Course Schedule</span>
       </a>
 
-      <a href="/location-master.html" class="nav-item">
-        <div class="nav-icon">📍</div>
-        <span>Location Master</span>
-      </a>
+<!--      <a href="/location-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">📍</div>-->
+<!--        <span>Location Master</span>-->
+<!--      </a>-->
 
       <!-- <a href="/command-master.html" class="nav-item">
         <div class="nav-icon">🚩</div>
@@ -381,6 +428,12 @@
         <div class="nav-icon">🏅</div>
         <span>Decoration Master</span>
       </a>
+
+      <a href="Usermmaster.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>User Master</span>
+      </a>
+
 
       <a href="/unit-master.html" class="nav-item">
         <div class="nav-icon">🛡️</div>
@@ -452,6 +505,8 @@
     </div>
   </aside>
 </div>
+<script src="auth.js"></script>
+
 
 <script>
     (function () {
@@ -472,5 +527,8 @@
       sessionStorage.clear();
       window.location.replace("/login.html"); // prevent back button
   }
+
+
+
 
 </script>

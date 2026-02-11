@@ -546,19 +546,51 @@
     }
 
     /* ===== PDF EXPORT ===== */
-    function downloadPDF() {
-      const element = document.getElementById("pdfContent");
-      const opt = {
-        margin: 0.4,
-        filename: "Paramount_Card.pdf",
-        image: { type: "jpeg", quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-      };
-      html2pdf().from(element).set(opt).save();
-    }
+<!--    function downloadPDF() {-->
+<!--      const element = document.getElementById("pdfContent");-->
+<!--      const opt = {-->
+<!--        margin: 0.4,-->
+<!--        filename: "Paramount_Card.pdf",-->
+<!--        image: { type: "jpeg", quality: 1 },-->
+<!--        html2canvas: { scale: 2 },-->
+<!--        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }-->
+<!--      };-->
+<!--      html2pdf().from(element).set(opt).save();-->
+<!--    }-->
 
-    loadPersonnelDropdown();
+<!--    loadPersonnelDropdown();-->
+
+    function downloadPDF() {
+  const element = document.getElementById("pdfContent");
+  const opt = {
+    margin: 0.4,
+    filename: "Paramount_Card.pdf",
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().from(element).set(opt).save();
+}
+
+/* ===============================
+   AUTO DOWNLOAD WHEN ID EXISTS
+================================ */
+
+const params = new URLSearchParams(window.location.search);
+const autoId = params.get("id");
+
+if (autoId) {
+  loadAllData(autoId);
+
+  setTimeout(() => {
+    downloadPDF();
+  }, 1200);
+} else {
+  loadPersonnelDropdown();
+}
+
+
+
 </script>
 
 </body>

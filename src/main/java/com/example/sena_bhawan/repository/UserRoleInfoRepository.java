@@ -8,6 +8,8 @@ import java.util.List;
 public interface UserRoleInfoRepository
         extends JpaRepository<UserRoleInfo, Long> {
 
+
+
     List<UserRoleInfo> findByUserId(Long userId);
 }
 

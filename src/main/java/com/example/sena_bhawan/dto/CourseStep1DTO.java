@@ -12,6 +12,8 @@ import java.time.LocalDate;
 public class CourseStep1DTO {
 
     private Integer courseId;
+    private Long scheduleId;
+    private String batchNumber;
     private String courseName;
     private String location;
     private LocalDate startDate;

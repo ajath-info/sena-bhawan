@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Location Master - ARMY HRMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            min-height: 72px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffb703;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #52b788;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            padding: 16px 20px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #52b788;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffb703;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d6a4f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .user-info .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-info .role {
+            font-size: 12px;
+            color: #52b788;
+        }
+
+        /* ================= MAIN ================= */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-left h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .search-box input {
+            width: 240px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f1f3f5;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #1b4332;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            background: #f9fafb;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+        }
+
+        .icon-btn.edit { color: #2563eb; border-color: #93c5fd; }
+        .icon-btn.delete { color: #ef4444; border-color: #fecaca; }
+    </style>
+</head>
+
+<body>
+
+<script src="logout.js"></script>
+
+<div class="container">
+
+
+
+    <div id="sidebar"></div>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="header">
+            <div class="header-left">
+                <h2>Location Master</h2>
+                <p>Manage Location Information</p>
+            </div>
+
+            <div class="search-box">
+                <input type="text" placeholder="Search locations..." />
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="card">
+
+                <div class="card-header">
+                    <span id="userCount" class="badge">0 Users</span>
+                </div>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Appointment</th>
+                        <th>Role</th>
+                        <th>SOS No</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="userTable">
+                    <tr>
+                        <td colspan="4">Loading...</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    let usersData = [];
+    let rolesMap = {};
+
+    // LOAD ALL DATA
+    async function loadUsers() {
+        try {
+            const [userRes, roleRes] = await Promise.all([
+                fetch("http://localhost:6060/api/users"),
+                fetch("http://localhost:6060/api/roles")
+            ]);
+
+            const users = await userRes.json();
+            const roles = await roleRes.json();
+
+            // CREATE ROLE MAP
+            roles.forEach(role => {
+                rolesMap[role.roleId] = role.roleName;
+            });
+
+            usersData = users;
+            renderUsers(usersData);
+            document.getElementById("userCount").innerText =
+                usersData.length + " Users";
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById("userTable").innerHTML =
+                "<tr><td colspan='6'>Failed to load data</td></tr>";
+        }
+    }
+
+    // RENDER TABLE
+    function renderUsers(data) {
+        const table = document.getElementById("userTable");
+        table.innerHTML = "";
+
+        if (data.length === 0) {
+            table.innerHTML =
+                "<tr><td colspan='6'>No users found</td></tr>";
+            return;
+        }
+
+        data.forEach((user, index) => {
+            table.innerHTML += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${user.username ?? "-"}</td>
+          <td>${user.name ?? "-"}</td>
+          <td>${user.appointment ?? "-"}</td>
+          <td>${rolesMap[user.roleId] ?? "-"}</td>
+          <td>${user.sosNo ?? "-"}</td>
+        </tr>
+      `;
+        });
+    }
+
+    // SEARCH
+    function searchUsers() {
+        const keyword = document
+            .getElementById("searchInput")
+            .value
+            .toLowerCase();
+
+        const filtered = usersData.filter(user =>
+            (user.username && user.username.toLowerCase().includes(keyword)) ||
+            (user.name && user.name.toLowerCase().includes(keyword)) ||
+            (user.appointment && user.appointment.toLowerCase().includes(keyword)) ||
+            (user.sosNo && user.sosNo.toLowerCase().includes(keyword))
+        );
+
+        renderUsers(filtered);
+        document.getElementById("userCount").innerText =
+            filtered.length + " Users";
+    }
+
+    loadUsers();
+</script>
+
+</body>
+</html>

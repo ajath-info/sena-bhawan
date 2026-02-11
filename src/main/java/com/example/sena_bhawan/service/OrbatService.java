@@ -16,4 +16,5 @@ public interface OrbatService {
     List<String> getDistinctSosNumbers();
 
     List<OrbatStructure> getSosList();
+
 }

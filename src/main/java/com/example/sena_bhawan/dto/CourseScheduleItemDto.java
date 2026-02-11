@@ -29,6 +29,10 @@ public class CourseScheduleItemDto {
     @JsonProperty("venue")
     private String venue;
 
+
+    @JsonProperty("remarks")
+    private String remarks;
+
     // nested course object as in your sample
     @JsonProperty("courseid")
     private Integer courseId;

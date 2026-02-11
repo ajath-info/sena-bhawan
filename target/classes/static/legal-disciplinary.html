@@ -237,6 +237,11 @@
                     </div>
 
                     <div class="grid">
+
+                        <div>
+                            <label>Case Id</label>
+                            <input id="caseId">
+                        </div>
                         <div>
                             <label>Case Type</label>
                             <input id="caseType">
@@ -266,6 +271,7 @@
                         <thead>
                         <tr>
                             <th>S.No</th>
+                            <th>Case Id</th>
                             <th>Case Type</th>
                             <th>Date Filed</th>
                             <th>Status</th>
@@ -333,6 +339,7 @@
             tbody.innerHTML += `
               <tr>
                 <td>${i + 1}</td>
+                 <td>${x.caseId}</td>
                 <td>${x.caseType}</td>
                 <td>${x.dateOfFiling}</td>
                 <td><span class="badge">${x.currentStatus}</span></td>
@@ -354,6 +361,7 @@
         rank: document.getElementById("rankInput").value,
         fullName: document.getElementById("fullNameInput").value,
         caseType: document.getElementById("caseType").value,
+          caseId: document.getElementById("caseId").value,
         dateOfFiling: document.getElementById("dateOfFiling").value,
         currentStatus: document.getElementById("currentStatus").value,
         finalOutcome: document.getElementById("finalOutcome").value

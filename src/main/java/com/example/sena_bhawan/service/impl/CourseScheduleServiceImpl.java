@@ -62,6 +62,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         schedule.setEndDate(LocalDate.parse(request.getEndDate()));
         schedule.setCourseStrength(request.getCourseStrength());
         schedule.setVenue(request.getVenue());
+        schedule.setRemarks(request.getRemarks());
 
         return scheduleRepo.save(schedule);
     }
@@ -162,6 +163,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         return schedules.stream()
                 .map(cs -> new CourseStep1DTO(
                         cs.getCourse().getSrno(),
+                        cs.getScheduleId(),
+                        cs.getBatchNumber(),
                         cs.getCourse().getCourseName(),
                         cs.getCourse().getLocation(),
                         cs.getStartDate(),

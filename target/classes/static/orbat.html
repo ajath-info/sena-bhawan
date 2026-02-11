@@ -257,13 +257,13 @@
                         <input id="pin">
                     </div>
 
-                    <div class="form-group full" style="display:none;">
+                    <div class="form-group full" >
                         <label>Unit Name</label>
-                        <input id="unitName" value="" readonly>
+                        <input id="unitName">
                     </div>
 
 
-                    <div class="form-group full">
+                    <div class="form-group full" style="display: none;">
                         <label>Formation Code (Auto)</label>
                         <input id="formationCode" readonly>
                     </div>
@@ -445,7 +445,7 @@
       updateSubmitState() {
         const btn = document.getElementById("submitBtn");
 
-        const requiredFields = ["hqId", "name", "location", "sosNo", "pin"];
+        const requiredFields = ["hqId", "name", "location", "sosNo", "pin","unitName"];
         for (let id of requiredFields) {
           if (!document.getElementById(id)?.value.trim()) {
             btn.disabled = true;
@@ -488,7 +488,7 @@
           location: document.getElementById("location").value.trim(),
           sosNo: document.getElementById("sosNo").value.trim(),
           pin: document.getElementById("pin").value.trim(),
-          unitName: null
+          unitName: document.getElementById("unitName").value.trim(),
         };
 
         const res = await fetch(`${this.api}/create`, {

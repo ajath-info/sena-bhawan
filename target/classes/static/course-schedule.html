@@ -613,14 +613,14 @@
 
   <div id="sidebar"></div>
 
-  <main class="main-content">
+  <main class="main-content" id="printMe">
     <header class="header">
       <div class="header-left">
         <h2>Course Schedule Management</h2>
         <p>Plan and manage course schedules across years</p>
       </div>
       <div class="header-right">
-        <button class="btn btn-secondary">
+        <button class="btn btn-secondary" onclick="printDiv('printMe')">
           <span>📊</span>
           Export Calendar
         </button>
@@ -956,6 +956,16 @@
 
   function openAddSchedule() {
     window.location.href = "/add-new-schedule.html";
+  }
+
+
+  function printDiv(divName) {
+    var printContents = document.getElementById(divName).innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents; // Temporarily replace body content with the div content
+    window.print(); // Open the print dialog
+    document.body.innerHTML = originalContents; // Restore the original body content
   }
 </script>
 

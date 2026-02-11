@@ -1,11 +1,18 @@
 package com.example.sena_bhawan.service.impl;
 
-import com.example.sena_bhawan.dto.CreatePersonnelRequest;
+import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.PersonnelService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,11 +41,14 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     @Override
     @Transactional
-    public Long createPersonnel(CreatePersonnelRequest req) {
+    public Long createPersonnel(CreatePersonnelRequest req, MultipartFile officerImage)
+
+    {
 
         Personnel p = new Personnel();
 
         // Basic Info
+        p.setCommissionType(req.commissionType);
         p.setArmyNo(req.armyNo);
         p.setRank(req.rank);
         p.setFullName(req.fullName);
@@ -46,7 +56,11 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setDateOfSeniority(req.dateOfSeniority);
         p.setDateOfBirth(req.dateOfBirth);
         p.setPlaceOfBirth(req.placeOfBirth);
-        p.setOfficerImage(req.officerImage);
+
+        if (officerImage != null && !officerImage.isEmpty()) {
+            String imagePath = saveOfficerImage(officerImage);
+            p.setOfficerImage(imagePath);
+        }
 
         // Service
         p.setNrs(req.nrs);
@@ -67,6 +81,8 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setMobileNumber(req.mobileNumber);
         p.setAlternateMobile(req.alternateMobile);
         p.setEmailAddress(req.emailAddress);
+        p.setNsgEmail(req.nsgEmail);
+
 
         // Medical
 //        p.setMedicalS(req.medicalS);
@@ -75,7 +91,16 @@ public class PersonnelServiceImpl implements PersonnelService {
 //        p.setMedicalP(req.medicalP);
 //        p.setMedicalE(req.medicalE);
 
+        // Medical
         p.setMedicalCategory(req.medicalCategory);
+        p.setMedicalDate(req.medicalDate);
+        p.setDiagnosis(req.diagnosis);
+        p.setReviewDate(req.reviewDate);
+        p.setRestriction(req.restriction);
+        p.setInjuryCategory(req.injuryCategory);
+        p.setIrsTransfer(req.irsTransfer);
+
+
 
 
         p.setCreatedAt(LocalDateTime.now());
@@ -103,6 +128,7 @@ public class PersonnelServiceImpl implements PersonnelService {
                 req.qualifications.stream().map(q -> {
                     PersonnelQualifications pq = new PersonnelQualifications();
                     pq.setQualification(q.qualification);
+                    pq.setStream(q.stream);
                     pq.setInstitution(q.institution);
                     pq.setYearOfCompletion(q.yearOfCompletion);
                     pq.setGradePercentage(q.gradePercentage);
@@ -143,5 +169,244 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         return saved.getId();
     }
+
+    private String saveOfficerImage(MultipartFile file) {
+
+        try {
+            String folder = "uploads/personnel/officer/";
+
+            File dir = new File(folder);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            String fileName =
+                    System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+            Path path = Paths.get(folder + fileName);
+            Files.write(path, file.getBytes());
+
+            // return RELATIVE path (stored in DB)
+            return folder + fileName;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save officer image", e);
+        }
+    }
+
+    @Transactional
+    public void updateDecorations(Long id, List<DecorationRequest> reqList) {
+
+        Personnel personnel = personnelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        List<PersonnelDecorations> existing = personnel.getDecorations();
+
+        // Remove deleted decorations
+        existing.removeIf(d ->
+                reqList.stream().noneMatch(r -> r.id != null && r.id.equals(d.getId()))
+        );
+
+        // Update or Add
+        for (DecorationRequest r : reqList) {
+
+            if (r.id != null) {
+                // UPDATE
+                PersonnelDecorations deco = existing.stream()
+                        .filter(d -> d.getId().equals(r.id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Decoration not found"));
+
+                deco.setDecorationCategory(r.decorationCategory);
+                deco.setDecorationName(r.decorationName);
+                deco.setAwardDate(r.awardDate);
+                deco.setCitation(r.citation);
+
+            } else {
+                // ADD NEW
+                PersonnelDecorations deco = new PersonnelDecorations();
+                deco.setDecorationCategory(r.decorationCategory);
+                deco.setDecorationName(r.decorationName);
+                deco.setAwardDate(r.awardDate);
+                deco.setCitation(r.citation);
+                deco.setPersonnel(personnel);
+                deco.setCreatedAt(LocalDateTime.now());
+
+                existing.add(deco);
+            }
+        }
+    }
+
+    @Transactional
+    public void updateQualifications(Long personnelId, List<QualificationRequest> reqList) {
+
+        Personnel personnel = personnelRepository.findById(personnelId)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        List<PersonnelQualifications> existing = personnel.getQualifications();
+
+        // Remove deleted
+        existing.removeIf(q ->
+                reqList.stream().noneMatch(r -> r.id != null && r.id.equals(q.getId()))
+        );
+
+        for (QualificationRequest r : reqList) {
+
+            if (r.id != null) {
+                // UPDATE
+                PersonnelQualifications q = existing.stream()
+                        .filter(e -> e.getId().equals(r.id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Qualification not found"));
+
+                q.setQualification(r.qualification);
+                q.setStream(r.stream);
+                q.setInstitution(r.institution);
+                q.setYearOfCompletion(r.yearOfCompletion);
+                q.setGradePercentage(r.gradePercentage);
+
+            } else {
+                // ADD NEW
+                PersonnelQualifications q = new PersonnelQualifications();
+                q.setQualification(r.qualification);
+                q.setStream(r.stream);
+                q.setInstitution(r.institution);
+                q.setYearOfCompletion(r.yearOfCompletion);
+                q.setGradePercentage(r.gradePercentage);
+                q.setPersonnel(personnel);
+                q.setCreatedAt(LocalDateTime.now());
+
+                existing.add(q);
+            }
+        }
+    }
+
+    @Transactional
+    public void updateAdditionalQualifications(
+            Long personnelId,
+            List<AdditionalQualificationRequest> reqList
+    ) {
+
+        Personnel personnel = personnelRepository.findById(personnelId)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        List<PersonnelAdditionalQualifications> existing =
+                personnel.getAdditionalQualifications();
+
+        // Remove deleted
+        existing.removeIf(a ->
+                reqList.stream().noneMatch(r -> r.id != null && r.id.equals(a.getId()))
+        );
+
+        for (AdditionalQualificationRequest r : reqList) {
+
+            if (r.id != null) {
+                // UPDATE
+                PersonnelAdditionalQualifications aq = existing.stream()
+                        .filter(e -> e.getId().equals(r.id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Additional qualification not found"));
+
+                aq.setQualification(r.qualification);
+                aq.setIssuingAuthority(r.issuingAuthority);
+                aq.setYear(r.year);
+                aq.setValidity(r.validity);
+
+            } else {
+                // ADD NEW
+                PersonnelAdditionalQualifications aq =
+                        new PersonnelAdditionalQualifications();
+
+                aq.setQualification(r.qualification);
+                aq.setIssuingAuthority(r.issuingAuthority);
+                aq.setYear(r.year);
+                aq.setValidity(r.validity);
+                aq.setPersonnel(personnel);
+                aq.setCreatedAt(LocalDate.now());
+
+                existing.add(aq);
+            }
+        }
+    }
+
+    @Transactional
+    public void updateFamily(Long personnelId, List<FamilyRequest> reqList) {
+
+        Personnel personnel = personnelRepository.findById(personnelId)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        List<PersonnelFamily> existing = personnel.getFamilyMembers();
+
+        // Remove deleted
+        existing.removeIf(f ->
+                reqList.stream().noneMatch(r -> r.id != null && r.id.equals(f.getId()))
+        );
+
+        for (FamilyRequest r : reqList) {
+
+            if (r.id != null) {
+                // UPDATE
+                PersonnelFamily fam = existing.stream()
+                        .filter(e -> e.getId().equals(r.id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Family member not found"));
+
+                fam.setName(r.name);
+                fam.setRelationship(r.relationship);
+                fam.setContactNumber(r.contactNumber);
+
+            } else {
+                // ADD NEW
+                PersonnelFamily fam = new PersonnelFamily();
+                fam.setName(r.name);
+                fam.setRelationship(r.relationship);
+                fam.setContactNumber(r.contactNumber);
+                fam.setPersonnel(personnel);
+                fam.setCreatedAt(LocalDateTime.now());
+
+                existing.add(fam);
+            }
+        }
+    }
+
+    @Transactional
+    public void updateMedical(Long id, MedicalUpdateRequest req) {
+
+        Personnel p = personnelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        p.setMedicalCategory(req.medicalCategory);
+        p.setMedicalDate(req.medicalDate);
+        p.setDiagnosis(req.diagnosis);
+        p.setReviewDate(req.reviewDate);
+        p.setRestriction(req.restriction);
+        p.setInjuryCategory(req.injuryCategory);
+
+        p.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Transactional
+    public void updateBasicDetails(Long id, UpdatePersonnelRequest req) {
+
+        Personnel p = personnelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        p.setCommissionType(req.commissionType);
+        p.setRank(req.rank);
+        p.setFullName(req.fullName);
+        p.setReligion(req.religion);
+        p.setMaritalStatus(req.maritalStatus);
+        p.setEmailAddress(req.emailAddress);
+        p.setNsgEmail(req.nsgEmail);
+        p.setMobileNumber(req.mobileNumber);
+        p.setAlternateMobile(req.alternateMobile);
+
+        p.setUpdatedAt(LocalDateTime.now());
+    }
+
+
+
+
 }
+
 
