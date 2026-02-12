@@ -1,1098 +1,1759 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Master Filter & Search - ARMY HRMS</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: "Inter", sans-serif;
-        background: #f1f3f5;
-        color: #1f2937;
-      }
-      .nav-item {
-        text-decoration: none;
-        color: white;
-      }
-      .container {
-        display: flex;
-        height: 100vh;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Filter & Search - ARMY HRMS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .sidebar {
-        width: 256px;
-        background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
-        color: white;
-        display: flex;
-        flex-direction: column;
-      }
-      .sidebar-header {
-        padding: 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 72px;
-      }
-      .logo-section {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        background: #ffb703;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 16px;
-      }
-      .logo-text h1 {
-        font-size: 18px;
-        font-weight: 700;
-      }
-      .logo-text p {
-        font-size: 11px;
-        color: #52b788;
-      }
-      .menu-icon {
-        width: 24px;
-        height: 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-      .menu-icon span {
-        width: 100%;
-        height: 2px;
-        background: white;
-        border-radius: 2px;
-      }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
 
-      .main-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .header {
-        background: white;
-        border-bottom: 1px solid #e5e7eb;
-        padding: 16px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 72px;
-      }
-      .header-left h2 {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 4px;
-      }
-      .header-left p {
-        font-size: 14px;
-        color: #6b7280;
-      }
-      .header-right {
-        display: flex;
-        gap: 12px;
-      }
-      .btn {
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .btn-primary {
-        background: #1b4332;
-        color: white;
-      }
-      .btn-secondary {
-        background: white;
-        color: #1b4332;
-        border: 2px solid #1b4332;
-      }
+    .container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-      .content-area {
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-      }
+    /* Sidebar Styles - Fixed */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #0b2c1f 0%, #04120c 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-      /* Filter Panel */
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: #ffb703;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      color: #0b2c1f;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: #a7e0c0;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a7e0c0;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      padding-left: 12px;
+    }
+
+    .nav-section-title:first-child {
+      margin-top: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .nav-item.active {
+      background: #2d6a4f;
+      color: white;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      background: #2d6a4f;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: white;
+      border: 2px solid #52b788;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-info .name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .user-info .role {
+      font-size: 12px;
+      color: #a7e0c0;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header-left h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+
+    .header-left p {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #0b2c1f;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1a4731;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #0b2c1f;
+      border: 2px solid #0b2c1f;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .content-area {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Filter Panel - Fixed */
+    .filter-panel {
+      width: 360px;
+      background: white;
+      border-right: 1px solid #e2e8f0;
+      padding: 24px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .filter-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .clear-filters {
+      font-size: 13px;
+      color: #dc2626;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #fef2f2;
+      transition: all 0.2s;
+    }
+
+    .clear-filters:hover {
+      background: #fee2e2;
+    }
+
+    .filter-section {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .filter-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .filter-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-group {
+      margin-bottom: 16px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .filter-input,
+    .filter-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      border-color: #0b2c1f;
+      box-shadow: 0 0 0 3px rgba(11, 44, 31, 0.1);
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .checkbox-item:hover {
+      background: #f8fafc;
+    }
+
+    .checkbox-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .checkbox-box.checked {
+      background: #0b2c1f;
+      border-color: #0b2c1f;
+      color: white;
+    }
+
+    .checkbox-label {
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .radio-item:hover {
+      background: #f8fafc;
+    }
+
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radio-circle.checked {
+      border-color: #0b2c1f;
+    }
+
+    .radio-circle.checked::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      background: #0b2c1f;
+      border-radius: 50%;
+    }
+
+    .radio-label {
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .filter-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* Results Area */
+    .results-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .results-header {
+      background: white;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .results-count {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .results-count strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .view-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-btn.active {
+      background: white;
+      color: #0b2c1f;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .results-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: auto;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    .data-table thead {
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .data-table th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .officer-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .officer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0b2c1f, #1e4a3a);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .officer-info {
+      min-width: 0;
+    }
+
+    .officer-name {
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .officer-army-no {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-warning {
+      background: #fef9c3;
+      color: #b45309;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-purple {
+      background: #f3e8ff;
+      color: #6b21a8;
+    }
+
+    .badge-gray {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .action-icons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+      background: white;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .icon-btn.view {
+      color: #15803d;
+      border-color: #15803d;
+    }
+
+    .icon-btn.edit {
+      color: #2563eb;
+      border-color: #2563eb;
+    }
+
+    /* Active Filters */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: #0b2c1f;
+      color: white;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .filter-tag-close {
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .filter-tag-close:hover {
+      opacity: 1;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pagination-btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .pagination-btn.active {
+      background: #0b2c1f;
+      color: white;
+      border-color: #0b2c1f;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Loading State */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      border-radius: 12px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #0b2c1f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Card View */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .officer-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .officer-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .card-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0b2c1f, #1e4a3a);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .card-rank {
+      padding: 4px 12px;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      margin-bottom: 16px;
+    }
+
+    .card-name {
+      font-weight: 700;
+      font-size: 16px;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .card-army-no {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .card-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .card-detail-item {
+      color: #475569;
+    }
+
+    .card-detail-label {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .card-detail-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .card-unit {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0b2c1f;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
       .filter-panel {
         width: 320px;
-        background: white;
-        border-right: 1px solid #e5e7eb;
-        padding: 24px;
-        overflow-y: auto;
       }
-      .filter-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      }
-      .filter-header h3 {
-        font-size: 18px;
-        font-weight: 700;
-      }
-      .clear-filters {
-        font-size: 12px;
-        color: #ef4444;
-        cursor: pointer;
-        font-weight: 600;
-      }
+    }
 
-      .filter-section {
-        margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid #e5e7eb;
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 240px;
       }
-      .filter-section:last-child {
-        border-bottom: none;
-      }
-      .filter-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .filter-group {
-        margin-bottom: 16px;
-      }
-      .filter-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 6px;
-        display: block;
-      }
-      .filter-input,
-      .filter-select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 14px;
-      }
-      .filter-input:focus,
-      .filter-select:focus {
-        outline: none;
-        border-color: #1b4332;
-      }
+    }
 
-      .radio-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .radio-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      .radio-item:hover {
-        background: #f9fafb;
-      }
-      .radio-circle {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #d1d5db;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .radio-circle.checked {
-        border-color: #1b4332;
-      }
-      .radio-circle.checked::after {
-        content: "";
-        width: 10px;
-        height: 10px;
-        background: #1b4332;
-        border-radius: 50%;
-      }
-      .radio-label {
-        font-size: 13px;
-        color: #1f2937;
-      }
+    /* Search Bar */
+    .search-bar {
+      margin-bottom: 20px;
+    }
 
-      .checkbox-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .checkbox-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px;
-      }
-      .checkbox-box {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #d1d5db;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .checkbox-box.checked {
-        background: #1b4332;
-        border-color: #1b4332;
-        color: white;
-      }
-      .checkbox-label {
-        font-size: 13px;
-        color: #1f2937;
-      }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      padding-left: 40px;
+      background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 12px center;
+    }
 
-      .filter-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 24px;
-      }
-      .filter-actions .btn {
-        width: 100%;
-        justify-content: center;
-      }
+    .search-input:focus {
+      outline: none;
+      border-color: #0b2c1f;
+      box-shadow: 0 0 0 3px rgba(11, 44, 31, 0.1);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Sidebar will be loaded here -->
+  <div id="sidebar"></div>
 
-      /* Results Area */
-      .results-area {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .results-header {
-        background: white;
-        padding: 16px 24px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .results-count {
-        font-size: 14px;
-        color: #6b7280;
-      }
-      .results-count strong {
-        color: #1f2937;
-        font-weight: 700;
-      }
-      .view-toggle {
-        display: flex;
-        gap: 4px;
-        background: #f3f4f6;
-        padding: 4px;
-        border-radius: 6px;
-      }
-      .view-btn {
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #6b7280;
-        border: none;
-        background: none;
-        cursor: pointer;
-      }
-      .view-btn.active {
-        background: white;
-        color: #1b4332;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
+  <main class="main-content">
+    <header class="header">
+      <div class="header-left">
+        <h2>Master Filter & Search</h2>
+        <p>Advanced filtering for officer records</p>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="exportResults()">
+          <span>📊</span>
+          Export Results
+        </button>
+        <button class="btn btn-primary" onclick="generateLetter()">
+          <span>📧</span>
+          Generate Letter
+        </button>
+      </div>
+    </header>
 
-      .results-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 24px;
-      }
+    <div class="content-area">
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <div class="filter-header">
+          <h3>Filters</h3>
+          <span class="clear-filters" onclick="clearAllFilters()">Clear All</span>
+        </div>
 
-      /* Table View */
-      .table-container {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        overflow: hidden;
-      }
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .data-table thead {
-        background: #f9fafb;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
-      .data-table th {
-        padding: 12px 16px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #6b7280;
-        border-bottom: 2px solid #e5e7eb;
-      }
-      .data-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f3f4f6;
-        font-size: 14px;
-      }
-      .data-table tbody tr:hover {
-        background: #f9fafb;
-      }
-      .data-table tbody tr:last-child td {
-        border-bottom: none;
-      }
-
-      .officer-cell {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .officer-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #1b4332, #2d6a4f);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 14px;
-      }
-      .officer-info {
-      }
-      .officer-name {
-        font-weight: 600;
-        color: #1f2937;
-      }
-      .officer-army-no {
-        font-size: 12px;
-        color: #6b7280;
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-      }
-      .badge-success {
-        background: #d1fae5;
-        color: #10b981;
-      }
-      .badge-warning {
-        background: #fef3c7;
-        color: #f59e0b;
-      }
-      .badge-info {
-        background: #dbeafe;
-        color: #3b82f6;
-      }
-      .badge-purple {
-        background: #e9d5ff;
-        color: #a855f7;
-      }
-
-      .action-icons {
-        display: flex;
-        gap: 6px;
-      }
-      .icon-btn {
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        cursor: pointer;
-        border: 1px solid #e5e7eb;
-        background: white;
-        transition: all 0.2s;
-      }
-      .icon-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      .icon-btn.view {
-        color: #10b981;
-        border-color: #10b981;
-      }
-      .icon-btn.edit {
-        color: #3b82f6;
-        border-color: #3b82f6;
-      }
-
-      /* Active Filters Display */
-      .active-filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 16px;
-      }
-      .filter-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        background: #1b4332;
-        color: white;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 600;
-      }
-      .filter-tag-close {
-        cursor: pointer;
-        font-size: 14px;
-        opacity: 0.8;
-      }
-      .filter-tag-close:hover {
-        opacity: 1;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-<!--      <aside class="sidebar">-->
-<!--    <div class="sidebar-header">-->
-<!--      <div class="logo-section">-->
-<!--        <div class="logo-icon">🛡️</div>-->
-<!--        <div class="logo-text">-->
-<!--          <h1>ARMY HRMS</h1>-->
-<!--          <p>भारतीय सेना</p>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <nav class="sidebar-nav">-->
-<!--      <div class="nav-section-title">Main Menu</div>-->
-
-<!--      <a href="/dashboard-new.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-officers.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Officers</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-training.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Training</span>-->
-<!--      </a>-->
-
-<!--      <a href="/filter.html" class="nav-item active">-->
-<!--        <div class="nav-icon">🔍</div>-->
-<!--        <span>Master Filter & Search</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Administration</div>-->
-
-<!--      <a href="/role-permmissoon.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔐</div>-->
-<!--        <span>Role & Permissions</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
-<!--        <div class="nav-icon">👥</div>-->
-<!--        <span>User Management</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <div class="nav-section-title">Masters</div>-->
-
-<!--      <a href="/course-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📚</div>-->
-<!--        <span>Course Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/grade-awards.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Grade & Awards</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-schedule.html" class="nav-item">-->
-<!--        <div class="nav-icon">📅</div>-->
-<!--        <span>Course Schedule</span>-->
-<!--      </a>-->
-
-<!--      <a href="/location-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📍</div>-->
-<!--        <span>Location Master</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🚩</div>-->
-<!--        <span>Command Master</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <a href="/rank-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏅</div>-->
-<!--        <span>Rank Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/unit-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🛡️</div>-->
-<!--        <span>Unit Master</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Forms</div>-->
-
-<!--      <a href="/personnel-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">👤</div>-->
-<!--        <span>Personnel Data Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/coursepanel.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Course Panel Generation</span>-->
-<!--      </a>-->
-
-<!--      <a href="/orbat.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Orbit Generation Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/add-new-user.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>New User Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/legal-disciplinary.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Legal And Disciplinary Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-posting-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Course & Posting Form</span>-->
-<!--      </a>-->
-<!--    </nav>-->
-
-<!--    <div class="sidebar-footer">-->
-<!--      <div class="user-profile">-->
-<!--        <div class="user-avatar">AD</div>-->
-<!--        <div class="user-info">-->
-<!--          <div class="name">Admin User</div>-->
-<!--          <div class="role">HQ Command</div>-->
-<!--        </div>-->
-<!--        <div>🚪</div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </aside>-->
-
-      <div id="sidebar"></div>
-
-      <main class="main-content">
-        <header class="header">
-          <div class="header-left">
-            <h2>Master Filter & Search</h2>
-            <p>Advanced filtering for officer records</p>
+        <!-- Search Filter -->
+        <div class="filter-section">
+          <div class="filter-title">🔍 Quick Search</div>
+          <div class="search-bar">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search by name, army no, NRS..." onkeyup="debounceSearch()">
           </div>
-          <div class="header-right">
-            <button class="btn btn-secondary">
-              <span>📊</span>
-              Export Results
-            </button>
-            <button class="btn btn-primary">
-              <span>📧</span>
-              Generate Letter
-            </button>
+        </div>
+
+        <!-- Unit Filter -->
+        <div class="filter-section">
+          <div class="filter-title">🛡️ Unit</div>
+          <div class="filter-group">
+            <label class="filter-label">Select Unit</label>
+            <select class="filter-select" id="unitFilter" onchange="applyFilters()">
+              <option value="">All Units</option>
+              <option value="15 RAJPUT">15 RAJPUT</option>
+              <option value="22 GRENADIERS">22 GRENADIERS</option>
+              <option value="9 PARA (SF)">9 PARA (SF)</option>
+              <option value="3 GORKHA RIFLES">3 GORKHA RIFLES</option>
+              <option value="11 SIKH">11 SIKH</option>
+            </select>
           </div>
-        </header>
+        </div>
 
-        <div class="content-area">
-          <!-- Filter Panel -->
-          <div class="filter-panel">
-            <div class="filter-header">
-              <h3>Filters</h3>
-              <span class="clear-filters">Clear All</span>
+        <!-- Rank Filter -->
+        <div class="filter-section">
+          <div class="filter-title">🏅 Rank</div>
+          <div class="checkbox-group" id="rankFilters">
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Brigadier & Above')">
+              <div class="checkbox-box checked">✓</div>
+              <span class="checkbox-label">Brigadier & Above</span>
             </div>
-
-            <!-- Unit Filter -->
-            <div class="filter-section">
-              <div class="filter-title">🛡️ Unit</div>
-              <div class="filter-group">
-                <label class="filter-label">Select Unit</label>
-                <select class="filter-select">
-                  <option>All Units</option>
-                  <option>15 RAJPUT</option>
-                  <option>22 GRENADIERS</option>
-                  <option>9 PARA (SF)</option>
-                  <option>3 GORKHA RIFLES</option>
-                  <option>11 SIKH</option>
-                </select>
-              </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Colonel')">
+              <div class="checkbox-box checked">✓</div>
+              <span class="checkbox-label">Colonel</span>
             </div>
-
-            <!-- Rank Filter -->
-            <div class="filter-section">
-              <div class="filter-title">🏅 Rank</div>
-              <div class="checkbox-group">
-                <div class="checkbox-item">
-                  <div class="checkbox-box checked">✓</div>
-                  <span class="checkbox-label">Brigadier & Above</span>
-                </div>
-                <div class="checkbox-item">
-                  <div class="checkbox-box checked">✓</div>
-                  <span class="checkbox-label">Colonel</span>
-                </div>
-                <div class="checkbox-item">
-                  <div class="checkbox-box checked">✓</div>
-                  <span class="checkbox-label">Lieutenant Colonel</span>
-                </div>
-                <div class="checkbox-item">
-                  <div class="checkbox-box checked">✓</div>
-                  <span class="checkbox-label">Major</span>
-                </div>
-                <div class="checkbox-item">
-                  <div class="checkbox-box"></div>
-                  <span class="checkbox-label">Captain</span>
-                </div>
-                <div class="checkbox-item">
-                  <div class="checkbox-box"></div>
-                  <span class="checkbox-label">Lieutenant</span>
-                </div>
-              </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Lieutenant Colonel')">
+              <div class="checkbox-box checked">✓</div>
+              <span class="checkbox-label">Lieutenant Colonel</span>
             </div>
-
-            <!-- Date of Birth Filter -->
-            <div class="filter-section">
-              <div class="filter-title">📅 Date of Birth</div>
-              <div class="filter-group">
-                <label class="filter-label">From Date</label>
-                <input type="date" class="filter-input" value="1985-01-01" />
-              </div>
-              <div class="filter-group">
-                <label class="filter-label">To Date</label>
-                <input type="date" class="filter-input" value="1995-12-31" />
-              </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Major')">
+              <div class="checkbox-box checked">✓</div>
+              <span class="checkbox-label">Major</span>
             </div>
-
-            <!-- Date of Seniority Filter -->
-            <div class="filter-section">
-              <div class="filter-title">📊 Date of Seniority</div>
-              <div class="filter-group">
-                <label class="filter-label">From Date</label>
-                <input type="date" class="filter-input" value="2010-01-01" />
-              </div>
-              <div class="filter-group">
-                <label class="filter-label">To Date</label>
-                <input type="date" class="filter-input" value="2020-12-31" />
-              </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Captain')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">Captain</span>
             </div>
-
-            <!-- Posted In Filter -->
-            <div class="filter-section">
-              <div class="filter-title">📍 Posted In</div>
-              <div class="filter-group">
-                <label class="filter-label">Command</label>
-                <select class="filter-select">
-                  <option>All Commands</option>
-                  <option>Northern Command</option>
-                  <option>Western Command</option>
-                  <option>Eastern Command</option>
-                  <option>Southern Command</option>
-                  <option>South Western Command</option>
-                  <option>Central Command</option>
-                </select>
-              </div>
-              <div class="filter-group">
-                <label class="filter-label">Corps</label>
-                <select class="filter-select">
-                  <option>All Corps</option>
-                  <option>I Corps</option>
-                  <option>II Corps</option>
-                  <option>III Corps</option>
-                  <option>XV Corps</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Course Filter -->
-            <div class="filter-section">
-              <div class="filter-title">🎓 Course List</div>
-              <div class="radio-group">
-                <div class="radio-item">
-                  <div class="radio-circle checked"></div>
-                  <span class="radio-label">All Courses</span>
-                </div>
-                <div class="radio-item">
-                  <div class="radio-circle"></div>
-                  <span class="radio-label">Staff College</span>
-                </div>
-                <div class="radio-item">
-                  <div class="radio-circle"></div>
-                  <span class="radio-label">Junior Command</span>
-                </div>
-                <div class="radio-item">
-                  <div class="radio-circle"></div>
-                  <span class="radio-label">Higher Command</span>
-                </div>
-                <div class="radio-item">
-                  <div class="radio-circle"></div>
-                  <span class="radio-label">Commando Training</span>
-                </div>
-                <div class="radio-item">
-                  <div class="radio-circle"></div>
-                  <span class="radio-label">Not Completed Any</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Filter Actions -->
-            <div class="filter-actions">
-              <button class="btn btn-secondary">Reset</button>
-              <button class="btn btn-primary">Apply Filters</button>
-            </div>
-          </div>
-
-          <!-- Results Area -->
-          <div class="results-area">
-            <div class="results-header">
-              <div class="results-count">
-                Showing <strong>248 officers</strong> matching your filters
-              </div>
-              <div class="view-toggle">
-                <button class="view-btn active">📋 Table</button>
-                <button class="view-btn">📇 Cards</button>
-              </div>
-            </div>
-
-            <div class="results-content">
-              <!-- Active Filters Display -->
-              <div class="active-filters">
-                <div class="filter-tag">
-                  <span>Rank: Brigadier & Above, Colonel, Lt Col, Major</span>
-                  <span class="filter-tag-close">✕</span>
-                </div>
-                <div class="filter-tag">
-                  <span>DOB: 1985 - 1995</span>
-                  <span class="filter-tag-close">✕</span>
-                </div>
-                <div class="filter-tag">
-                  <span>Seniority: 2010 - 2020</span>
-                  <span class="filter-tag-close">✕</span>
-                </div>
-              </div>
-
-              <!-- Results Table -->
-              <div class="table-container">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Officer</th>
-                      <th>Rank</th>
-                      <th>DOB</th>
-                      <th>Date of Seniority</th>
-                      <th>Current Unit</th>
-                      <th>Command</th>
-                      <th>Last Course</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">RK</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Rajesh Kumar Singh</div>
-                            <div class="officer-army-no">IC-12345</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Major</span></td>
-                      <td>25 Mar 1990</td>
-                      <td>15 Jun 2015</td>
-                      <td>15 RAJPUT</td>
-                      <td><span class="badge badge-success">Western</span></td>
-                      <td>
-                        <span class="badge badge-purple">Junior Command</span>
-                      </td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">AS</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Amit Kumar Sharma</div>
-                            <div class="officer-army-no">IC-23456</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Lt Colonel</span></td>
-                      <td>10 Aug 1987</td>
-                      <td>20 Dec 2012</td>
-                      <td>22 GRENADIERS</td>
-                      <td><span class="badge badge-warning">Northern</span></td>
-                      <td>
-                        <span class="badge badge-purple">Staff College</span>
-                      </td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">PV</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Priya Verma</div>
-                            <div class="officer-army-no">IC-34567</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Major</span></td>
-                      <td>15 Feb 1992</td>
-                      <td>10 Jun 2017</td>
-                      <td>9 PARA (SF)</td>
-                      <td><span class="badge badge-success">Western</span></td>
-                      <td><span class="badge badge-purple">Commando</span></td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">VS</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Vikram Singh Rathore</div>
-                            <div class="officer-army-no">IC-45678</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Colonel</span></td>
-                      <td>05 May 1985</td>
-                      <td>15 Jun 2010</td>
-                      <td>3 GORKHA RIFLES</td>
-                      <td><span class="badge badge-warning">Northern</span></td>
-                      <td>
-                        <span class="badge badge-purple">Higher Command</span>
-                      </td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">AP</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Arun Prakash</div>
-                            <div class="officer-army-no">IC-56789</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Major</span></td>
-                      <td>20 Nov 1991</td>
-                      <td>05 Jun 2016</td>
-                      <td>11 SIKH</td>
-                      <td><span class="badge badge-success">Western</span></td>
-                      <td>
-                        <span class="badge badge-purple">Junior Command</span>
-                      </td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="officer-cell">
-                          <div class="officer-avatar">SK</div>
-                          <div class="officer-info">
-                            <div class="officer-name">Suresh Kumar</div>
-                            <div class="officer-army-no">IC-67890</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span class="badge badge-info">Lt Colonel</span></td>
-                      <td>12 Jan 1988</td>
-                      <td>25 Dec 2013</td>
-                      <td>15 RAJPUT</td>
-                      <td><span class="badge badge-warning">Northern</span></td>
-                      <td>
-                        <span class="badge badge-purple">Staff College</span>
-                      </td>
-                      <td>
-                        <div class="action-icons">
-                          <div class="icon-btn view">👁️</div>
-                          <div class="icon-btn edit">✏️</div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Pagination -->
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-top: 24px;
-                  padding: 16px;
-                  background: white;
-                  border-radius: 12px;
-                  border: 1px solid #e5e7eb;
-                "
-              >
-                <div style="font-size: 14px; color: #6b7280">
-                  Showing <strong style="color: #1f2937">1-6</strong> of
-                  <strong style="color: #1f2937">248</strong> officers
-                </div>
-                <div style="display: flex; gap: 8px">
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 12px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    ← Previous
-                  </button>
-                  <button
-                    class="btn"
-                    style="padding: 8px 16px; background: #1b4332; color: white"
-                  >
-                    1
-                  </button>
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 16px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    2
-                  </button>
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 16px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    3
-                  </button>
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 12px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    ...
-                  </button>
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 16px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    42
-                  </button>
-                  <button
-                    class="btn"
-                    style="
-                      padding: 8px 12px;
-                      background: white;
-                      border: 1px solid #e5e7eb;
-                      color: #6b7280;
-                    "
-                  >
-                    Next →
-                  </button>
-                </div>
-              </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'Lieutenant')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">Lieutenant</span>
             </div>
           </div>
         </div>
-      </main>
+
+        <!-- Date of Birth Filter -->
+        <div class="filter-section">
+          <div class="filter-title">📅 Date of Birth</div>
+          <div class="filter-group">
+            <label class="filter-label">From Date</label>
+            <input type="date" class="filter-input" id="dobFrom" onchange="applyFilters()" />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">To Date</label>
+            <input type="date" class="filter-input" id="dobTo" onchange="applyFilters()" />
+          </div>
+        </div>
+
+        <!-- Date of Seniority Filter -->
+        <div class="filter-section">
+          <div class="filter-title">📊 Date of Seniority</div>
+          <div class="filter-group">
+            <label class="filter-label">From Date</label>
+            <input type="date" class="filter-input" id="seniorityFrom" onchange="applyFilters()" />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">To Date</label>
+            <input type="date" class="filter-input" id="seniorityTo" onchange="applyFilters()" />
+          </div>
+        </div>
+
+        <!-- Command Filter -->
+        <div class="filter-section">
+          <div class="filter-title">📍 Command</div>
+          <div class="filter-group">
+            <label class="filter-label">Select Command</label>
+            <select class="filter-select" id="commandFilter" onchange="applyFilters()">
+              <option value="">All Commands</option>
+              <option value="Northern Command">Northern Command</option>
+              <option value="Western Command">Western Command</option>
+              <option value="Eastern Command">Eastern Command</option>
+              <option value="Southern Command">Southern Command</option>
+              <option value="South Western Command">South Western Command</option>
+              <option value="Central Command">Central Command</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Medical Category Filter -->
+        <div class="filter-section">
+          <div class="filter-title">⚕️ Medical Category</div>
+          <div class="checkbox-group" id="medicalFilters">
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'SHAPE-1')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">SHAPE-1</span>
+            </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'SHAPE-2')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">SHAPE-2</span>
+            </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'SHAPE-3')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">SHAPE-3</span>
+            </div>
+            <div class="checkbox-item" onclick="toggleCheckbox(this, 'LOW MEDICAL CAT')">
+              <div class="checkbox-box"></div>
+              <span class="checkbox-label">LOW MEDICAL CAT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission Type Filter -->
+        <div class="filter-section">
+          <div class="filter-title">🎖️ Commission Type</div>
+          <div class="radio-group" id="commissionFilter">
+            <div class="radio-item" onclick="setCommissionType('')">
+              <div class="radio-circle checked"></div>
+              <span class="radio-label">All Types</span>
+            </div>
+            <div class="radio-item" onclick="setCommissionType('Permanent Commission')">
+              <div class="radio-circle"></div>
+              <span class="radio-label">Permanent Commission</span>
+            </div>
+            <div class="radio-item" onclick="setCommissionType('Short Service Commission')">
+              <div class="radio-circle"></div>
+              <span class="radio-label">Short Service Commission</span>
+            </div>
+            <div class="radio-item" onclick="setCommissionType('Emergency Commission')">
+              <div class="radio-circle"></div>
+              <span class="radio-label">Emergency Commission</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="filter-actions">
+          <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+          <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+        </div>
+      </div>
+
+      <!-- Results Area -->
+      <div class="results-area">
+        <div class="results-header">
+          <div class="results-count" id="resultsCount">
+            Loading...
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" onclick="switchView('table')">📋 Table</button>
+            <button class="view-btn" onclick="switchView('cards')">📇 Cards</button>
+          </div>
+        </div>
+
+        <div class="results-content">
+          <!-- Active Filters Display -->
+          <div class="active-filters" id="activeFilters">
+          </div>
+
+          <!-- Results Container -->
+          <div id="resultsContainer">
+            <!-- Table View (Default) -->
+            <div id="tableView" style="display: block;">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>Officer</th>
+                    <th>Rank</th>
+                    <th>DOB</th>
+                    <th>Date of Seniority</th>
+                    <th>Unit</th>
+                    <th>Command</th>
+                    <th>Medical</th>
+                    <th>Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px;">
+                      <div class="loading-spinner" style="margin: 0 auto;"></div>
+                      <div style="margin-top: 16px; color: #64748b;">Loading officer records...</div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Card View (Hidden by Default) -->
+            <div id="cardView" style="display: none;">
+              <div class="cards-grid" id="cardGrid">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="pagination">
+          </div>
+        </div>
+      </div>
     </div>
+  </main>
+</div>
 
-    <script>
-      // Load sidebar
-      fetch("sidebar.html")
-          .then(res => res.text())
-          .then(html => {
-              document.getElementById("sidebar").innerHTML = html;
+<script>
+  // Global state
+  let currentView = 'table';
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let totalItems = 0;
+  let totalPages = 0;
+  let filterState = {
+    search: '',
+    unit: '',
+    ranks: ['Brigadier & Above', 'Colonel', 'Lieutenant Colonel', 'Major'],
+    dobFrom: '',
+    dobTo: '',
+    seniorityFrom: '',
+    seniorityTo: '',
+    command: '',
+    medicalCategories: [],
+    commissionType: ''
+  };
 
-              // Attach logout after sidebar loads
-              document.getElementById("logoutBtn")
-                  .addEventListener("click", function () {
-                      sessionStorage.clear();
-                      window.location.replace("/login.html");
-                  });
+  let debounceTimer;
 
-              (function () {
-                const currentPage = location.pathname.split('/').pop();
-                const menuLinks = document.querySelectorAll('.sidebar-nav a');
+  // Load sidebar
+  document.addEventListener('DOMContentLoaded', function() {
+    loadSidebar();
+    loadInitialData();
+    initializeDateDefaults();
+  });
 
-                menuLinks.forEach(link => {
-                    const linkPath = link.getAttribute('href').split('/').pop();
-                    if (currentPage === linkPath) {
-                        link.classList.add('active');
-                    }
-                });
-            })();
+  function loadSidebar() {
+    // Create sidebar HTML
+    const sidebarHTML = `
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo-section">
+                            <div class="logo-icon">🛡️</div>
+                            <div class="logo-text">
+                                <h1>ARMY HRMS</h1>
+                                <p>भारतीय सेना</p>
+                            </div>
+                        </div>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <div class="nav-section-title">Main Menu</div>
+                        <a href="/dashboard-new.html" class="nav-item">
+                            <div class="nav-icon">🏠</div>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/filter.html" class="nav-item active">
+                            <div class="nav-icon">🔍</div>
+                            <span>Master Filter & Search</span>
+                        </a>
+                        <div class="nav-section-title">Masters</div>
+                        <a href="/personnel-form.html" class="nav-item">
+                            <div class="nav-icon">👤</div>
+                            <span>Personnel Data Form</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-footer">
+                        <div class="user-profile">
+                            <div class="user-avatar">AD</div>
+                            <div class="user-info">
+                                <div class="name">Admin User</div>
+                                <div class="role">HQ Command</div>
+                            </div>
+                            <div class="nav-icon" id="logoutBtn">🚪</div>
+                        </div>
+                    </div>
+                </aside>
+            `;
+    document.getElementById('sidebar').innerHTML = sidebarHTML;
 
-          });
-    </script>
+    // Attach logout event
+    document.getElementById('logoutBtn')?.addEventListener('click', function() {
+      sessionStorage.clear();
+      window.location.replace('/login.html');
+    });
+  }
 
-  </body>
+  function initializeDateDefaults() {
+    // Set default DOB range
+    const today = new Date();
+    const twentyYearsAgo = new Date(today.getFullYear() - 20, today.getMonth(), today.getDate());
+    const fortyYearsAgo = new Date(today.getFullYear() - 40, today.getMonth(), today.getDate());
+
+    document.getElementById('dobFrom').valueAsDate = fortyYearsAgo;
+    document.getElementById('dobTo').valueAsDate = twentyYearsAgo;
+
+    filterState.dobFrom = fortyYearsAgo.toISOString().split('T')[0];
+    filterState.dobTo = twentyYearsAgo.toISOString().split('T')[0];
+  }
+
+  async function loadInitialData() {
+    await fetchOfficers();
+  }
+
+  async function fetchOfficers() {
+    showLoading();
+
+    try {
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        limit: itemsPerPage,
+        ...filterState
+      });
+
+      const response = await fetch(`/api/officers/filter?${queryParams}`);
+      const data = await response.json();
+
+      totalItems = data.total;
+      totalPages = Math.ceil(totalItems / itemsPerPage);
+
+      renderResults(data.officers);
+      renderPagination();
+      renderActiveFilters();
+      updateResultsCount();
+    } catch (error) {
+      console.error('Error fetching officers:', error);
+      showError('Failed to load officer records');
+    }
+
+    hideLoading();
+  }
+
+  function renderResults(officers) {
+    renderTable(officers);
+    renderCards(officers);
+  }
+
+  function renderTable(officers) {
+    const tbody = document.getElementById('tableBody');
+
+    if (!officers || officers.length === 0) {
+      tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
+                            <div style="color: #64748b;">Try adjusting your filters</div>
+                        </td>
+                    </tr>
+                `;
+      return;
+    }
+
+    let html = '';
+    officers.forEach(officer => {
+      const initials = officer.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const dob = new Date(officer.date_of_birth).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const seniority = officer.date_of_seniority ? new Date(officer.date_of_seniority).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
+
+      html += `
+                    <tr>
+                        <td>
+                            <div class="officer-cell">
+                                <div class="officer-avatar">${initials}</div>
+                                <div class="officer-info">
+                                    <div class="officer-name">${officer.full_name}</div>
+                                    <div class="officer-army-no">${officer.army_no}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-info">${officer.rank}</span></td>
+                        <td>${dob}</td>
+                        <td>${seniority}</td>
+                        <td>${officer.unit || 'N/A'}</td>
+                        <td><span class="badge ${officer.command === 'Northern Command' ? 'badge-warning' : 'badge-success'}">${officer.command || 'N/A'}</span></td>
+                        <td><span class="badge ${officer.medical_category === 'SHAPE-1' ? 'badge-success' : 'badge-gray'}">${officer.medical_category || 'N/A'}</span></td>
+                        <td>
+                            <div class="action-icons">
+                                <div class="icon-btn view" onclick="viewOfficer('${officer.id}')" title="View Details">👁️</div>
+                                <div class="icon-btn edit" onclick="editOfficer('${officer.id}')" title="Edit Officer">✏️</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  function renderCards(officers) {
+    const cardGrid = document.getElementById('cardGrid');
+
+    if (!officers || officers.length === 0) {
+      cardGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 12px;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                        <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
+                        <div style="color: #64748b;">Try adjusting your filters</div>
+                    </div>
+                `;
+      return;
+    }
+
+    let html = '';
+    officers.forEach(officer => {
+      const initials = officer.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const dob = new Date(officer.date_of_birth).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      html += `
+                    <div class="officer-card">
+                        <div class="card-header">
+                            <div class="card-avatar">${initials}</div>
+                            <span class="card-rank">${officer.rank}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-name">${officer.full_name}</div>
+                            <div class="card-army-no">${officer.army_no} | ${officer.nrs}</div>
+                            <div class="card-details">
+                                <div class="card-detail-item">
+                                    <div class="card-detail-label">Date of Birth</div>
+                                    <div class="card-detail-value">${dob}</div>
+                                </div>
+                                <div class="card-detail-item">
+                                    <div class="card-detail-label">Commission</div>
+                                    <div class="card-detail-value">${officer.commission_type || 'N/A'}</div>
+                                </div>
+                                <div class="card-detail-item">
+                                    <div class="card-detail-label">Medical</div>
+                                    <div class="card-detail-value">${officer.medical_category || 'N/A'}</div>
+                                </div>
+                                <div class="card-detail-item">
+                                    <div class="card-detail-label">Mobile</div>
+                                    <div class="card-detail-value">${officer.mobile_number}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-unit">${officer.unit || 'No Unit'}</span>
+                            <div class="card-actions">
+                                <div class="icon-btn view" onclick="viewOfficer('${officer.id}')" title="View Details">👁️</div>
+                                <div class="icon-btn edit" onclick="editOfficer('${officer.id}')" title="Edit Officer">✏️</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    });
+
+    cardGrid.innerHTML = html;
+  }
+
+  function renderPagination() {
+    const pagination = document.getElementById('pagination');
+
+    if (totalPages <= 1) {
+      pagination.innerHTML = '';
+      return;
+    }
+
+    let html = `
+                <div class="pagination-info">
+                    Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of
+                    <strong>${totalItems}</strong> officers
+                </div>
+                <div class="pagination-controls">
+            `;
+
+    // Previous button
+    html += `
+                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    ← Previous
+                </button>
+            `;
+
+    // Page numbers
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (startPage > 1) {
+      html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+      if (startPage > 2) {
+        html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      html += `
+                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
+      }
+      html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+
+    // Next button
+    html += `
+                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next →
+                </button>
+            `;
+
+    html += '</div>';
+
+    pagination.innerHTML = html;
+  }
+
+  function renderActiveFilters() {
+    const container = document.getElementById('activeFilters');
+    let filters = [];
+
+    if (filterState.search) {
+      filters.push({ label: `Search: "${filterState.search}"`, key: 'search' });
+    }
+    if (filterState.unit) {
+      filters.push({ label: `Unit: ${filterState.unit}`, key: 'unit' });
+    }
+    if (filterState.ranks && filterState.ranks.length > 0 && filterState.ranks.length < 6) {
+      filters.push({ label: `Rank: ${filterState.ranks.join(', ')}`, key: 'ranks' });
+    }
+    if (filterState.dobFrom && filterState.dobTo) {
+      filters.push({ label: `DOB: ${filterState.dobFrom} to ${filterState.dobTo}`, key: 'dob' });
+    }
+    if (filterState.seniorityFrom && filterState.seniorityTo) {
+      filters.push({ label: `Seniority: ${filterState.seniorityFrom} to ${filterState.seniorityTo}`, key: 'seniority' });
+    }
+    if (filterState.command) {
+      filters.push({ label: `Command: ${filterState.command}`, key: 'command' });
+    }
+    if (filterState.medicalCategories && filterState.medicalCategories.length > 0) {
+      filters.push({ label: `Medical: ${filterState.medicalCategories.join(', ')}`, key: 'medicalCategories' });
+    }
+    if (filterState.commissionType) {
+      filters.push({ label: `Commission: ${filterState.commissionType}`, key: 'commissionType' });
+    }
+
+    if (filters.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    let html = '';
+    filters.forEach(filter => {
+      html += `
+                    <div class="filter-tag">
+                        <span>${filter.label}</span>
+                        <span class="filter-tag-close" onclick="removeFilter('${filter.key}')">✕</span>
+                    </div>
+                `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function updateResultsCount() {
+    const countElement = document.getElementById('resultsCount');
+    countElement.innerHTML = `Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of <strong>${totalItems}</strong> officers matching your filters`;
+  }
+
+  // Filter Functions
+  function toggleCheckbox(element, value) {
+    const box = element.querySelector('.checkbox-box');
+    box.classList.toggle('checked');
+
+    if (box.classList.contains('checked')) {
+      box.innerHTML = '✓';
+      if (!filterState.ranks.includes(value)) {
+        filterState.ranks.push(value);
+      }
+    } else {
+      box.innerHTML = '';
+      filterState.ranks = filterState.ranks.filter(r => r !== value);
+    }
+  }
+
+  function toggleMedicalCheckbox(element, value) {
+    const box = element.querySelector('.checkbox-box');
+    box.classList.toggle('checked');
+
+    if (box.classList.contains('checked')) {
+      box.innerHTML = '✓';
+      if (!filterState.medicalCategories.includes(value)) {
+        filterState.medicalCategories.push(value);
+      }
+    } else {
+      box.innerHTML = '';
+      filterState.medicalCategories = filterState.medicalCategories.filter(c => c !== value);
+    }
+  }
+
+  function setCommissionType(type) {
+    filterState.commissionType = type;
+
+    // Update radio buttons
+    document.querySelectorAll('#commissionFilter .radio-circle').forEach((el, index) => {
+      if ((type === '' && index === 0) ||
+              (type === 'Permanent Commission' && index === 1) ||
+              (type === 'Short Service Commission' && index === 2) ||
+              (type === 'Emergency Commission' && index === 3)) {
+        el.classList.add('checked');
+      } else {
+        el.classList.remove('checked');
+      }
+    });
+
+    applyFilters();
+  }
+
+  function debounceSearch() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      filterState.search = document.getElementById('globalSearch').value;
+      currentPage = 1;
+      fetchOfficers();
+    }, 500);
+  }
+
+  function applyFilters() {
+    // Update filter state from DOM
+    filterState.unit = document.getElementById('unitFilter').value;
+    filterState.dobFrom = document.getElementById('dobFrom').value;
+    filterState.dobTo = document.getElementById('dobTo').value;
+    filterState.seniorityFrom = document.getElementById('seniorityFrom').value;
+    filterState.seniorityTo = document.getElementById('seniorityTo').value;
+    filterState.command = document.getElementById('commandFilter').value;
+
+    currentPage = 1;
+    fetchOfficers();
+  }
+
+  function resetFilters() {
+    // Reset all filter inputs
+    document.getElementById('globalSearch').value = '';
+    document.getElementById('unitFilter').value = '';
+    document.getElementById('dobFrom').value = '';
+    document.getElementById('dobTo').value = '';
+    document.getElementById('seniorityFrom').value = '';
+    document.getElementById('seniorityTo').value = '';
+    document.getElementById('commandFilter').value = '';
+
+    // Reset rank checkboxes
+    document.querySelectorAll('#rankFilters .checkbox-box').forEach(box => {
+      box.classList.add('checked');
+      box.innerHTML = '✓';
+    });
+
+    // Reset medical checkboxes
+    document.querySelectorAll('#medicalFilters .checkbox-box').forEach(box => {
+      box.classList.remove('checked');
+      box.innerHTML = '';
+    });
+
+    // Reset commission type
+    setCommissionType('');
+
+    // Reset filter state
+    filterState = {
+      search: '',
+      unit: '',
+      ranks: ['Brigadier & Above', 'Colonel', 'Lieutenant Colonel', 'Major'],
+      dobFrom: '',
+      dobTo: '',
+      seniorityFrom: '',
+      seniorityTo: '',
+      command: '',
+      medicalCategories: [],
+      commissionType: ''
+    };
+
+    initializeDateDefaults();
+    currentPage = 1;
+    fetchOfficers();
+  }
+
+  function clearAllFilters() {
+    resetFilters();
+  }
+
+  function removeFilter(key) {
+    switch(key) {
+      case 'search':
+        filterState.search = '';
+        document.getElementById('globalSearch').value = '';
+        break;
+      case 'unit':
+        filterState.unit = '';
+        document.getElementById('unitFilter').value = '';
+        break;
+      case 'ranks':
+        filterState.ranks = [];
+        document.querySelectorAll('#rankFilters .checkbox-box').forEach(box => {
+          box.classList.remove('checked');
+          box.innerHTML = '';
+        });
+        break;
+      case 'dob':
+        filterState.dobFrom = '';
+        filterState.dobTo = '';
+        document.getElementById('dobFrom').value = '';
+        document.getElementById('dobTo').value = '';
+        break;
+      case 'seniority':
+        filterState.seniorityFrom = '';
+        filterState.seniorityTo = '';
+        document.getElementById('seniorityFrom').value = '';
+        document.getElementById('seniorityTo').value = '';
+        break;
+      case 'command':
+        filterState.command = '';
+        document.getElementById('commandFilter').value = '';
+        break;
+      case 'medicalCategories':
+        filterState.medicalCategories = [];
+        document.querySelectorAll('#medicalFilters .checkbox-box').forEach(box => {
+          box.classList.remove('checked');
+          box.innerHTML = '';
+        });
+        break;
+      case 'commissionType':
+        filterState.commissionType = '';
+        setCommissionType('');
+        break;
+    }
+
+    currentPage = 1;
+    fetchOfficers();
+  }
+
+  function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    fetchOfficers();
+  }
+
+  function switchView(view) {
+    currentView = view;
+
+    // Update toggle buttons
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Show/hide views
+    if (view === 'table') {
+      document.getElementById('tableView').style.display = 'block';
+      document.getElementById('cardView').style.display = 'none';
+    } else {
+      document.getElementById('tableView').style.display = 'none';
+      document.getElementById('cardView').style.display = 'block';
+    }
+  }
+
+  // Action Functions
+  function viewOfficer(id) {
+    window.location.href = `/view-officer.html?id=${id}`;
+  }
+
+  function editOfficer(id) {
+    window.location.href = `/personnel-form.html?id=${id}`;
+  }
+
+  function exportResults() {
+    const queryParams = new URLSearchParams(filterState);
+    window.location.href = `/api/officers/export?${queryParams}`;
+  }
+
+  function generateLetter() {
+    alert('Letter generation feature coming soon!');
+  }
+
+  // UI State Functions
+  function showLoading() {
+    // Add loading overlay
+  }
+
+  function hideLoading() {
+    // Remove loading overlay
+  }
+
+  function showError(message) {
+    // Show error notification
+    alert(message);
+  }
+
+  // Initialize event listeners for medical checkboxes
+  document.querySelectorAll('#medicalFilters .checkbox-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const value = this.querySelector('.checkbox-label').textContent;
+      toggleMedicalCheckbox(this, value);
+      applyFilters();
+    });
+  });
+
+  // Initialize event listeners for rank checkboxes
+  document.querySelectorAll('#rankFilters .checkbox-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const value = this.querySelector('.checkbox-label').textContent;
+      toggleCheckbox(this, value);
+      applyFilters();
+    });
+  });
+
+  // Add event listeners for select changes
+  document.getElementById('unitFilter').addEventListener('change', applyFilters);
+  document.getElementById('commandFilter').addEventListener('change', applyFilters);
+  document.getElementById('dobFrom').addEventListener('change', applyFilters);
+  document.getElementById('dobTo').addEventListener('change', applyFilters);
+  document.getElementById('seniorityFrom').addEventListener('change', applyFilters);
+  document.getElementById('seniorityTo').addEventListener('change', applyFilters);
+</script>
+</body>
 </html>

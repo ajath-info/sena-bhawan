@@ -22,4 +22,7 @@ public class OrbatCreateRequest {
 
     private String formationCode;
 
+    private String areaType;
+    private String unitType;
+
 }

@@ -1,0 +1,28 @@
+# --- Build Artifacts ---
+target/             # Maven build output
+build/              # Gradle build output
+out/                # IntelliJ IDEA output
+*.jar               # Compiled jar files
+*.war               # Compiled war files
+target
+
+
+# --- IDE Settings ---
+.idea/              # IntelliJ IDEA project settings
+*.iml               # IntelliJ project module
+.vscode/            # VS Code settings
+.classpath          # Eclipse settings
+.project            # Eclipse project file
+.settings/          # Eclipse specific settings
+
+# --- Spring Boot & Environment ---
+*.log               # Application logs
+logs/               # Log directories
+.env                # Local environment variables
+application.properties # Optional: Only if it contains secrets
+application.yml        # Optional: Only if it contains secrets
+
+# --- System Files ---
+.DS_Store           # macOS system files
+Thumbs.db           # Windows thumbnail cache
+target/*
