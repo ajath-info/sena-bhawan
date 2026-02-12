@@ -51,20 +51,12 @@ public class Personnel {
     private String alternateMobile;
     private String emailAddress;
 
-    @Column(name = "medical_s")
-    private Short medicalS;
+    @Column(name = "medical_category")
+    private String medicalCategory;
+    @Column(name = "medical_remark")
+    private String medicalRemark;
 
-    @Column(name = "medical_h")
-    private Short medicalH;
 
-    @Column(name = "medical_a")
-    private Short medicalA;
-
-    @Column(name = "medical_p")
-    private Short medicalP;
-
-    @Column(name = "medical_e")
-    private Short medicalE;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -19,6 +19,9 @@ public class PersonnelDecorations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "decoration_category")
+    private String decorationCategory;
+
     private String decorationName;
     private LocalDate awardDate;
     private String citation;

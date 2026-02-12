@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Paramount Card | ARMY HRMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+          font-family: "Inter", sans-serif;
+          background: #f1f3f5;
+          color: #1f2937;
+        }
+
+        .container {
+          display: flex;
+          height: 100vh;
+          overflow: hidden;
+        }
+
+        /* SIDEBAR HOLDER */
+        #sidebar {
+          width: 256px;
+          flex-shrink: 0;
+          overflow-y: auto;
+          background: #081c15;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        .header {
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 16px 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .header h2 {
+          font-size: 22px;
+          font-weight: 700;
+        }
+
+        .header p {
+          font-size: 13px;
+          color: #6b7280;
+          margin-top: 4px;
+        }
+
+        .content-area {
+          flex: 1;
+          overflow-y: auto;
+          padding: 24px;
+        }
+
+        /* ================= PARAMOUNT CARD STYLES ================= */
+
+        .selector-area {
+          max-width: 900px;
+          margin: auto;
+          background: #ffffff;
+          padding: 20px;
+          border-radius: 12px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+          margin-bottom: 20px;
+        }
+
+        .selector-area label {
+          font-weight: 600;
+          font-size: 15px;
+        }
+
+        .selector-area select {
+          width: 100%;
+          padding: 10px;
+          margin-top: 8px;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 15px;
+        }
+
+        .download-btn {
+          background:#1b4332;
+          color:white;
+          padding:10px 18px;
+          border-radius:8px;
+          cursor:pointer;
+          border:none;
+          font-size:14px;
+          margin-bottom:20px;
+          display:none;
+          margin-left: 930px;
+        }
+
+        .page {
+          max-width: 900px;
+          margin: auto;
+          background: #ffffff;
+          border-radius: 14px;
+          padding: 32px 36px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+          display:none;
+        }
+
+        .header-card {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          margin-bottom:28px;
+        }
+
+        .header-left {
+          display:flex;
+          align-items:center;
+          gap:18px;
+        }
+
+        .profile-photo {
+          width:88px;
+          height:88px;
+          border-radius:12px;
+          object-fit:cover;
+          border:2px solid #1b4332;
+          background:#e5e7eb;
+        }
+
+        .profile-name h1 {
+          font-size:24px;
+          font-weight:700;
+          margin-bottom:4px;
+        }
+
+        .profile-name .meta {
+          font-size:14px;
+          color:#6b7280;
+        }
+
+        .selected {
+          font-size:12px;
+          font-weight:600;
+          color:#1b4332;
+          border:1px solid #1b4332;
+          padding:4px 10px;
+          border-radius:20px;
+        }
+
+        .section {
+          margin-top:26px;
+        }
+
+        .section-title {
+          display:flex;
+          align-items:center;
+          gap:10px;
+          font-size:16px;
+          font-weight:700;
+          color:#1b4332;
+          border-bottom:2px solid #e5e7eb;
+          padding-bottom:8px;
+          margin-bottom:14px;
+        }
+
+        .info-grid {
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:14px 24px;
+          font-size:13px;
+        }
+
+        .info-item span { color:#6b7280; display:block; font-size:12px; }
+        .info-item strong { font-weight:600; }
+
+        .table {
+          width:100%;
+          border-collapse:collapse;
+          margin-top:10px;
+          font-size:13px;
+        }
+
+        .table th {
+          text-align:left;
+          background:#f9fafb;
+          border:1px solid #e5e7eb;
+          padding:10px;
+          font-weight:700;
+        }
+
+        .table td {
+          border:1px solid #e5e7eb;
+          padding:10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar"></div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+        <!-- TOP HEADER -->
+        <div class="header">
+            <div>
+                <h2>Paramount Card</h2>
+                <p>Select an officer to view complete profile</p>
+            </div>
+        </div>
+
+        <!-- BODY CONTENT -->
+        <div class="content-area">
+
+            <!-- DROPDOWN -->
+            <div class="selector-area">
+                <label>Select Officer</label>
+                <select id="personnelSelect">
+                    <option value="">-- Select Officer --</option>
+                </select>
+            </div>
+
+            <button class="download-btn" id="pdfBtn" onclick="downloadPDF()">Download PDF</button>
+
+            <!-- PARAMOUNT CARD -->
+            <div class="page" id="pdfContent">
+
+                <!-- HEADER CARD -->
+                <div class="header-card">
+                    <div class="header-left">
+                        <img id="photo" src="" class="profile-photo" />
+                        <div class="profile-name">
+                            <h1 id="name"></h1>
+                            <div class="meta" id="rankArmyMobile"></div>
+                        </div>
+                    </div>
+                    <div class="selected">SELECTED</div>
+                </div>
+
+                <!-- IDENTITY -->
+                <div class="section">
+                    <div class="section-title">Identity & Service Dates</div>
+                    <div class="info-grid">
+                        <div class="info-item"><span>Date of Birth</span><strong id="dob"></strong></div>
+                        <div class="info-item"><span>Date of Commission</span><strong id="doc"></strong></div>
+                        <div class="info-item"><span>Date of Seniority</span><strong id="dos"></strong></div>
+                        <div class="info-item"><span>Last Rank (Substantive)</span><strong>N/A</strong></div>
+                        <div class="info-item"><span>PAN</span><strong id="pan"></strong></div>
+                        <div class="info-item"><span>Aadhaar</span><strong id="aadhaar"></strong></div>
+                    </div>
+                </div>
+
+                <!-- POSTING -->
+                <div class="section">
+                    <div class="section-title">Posting History</div>
+                    <table class="table" id="postingTable">
+                        <thead>
+                        <tr>
+                            <th>Unit Name</th>
+                            <th>Command</th>
+                            <th>Type of Unit</th>
+                            <th>Taken on Strength</th>
+                            <th>Appointment</th>
+                            <th>Total Time Served</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- COURSES -->
+                <div class="section">
+                    <div class="section-title">Courses Completed</div>
+                    <table class="table" id="courseTable">
+                        <thead>
+                        <tr>
+                            <th>Course Name</th>
+                            <th>Grading</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- DECORATIONS -->
+                <div class="section">
+                    <div class="section-title">Decorations</div>
+                    <table class="table" id="decorTable">
+                        <thead>
+                        <tr>
+                            <th>Award Name</th>
+                            <th>Award Date</th>
+                            <th>Citation</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- QUALIFICATIONS -->
+                <div class="section">
+                    <div class="section-title">Qualifications</div>
+                    <table class="table" id="qualTable">
+                        <thead>
+                        <tr>
+                            <th>Qualification</th>
+                            <th>Institution</th>
+                            <th>Year</th>
+                            <th>Grade</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- ADDITIONAL QUALIFICATIONS -->
+                <div class="section">
+                    <div class="section-title">Additional Qualifications</div>
+                    <table class="table" id="addQualTable">
+                        <thead>
+                        <tr>
+                            <th>Qualification</th>
+                            <th>Issuing Authority</th>
+                            <th>Year</th>
+                            <th>Validity</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- FAMILY -->
+                <div class="section">
+                    <div class="section-title">Family Details</div>
+                    <table class="table" id="familyTable">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Relationship</th>
+                            <th>Contact</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- DISCIPLINE -->
+                <div class="section">
+                    <div class="section-title">Discipline & Medical</div>
+                    <div class="info-grid">
+                        <div class="info-item"><span>Discipline Case</span><strong id="disciplineCase"></strong></div>
+                        <div class="info-item"><span>Restrictions</span><strong>N/A</strong></div>
+                        <div class="info-item"><span>Vigilance Status</span><strong>N/A</strong></div>
+                        <div class="info-item"><span>Medical Category</span><strong id="medCat"></strong></div>
+                        <div class="info-item"><span>School / Institute</span><strong id="institute"></strong></div>
+                        <div class="info-item"><span>Degree</span><strong id="degree"></strong></div>
+                        <div class="info-item"><span>Course</span><strong id="courseQual"></strong></div>
+                        <div class="info-item"><span>Home Station</span><strong id="homeStation"></strong></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    /* ===== LOAD SIDEBAR ===== */
+    fetch("sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar").innerHTML = html;
+
+        document.getElementById("logoutBtn")
+          ?.addEventListener("click", () => {
+            sessionStorage.clear();
+            window.location.replace("/login.html");
+          });
+
+        const currentPage = location.pathname.split('/').pop();
+        document.querySelectorAll('.sidebar-nav a')
+          .forEach(link => {
+            if (link.getAttribute('href').includes(currentPage)) {
+              link.classList.add('active');
+            }
+          });
+    });
+
+    /* ===== LOAD PERSONNEL DROPDOWN ===== */
+    async function loadPersonnelDropdown() {
+      const res = await fetch("http://localhost:6060/api/personnel");
+      const list = await res.json();
+
+      const select = document.getElementById("personnelSelect");
+
+      list.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.armyNo} – ${p.fullName}`;
+        select.appendChild(opt);
+      });
+    }
+
+    document.getElementById("personnelSelect").addEventListener("change", function () {
+      const id = this.value;
+      if (id) loadAllData(id);
+    });
+
+    /* ===== LOAD ALL 3 APIs ===== */
+    async function loadAllData(id) {
+
+      const p1 = await fetch(`http://localhost:6060/api/personnel/${id}`);
+      const personnel = await p1.json();
+
+      const p2 = await fetch(`http://localhost:6060/personnel-full-details/${id}`);
+      const fullDetails = await p2.json();
+
+      const p3 = await fetch(`http://localhost:6060/api/personnelinformation/${id}`);
+      const info = await p3.json();
+
+      fillCard(personnel, fullDetails, info);
+    }
+
+    /* ===== FILL THE PARAMOUNT CARD ===== */
+    function fillCard(p, fd, info) {
+
+      document.getElementById("pdfContent").style.display = "block";
+      document.getElementById("pdfBtn").style.display = "inline-block";
+
+      document.getElementById("name").innerText = p.fullName;
+      document.getElementById("rankArmyMobile").innerHTML =
+        `${p.rank} | ${p.armyNo}<br>Mobile: ${p.mobileNumber}`;
+
+      document.getElementById("photo").src =
+        p.officerImage ? p.officerImage : "https://via.placeholder.com/150";
+
+      document.getElementById("dob").innerText = p.dateOfBirth;
+      document.getElementById("doc").innerText = p.dateOfCommission;
+      document.getElementById("dos").innerText = p.dateOfSeniority;
+      document.getElementById("pan").innerText = p.panCard;
+      document.getElementById("aadhaar").innerText = p.aadhaarNumber;
+      document.getElementById("medCat").innerText = p.medicalCategory ?? "N/A";
+
+      const disc = info.find(i => i.caseType?.toLowerCase() === "disciplinary");
+      document.getElementById("disciplineCase").innerText = disc ? disc.caseType : "N/A";
+
+      const postingBody = document.querySelector("#postingTable tbody");
+      postingBody.innerHTML = "";
+      fd.postingDetails.forEach(post => {
+        postingBody.innerHTML += `
+          <tr>
+            <td>${post.unitName}</td>
+            <td>${post.command}</td>
+            <td>N/A</td>
+            <td>${post.fromDate}</td>
+            <td>${post.appointment}</td>
+            <td>${post.duration}</td>
+          </tr>`;
+      });
+
+      const courseBody = document.querySelector("#courseTable tbody");
+      courseBody.innerHTML = "";
+      fd.courseDetails.forEach(c => {
+        courseBody.innerHTML += `
+          <tr>
+            <td>${c.courseName}</td>
+            <td>${c.grading}</td>
+            <td>${c.fromDate}</td>
+            <td>${c.toDate}</td>
+          </tr>`;
+      });
+
+      const decorBody = document.querySelector("#decorTable tbody");
+      decorBody.innerHTML = "";
+      p.decorations.forEach(d => {
+        decorBody.innerHTML += `
+          <tr>
+            <td>${d.decorationName}</td>
+            <td>${d.awardDate}</td>
+            <td>${d.citation}</td>
+          </tr>`;
+      });
+
+      const qualBody = document.querySelector("#qualTable tbody");
+      qualBody.innerHTML = "";
+      p.qualifications.forEach(q => {
+        qualBody.innerHTML += `
+          <tr>
+            <td>${q.qualification}</td>
+            <td>${q.institution}</td>
+            <td>${q.yearOfCompletion}</td>
+            <td>${q.gradePercentage}</td>
+          </tr>`;
+      });
+
+      const addQ = document.querySelector("#addQualTable tbody");
+      addQ.innerHTML = "";
+      p.additionalQualifications.forEach(a => {
+        addQ.innerHTML += `
+          <tr>
+            <td>${a.qualification}</td>
+            <td>${a.issuingAuthority}</td>
+            <td>${a.year}</td>
+            <td>${a.validity}</td>
+          </tr>`;
+      });
+
+      const famBody = document.querySelector("#familyTable tbody");
+      famBody.innerHTML = "";
+      p.familyMembers.forEach(f => {
+        famBody.innerHTML += `
+          <tr>
+            <td>${f.name}</td>
+            <td>${f.relationship}</td>
+            <td>${f.contactNumber}</td>
+          </tr>`;
+      });
+
+      const firstQual = p.qualifications[0];
+      document.getElementById("institute").innerText = firstQual ? firstQual.institution : "N/A";
+      document.getElementById("degree").innerText = firstQual ? firstQual.qualification : "N/A";
+      document.getElementById("courseQual").innerText = firstQual ? firstQual.qualification : "N/A";
+
+      document.getElementById("homeStation").innerText = p.city;
+    }
+
+    /* ===== PDF EXPORT ===== */
+<!--    function downloadPDF() {-->
+<!--      const element = document.getElementById("pdfContent");-->
+<!--      const opt = {-->
+<!--        margin: 0.4,-->
+<!--        filename: "Paramount_Card.pdf",-->
+<!--        image: { type: "jpeg", quality: 1 },-->
+<!--        html2canvas: { scale: 2 },-->
+<!--        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }-->
+<!--      };-->
+<!--      html2pdf().from(element).set(opt).save();-->
+<!--    }-->
+
+<!--    loadPersonnelDropdown();-->
+
+    function downloadPDF() {
+  const element = document.getElementById("pdfContent");
+  const opt = {
+    margin: 0.4,
+    filename: "Paramount_Card.pdf",
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().from(element).set(opt).save();
+}
+
+/* ===============================
+   AUTO DOWNLOAD WHEN ID EXISTS
+================================ */
+
+const params = new URLSearchParams(window.location.search);
+const autoId = params.get("id");
+
+if (autoId) {
+  loadAllData(autoId);
+
+  setTimeout(() => {
+    downloadPDF();
+  }, 1200);
+} else {
+  loadPersonnelDropdown();
+}
+
+</script>
+
+</body>
+</html>

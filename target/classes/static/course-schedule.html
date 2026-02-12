@@ -76,67 +76,6 @@
       background: white;
       border-radius: 2px;
     }
-    .sidebar-nav {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 0;
-    }
-    .nav-section-title {
-      padding: 16px 20px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #52b788;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: white;
-      border-left: 4px solid transparent;
-    }
-    .nav-item.active {
-      background: rgba(255, 255, 255, 0.1);
-      border-left-color: #ffb703;
-      font-weight: 600;
-    }
-    .nav-icon {
-      width: 20px;
-      height: 20px;
-      font-size: 18px;
-    }
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2d6a4f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .user-info {
-      flex: 1;
-    }
-    .user-info .name {
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .user-info .role {
-      font-size: 12px;
-      color: #52b788;
-    }
 
     .main-content {
       flex: 1;
@@ -545,117 +484,134 @@
 </head>
 <body>
 <div class="container">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">🛡️</div>
-        <div class="logo-text">
-          <h1>ARMY HRMS</h1>
-          <p>भारतीय सेना</p>
-        </div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section-title">Main Menu</div>
+<!--  <aside class="sidebar">-->
+<!--    <div class="sidebar-header">-->
+<!--      <div class="logo-section">-->
+<!--        <div class="logo-icon">🛡️</div>-->
+<!--        <div class="logo-text">-->
+<!--          <h1>ARMY HRMS</h1>-->
+<!--          <p>भारतीय सेना</p>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <nav class="sidebar-nav">-->
+<!--      <div class="nav-section-title">Main Menu</div>-->
 
-      <a href="/dashboard-new.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard</span>
-      </a>
+<!--      <a href="/dashboard-new.html" class="nav-item">-->
+<!--        <div class="nav-icon">🏠</div>-->
+<!--        <span>Dashboard</span>-->
+<!--      </a>-->
 
-      <a href="/dashboard-officers.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Officers</span>
-      </a>
+<!--      <a href="/dashboard-officers.html" class="nav-item">-->
+<!--        <div class="nav-icon">🏠</div>-->
+<!--        <span>Dashboard Officers</span>-->
+<!--      </a>-->
 
-      <a href="/dashboard-training.html" class="nav-item ">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Training</span>
-      </a>
+<!--      <a href="/dashboard-training.html" class="nav-item ">-->
+<!--        <div class="nav-icon">🏠</div>-->
+<!--        <span>Dashboard Training</span>-->
+<!--      </a>-->
 
-      <a href="/filter.html" class="nav-item">
-        <div class="nav-icon">🔍</div>
-        <span>Master Filter & Search</span>
-      </a>
+<!--      <a href="/filter.html" class="nav-item">-->
+<!--        <div class="nav-icon">🔍</div>-->
+<!--        <span>Master Filter & Search</span>-->
+<!--      </a>-->
 
-      <div class="nav-section-title">Administration</div>
+<!--      <div class="nav-section-title">Administration</div>-->
 
-      <a href="/role-permmissoon.html" class="nav-item">
-        <div class="nav-icon">🔐</div>
-        <span>Role & Permissions</span>
-      </a>
+<!--      <a href="/role-permmissoon.html" class="nav-item">-->
+<!--        <div class="nav-icon">🔐</div>-->
+<!--        <span>Role & Permissions</span>-->
+<!--      </a>-->
 
-      <!-- <a href="/user-management.html" class="nav-item">
-        <div class="nav-icon">👥</div>
-        <span>User Management</span>
-      </a> -->
+<!--      &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
+<!--        <div class="nav-icon">👥</div>-->
+<!--        <span>User Management</span>-->
+<!--      </a> &ndash;&gt;-->
 
-      <div class="nav-section-title">Masters</div>
+<!--      <div class="nav-section-title">Masters</div>-->
 
-      <a href="/course-master.html" class="nav-item">
-        <div class="nav-icon">📚</div>
-        <span>Course Master</span>
-      </a>
+<!--      <a href="/course-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">📚</div>-->
+<!--        <span>Course Master</span>-->
+<!--      </a>-->
 
-      <a href="/grade-awards.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Grade & Awards</span>
-      </a>
+<!--      <a href="/grade-awards.html" class="nav-item">-->
+<!--        <div class="nav-icon">📝</div>-->
+<!--        <span>Grade & Awards</span>-->
+<!--      </a>-->
 
-      <a href="/course-schedule.html" class="nav-item active">
-        <div class="nav-icon">📅</div>
-        <span>Course Schedule</span>
-      </a>
+<!--      <a href="/course-schedule.html" class="nav-item active">-->
+<!--        <div class="nav-icon">📅</div>-->
+<!--        <span>Course Schedule</span>-->
+<!--      </a>-->
 
-      <a href="/location-master.html" class="nav-item">
-        <div class="nav-icon">📍</div>
-        <span>Location Master</span>
-      </a>
+<!--      <a href="/location-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">📍</div>-->
+<!--        <span>Location Master</span>-->
+<!--      </a>-->
 
-      <!-- <a href="/command-master.html" class="nav-item">
-        <div class="nav-icon">🚩</div>
-        <span>Command Master</span>
-      </a> -->
+<!--      &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">🚩</div>-->
+<!--        <span>Command Master</span>-->
+<!--      </a> &ndash;&gt;-->
 
-      <a href="/rank-master.html" class="nav-item">
-        <div class="nav-icon">🏅</div>
-        <span>Rank Master</span>
-      </a>
+<!--      <a href="/rank-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">🏅</div>-->
+<!--        <span>Rank Master</span>-->
+<!--      </a>-->
 
-      <a href="/unit-master.html" class="nav-item">
-        <div class="nav-icon">🛡️</div>
-        <span>Unit Master</span>
-      </a>
+<!--      <a href="/unit-master.html" class="nav-item">-->
+<!--        <div class="nav-icon">🛡️</div>-->
+<!--        <span>Unit Master</span>-->
+<!--      </a>-->
 
-      <div class="nav-section-title">Forms</div>
+<!--      <div class="nav-section-title">Forms</div>-->
 
-      <a href="/personnel-form.html" class="nav-item">
-        <div class="nav-icon">👤</div>
-        <span>Personnel Data Form</span>
-      </a>
+<!--      <a href="/personnel-form.html" class="nav-item">-->
+<!--        <div class="nav-icon">👤</div>-->
+<!--        <span>Personnel Data Form</span>-->
+<!--      </a>-->
 
-      <a href="/coursepanel.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>Course Panel Generation</span>
-      </a>
+<!--      <a href="/coursepanel.html" class="nav-item">-->
+<!--        <div class="nav-icon">📋</div>-->
+<!--        <span>Course Panel Generation</span>-->
+<!--      </a>-->
 
-      <a href="/course-posting-form.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Course & Posting Form</span>
-      </a>
-    </nav>
+<!--      <a href="/orbat.html" class="nav-item">-->
+<!--        <div class="nav-icon">📋</div>-->
+<!--        <span>Orbit Generation Form</span>-->
+<!--      </a>-->
 
-    <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="user-avatar">AD</div>
-        <div class="user-info">
-          <div class="name">Admin User</div>
-          <div class="role">HQ Command</div>
-        </div>
-        <div>🚪</div>
-      </div>
-    </div>
-  </aside>
+<!--      <a href="/add-new-user.html" class="nav-item">-->
+<!--        <div class="nav-icon">📋</div>-->
+<!--        <span>New User Form</span>-->
+<!--      </a>-->
+
+<!--      <a href="/legal-disciplinary.html" class="nav-item">-->
+<!--        <div class="nav-icon">📋</div>-->
+<!--        <span>Legal And Disciplinary Form</span>-->
+<!--      </a>-->
+
+<!--      <a href="/course-posting-form.html" class="nav-item">-->
+<!--        <div class="nav-icon">📝</div>-->
+<!--        <span>Course & Posting Form</span>-->
+<!--      </a>-->
+<!--    </nav>-->
+
+<!--    <div class="sidebar-footer">-->
+<!--      <div class="user-profile">-->
+<!--        <div class="user-avatar">AD</div>-->
+<!--        <div class="user-info">-->
+<!--          <div class="name">Admin User</div>-->
+<!--          <div class="role">HQ Command</div>-->
+<!--        </div>-->
+<!--        <div>🚪</div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </aside>-->
+
+  <div id="sidebar"></div>
 
   <main class="main-content">
     <header class="header">
@@ -786,6 +742,35 @@
   </main>
 </div>
 <script>
+
+  // Load sidebar
+  fetch("sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+          document.getElementById("sidebar").innerHTML = html;
+
+          // Attach logout after sidebar loads
+          document.getElementById("logoutBtn")
+              .addEventListener("click", function () {
+                  sessionStorage.clear();
+                  window.location.replace("/login.html");
+              });
+
+          (function () {
+            const currentPage = location.pathname.split('/').pop();
+            const menuLinks = document.querySelectorAll('.sidebar-nav a');
+
+            menuLinks.forEach(link => {
+                const linkPath = link.getAttribute('href').split('/').pop();
+                if (currentPage === linkPath) {
+                    link.classList.add('active');
+                }
+            });
+        })();
+
+      });
+
+
   document.addEventListener("DOMContentLoaded", () => {
     loadCourses();
   });

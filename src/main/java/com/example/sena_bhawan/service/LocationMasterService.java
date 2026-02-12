@@ -12,4 +12,6 @@ public interface LocationMasterService {
     LocationMaster addLocation(LocationMaster location);
 
     LocationMaster updateLocation(Integer srno, LocationMaster location);
+
+    void delete(Integer srno);
 }

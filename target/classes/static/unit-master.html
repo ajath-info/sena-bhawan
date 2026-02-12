@@ -266,122 +266,12 @@
 </head>
 
 <body>
+
+<script src="auth.js"></script>
+<script src="logout.js"></script>
 <div class="container">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">🛡️</div>
-        <div class="logo-text">
-          <h1>ARMY HRMS</h1>
-          <p>भारतीय सेना</p>
-        </div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section-title">Main Menu</div>
-
-      <a href="/dashboard-new.html" class="nav-item ">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard</span>
-      </a>
-
-      <a href="/dashboard-officers.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Officers</span>
-      </a>
-
-      <a href="/dashboard-training.html" class="nav-item">
-        <div class="nav-icon">🏠</div>
-        <span>Dashboard Training</span>
-      </a>
-
-      <a href="/filter.html" class="nav-item">
-        <div class="nav-icon">🔍</div>
-        <span>Master Filter & Search</span>
-      </a>
-
-      <div class="nav-section-title">Administration</div>
-
-      <a href="/role-permmissoon.html" class="nav-item">
-        <div class="nav-icon">🔐</div>
-        <span>Role & Permissions</span>
-      </a>
-
-      <!-- <a href="/user-management.html" class="nav-item">
-        <div class="nav-icon">👥</div>
-        <span>User Management</span>
-      </a> -->
-
-      <div class="nav-section-title">Masters</div>
-
-      <a href="/course-master.html" class="nav-item">
-        <div class="nav-icon">📚</div>
-        <span>Course Master</span>
-      </a>
-
-      <a href="/grade-awards.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Grade & Awards</span>
-      </a>
-
-      <a href="/course-schedule.html" class="nav-item">
-        <div class="nav-icon">📅</div>
-        <span>Course Schedule</span>
-      </a>
-
-      <a href="/location-master.html" class="nav-item">
-        <div class="nav-icon">📍</div>
-        <span>Location Master</span>
-      </a>
-
-      <!-- <a href="/command-master.html" class="nav-item">
-        <div class="nav-icon">🚩</div>
-        <span>Command Master</span>
-      </a> -->
-
-      <a href="/rank-master.html" class="nav-item">
-        <div class="nav-icon">🏅</div>
-        <span>Rank Master</span>
-      </a>
-
-      <a href="/unit-master.html" class="nav-item active">
-        <div class="nav-icon">🛡️</div>
-        <span>Unit Master</span>
-      </a>
-
-      <div class="nav-section-title">Forms</div>
-
-      <a href="/personnel-form.html" class="nav-item">
-        <div class="nav-icon">👤</div>
-        <span>Personnel Data Form</span>
-      </a>
-
-      <a href="/coursepanel.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>Course Panel Generation</span>
-      </a>
-
-      <a href="/course-posting-form.html" class="nav-item">
-        <div class="nav-icon">📝</div>
-        <span>Course & Posting Form</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="user-avatar">AD</div>
-        <div class="user-info">
-          <div class="name">Admin User</div>
-          <div class="role">HQ Command</div>
-        </div>
-        <div>🚪</div>
-      </div>
-    </div>
-  </aside>
-
-
+    <div id="sidebar"></div>
 
     <main class="main-content">
 
@@ -415,81 +305,13 @@
                     <tr>
                         <th>S.No</th>
                         <th>Unit Name</th>
-                        <th>personel</th>
+                        <th>Location</th>
                         <th>Action</th>
-<!--                        <th>Action</th>-->
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2RAJPUT</td>
-<!--                        <td>Wellington, Tamil Nadu</td>-->
-                        <td>12</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td>2</td>
-                        <td>11 GORKHA RIFIELS</td>
-<!--                        <td>Shimla, Himachal Pradesh</td>-->
-                        <td>52</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>3</td>
-                        <td>1 PARA(SF)</td>
-<!--                        <td>Belgaum, Karnataka</td>-->
-                        <td>8</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>4</td>
-                        <td>3 GORKHA RIFILES</td>
-<!--                        <td>Jabalpur, Madhya Pradesh</td>-->
-                        <td>16</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>5</td>
-                        <td>RAJPUTANA RIFELES</td>
-<!--                        <td>Sonamarg, Jammu & Kashmir</td>-->
-                        <td>6</td>
-                        <td class="actions">
-                            <div class="icon-btn edit">✏️</div>
-                            <div class="icon-btn delete">🗑️</div>
-                        </td>
-                    </tr>
-
-
-
-
-
-
-                    </tbody>
-
-
-
-
-
-
+                    <tbody></tbody>
                 </table>
-
             </div>
         </div>
 
@@ -497,5 +319,86 @@
 
 
 </div>
+<script>
+    const API_BASE = "http://localhost:6060/api/unit"; // change if needed
+
+    // Load units when page opens
+    document.addEventListener("DOMContentLoaded", loadUnits);
+
+    function loadUnits() {
+        fetch(API_BASE)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("tbody");
+                tbody.innerHTML = ""; // clear previous rows
+
+                data.forEach((unit, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${unit.unitName}</td>
+                            <td>${unit.location}</td>
+                            <td class="actions">
+                                <div class="icon-btn edit" onclick="editUnit(${unit.id})">✏️</div>
+                                <div class="icon-btn delete" onclick="deleteUnit(${unit.id})">🗑️</div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    // Add new unit
+    document.querySelector(".btn-primary").addEventListener("click", function () {
+        const unitName = prompt("Enter Unit Name:");
+        const location = prompt("Enter Location:");
+
+        if (!unitName || !location) {
+            alert("Unit Name and Location are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(API_BASE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    });
+
+    // Edit unit
+    function editUnit(id) {
+        const unitName = prompt("Enter new Unit Name:");
+        const location = prompt("Enter new Location:");
+
+        if (!unitName || !location) {
+            alert("All fields are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(`${API_BASE}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    }
+
+    // Delete unit
+    function deleteUnit(id) {
+        if (!confirm("Are you sure you want to delete this unit?")) return;
+
+        fetch(`${API_BASE}/${id}`, { method: "DELETE" })
+            .then(() => loadUnits());
+    }
+</script>
+
 </body>
 </html>
