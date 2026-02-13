@@ -34,4 +34,7 @@ public interface PersonnelService {
 
     void updateOfficerImage(Long id, MultipartFile image);
 
+    List<Personnel> filterPersonnel(PersonnelFilterRequest filter);
+
+
 }

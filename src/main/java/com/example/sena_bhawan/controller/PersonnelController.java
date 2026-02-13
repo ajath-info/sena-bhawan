@@ -210,4 +210,18 @@ public class PersonnelController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/filter")
+    public ResponseEntity<?> filterPersonnel(
+            @RequestBody PersonnelFilterRequest filterRequest) {
+
+        List<Personnel> result = personnelService.filterPersonnel(filterRequest);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("count", result.size());
+        response.put("data", result);
+
+        return ResponseEntity.ok(response);
+    }
 }

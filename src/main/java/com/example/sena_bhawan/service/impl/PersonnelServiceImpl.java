@@ -5,6 +5,9 @@ import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.PersonnelService;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -349,4 +353,154 @@ public class PersonnelServiceImpl implements PersonnelService {
             throw new RuntimeException("Failed to save officer image", e);
         }
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Personnel> filterPersonnel(PersonnelFilterRequest f) {
+
+        return personnelRepository.findAll((root, query, cb) -> {
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            // ================= RANK =================
+            if (f.rank != null && !f.rank.isBlank()) {
+                predicates.add(cb.equal(root.get("rank"), f.rank));
+            }
+
+            // ================= DOB (Greater Than) =================
+            if (f.dobGreaterThan != null) {
+                predicates.add(
+                        cb.greaterThan(root.get("dateOfBirth"), f.dobGreaterThan)
+                );
+            }
+
+            // ================= DATE OF COMMISSION =================
+            if (f.docFrom != null) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("dateOfCommission"), f.docFrom)
+                );
+            }
+            if (f.docTo != null) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("dateOfCommission"), f.docTo)
+                );
+            }
+
+            // ================= DATE OF SENIORITY =================
+            if (f.dosFrom != null) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("dateOfSeniority"), f.dosFrom)
+                );
+            }
+            if (f.dosTo != null) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("dateOfSeniority"), f.dosTo)
+                );
+            }
+
+            // ================= MEDICAL CATEGORY =================
+            if (f.medicalCategory != null && !f.medicalCategory.isBlank()) {
+                predicates.add(cb.equal(root.get("medicalCategory"), f.medicalCategory));
+            }
+
+            // ================= PLACE OF BIRTH =================
+            if (f.placeOfBirth != null && !f.placeOfBirth.isBlank()) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("placeOfBirth")),
+                                "%" + f.placeOfBirth.toLowerCase() + "%"
+                        )
+                );
+            }
+
+            // ================= FUTURE: ORGANISATION =================
+            if (f.command != null && hasField(root, "command")) {
+                predicates.add(cb.equal(root.get("command"), f.command));
+            }
+
+            if (f.corps != null && hasField(root, "corps")) {
+                predicates.add(cb.equal(root.get("corps"), f.corps));
+            }
+
+            if (f.division != null && hasField(root, "division")) {
+                predicates.add(cb.equal(root.get("division"), f.division));
+            }
+
+            if (f.establishmentType != null && hasField(root, "establishmentType")) {
+                predicates.add(cb.equal(root.get("establishmentType"), f.establishmentType));
+            }
+
+            // ================= FUTURE: TOS =================
+            if (f.tosFrom != null && hasField(root, "tosFrom")) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("tosFrom"), f.tosFrom)
+                );
+            }
+
+            if (f.tosTo != null && hasField(root, "tosTo")) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("tosTo"), f.tosTo)
+                );
+            }
+
+            // ================= FUTURE: COURSE =================
+            if (f.courseName != null && hasField(root, "courseName")) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("courseName")),
+                                "%" + f.courseName.toLowerCase() + "%"
+                        )
+                );
+            }
+
+            if (f.courseFrom != null && hasField(root, "courseFrom")) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("courseFrom"), f.courseFrom)
+                );
+            }
+
+            if (f.courseTo != null && hasField(root, "courseTo")) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("courseTo"), f.courseTo)
+                );
+            }
+
+            // ================= FUTURE: AREA / QUAL / SPORTS =================
+            if (f.areaType != null && hasField(root, "areaType")) {
+                predicates.add(cb.equal(root.get("areaType"), f.areaType));
+            }
+
+            if (f.civilQualification != null && hasField(root, "civilQualification")) {
+                predicates.add(cb.equal(root.get("civilQualification"), f.civilQualification));
+            }
+
+            if (f.sports != null && hasField(root, "sports")) {
+                predicates.add(cb.equal(root.get("sports"), f.sports));
+            }
+
+            // ================= FUTURE: POSTING DUE =================
+            if (f.postingDueMonths != null && hasField(root, "postingDueDate")) {
+                LocalDate dueDate = LocalDate.now().plusMonths(f.postingDueMonths);
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("postingDueDate"), dueDate)
+                );
+            }
+
+            query.orderBy(cb.asc(root.get("rank")));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        });
+    }
+
+
+    private boolean hasField(Root<Personnel> root, String fieldName) {
+        try {
+            root.get(fieldName);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+
 }
