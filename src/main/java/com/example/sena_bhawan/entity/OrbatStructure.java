@@ -33,6 +33,15 @@ public class OrbatStructure {
     @Column(unique = true)
     private String formationCode;
 
+    private String rank;
+    private String medicalCategory;
+    private String establishmentType;
+    private String areaType;
+    private String civilQualification;
+    private String sports;
+    private String placeOfBirth;
+    private Integer postingDueMonths;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 

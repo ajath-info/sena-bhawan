@@ -145,4 +145,57 @@ public class OrbatServiceImpl implements OrbatService {
 
         return node;
     }
+
+    // ================= ORBAT NAME DROPDOWNS =================
+    @Override
+    public List<String> getCommandDropdown() {
+        return repo.findDistinctCommandNames();
+    }
+
+    @Override
+    public List<String> getCorpsDropdown() {
+        return repo.findDistinctCorpsNames();
+    }
+
+    @Override
+    public List<String> getDivisionDropdown() {
+        return repo.findDistinctDivisionNames();
+    }
+
+    // ================= FILTER DROPDOWNS =================
+    @Override
+    public List<String> getRankDropdown() {
+        return repo.findDistinctRanks();
+    }
+
+    @Override
+    public List<String> getMedicalCategoryDropdown() {
+        return repo.findDistinctMedicalCategories();
+    }
+
+    @Override
+    public List<String> getEstablishmentTypeDropdown() {
+        return repo.findDistinctEstablishmentTypes();
+    }
+
+    @Override
+    public List<String> getAreaTypeDropdown() {
+        return repo.findDistinctAreaTypes();
+    }
+
+    @Override
+    public List<String> getCivilQualificationDropdown() {
+        return repo.findDistinctCivilQualifications();
+    }
+
+    @Override
+    public List<String> getSportsDropdown() {
+        return repo.findDistinctSports();
+    }
+
+
+    @Override
+    public List<Integer> getPostingDueMonthsDropdown() {
+        return repo.findDistinctPostingDueMonths();
+    }
 }
