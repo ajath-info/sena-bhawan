@@ -2,6 +2,7 @@ package com.example.sena_bhawan.repository;
 
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.projection.AgeBandProjection;
+import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,5 +37,12 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long> {
                                           @Param("date40") LocalDate date40,
                                           @Param("date45") LocalDate date45,
                                           @Param("date50") LocalDate date50);
+
+    // Add this method to your existing PersonnelRepository
+    @Query("SELECT p.medicalCategory as medicalCategory, COUNT(p) as count " +
+            "FROM Personnel p " +
+            "WHERE p.medicalCategory IS NOT NULL AND p.medicalCategory <> '' " +
+            "GROUP BY p.medicalCategory")
+    List<MedicalCategoryProjection> getMedicalCategoryCounts();
 }
 

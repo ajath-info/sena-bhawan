@@ -116,4 +116,10 @@ public class PersonnelController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/medical-distribution")
+    public ResponseEntity<MedicalCategoryResponse> getMedicalDistribution() {
+        MedicalCategoryResponse response = personnelService.getMedicalCategoryDistribution();
+        return ResponseEntity.ok(response);
+    }
+
 }

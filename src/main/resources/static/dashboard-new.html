@@ -648,16 +648,23 @@
           <div class="chart-title">Medical Category Distribution</div>
           <canvas id="medicalChart"></canvas>
           <script>
-            new Chart(document.getElementById('medicalChart'), {
-              type:'doughnut',
-              data:{
-                labels:['A1','A2','B','C'],
-                datasets:[{
-                  data:[72,18,8,2],
-                  backgroundColor:['#16a34a','#84cc16','#facc15','#dc2626']
-                }]
-              }
-            });
+            fetch('http://localhost:6060/api/personnel/medical-distribution')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('medicalChart'), {
+                        type: 'doughnut',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            data: data.data,
+                            backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { position: 'bottom' } }
+                        }
+                      });
+                    });
           </script>
         </div>
       </div>
@@ -716,54 +723,26 @@
           <div class="chart-title">Ongoing Courses – Officer Strength</div>
           <canvas id="ongoingCourseChart"></canvas>
           <script>
-            new Chart(document.getElementById('ongoingCourseChart'), {
-              type: 'bar',
-              data: {
-                labels: [
-                  'Junior Command Course',
-                  'Senior Command Course',
-                  'Technical Staff Course',
-                  'Refresher Course',
-                  'Young Officers Course'
-                ],
-                datasets: [{
-                  label: 'Officer Strength',
-                  data: [120, 85, 60, 45, 95],
-                  backgroundColor: [
-                    '#1b4332',
-                    '#2d6a4f',
-                    '#40916c',
-                    '#52b788',
-                    '#74c69d'
-                  ],
-                  borderRadius: 8
-                }]
-              },
-              options: {
-                responsive: true,
-                plugins: {
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function(context) {
-                        return context.parsed.y + ' Officers';
-                      }
-                    }
-                  }
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    title: {
-                      display: true,
-                      text: 'Number of Officers'
-                    }
-                  }
-                }
-              }
-            });
+            fetch('http://localhost:6060/api/course-panel/ongoing-strength')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('ongoingCourseChart'), {
+                        type: 'bar',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            label: 'Officer Strength',
+                            data: data.data,
+                            backgroundColor: ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#74c69d'],
+                            borderRadius: 8
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { display: false } },
+                          scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Officers' } } }
+                        }
+                      });
+                    });
           </script>
         </div>
 

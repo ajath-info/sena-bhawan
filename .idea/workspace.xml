@@ -4,264 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/AgeBandResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/RankStrengthResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/projection/AgeBandProjection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/projection/RankCountProjection.java" afterDir="false" />
+    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CoursePanelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CoursePanelController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/MedicalUpdateRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/MedicalUpdateRequestDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/OrbatCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/OrbatCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/MedicalCategoryHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/MedicalCategoryHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/CourseMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/CourseMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelMmedicalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelMedicalService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CoursePanelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CoursePanelService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/orbat.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/orbat.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/SenaBhawanApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/config/WebConfig.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/AuthController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseDetailsController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseEligibilityController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseMasterController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CoursePanelController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseScheduleController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseScheduleRoleStatusController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/DecorationMasterController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/LocationMasterController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/ModuleController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OfficerController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OfficerPostingController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OrbatController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OrbatStructureController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PanelSelectionController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PermissionController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PersonnelController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PersonnelFullDetailsController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PersonnelInformationController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PostingTypeController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RankMasterController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RoleController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RolePermissionController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UnitMasterController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UserController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UserPermissionController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AdditionalQualificationRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AttendanceRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AttendanceResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseCountDto.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseDetailsDto.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseDetailsRequestDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseEligibilityDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelView.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleItemDto.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleRoleStatusRequestDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleRoleStatusResponseDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleSummaryResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseStep1DTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreateCourseScheduleRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreatePersonnelRequest$AdditionalQualificationDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreatePersonnelRequest$DecorationDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreatePersonnelRequest$FamilyDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreatePersonnelRequest$QualificationDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CreatePersonnelRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/DecorationRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/FamilyRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/LoginRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/LoginResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalUpdateRequestDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/ModuleResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/NominationDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OfficerPostingRequestDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatDropdownResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatSimpleDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatTreeResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PanelOfficerDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PermissionResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PersonnelFullDetailsDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PostingDetailsDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/QualificationRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse$ModuleDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse$PermissionDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsSaveRequest$PermissionEntry.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsSaveRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RoleSummaryDto.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/Step2PanelStrengthDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/SusDropdownDTO.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UpdatePersonnelRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserPermissionProjection.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserPermissionsResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Admin.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/AppointmentMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseDetails.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibilityMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligiblePostingType.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibleRank.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibleUnit.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CoursePanelNomination$CoursePanelNominationBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CoursePanelNomination.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseSchedule.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseScheduleRoleStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/DecorationMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/LocationMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/MedicalCategoryHistory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/ModuleEntity.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Officer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OfficerPosting$OfficerPostingBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OfficerPosting.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OrbatStructure.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PanelAttendance.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Permission.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Personnel.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PersonnelAdditionalQualifications.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PersonnelDecorations.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PersonnelFamily.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PersonnelInformation.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PersonnelQualifications.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PostingDetails.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PostingTypeMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RankMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Role.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RoleMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RolePermission.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UnitMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UserMaster.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UserRoleInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/AdminRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/AppointmentRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseDetailsRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibilityRepo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligiblePostingTypeRepo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibleRankRepo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibleUnitRepo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CoursePanelRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseScheduleRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseScheduleRoleStatusRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/DecorationMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/LocationMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/MedicalCategoryHistoryRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/ModuleRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OfficerPostingRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OfficerRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OrbatRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OrbatStructureRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PanelAttendanceRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PermissionRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PersonnelInformationRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PersonnelRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PostingDetailsRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PostingTypeMasterRepo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RankMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RoleMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RolePermissionRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RoleRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UnitMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserMasterRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserPermissionRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserRoleInfoRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AppointmentService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseDetailsService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseEligibilityService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseMasterService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CoursePanelService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseScheduleRoleStatusService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseScheduleService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/DecorationMasterService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/LocationMasterService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/ModuleService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OfficerPostingService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OfficerService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OrbatService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OrbatStructureService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PanelSelectionService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PermissionService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PersonnelInformationService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PersonnelService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PostingDetailsService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PostingTypeService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RankMasterService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleCrud.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RolePermissionService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleSummaryService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UnitMasterService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UserPermissionService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UserService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/AppointmentServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseDetailsServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseMasterServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseScheduleRoleStatusServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseScheduleServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/LocationMasterServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/ModuleServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/OfficerServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/OrbatServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/OrbatStructureServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PanelSelectionServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PermissionServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PersonnelInformationServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PostingDetailsServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleCrudImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RolePermissionServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleSummaryServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/UserServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/officerPostingServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/util/JwtUtil.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/Col-PLG-Dashboard.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/UserSession.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/Usermmaster.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/add-new-schedule.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/add-new-user.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/addcourse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/addlocation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/auth.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/course-eligibility-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/course-master.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/course-posting-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/course-schedule.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/coursepanel.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-new.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-officers.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/dashboard-training.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/decoration-matser.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/figma_individual_dashboard.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/filter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/grade-awards.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/legal-disciplinary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/location-master.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/login.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/logout.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/orbat.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/paramount.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/personnel-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/rank-master.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/role-permmissoon.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/session.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/sidebar.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/sidebar.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/unit-master.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/example/sena_bhawan/SenaBhawanApplicationTests.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -280,6 +33,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;VipanKumarAjath&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ajath-info/sena-bhawan.git&quot;,
+    &quot;accountId&quot;: &quot;465459c3-4ec9-4833-a838-d66a81685772&quot;
+  }
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -302,39 +67,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.SenaBhawanApplication.executor": "Run",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.SenaBhawanApplication.executor": "Debug",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "dev-vipan",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/diwakarjha/Downloads/sena-bhawan",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.SenaBhawanApplication.executor&quot;: &quot;Run&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev-vipan&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/diwakarjha/Downloads/sena-bhawan&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\uploads\personnel\officer" />
@@ -392,12 +157,26 @@
       <workItem from="1770288774285" duration="1789000" />
       <workItem from="1770316757435" duration="9701000" />
       <workItem from="1770832815627" duration="6495000" />
-      <workItem from="1770909125016" duration="11704000" />
+      <workItem from="1770909125016" duration="12428000" />
+      <workItem from="1770994119945" duration="10530000" />
     </task>
+    <task id="LOCAL-00001" summary="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
+      <option name="closed" value="true" />
+      <created>1770927705849</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1770927705849</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -29,4 +29,6 @@ public interface PersonnelService {
     RankStrengthResponse getOfficerStrengthByRank();
 
     AgeBandResponse getAgeBandDistribution();
+
+    MedicalCategoryResponse getMedicalCategoryDistribution();
 }

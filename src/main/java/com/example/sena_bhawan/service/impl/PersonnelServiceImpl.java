@@ -3,6 +3,7 @@ package com.example.sena_bhawan.service.impl;
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.projection.AgeBandProjection;
+import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.PersonnelService;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,30 @@ public class PersonnelServiceImpl implements PersonnelService {
             "Lt Col", Arrays.asList("lt col", "lieutenant col", "lt colonel", "lieutenant colonel"),
             "Col", Arrays.asList("col", "colonel")
     );
+
+    @Override
+    public MedicalCategoryResponse getMedicalCategoryDistribution() {
+        List<MedicalCategoryProjection> projections =
+                personnelRepository.getMedicalCategoryCounts();
+
+        List<String> labels = new ArrayList<>();
+        List<Integer> data = new ArrayList<>();
+
+        for (MedicalCategoryProjection projection : projections) {
+            String category = projection.getMedicalCategory();
+            if (category != null && !category.trim().isEmpty()) {
+                labels.add(category.trim());
+                data.add(projection.getCount().intValue());
+            }
+        }
+
+        return MedicalCategoryResponse.builder()
+                .labels(labels)
+                .data(data)
+                .chartType("doughnut")
+                .title("Medical Category Distribution")
+                .build();
+    }
 
     @Override
     public RankStrengthResponse getOfficerStrengthByRank() {
