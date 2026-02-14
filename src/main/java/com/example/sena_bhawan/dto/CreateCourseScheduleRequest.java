@@ -19,4 +19,5 @@ public class CreateCourseScheduleRequest {
 
     private String courseStrength;
     private String venue;
+    private String remarks;
 }

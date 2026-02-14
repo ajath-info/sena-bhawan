@@ -19,8 +19,35 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
     @Autowired
     private CourseScheduleRepository scheduleRepo;
 
+    private static final int BUFFER_SIZE = 10;
+
+
+
+
+    @Autowired
+    private CourseScheduleRepository repository;
+
     @Autowired
     private CourseMasterRepository courseRepo;
+    private CourseScheduleRepository scheduleRepository;
+
+    public CourseScheduleServiceImpl(
+            CourseScheduleRepository scheduleRepository) {
+        this.scheduleRepository = scheduleRepository;
+    }
+
+
+
+
+
+//    @Autowired
+//    public CourseScheduleServiceImpl(
+//            CourseScheduleRepository scheduleRepository) {
+//        this.scheduleRepository = scheduleRepository;
+//    }
+
+
+
 
     @Override
     public CourseSchedule addSchedule(CreateCourseScheduleRequest request) {
@@ -35,8 +62,61 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         schedule.setEndDate(LocalDate.parse(request.getEndDate()));
         schedule.setCourseStrength(request.getCourseStrength());
         schedule.setVenue(request.getVenue());
+        schedule.setRemarks(request.getRemarks());
 
         return scheduleRepo.save(schedule);
+    }
+
+
+
+
+    @Override
+    public Step2PanelStrengthDTO getPanelStrength(Integer courseId) {
+
+        // Step-1 validation
+        if (courseId == null) {
+            throw new IllegalArgumentException("Course ID is required");
+        }
+
+        // Latest / active schedule fetch
+        List<CourseSchedule> schedules =
+                scheduleRepository.findByCourseId(courseId);
+
+        if (schedules.isEmpty()) {
+            throw new RuntimeException(
+                    "No course schedule found for courseId: " + courseId);
+        }
+
+        CourseSchedule schedule = schedules.get(0);
+
+        // 🔴 course_strength STRING from DB
+        String strengthStr = schedule.getCourseStrength();
+
+        if (strengthStr == null || strengthStr.isBlank()) {
+            throw new RuntimeException(
+                    "Course strength not defined in schedule");
+        }
+
+        // ✅ Safe conversion
+        int courseStrength;
+        try {
+            courseStrength = Integer.parseInt(strengthStr);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(
+                    "Invalid course strength value: " + strengthStr);
+        }
+
+        // Panel size logic
+        int panelSize = courseStrength + BUFFER_SIZE;
+
+        // DTO response
+        Step2PanelStrengthDTO dto = new Step2PanelStrengthDTO();
+        dto.setCourseId(courseId);
+        dto.setCourseStrength(strengthStr); // STRING
+        dto.setBuffer(BUFFER_SIZE);
+        dto.setPanelSize(panelSize);
+
+        return dto;
     }
 
     @Override
@@ -49,15 +129,49 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         return scheduleRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Schedule not found"));
     }
+//    @Override
+//    public List<CourseStep1Dto> fetchStep1Courses() {
+//        return repository.fetchStep1Courses();   // ✅ CORRECT
+//    }
+
+//    @Override
+//    public List<CourseStep1Dto> getStep1Data() {
+//        return List.of();
+//    }
 
     @Override
     public List<CourseSchedule> getSchedulesByCourseId(Integer courseId) {
+
         return scheduleRepo.findByCourse_Srno(courseId);
+
     }
+
+
+
 
     @Override
     public void deleteSchedule(Long id) {
         scheduleRepo.deleteById(id);
+    }
+
+    @Override
+    public List<CourseStep1DTO> getStep1Courses() {
+
+        List<CourseSchedule> schedules =
+                scheduleRepository.findCurrentAndUpcoming();
+
+        return schedules.stream()
+                .map(cs -> new CourseStep1DTO(
+                        cs.getCourse().getSrno(),
+                        cs.getScheduleId(),
+                        cs.getBatchNumber(),
+                        cs.getCourse().getCourseName(),
+                        cs.getCourse().getLocation(),
+                        cs.getStartDate(),
+                        cs.getEndDate(),
+                        cs.getVenue()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -114,4 +228,11 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
         return response;
     }
+
+//    @Override
+//    public List<CourseStep1Dto> getStep1Courses() {
+//        return List.of();
+//    }
+
+
 }

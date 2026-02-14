@@ -41,4 +41,8 @@ public class CourseSchedule {
 
     @Column(name = "venue")
     private String venue;
+
+    @Column(name = "remarks")
+    private String remarks;
+
 }

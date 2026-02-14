@@ -42,4 +42,8 @@ public class LocationMasterServiceImpl implements LocationMasterService {
 
         return repository.save(existing);
     }
+
+    public void delete(Integer srno) {
+        repository.deleteById(srno);
+    }
 }

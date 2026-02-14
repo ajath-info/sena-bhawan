@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sidebar</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            min-height: 72px;
+        }
+
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffb703;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logo-text h1 { font-size: 18px; font-weight: 700; }
+        .logo-text p { font-size: 11px; color: #52b788; }
+
+        .sidebar-nav { flex: 1; padding: 16px 0; }
+
+        .nav-section-title {
+            padding: 16px 20px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #52b788;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffb703;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d6a4f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            cursor: pointer;
+            color: #ffffff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- HEADER -->
+        <div class="sidebar-header">
+            <div class="logo-section">
+                <div class="logo-icon">🛡️</div>
+                <div class="logo-text">
+                    <h1>ARMY HRMS</h1>
+                    <p>भारतीय सेना</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Sidebar Menu -->
+        <nav class="sidebar-nav" id="dynamicSidebar"></nav>
+
+        <!-- FOOTER -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar" id="avatar">U</div>
+                <div class="user-info">
+                    <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
+                    <div class="role">User</div>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+<!-- ================= SIDEBAR JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        /* ------------------------ KEYWORD → EMOJI MAPPING ------------------------ */
+        const keywordEmojis = [
+            { key: "dashboard", icon: "📊" },
+            { key: "stat", icon: "📈" },
+            { key: "report", icon: "📄" },
+            { key: "chart", icon: "📉" },
+            { key: "command", icon: "🧭" },
+
+            { key: "personnel", icon: "👤" },
+            { key: "officer", icon: "🎖️" },
+            { key: "unit", icon: "🏢" },
+            { key: "location", icon: "📍" },
+
+            { key: "course", icon: "📚" },
+            { key: "training", icon: "🏋️" },
+            { key: "schedule", icon: "🗓️" },
+            { key: "attendance", icon: "📝" },
+
+            { key: "posting", icon: "📌" },
+            { key: "transfer", icon: "🔁" },
+
+            { key: "master", icon: "⚙️" },
+            { key: "setting", icon: "⚙️" },
+            { key: "config", icon: "🧩" },
+
+            { key: "export", icon: "📤" },
+            { key: "delete", icon: "🗑️" },
+            { key: "edit", icon: "✏️" },
+            { key: "add", icon: "➕" },
+            { key: "create", icon: "✍️" },
+            { key: "view", icon: "👁️" },
+
+            { key: "history", icon: "📜" },
+            { key: "print", icon: "🖨️" }
+        ];
+
+        /* ------------------------ AUTO ICON DETECT FUNCTION ------------------------ */
+        function autoEmoji(label, moduleName) {
+            const text = (label + " " + moduleName).toLowerCase();
+
+            for (const item of keywordEmojis) {
+                if (text.includes(item.key)) {
+                    return item.icon;
+                }
+            }
+            return "📁"; // fallback for unknown
+        }
+
+        /* ------------------------ LOAD SIDEBAR ------------------------ */
+        async function loadSidebar() {
+            const userId = sessionStorage.getItem("userId");
+            const token = sessionStorage.getItem("token");
+
+            if (!userId) return window.location.replace("/login.html");
+
+            const res = await fetch(`http://localhost:6060/api/users/${userId}/permissions`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            const data = await res.json();
+            const container = document.getElementById("dynamicSidebar");
+
+            let html = "";
+
+            data.modules.forEach(module => {
+                const allowed = module.permissions.filter(p => p.allowed === true);
+
+                if (allowed.length === 0) return;
+
+                html += `<div class="nav-section-title">${module.moduleName}</div>`;
+
+                allowed.forEach(perm => {
+                    let page = perm.url ? perm.url : "#";
+                    let icon = autoEmoji(perm.label, module.moduleName);
+
+                    html += `
+                        <a href="${page}" class="nav-item">
+                            <div class="nav-icon">${icon}</div>
+                            <span>${perm.label}</span>
+                        </a>
+                    `;
+                });
+            });
+
+            container.innerHTML = html;
+            highlightActivePage();
+        }
+
+        /* ------------------------ ACTIVE HIGHLIGHT ------------------------ */
+        function highlightActivePage() {
+            const current = location.pathname.split('/').pop().split('?')[0];
+            document.querySelectorAll(".nav-item").forEach(item => {
+                const page = item.getAttribute("href").split('/').pop();
+                if (current === page) item.classList.add("active");
+            });
+        }
+
+        /* ------------------------ LOGOUT ------------------------ */
+        function logout() {
+            sessionStorage.clear();
+            window.location.replace("/login.html");
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", logout);
+
+        loadSidebar();
+    });
+</script>
+
+</body>
+</html>

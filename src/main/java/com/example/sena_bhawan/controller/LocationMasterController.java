@@ -41,4 +41,10 @@ public class LocationMasterController {
     ) {
         return service.updateLocation(srno, location);
     }
+
+    @DeleteMapping("/{srno}")
+    public String delete(@PathVariable Integer srno) {
+        service.delete(srno);
+        return "Location deleted successfully";
+    }
 }

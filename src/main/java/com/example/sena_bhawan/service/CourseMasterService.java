@@ -14,4 +14,6 @@ public interface CourseMasterService {
     CourseMaster addCourse(CourseMaster course);
 
     CourseMaster updateCourse(Integer srno, CourseMaster course);
+
+    void delete(Integer srno);
 }

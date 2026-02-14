@@ -33,6 +33,9 @@ public class PersonnelInformation {
     @Column(name = "case_type")
     private String caseType;
 
+    @Column(name = "case_id")
+    private String caseId;
+
     @Column(name = "date_of_filing")
     private LocalDate dateOfFiling;
 

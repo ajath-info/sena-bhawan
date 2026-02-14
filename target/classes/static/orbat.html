@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create ORBAT Entry - ARMY HRMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: "Inter", sans-serif; background:#f1f3f5; color:#1f2937; }
+        .container { display:flex; height:100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width:260px; background:linear-gradient(180deg,#1b4332,#081c15); color:white; }
+        .sidebar-header { padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .logo { display:flex; gap:12px; align-items:center; }
+        .logo-icon { width:32px;height:32px; background:#ffb703; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#000; }
+        .sidebar-nav { padding:16px 0; }
+        .nav-title { padding:16px 20px 8px; font-size:11px; text-transform:uppercase; color:#52b788; font-weight:700; }
+        .nav-item { padding:12px 20px; display:flex; gap:12px; align-items:center; color:white; text-decoration:none; }
+        .nav-item.active { background:rgba(255,255,255,0.1); border-left:4px solid #ffb703; font-weight:600; }
+
+        /* MAIN */
+        .main { flex:1; display:flex; flex-direction:column; }
+        .header { background:white; padding:20px 24px; border-bottom:1px solid #e5e7eb; }
+        .header h2 { font-size:22px; }
+        .header p { font-size:13px; color:#6b7280; }
+
+        .content { padding:32px; overflow-y:auto; }
+
+        /* FORM */
+        .form-grid {
+          max-width:900px;
+          display:grid;
+          grid-template-columns:repeat(2,1fr);
+          gap:20px;
+        }
+        .form-group { display:flex; flex-direction:column; gap:6px; }
+        .full { grid-column:1 / -1; }
+
+        label { font-size:14px; font-weight:600; }
+        input, select {
+          padding:12px;
+          border:1px solid #d1d5db;
+          border-radius:8px;
+          font-size:14px;
+          background:white;
+        }
+        input:focus, select:focus {
+          border-color:#1b4332;
+          box-shadow:0 0 0 3px rgba(27,67,50,0.15);
+          outline:none;
+        }
+
+        .actions { margin-top:30px; display:flex; justify-content:flex-end; gap:12px; }
+        .btn {
+          padding:12px 20px;
+          border-radius:8px;
+          font-size:14px;
+          cursor:pointer;
+          font-weight:600;
+          border:1px solid transparent;
+        }
+        .btn-primary { background:#1b4332; color:white; }
+        .btn-primary:disabled { background:#6b7280; cursor:not-allowed; }
+        .btn-secondary { background:white; border:1px solid #d1d5db; color:#374151; }
+
+    </style>
+</head>
+
+<body>
+<script src="auth.js"></script>
+<script src="logout.js"></script>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+<!--    <aside class="sidebar">-->
+<!--        <div class="sidebar-header">-->
+<!--            <div class="logo">-->
+<!--                <div class="logo-icon">🛡️</div>-->
+<!--                <div><strong>ARMY HRMS</strong><br><small style="color:#52b788">भारतीय सेना</small></div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <nav class="sidebar-nav">-->
+<!--            <div class="nav-section-title">Main Menu</div>-->
+
+<!--            <a href="/dashboard-new.html" class="nav-item">-->
+<!--                <div class="nav-icon">🏠</div>-->
+<!--                <span>Dashboard</span>-->
+<!--            </a>-->
+
+<!--            <a href="/dashboard-officers.html" class="nav-item">-->
+<!--                <div class="nav-icon">🏠</div>-->
+<!--                <span>Dashboard Officers</span>-->
+<!--            </a>-->
+
+<!--            <a href="/dashboard-training.html" class="nav-item">-->
+<!--                <div class="nav-icon">🏠</div>-->
+<!--                <span>Dashboard Training</span>-->
+<!--            </a>-->
+
+<!--            <a href="/filter.html" class="nav-item">-->
+<!--                <div class="nav-icon">🔍</div>-->
+<!--                <span>Master Filter & Search</span>-->
+<!--            </a>-->
+
+<!--            <div class="nav-section-title">Administration</div>-->
+
+<!--            <a href="/role-permmissoon.html" class="nav-item">-->
+<!--                <div class="nav-icon">🔐</div>-->
+<!--                <span>Role & Permissions</span>-->
+<!--            </a>-->
+
+<!--            &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
+<!--              <div class="nav-icon">👥</div>-->
+<!--              <span>User Management</span>-->
+<!--            </a> &ndash;&gt;-->
+
+<!--            <div class="nav-section-title">Masters</div>-->
+
+<!--            <a href="/course-master.html" class="nav-item">-->
+<!--                <div class="nav-icon">📚</div>-->
+<!--                <span>Course Master</span>-->
+<!--            </a>-->
+
+<!--            <a href="/grade-awards.html" class="nav-item">-->
+<!--                <div class="nav-icon">📝</div>-->
+<!--                <span>Grade & Awards</span>-->
+<!--            </a>-->
+
+<!--            <a href="/course-schedule.html" class="nav-item">-->
+<!--                <div class="nav-icon">📅</div>-->
+<!--                <span>Course Schedule</span>-->
+<!--            </a>-->
+
+<!--            <a href="/location-master.html" class="nav-item">-->
+<!--                <div class="nav-icon">📍</div>-->
+<!--                <span>Location Master</span>-->
+<!--            </a>-->
+
+<!--            &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
+<!--              <div class="nav-icon">🚩</div>-->
+<!--              <span>Command Master</span>-->
+<!--            </a> &ndash;&gt;-->
+
+<!--            <a href="/rank-master.html" class="nav-item">-->
+<!--                <div class="nav-icon">🏅</div>-->
+<!--                <span>Rank Master</span>-->
+<!--            </a>-->
+
+<!--            <a href="/unit-master.html" class="nav-item">-->
+<!--                <div class="nav-icon">🛡️</div>-->
+<!--                <span>Unit Master</span>-->
+<!--            </a>-->
+
+<!--            <div class="nav-section-title">Forms</div>-->
+
+<!--            <a href="/personnel-form.html" class="nav-item">-->
+<!--                <div class="nav-icon">👤</div>-->
+<!--                <span>Personnel Data Form</span>-->
+<!--            </a>-->
+
+<!--            <a href="/coursepanel.html" class="nav-item">-->
+<!--                <div class="nav-icon">📋</div>-->
+<!--                <span>Course Panel Generation</span>-->
+<!--            </a>-->
+
+<!--            <a href="/orbat.html" class="nav-item active">-->
+<!--                <div class="nav-icon">📋</div>-->
+<!--                <span>Orbit Generation Form</span>-->
+<!--            </a>-->
+
+<!--            <a href="/add-new-user.html" class="nav-item">-->
+<!--                <div class="nav-icon">📋</div>-->
+<!--                <span>New User Form</span>-->
+<!--            </a>-->
+
+<!--            <a href="/legal-disciplinary.html" class="nav-item">-->
+<!--                <div class="nav-icon">📋</div>-->
+<!--                <span>Legal And Disciplinary Form</span>-->
+<!--            </a>-->
+
+<!--            <a href="/course-posting-form.html" class="nav-item">-->
+<!--                <div class="nav-icon">📝</div>-->
+<!--                <span>Course & Posting Form</span>-->
+<!--            </a>-->
+<!--        </nav>-->
+
+<!--        <div class="sidebar-footer">-->
+<!--            <div class="user-profile">-->
+<!--                <div class="user-avatar">AD</div>-->
+<!--                <div class="user-info">-->
+<!--                    <div class="name">Admin User</div>-->
+<!--                    <div class="role">HQ Command</div>-->
+<!--                </div>-->
+<!--                <div>🚪</div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </aside>-->
+
+    <div id="sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <div class="header">
+            <h2>ARMY HQ – ORBAT Creation</h2>
+            <p>Create hierarchical formation structure</p>
+        </div>
+
+        <div class="content">
+            <div class="form-grid" id="formGrid">
+
+                <!-- HQ DROPDOWN -->
+                <div class="form-group full">
+                    <label>Army HQ *</label>
+                    <select id="hqId"></select>
+                </div>
+
+                <!-- Formation Type -->
+                <div class="form-group full">
+                    <label>What do you want to create? *</label>
+                    <select id="formationType">
+                        <option value="">Select Type</option>
+                        <option value="command">Command</option>
+                        <option value="corps">Corps</option>
+                        <option value="division">Division</option>
+                        <option value="brigade">Brigade</option>
+                        <option value="battalion">Battalion</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic hierarchy -->
+                <div id="hierarchyContainer" class="full"></div>
+
+                <!-- COMMON FIELDS -->
+                <div id="commonFields" style="display:none;">
+                    <div class="form-group full">
+                        <label>Name of Est</label>
+                        <input id="name" placeholder="Enter Name of Est">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <input id="location">
+                    </div>
+
+                    <div class="form-group">
+                        <label>SUS Number *</label>
+                        <input id="sosNo">
+                    </div>
+
+                    <div class="form-group">
+                        <label>PIN *</label>
+                        <input id="pin">
+                    </div>
+
+                    <div class="form-group full" >
+                        <label>Unit Name</label>
+                        <input id="unitName">
+                    </div>
+
+
+                    <div class="form-group full" style="display: none;">
+                        <label>Formation Code (Auto)</label>
+                        <input id="formationCode" readonly>
+                    </div>
+                </div>
+
+            </div> <!-- form-grid -->
+
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="window.location.reload()">Cancel</button>
+                <button class="btn btn-primary" id="submitBtn" disabled>Create ORBAT Entry</button>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- JS LOGIC -->
+<script>
+    class ORBAT {
+      constructor() {
+        this.api = "http://localhost:6060/api/orbat";
+
+        this.hierarchyOrder = ["command", "corps", "division", "brigade", "battalion"];
+
+        this.hierarchyLevels = {
+          command: [],
+          corps: ["command"],
+          division: ["command", "corps"],
+          brigade: ["command", "corps", "division"],
+          battalion: ["command", "corps", "division", "brigade"]
+        };
+
+        this.init();
+      }
+
+      async init() {
+        await this.loadHQ();
+        this.setupEvents();
+      }
+
+      /* Load HQ */
+      async loadHQ() {
+        const res = await fetch(`${this.api}/dropdown/hq`);
+        const hqs = await res.json();
+        document.getElementById("hqId").innerHTML =
+          hqs.map(h => `<option value="${h.id}">${h.name}</option>`).join("");
+      }
+
+      setupEvents() {
+        document.getElementById("formationType")
+          .addEventListener("change", () => this.renderHierarchy());
+
+        document.getElementById("submitBtn")
+          .addEventListener("click", () => this.submitForm());
+
+        // Watch all inputs for changes
+        document.addEventListener("change", () => this.updateSubmitState());
+        document.addEventListener("input", () => this.updateSubmitState());
+      }
+
+      /* Build hierarchy dropdowns */
+      async renderHierarchy() {
+        const type = document.getElementById("formationType").value;
+        const container = document.getElementById("hierarchyContainer");
+        container.innerHTML = "";
+
+        document.getElementById("commonFields").style.display = type ? "contents" : "none";
+
+        if (!type) return;
+
+        const levels = this.hierarchyLevels[type];
+
+        for (let lvl of levels) {
+          const label = lvl.charAt(0).toUpperCase() + lvl.slice(1);
+
+          container.insertAdjacentHTML("beforeend", `
+            <div class="form-group">
+              <label>Select ${label} *</label>
+              <select id="${lvl}Id"></select>
+            </div>
+          `);
+
+          await this.loadDropdown(lvl);
+        }
+
+        this.updateSubmitState();
+      }
+
+      /* Load dropdown values correctly */
+      async loadDropdown(level) {
+        let url = `${this.api}/dropdown/${level}`;
+
+        const parents = this.hierarchyLevels[level];
+        if (parents.length > 0) {
+          const parentLevel = parents[parents.length - 1];  // Correct parent
+          const parentId = document.getElementById(parentLevel + "Id")?.value;
+
+          if (parentId) url += `?parentId=${parentId}`;
+        }
+
+        const res = await fetch(url);
+        const items = await res.json();
+
+        const select = document.getElementById(level + "Id");
+
+        // Prevent dropdown from reverting to "Select..."
+        let previousValue = select.value;
+
+        select.innerHTML =
+          `<option value="">Select...</option>` +
+          items.map(i => `<option value="${i.id}">${i.name}</option>`).join("");
+
+        // Try to restore previous selection
+        if (items.some(i => String(i.id) === previousValue)) {
+          select.value = previousValue;
+        }
+
+        select.addEventListener("change", () => {
+          this.clearChildren(level);
+          this.updateFormationCode();
+          this.loadChildren(level);
+        });
+      }
+
+      /* Clear child dropdowns */
+      clearChildren(level) {
+        const levelIndex = this.hierarchyOrder.indexOf(level);
+        const container = document.getElementById("hierarchyContainer");
+
+        // Remove all dropdowns BELOW current level
+        container.querySelectorAll("select").forEach(sel => {
+          const selLevel = sel.id.replace("Id", "");
+          if (this.hierarchyOrder.indexOf(selLevel) > levelIndex) {
+            sel.closest(".form-group").remove();
+          }
+        });
+      }
+
+      /* Load next-level dropdown after this level */
+      async loadChildren(level) {
+        const levelIndex = this.hierarchyOrder.indexOf(level);
+        const nextLevel = this.hierarchyOrder[levelIndex + 1];
+
+        const type = document.getElementById("formationType").value;
+        if (!nextLevel || !this.hierarchyLevels[type].includes(nextLevel)) return;
+
+        // Add dropdown HTML
+        document.getElementById("hierarchyContainer").insertAdjacentHTML("beforeend", `
+            <div class="form-group">
+              <label>Select ${nextLevel.charAt(0).toUpperCase() + nextLevel.slice(1)} *</label>
+              <select id="${nextLevel}Id"></select>
+            </div>
+        `);
+
+        await this.loadDropdown(nextLevel);
+      }
+
+      /* Build formation code */
+      updateFormationCode() {
+        const type = document.getElementById("formationType").value;
+        if (!type) return;
+
+        let code = "01"; // HQ always 01
+
+        const levels = this.hierarchyLevels[type];
+        for (let lvl of levels) {
+          const id = document.getElementById(lvl + "Id")?.value;
+          code += id ? id.toString().padStart(2, "0") : "00";
+        }
+
+        const ownId = document.getElementById(type + "Id")?.value || "01";
+        code += ownId.toString().padStart(2, "0");
+
+        document.getElementById("formationCode").value = code;
+      }
+
+      /* Validation */
+      updateSubmitState() {
+        const btn = document.getElementById("submitBtn");
+
+        const requiredFields = ["hqId", "name", "location", "sosNo", "pin","unitName"];
+        for (let id of requiredFields) {
+          if (!document.getElementById(id)?.value.trim()) {
+            btn.disabled = true;
+            return;
+          }
+        }
+
+        const type = document.getElementById("formationType").value;
+        if (!type) {
+          btn.disabled = true;
+          return;
+        }
+
+        for (let lvl of this.hierarchyLevels[type]) {
+          const el = document.getElementById(lvl + "Id");
+          if (!el || !el.value) {
+            btn.disabled = true;
+            return;
+          }
+        }
+
+        btn.disabled = false;
+      }
+
+      /* Submit */
+      async submitForm() {
+        const type = document.getElementById("formationType").value;
+
+        const payload = {
+          hqId: Number(document.getElementById("hqId").value),
+          formationType: type,
+          formationCode: document.getElementById("formationCode").value,
+
+          commandId: document.getElementById("commandId")?.value || null,
+          corpsId: document.getElementById("corpsId")?.value || null,
+          divisionId: document.getElementById("divisionId")?.value || null,
+          brigadeId: document.getElementById("brigadeId")?.value || null,
+
+          name: document.getElementById("name").value.trim(),
+          location: document.getElementById("location").value.trim(),
+          sosNo: document.getElementById("sosNo").value.trim(),
+          pin: document.getElementById("pin").value.trim(),
+          unitName: document.getElementById("unitName").value.trim(),
+        };
+
+        const res = await fetch(`${this.api}/create`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          alert("✔ ORBAT Entry Created Successfully!");
+          window.location.reload();
+        } else {
+          alert("❌ Error creating ORBAT entry");
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => new ORBAT());
+</script>
+
+
+</body>
+</html>

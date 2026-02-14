@@ -20,6 +20,7 @@ public class PersonnelQualifications {
     private Long id;
 
     private String qualification;
+    private String stream;
     private String institution;
     private Integer yearOfCompletion;
     private String gradePercentage;

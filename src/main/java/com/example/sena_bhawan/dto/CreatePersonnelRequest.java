@@ -6,6 +6,7 @@ import java.util.List;
 public class CreatePersonnelRequest {
 
     // PERSONNEL FIELDS
+    public String commissionType;
     public String armyNo;
     public String rank;
     public String fullName;
@@ -31,12 +32,16 @@ public class CreatePersonnelRequest {
     public String mobileNumber;
     public String alternateMobile;
     public String emailAddress;
+    public String nsgEmail;
 
-    public Short medicalS;
-    public Short medicalH;
-    public Short medicalA;
-    public Short medicalP;
-    public Short medicalE;
+    public String medicalCategory;
+    public LocalDate medicalDate;
+    public String diagnosis;
+    public LocalDate reviewDate;
+    public String restriction;
+    public String injuryCategory;
+    public String irsTransfer;
+
 
     // CHILD LISTS
     public List<DecorationDTO> decorations;
@@ -45,18 +50,23 @@ public class CreatePersonnelRequest {
     public List<FamilyDTO> family;
 
 
+
     // CHILD DTOs
     public static class DecorationDTO {
+        public String decorationCategory;
         public String decorationName;
         public LocalDate awardDate;
         public String citation;
     }
 
+
     public static class QualificationDTO {
         public String qualification;
+        public String stream;
         public String institution;
         public Integer yearOfCompletion;
         public String gradePercentage;
+
     }
 
     public static class AdditionalQualificationDTO {

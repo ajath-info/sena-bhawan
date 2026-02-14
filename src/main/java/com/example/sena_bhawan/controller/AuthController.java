@@ -1,111 +1,55 @@
 package com.example.sena_bhawan.controller;
 
+import com.example.sena_bhawan.dto.LoginRequest;
+import com.example.sena_bhawan.dto.LoginResponse;
+import com.example.sena_bhawan.entity.UserMaster;
 import com.example.sena_bhawan.service.AdminService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.example.sena_bhawan.util.JwtUtil;
 
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
-@Configuration
-public class AuthController implements WebMvcConfigurer, HandlerInterceptor {
+@RequestMapping("/api")
+public class AuthController {
 
-    private final AdminService adminService;
+    @Autowired
+    private AdminService adminService;
 
-    public AuthController(AdminService adminService) {
-        this.adminService = adminService;
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    // --------------------------------------
-    // ✅ LoginRequest INNER CLASS
-    // --------------------------------------
-    public static class LoginRequest {
-        private String username;
-        private String password;
-
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-    }
-
-    // --------------------------------------
-    // ✅ LOGIN API
-    // --------------------------------------
-    @PostMapping(
-            value = "/login",
-            consumes = "application/json"
-    )
+    @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> login(
             @RequestBody LoginRequest loginRequest,
             HttpServletRequest request) {
 
-        boolean valid = adminService.authenticate(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-        );
+        UserMaster user = adminService.getUserByUsername(loginRequest.getUsername());
 
-        if (!valid) {
+        if (user == null || !adminService.authenticate(loginRequest.getUsername(), loginRequest.getPassword())) {
             return ResponseEntity.status(401)
-                    .body(Map.of("error", "Invalid credentials"));
+                    .body("Invalid username or password");
         }
 
-        request.getSession(true).setAttribute("user", loginRequest.getUsername());
-        return ResponseEntity.ok(Map.of("ok", true));
-    }
+        String token = jwtUtil.generateToken(user.getUsername(), user.getUserId());
 
-    // --------------------------------------
-    // ✅ SESSION CHECK
-    // --------------------------------------
-    @GetMapping("/me")
-    public ResponseEntity<?> me(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("user") != null) {
-            return ResponseEntity.ok(Map.of("ok", true));
-        }
-        return ResponseEntity.status(401).build();
-    }
+        HttpSession session = request.getSession(true);
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("username", user.getUsername());
+        session.setAttribute("appointment", user.getAppointment());
+        session.setAttribute("token", token);
 
-    // --------------------------------------
-    // ✅ INTERCEPTOR (same file)
-    // --------------------------------------
-    @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) throws Exception {
-
-        String uri = request.getRequestURI();
-
-        // allow login API + login page
-        if (uri.endsWith("login.html") || uri.equals("/login")) {
-            return true;
-        }
-
-        // check session
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("user") != null) {
-            return true;
-        }
-
-        // block and redirect
-        response.sendRedirect("/login.html");
-        return false;
-    }
-
-    // --------------------------------------
-    // ✅ REGISTER INTERCEPTOR
-    // --------------------------------------
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this)
-                .addPathPatterns("/**/*.html");
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getAppointment(),
+                        token
+                )
+        );
     }
 }

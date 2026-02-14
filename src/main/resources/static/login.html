@@ -198,30 +198,42 @@
     const username = usernameEl.value.trim();
     const password = passwordEl.value;
 
-    fetch('/login', {
+    fetch('/api/login', {     // 🔥 FIX: your backend login URL is /api/login
       method: 'POST',
-      credentials: 'same-origin',   // 🔴 REQUIRED
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     })
-            .then(res => res.json().then(data => ({ status: res.status, body: data })))
-            .then(({ status, body }) => {
-              if(status === 200){
-                window.location.href = '/dashboard-new.html';
-              } else {
-                errorEl.textContent = body.error || 'Invalid credentials';
-                errorEl.style.display = 'block';
-              }
-            })
-            .catch(() => {
-              errorEl.textContent = 'Server error. Try again.';
-              errorEl.style.display = 'block';
-            });
+    .then(res => res.json().then(data => ({ status: res.status, body: data })))
+    .then(({ status, body }) => {
+     console.log("STATUS:", status);
+    console.log("BODY:", body);
+
+        if(status === 200){
+
+          // 🔥 SAVE TOKEN + USER DETAILS
+          sessionStorage.setItem("token", body.token);
+          sessionStorage.setItem("userId", body.userId);
+          sessionStorage.setItem("username", body.username);
+          sessionStorage.setItem("appointment", body.appointment);
+
+          // redirect to dashboard
+          window.location.href = "/session.html";
+        }
+        else {
+          errorEl.textContent = body.error || 'Invalid credentials';
+          errorEl.style.display = 'block';
+        }
+    })
+    .catch(() => {
+      errorEl.textContent = 'Server error. Try again.';
+      errorEl.style.display = 'block';
+    });
 
     return false;
   }
 
   usernameEl.focus();
 </script>
+
 </body>
 </html>
