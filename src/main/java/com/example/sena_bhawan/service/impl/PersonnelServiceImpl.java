@@ -2,6 +2,8 @@ package com.example.sena_bhawan.service.impl;
 
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
+import com.example.sena_bhawan.projection.AgeBandProjection;
+import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.PersonnelService;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,116 @@ import java.nio.file.Paths;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class PersonnelServiceImpl implements PersonnelService {
 
     private final PersonnelRepository personnelRepository;
+    // STATIC labels in EXACT order as frontend
+    private final List<String> STATIC_RANK_LABELS = Arrays.asList(
+            "Lt", "Capt", "Maj", "Lt Col", "Col"
+    );
+
+    // STATIC labels in EXACT order as frontend
+    private final List<String> STATIC_AGE_LABELS = Arrays.asList(
+            "<30", "31-35", "36-40", "41-45", "46-50", "50+"
+    );
+
+    // Mapping of static labels to search terms
+    private final Map<String, List<String>> RANK_SEARCH_TERMS = Map.of(
+            "Lt", Arrays.asList("lt", "lieutenant"),
+            "Capt", Arrays.asList("capt", "captain"),
+            "Maj", Arrays.asList("maj", "major"),
+            "Lt Col", Arrays.asList("lt col", "lieutenant col", "lt colonel", "lieutenant colonel"),
+            "Col", Arrays.asList("col", "colonel")
+    );
+
+    @Override
+    public MedicalCategoryResponse getMedicalCategoryDistribution() {
+        List<MedicalCategoryProjection> projections =
+                personnelRepository.getMedicalCategoryCounts();
+
+        List<String> labels = new ArrayList<>();
+        List<Integer> data = new ArrayList<>();
+
+        for (MedicalCategoryProjection projection : projections) {
+            String category = projection.getMedicalCategory();
+            if (category != null && !category.trim().isEmpty()) {
+                labels.add(category.trim());
+                data.add(projection.getCount().intValue());
+            }
+        }
+
+        return MedicalCategoryResponse.builder()
+                .labels(labels)
+                .data(data)
+                .chartType("doughnut")
+                .title("Medical Category Distribution")
+                .build();
+    }
+
+    @Override
+    public RankStrengthResponse getOfficerStrengthByRank() {
+        List<Integer> data = STATIC_RANK_LABELS.stream()
+                .map(this::getCountForRank)
+                .map(Long::intValue)
+                .toList();
+
+        return RankStrengthResponse.builder()
+                .labels(STATIC_RANK_LABELS)
+                .data(data)
+                .chartType("bar")
+                .title("Officer Strength by Rank")
+                .build();
+    }
+
+    private long getCountForRank(String rankLabel) {
+        List<String> searchTerms = RANK_SEARCH_TERMS.get(rankLabel);
+
+        if (searchTerms == null || searchTerms.isEmpty()) {
+            return personnelRepository.countByExactRank(rankLabel);
+        }
+
+        // Sum counts for all variations of this rank
+        return searchTerms.stream()
+                .mapToLong(term -> personnelRepository.countByRankContaining(term))
+                .sum();
+    }
+
+    @Override
+    public AgeBandResponse getAgeBandDistribution() {
+        LocalDate now = LocalDate.now();
+        LocalDate date30 = now.minusYears(30);
+        LocalDate date35 = now.minusYears(35);
+        LocalDate date40 = now.minusYears(40);
+        LocalDate date45 = now.minusYears(45);
+        LocalDate date50 = now.minusYears(50);
+
+        AgeBandProjection projection = personnelRepository.getAllAgeBandCounts(
+                date30, date35, date40, date45, date50
+        );
+
+        List<Integer> data = Arrays.asList(
+                projection.getUnder30().intValue(),
+                projection.getAge31to35().intValue(),
+                projection.getAge36to40().intValue(),
+                projection.getAge41to45().intValue(),
+                projection.getAge46to50().intValue(),
+                projection.getOver50().intValue()
+        );
+
+        return AgeBandResponse.builder()
+                .labels(STATIC_AGE_LABELS)
+                .data(data)
+                .chartType("bar")
+                .title("Age Band Distribution")
+                .build();
+    }
 
     public PersonnelServiceImpl(PersonnelRepository personnelRepository) {
         this.personnelRepository = personnelRepository;

@@ -104,6 +104,22 @@ public class PersonnelController {
         personnelService.updateBasicDetails(id, req);
     }
 
+    @GetMapping("/officer-strength")  // This makes it /api/dashboard/officer-strength
+    public ResponseEntity<RankStrengthResponse> getOfficerStrength() {
+        RankStrengthResponse response = personnelService.getOfficerStrengthByRank();
+        return ResponseEntity.ok(response);
+    }
 
+    @GetMapping("/age-distribution")
+    public ResponseEntity<AgeBandResponse> getAgeDistribution() {
+        AgeBandResponse response = personnelService.getAgeBandDistribution();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/medical-distribution")
+    public ResponseEntity<MedicalCategoryResponse> getMedicalDistribution() {
+        MedicalCategoryResponse response = personnelService.getMedicalCategoryDistribution();
+        return ResponseEntity.ok(response);
+    }
 
 }

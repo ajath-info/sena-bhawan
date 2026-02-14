@@ -29,8 +29,5 @@ public class CourseMaster {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<CourseSchedule> schedules;
-
-
-
 }
 

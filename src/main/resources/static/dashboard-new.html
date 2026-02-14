@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -74,6 +74,40 @@
     .logo-text p {
       font-size: 11px;
       color: #52b788;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1b4332;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .sidebar-nav {
@@ -147,6 +181,14 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+    }
+
+    .alert-item {
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .alert-item:hover {
+      transform: scale(1.01);
     }
 
     .header {
@@ -310,149 +352,140 @@
 
 <div class="container">
 
-<!--  &lt;!&ndash; SIDEBAR &ndash;&gt;-->
-<!--  <aside class="sidebar">-->
-<!--    <div class="sidebar-header">-->
-<!--      <div class="logo-section">-->
-<!--        <div class="logo-icon">🛡️</div>-->
-<!--        <div class="logo-text">-->
-<!--          <h1>ARMY HRMS</h1>-->
-<!--          <p>भारतीय सेना</p>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <nav class="sidebar-nav">-->
-<!--      <div class="nav-section-title">Main Menu</div>-->
+  <!-- SIDEBAR - HARDCODED DIRECTLY IN THE HTML -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
 
-<!--      <a href="/dashboard-new.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard</span>-->
-<!--      </a>-->
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
 
-<!--      <a href="/dashboard-officers.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Officers</span>-->
-<!--      </a>-->
+      <a href="/dashboard-new.html" class="nav-item active">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
 
-<!--      <a href="/dashboard-training.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Training</span>-->
-<!--      </a>-->
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Officers</span>
+      </a>
 
-<!--      <a href="/filter.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔍</div>-->
-<!--        <span>Master Filter & Search</span>-->
-<!--      </a>-->
+      <a href="/dashboard-training.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard Training</span>
+      </a>
 
-<!--      <div class="nav-section-title">Administration</div>-->
+      <a href="/filter.html" class="nav-item">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
 
-<!--      <a href="/role-permmissoon.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔐</div>-->
-<!--        <span>Role & Permissions</span>-->
-<!--      </a>-->
+      <div class="nav-section-title">Administration</div>
 
-<!--      &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
-<!--        <div class="nav-icon">👥</div>-->
-<!--        <span>User Management</span>-->
-<!--      </a> &ndash;&gt;-->
+      <a href="/role-permmissoon.html" class="nav-item">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
 
-<!--      <div class="nav-section-title">Masters</div>-->
+      <div class="nav-section-title">Masters</div>
 
-<!--      <a href="/course-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📚</div>-->
-<!--        <span>Course Master</span>-->
-<!--      </a>-->
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
 
-<!--      <a href="/grade-awards.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Grade & Awards</span>-->
-<!--      </a>-->
+      <a href="/grade-awards.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
 
-<!--      <a href="/course-schedule.html" class="nav-item">-->
-<!--        <div class="nav-icon">📅</div>-->
-<!--        <span>Course Schedule</span>-->
-<!--      </a>-->
+      <a href="/course-schedule.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
 
-<!--      <a href="/location-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📍</div>-->
-<!--        <span>Location Master</span>-->
-<!--      </a>-->
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
 
-<!--      &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🚩</div>-->
-<!--        <span>Command Master</span>-->
-<!--      </a> &ndash;&gt;-->
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
 
-<!--      <a href="/rank-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏅</div>-->
-<!--        <span>Rank Master</span>-->
-<!--      </a>-->
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
 
-<!--      <a href="/unit-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🛡️</div>-->
-<!--        <span>Unit Master</span>-->
-<!--      </a>-->
+      <div class="nav-section-title">Forms</div>
 
-<!--      <div class="nav-section-title">Forms</div>-->
+      <a href="/personnel-form.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
 
-<!--      <a href="/personnel-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">👤</div>-->
-<!--        <span>Personnel Data Form</span>-->
-<!--      </a>-->
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
 
-<!--      <a href="/coursepanel.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Course Panel Generation</span>-->
-<!--      </a>-->
+      <a href="/orbat.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Orbit Generation Form</span>
+      </a>
 
-<!--      <a href="/orbat.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Orbit Generation Form</span>-->
-<!--      </a>-->
+      <a href="/add-new-user.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>New User Form</span>
+      </a>
 
-<!--      <a href="/add-new-user.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>New User Form</span>-->
-<!--      </a>-->
+      <a href="/legal-disciplinary.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Legal And Disciplinary Form</span>
+      </a>
 
-<!--      <a href="/legal-disciplinary.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Legal And Disciplinary Form</span>-->
-<!--      </a>-->
+      <a href="/course-eligibility-form.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Eligibility Form</span>
+      </a>
 
-<!--      <a href="/course-eligibility-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Course Eligibility Form</span>-->
-<!--      </a>-->
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
 
-<!--      <a href="/course-posting-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Course & Posting Form</span>-->
-<!--      </a>-->
-<!--    </nav>-->
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+      </div>
+    </div>
 
-<!--    <div class="sidebar-footer">-->
-<!--      <div class="user-profile">-->
-<!--        <div class="user-avatar">AD</div>-->
-<!--        <div class="user-info">-->
-<!--          <div class="name">Admin User</div>-->
-<!--          <div class="role">HQ Command</div>-->
-<!--        </div>-->
-<!--        <div>🚪</div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="sidebar-footer">-->
-<!--      <div class="user-profile">-->
-<!--        <div class="user-avatar" id="avatar">U</div>-->
-<!--        <div class="user-info">-->
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar" id="avatar">U</div>
+        <div class="user-info">
+          <a href="#" class="logout-btn" id="logoutBtn" onclick="logout()">Logout</a>
+          <div class="role">User</div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
-<!--          <a href = "#" class="logout-btn" onclick="logout()"> Logout </a>-->
-<!--          <div class="role">User</div>-->
-<!--        </div>-->
-<!--      </div>-->
-
-<!--    </div>-->
-<!--  </aside>-->
+  <!-- Then remove the fetch script at the bottom -->
 
   <div id="sidebar"></div>
 
@@ -519,6 +552,250 @@
         </div>
       </div>
 
+      <!-- GRAPHS -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Officer Strength by Rank</div>
+          <canvas id="rankStrengthChart"></canvas>
+          <script>
+            (async function() {
+              try {
+                const response = await fetch('/api/personnel/officer-strength');
+                const chartData = await response.json();
+
+                new Chart(document.getElementById('rankStrengthChart'), {
+                  type: 'bar',
+                  data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                      label: 'Officers',
+                      data: chartData.data,
+                      backgroundColor: '#1b4332',
+                      borderRadius: 8
+                    }]
+                  },
+                  options: {
+                    plugins: { legend: { display: false } },
+                    onClick: (e, el) => el.length && alert('Open officer list'),
+                    scales: { y: { beginAtZero: true } }
+                  }
+                });
+              } catch (error) {
+                console.error('Error:', error);
+              }
+            })();
+          </script>
+        </div>
+
+
+        <div class="chart-card">
+          <div class="chart-title">Age Band Distribution</div>
+          <canvas id="ageChart"></canvas>
+          <script>
+            fetch('http://localhost:6060/api/personnel/age-distribution')
+                    .then(response => {
+                      if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                    })
+                    .then(chartData => {
+                      new Chart(document.getElementById('ageChart'), {
+                        type: 'bar',
+                        data: {
+                          labels: chartData.labels,
+                          datasets: [{
+                            label: 'Officers',
+                            data: chartData.data,
+                            backgroundColor: '#74c69d',
+                            borderRadius: 8
+                          }]
+                        },
+                        options: {
+                          plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                              callbacks: {
+                                label: function(context) {
+                                  return context.raw + ' Officers';
+                                }
+                              }
+                            }
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              title: {
+                                display: true,
+                                text: 'Number of Officers'
+                              }
+                            }
+                          }
+                        }
+                      });
+                    })
+                    .catch(error => {
+                      console.error('Error loading age distribution:', error);
+                      document.getElementById('ageChart').insertAdjacentHTML(
+                              'afterend',
+                              '<p style="color: #dc2626; padding: 10px; text-align: center;">⚠️ Failed to load age distribution data</p>'
+                      );
+                    });
+          </script>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Medical Category Distribution</div>
+          <canvas id="medicalChart"></canvas>
+          <script>
+            fetch('http://localhost:6060/api/personnel/medical-distribution')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('medicalChart'), {
+                        type: 'doughnut',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            data: data.data,
+                            backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { position: 'bottom' } }
+                        }
+                      });
+                    });
+          </script>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Retirement Forecast</div>
+          <canvas id="retirementChart"></canvas>
+          <script>
+            new Chart(document.getElementById('retirementChart'), {
+              type: 'line',
+              data: {
+                labels: ['2025', '2026', '2027', '2028', '2029'],
+                datasets: [
+                  {
+                    label: 'Retirement',
+                    data: [180, 240, 310, 380, 420],
+                    borderColor: '#1b4332',
+                    backgroundColor: 'rgba(27, 67, 50, 0.15)',
+                    fill: true,
+                    tension: 0.4
+                  },
+                  {
+                    label: 'Intake',
+                    data: [260, 300, 340, 360, 390],
+                    borderColor: '#2a9d8f',
+                    backgroundColor: 'rgba(42, 157, 143, 0.15)',
+                    fill: true,
+                    tension: 0.4
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: 'bottom'
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Number of Officers'
+                    }
+                  }
+                }
+              }
+            });
+          </script>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Ongoing Courses – Officer Strength</div>
+          <canvas id="ongoingCourseChart"></canvas>
+          <script>
+            fetch('http://localhost:6060/api/course-panel/ongoing-strength')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('ongoingCourseChart'), {
+                        type: 'bar',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            label: 'Officer Strength',
+                            data: data.data,
+                            backgroundColor: ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#74c69d'],
+                            borderRadius: 8
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { display: false } },
+                          scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Officers' } } }
+                        }
+                      });
+                    });
+          </script>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Officer Status Overview</div>
+          <canvas id="officerStatusChart"></canvas>
+          <script>
+            new Chart(document.getElementById('officerStatusChart'), {
+              type: 'doughnut',
+              data: {
+                labels: [
+                  'Under Posting',
+                  'On Study Leave',
+                  'On Deputation',
+                  'Available for Duty'
+                ],
+                datasets: [{
+                  data: [
+                    140,
+                    60,
+                    90,
+                    710
+                  ],
+                  backgroundColor: [
+                    '#e63946',
+                    '#f4a261',
+                    '#457b9d',
+                    '#2a9d8f'
+                  ],
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                cutout: '65%',
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        return context.label + ': ' + context.parsed + ' Officers';
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          </script>
+        </div>
+      </div>
+
       <!-- ALERTS -->
       <div class="section">
         <div class="section-title">Alerts & Reminders</div>
@@ -552,33 +829,176 @@
   </main>
 
 </div>
+
 <script>
-  // Load sidebar
-  fetch("sidebar.html")
-      .then(res => res.text())
-      .then(html => {
-          document.getElementById("sidebar").innerHTML = html;
+  const rankData = {
+    Officers: 1245,
+    JCOs: 2890,
+    NCOs: 4123,
+    Soldiers: 4200
+  };
 
-          // Attach logout after sidebar loads
-          document.getElementById("logoutBtn")
-              .addEventListener("click", function () {
-                  sessionStorage.clear();
-                  window.location.replace("/login.html");
-              });
+  const detailedData = {
+    Officers: [
+      { label: 'Lt / Capt', value: 420 },
+      { label: 'Major', value: 310 },
+      { label: 'Lt Col', value: 265 },
+      { label: 'Col & Above', value: 250 }
+    ],
+    JCOs: [
+      { label: 'Sub Maj', value: 340 },
+      { label: 'Sub', value: 980 },
+      { label: 'Nb Sub', value: 1570 }
+    ],
+    NCOs: [
+      { label: 'Hav', value: 1200 },
+      { label: 'Nk', value: 1323 },
+      { label: 'Lance Nk', value: 1600 }
+    ],
+    Soldiers: [
+      { label: 'GD', value: 2600 },
+      { label: 'Tradesmen', value: 1600 }
+    ]
+  };
+</script>
+<script>
+  const ctx = document.getElementById('rankBarChart');
+  let rankChart;
 
-          (function () {
-            const currentPage = location.pathname.split('/').pop();
-            const menuLinks = document.querySelectorAll('.sidebar-nav a');
+  function loadChart(labels, values) {
+    if (rankChart) rankChart.destroy();
 
-            menuLinks.forEach(link => {
-                const linkPath = link.getAttribute('href').split('/').pop();
-                if (currentPage === linkPath) {
-                    link.classList.add('active');
-                }
-            });
-        })();
+    rankChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Personnel Count',
+          data: values,
+          backgroundColor: '#1b4332',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        onClick: (evt, elements) => {
+          if (elements.length > 0) {
+            const idx = elements[0].index;
+            const rank = labels[idx];
+            showRankDetails(rank);
+          }
+        },
+        scales: {
+          y: { beginAtZero: true },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
 
-      });
+  /* INITIAL LOAD */
+  loadChart(Object.keys(rankData), Object.values(rankData));
+</script>
+<script>
+  document.getElementById('rankFilter').addEventListener('change', applyFilters);
+  document.getElementById('viewFilter').addEventListener('change', applyFilters);
+
+  function applyFilters() {
+    const selectedRank = document.getElementById('rankFilter').value;
+    const view = document.getElementById('viewFilter').value;
+
+    if (selectedRank === 'ALL') {
+      loadChart(Object.keys(rankData), Object.values(rankData));
+      document.getElementById('rankDetails').style.display = 'none';
+      return;
+    }
+
+    if (view === 'SUMMARY') {
+      loadChart([selectedRank], [rankData[selectedRank]]);
+    } else {
+      const details = detailedData[selectedRank];
+      loadChart(
+              details.map(d => d.label),
+              details.map(d => d.value)
+      );
+    }
+  }
+</script>
+<script>
+  /* ================= ALERT DETAILS DATA ================= */
+  const alertData = {
+    retirement: {
+      title: 'Personnel Retiring Next Month',
+      rows: [
+        { name: 'Col. R. Mehta', rank: 'Colonel', unit: 'HQ Command', remarks: 'Superannuation' },
+        { name: 'Sub Maj A. Singh', rank: 'Sub Major', unit: '10 INF', remarks: 'Age limit' },
+        { name: 'Hav S. Yadav', rank: 'Havildar', unit: '5 GARH RIF', remarks: 'Pension due' }
+      ]
+    },
+    medical: {
+      title: 'Pending Medical Examinations',
+      rows: [
+        { name: 'Capt. N. Verma', rank: 'Captain', unit: 'AMC', remarks: 'Annual review' },
+        { name: 'Nb Sub R. Khan', rank: 'Naib Subedar', unit: 'ASC', remarks: 'Category update' }
+      ]
+    },
+    staffcollege: {
+      title: 'Eligible for Staff College',
+      rows: [
+        { name: 'Maj. P. Sharma', rank: 'Major', unit: 'INF', remarks: 'Merit list' },
+        { name: 'Maj. A. Joseph', rank: 'Major', unit: 'ARTY', remarks: 'Clear ACR' }
+      ]
+    },
+    tenure: {
+      title: 'Personnel Completing Tenure',
+      rows: [
+        { name: 'Lt Col S. Rao', rank: 'Lt Colonel', unit: 'MECH INF', remarks: 'Posting due' },
+        { name: 'Sub R. Das', rank: 'Subedar', unit: 'SIG', remarks: 'Rotation required' }
+      ]
+    }
+  };
+
+
+  /* ================= CLICK HANDLER ================= */
+  document.querySelectorAll('.alert-item').forEach(alert => {
+    alert.addEventListener('click', () => {
+      const type = alert.dataset.type;
+      showAlertDetails(type);
+    });
+  });
+
+
+  /* ================= RENDER DETAILS ================= */
+  function showAlertDetails(type) {
+    const detailBox = document.getElementById('alertDetails');
+    const title = document.getElementById('alertTitle');
+    const table = document.getElementById('alertTable');
+
+    title.innerText = alertData[type].title;
+    table.innerHTML = '';
+
+    alertData[type].rows.forEach(row => {
+      table.innerHTML += `
+      <tr>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.name}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.rank}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.unit}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.remarks}</td>
+      </tr>
+    `;
+    });
+
+    detailBox.style.display = 'block';
+  }
+</script>
+
+<script>
+  function logout() {
+    sessionStorage.clear();
+    window.location.replace("/login.html");
+    return false;
+  }
 </script>
 </body>
 </html>

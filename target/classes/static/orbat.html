@@ -257,9 +257,28 @@
                         <input id="pin">
                     </div>
 
-                    <div class="form-group full" >
-                        <label>Unit Name</label>
-                        <input id="unitName">
+                    <div class="form-group">
+                        <label>Area Type *</label>
+                        <select id="areaType">
+                            <option value="">Select Area Type</option>
+                            <option value="Peace Field">Peace Field</option>
+                            <option value="HAA">HAA</option>
+                            <option value="CI Peace">CI Peace</option>
+                            <option value="Modified Field">Modified Field</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full" id="unitTypeContainer" style="display:none;">
+                        <label>Type of Unit *</label>
+                        <select id="unitType">
+                            <option value="">Select Type</option>
+                            <option value="AT">AT</option>
+                            <option value="MT">MT</option>
+                            <option value="SUP">SUP</option>
+                            <option value="2nd Line">2nd Line</option>
+                            <option value="Tktpr">Tktpr</option>
+                            <option value="3rd Line">3rd Line</option>
+                        </select>
                     </div>
 
 
@@ -333,7 +352,16 @@
 
         document.getElementById("commonFields").style.display = type ? "contents" : "none";
 
-        if (!type) return;
+          // Show unit type only for battalion
+          const unitTypeContainer = document.getElementById("unitTypeContainer");
+          if (type === "battalion") {
+              unitTypeContainer.style.display = "block";
+          } else {
+              unitTypeContainer.style.display = "none";
+              document.getElementById("unitType").value = "";
+          }
+
+          if (!type) return;
 
         const levels = this.hierarchyLevels[type];
 
@@ -445,7 +473,7 @@
       updateSubmitState() {
         const btn = document.getElementById("submitBtn");
 
-        const requiredFields = ["hqId", "name", "location", "sosNo", "pin","unitName"];
+        const requiredFields = ["hqId", "name", "location", "sosNo", "pin", "areaType"];
         for (let id of requiredFields) {
           if (!document.getElementById(id)?.value.trim()) {
             btn.disabled = true;
@@ -458,8 +486,16 @@
           btn.disabled = true;
           return;
         }
+          // If battalion, unit type required
+          if (type === "battalion") {
+              if (!document.getElementById("unitType").value) {
+                  btn.disabled = true;
+                  return;
+              }
+          }
 
-        for (let lvl of this.hierarchyLevels[type]) {
+
+          for (let lvl of this.hierarchyLevels[type]) {
           const el = document.getElementById(lvl + "Id");
           if (!el || !el.value) {
             btn.disabled = true;
@@ -488,7 +524,9 @@
           location: document.getElementById("location").value.trim(),
           sosNo: document.getElementById("sosNo").value.trim(),
           pin: document.getElementById("pin").value.trim(),
-          unitName: document.getElementById("unitName").value.trim(),
+            areaType: document.getElementById("areaType").value,
+            unitType: document.getElementById("unitType")?.value || null,
+
         };
 
         const res = await fetch(`${this.api}/create`, {

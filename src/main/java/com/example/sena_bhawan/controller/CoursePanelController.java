@@ -2,6 +2,7 @@ package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.CoursePanelRequest;
 import com.example.sena_bhawan.dto.CoursePanelResponse;
+import com.example.sena_bhawan.dto.OngoingCoursesResponse;
 import com.example.sena_bhawan.service.CoursePanelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,11 @@ public class CoursePanelController {
             @PathVariable Long scheduleId) {
 
         return service.getPanel(scheduleId);
+    }
+
+    @GetMapping("/ongoing-strength")
+    public ResponseEntity<OngoingCoursesResponse> getOngoingCoursesStrength() {
+        OngoingCoursesResponse response = service.getOngoingCoursesStrength();
+        return ResponseEntity.ok(response);
     }
 }

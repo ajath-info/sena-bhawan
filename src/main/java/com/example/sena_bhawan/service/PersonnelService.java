@@ -25,4 +25,10 @@ public interface PersonnelService {
     void updateMedical(Long id, MedicalUpdateRequest req);
 
     void updateBasicDetails(Long id, UpdatePersonnelRequest req);
+
+    RankStrengthResponse getOfficerStrengthByRank();
+
+    AgeBandResponse getAgeBandDistribution();
+
+    MedicalCategoryResponse getMedicalCategoryDistribution();
 }
