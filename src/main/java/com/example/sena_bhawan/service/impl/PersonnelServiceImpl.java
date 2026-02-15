@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,8 @@ public class PersonnelServiceImpl implements PersonnelService {
         return personnelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Personnel not found with id " + id));
     }
+
+
 
     @Override
     public List<Personnel> getallPersonnels() {
@@ -217,24 +220,43 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         Personnel p = getPersonnel(id);
 
-        // Clear existing decorations (orphanRemoval deletes old rows)
-        p.getDecorations().clear();
+        Map<Long, PersonnelDecorations> existing =
+                p.getDecorations().stream()
+                        .collect(Collectors.toMap(
+                                PersonnelDecorations::getId,
+                                d -> d
+                        ));
 
-        if (list == null || list.isEmpty()) {
-            p.setUpdatedAt(LocalDateTime.now());
-            return;
+        if (list != null) {
+            for (CreatePersonnelRequest.DecorationDTO d : list) {
+
+                // UPDATE existing
+                if (d.id != null && existing.containsKey(d.id)) {
+                    PersonnelDecorations deco = existing.get(d.id);
+                    deco.setDecorationCategory(d.decorationCategory);
+                    deco.setDecorationName(d.decorationName);
+                    deco.setAwardDate(d.awardDate);
+                    deco.setCitation(d.citation);
+
+                    existing.remove(d.id);
+                }
+                // ADD new
+                else {
+                    PersonnelDecorations deco = new PersonnelDecorations();
+                    deco.setDecorationCategory(d.decorationCategory);
+                    deco.setDecorationName(d.decorationName);
+                    deco.setAwardDate(d.awardDate);
+                    deco.setCitation(d.citation);
+                    deco.setPersonnel(p);
+                    deco.setCreatedAt(LocalDateTime.now());
+
+                    p.getDecorations().add(deco);
+                }
+            }
         }
 
-        list.forEach(d -> {
-            PersonnelDecorations deco = new PersonnelDecorations();
-            deco.setDecorationCategory(d.decorationCategory);
-            deco.setDecorationName(d.decorationName);
-            deco.setAwardDate(d.awardDate);
-            deco.setCitation(d.citation);
-            deco.setPersonnel(p);
-            deco.setCreatedAt(LocalDateTime.now());
-            p.getDecorations().add(deco);
-        });
+        // DELETE removed ones
+        existing.values().forEach(p.getDecorations()::remove);
 
         p.setUpdatedAt(LocalDateTime.now());
     }
@@ -246,23 +268,39 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         Personnel p = getPersonnel(id);
 
-        p.getQualifications().clear();
+        Map<Long, PersonnelQualifications> existing =
+                p.getQualifications().stream()
+                        .collect(Collectors.toMap(
+                                PersonnelQualifications::getId,
+                                q -> q
+                        ));
 
-        if (list == null || list.isEmpty()) {
-            p.setUpdatedAt(LocalDateTime.now());
-            return;
+        if (list != null) {
+            for (CreatePersonnelRequest.QualificationDTO q : list) {
+
+                if (q.id != null && existing.containsKey(q.id)) {
+                    PersonnelQualifications pq = existing.get(q.id);
+                    pq.setQualification(q.qualification);
+                    pq.setInstitution(q.institution);
+                    pq.setYearOfCompletion(q.yearOfCompletion);
+                    pq.setGradePercentage(q.gradePercentage);
+
+                    existing.remove(q.id);
+                } else {
+                    PersonnelQualifications pq = new PersonnelQualifications();
+                    pq.setQualification(q.qualification);
+                    pq.setInstitution(q.institution);
+                    pq.setYearOfCompletion(q.yearOfCompletion);
+                    pq.setGradePercentage(q.gradePercentage);
+                    pq.setPersonnel(p);
+                    pq.setCreatedAt(LocalDateTime.now());
+
+                    p.getQualifications().add(pq);
+                }
+            }
         }
 
-        list.forEach(q -> {
-            PersonnelQualifications pq = new PersonnelQualifications();
-            pq.setQualification(q.qualification);
-            pq.setInstitution(q.institution);
-            pq.setYearOfCompletion(q.yearOfCompletion);
-            pq.setGradePercentage(q.gradePercentage);
-            pq.setPersonnel(p);
-            pq.setCreatedAt(LocalDateTime.now());
-            p.getQualifications().add(pq);
-        });
+        existing.values().forEach(p.getQualifications()::remove);
 
         p.setUpdatedAt(LocalDateTime.now());
     }
@@ -276,26 +314,44 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         Personnel p = getPersonnel(id);
 
-        p.getAdditionalQualifications().clear();
+        Map<Long, PersonnelAdditionalQualifications> existing =
+                p.getAdditionalQualifications().stream()
+                        .collect(Collectors.toMap(
+                                PersonnelAdditionalQualifications::getId,
+                                a -> a
+                        ));
 
-        if (list == null || list.isEmpty()) {
-            p.setUpdatedAt(LocalDateTime.now());
-            return;
+        if (list != null) {
+            for (CreatePersonnelRequest.AdditionalQualificationDTO a : list) {
+
+                if (a.id != null && existing.containsKey(a.id)) {
+                    PersonnelAdditionalQualifications aq = existing.get(a.id);
+                    aq.setQualification(a.qualification);
+                    aq.setIssuingAuthority(a.issuingAuthority);
+                    aq.setYear(a.year);
+                    aq.setValidity(a.validity);
+
+                    existing.remove(a.id);
+                } else {
+                    PersonnelAdditionalQualifications aq =
+                            new PersonnelAdditionalQualifications();
+                    aq.setQualification(a.qualification);
+                    aq.setIssuingAuthority(a.issuingAuthority);
+                    aq.setYear(a.year);
+                    aq.setValidity(a.validity);
+                    aq.setPersonnel(p);
+                    aq.setCreatedAt(LocalDate.now());
+
+                    p.getAdditionalQualifications().add(aq);
+                }
+            }
         }
 
-        list.forEach(a -> {
-            PersonnelAdditionalQualifications aq = new PersonnelAdditionalQualifications();
-            aq.setQualification(a.qualification);
-            aq.setIssuingAuthority(a.issuingAuthority);
-            aq.setYear(a.year);
-            aq.setValidity(a.validity);
-            aq.setPersonnel(p);
-            aq.setCreatedAt(LocalDate.now());
-            p.getAdditionalQualifications().add(aq);
-        });
+        existing.values().forEach(p.getAdditionalQualifications()::remove);
 
         p.setUpdatedAt(LocalDateTime.now());
     }
+
 
 
     @Override
@@ -304,25 +360,41 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         Personnel p = getPersonnel(id);
 
-        p.getFamilyMembers().clear();
+        Map<Long, PersonnelFamily> existing =
+                p.getFamilyMembers().stream()
+                        .collect(Collectors.toMap(
+                                PersonnelFamily::getId,
+                                f -> f
+                        ));
 
-        if (list == null || list.isEmpty()) {
-            p.setUpdatedAt(LocalDateTime.now());
-            return;
+        if (list != null) {
+            for (CreatePersonnelRequest.FamilyDTO f : list) {
+
+                if (f.id != null && existing.containsKey(f.id)) {
+                    PersonnelFamily fam = existing.get(f.id);
+                    fam.setName(f.name);
+                    fam.setRelationship(f.relationship);
+                    fam.setContactNumber(f.contactNumber);
+
+                    existing.remove(f.id);
+                } else {
+                    PersonnelFamily fam = new PersonnelFamily();
+                    fam.setName(f.name);
+                    fam.setRelationship(f.relationship);
+                    fam.setContactNumber(f.contactNumber);
+                    fam.setPersonnel(p);
+                    fam.setCreatedAt(LocalDateTime.now());
+
+                    p.getFamilyMembers().add(fam);
+                }
+            }
         }
 
-        list.forEach(f -> {
-            PersonnelFamily fam = new PersonnelFamily();
-            fam.setName(f.name);
-            fam.setRelationship(f.relationship);
-            fam.setContactNumber(f.contactNumber);
-            fam.setPersonnel(p);
-            fam.setCreatedAt(LocalDateTime.now());
-            p.getFamilyMembers().add(fam);
-        });
+        existing.values().forEach(p.getFamilyMembers()::remove);
 
         p.setUpdatedAt(LocalDateTime.now());
     }
+
 
 
     // ================= IMAGE =================
