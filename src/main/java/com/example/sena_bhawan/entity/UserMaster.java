@@ -19,7 +19,7 @@ public class UserMaster {
     private String password;
 
     private String sosNo;
-    private String name;
+//    private String name;
 //    private String unitName;
 }
 

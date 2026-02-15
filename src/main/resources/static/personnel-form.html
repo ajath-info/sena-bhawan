@@ -665,6 +665,18 @@
           </button>
         </div>
 
+        <!-- SPORTS DETAILS -->
+        <div class="section">
+          <div class="section-title">🏆 Sports Details</div>
+
+          <div id="sports-container"></div>
+
+          <button type="button"
+                  class="btn btn-primary"
+                  onclick="addSport()">
+            + Add Sport
+          </button>
+        </div>
 
         <!-- FAMILY DETAILS -->
         <div class="section">
@@ -712,32 +724,68 @@
         <div class="section">
           <div class="section-title">🩺 Medical Category</div>
 
-
           <div class="medical-category">
+
             <div class="medical-item">
-              <span>S</span>
-              <div class="medical-box" data-letter="S" data-value="1">1</div>
+              <label>S</label>
+              <select class="medical-select" data-letter="S">
+                <option value="">Select</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
 
             <div class="medical-item">
-              <span>H</span>
-              <div class="medical-box" data-letter="H" data-value="2">2</div>
+              <label>H</label>
+              <select class="medical-select" data-letter="H">
+                <option value="">Select</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
 
             <div class="medical-item">
-              <span>A</span>
-              <div class="medical-box" data-letter="A" data-value="3">3</div>
+              <label>A</label>
+              <select class="medical-select" data-letter="A">
+                <option value="">Select</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
 
             <div class="medical-item">
-              <span>P</span>
-              <div class="medical-box" data-letter="P" data-value="4">4</div>
+              <label>P</label>
+              <select class="medical-select" data-letter="P">
+                <option value="">Select</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
 
             <div class="medical-item">
-              <span>E</span>
-              <div class="medical-box" data-letter="E" data-value="5">5</div>
+              <label>E</label>
+              <select class="medical-select" data-letter="E">
+                <option value="">Select</option>
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
             </div>
+
           </div>
 
           <div class="grid grid-1" style="margin-top:16px;">
@@ -745,15 +793,13 @@
               <label>Medical Remarks</label>
               <textarea
                       id="medicalRemark"
-                      placeholder="Enter any medical observations, limitations, or remarks..."
+                      placeholder="Enter any medical observations..."
                       rows="3">
-              </textarea>
+                            </textarea>
             </div>
           </div>
 
         </div>
-
-
 
         <!-- ACTIONS -->
         <div class="actions">
@@ -900,6 +946,49 @@
     });
   }
 
+//----------------------------------SPORTS-------------
+let sportIndex = 0;
+
+function addSport(isFirst = false) {
+
+    const index = sportIndex++;
+    const id = `sport-${index}`;
+
+    document.getElementById("sports-container")
+        .insertAdjacentHTML("beforeend", `
+        <div class="grid repeater-item" id="${id}">
+
+            <div>
+                <label>Sport Name *</label>
+                <input type="text">
+            </div>
+
+            <div>
+                <label>Sports Level *</label>
+                <select>
+                    <option value="">Select Level</option>
+                    <option value="Domestic">Domestic</option>
+                    <option value="National">National</option>
+                    <option value="International">International</option>
+                </select>
+            </div>
+
+            <div class="grid-1">
+                <label>Achievements / Remarks</label>
+                <textarea rows="2"></textarea>
+            </div>
+
+            ${isFirst ? "" : `
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="removeBlock('${id}')">
+                    Remove
+                </button>
+            `}
+        </div>
+    `);
+}
+
 
   /* =======================================================
      CIVIL, ADDITIONAL, FAMILY
@@ -996,16 +1085,26 @@
   addCivilQualification(true);
   addAdditionalQualification(true);
   addFamilyMember(true);
+  addSport(true);
 
 });
 
 
-  function getMedicalCategoryString() {
-    return Object.keys(selectedMedicals)
-      .sort()
-      .map(l => l + selectedMedicals[l])
-      .join("");
-  }
+        function getMedicalCategoryString() {
+
+          let result = "";
+
+          document.querySelectorAll(".medical-select").forEach(select => {
+            const letter = select.dataset.letter;
+            const value = select.value;
+
+            if (value) {
+              result += letter + value;
+            }
+          });
+
+          return result;
+        }
 
 
   /* =======================================================
@@ -1037,10 +1136,10 @@
     mobileNumber: mobileNumber.value,
     alternateMobile: alternateMobile.value,
     emailAddress: emailAddress.value,
-    nsgEmmail: nsgEmail.value,
+    nsgEmail: nsgEmail.value,
     medicalCategory: getMedicalCategoryString(),
     medicalRemark: document.getElementById("medicalRemark").value,
-
+    sports: [],
     decorations: [],
     qualifications: [],
     additionalQualifications: [],

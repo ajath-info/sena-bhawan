@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Course Panel Generation - ARMY HRMS</title>
     <style>
         * {
@@ -811,6 +811,19 @@
   color: #9ca3af;
 }
 
+ /* Remove arrows in Chrome, Safari */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove arrows in Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+
     </style>
 </head>
 <body>
@@ -995,12 +1008,12 @@
 
                         <div class="form-group">
                             <label class="form-label">Course Start Date</label>
-                            <input type="date" id="courseStartDate" class="form-input" readonly />
+                            <input type="date" id="courseStartDate" class="form-input" readonly/>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Course End Date</label>
-                            <input type="date" id="courseEndDate" class="form-input" readonly />
+                            <input type="date" id="courseEndDate" class="form-input" readonly/>
                         </div>
                     </div>
                 </div>
@@ -1025,7 +1038,14 @@
 
                         <div class="strength-buttons">
                             <button class="strength-btn" disabled>−</button>
-                            <div class="strength-value" id="courseStrength">0</div>
+                            <input
+                                    type="number"
+                                    id="courseStrength"
+                                    class="strength-value"
+                                    min="0"
+                                    style="width:80px;text-align:center;"
+                            />
+
                             <button class="strength-btn" disabled>+</button>
                         </div>
                     </div>
@@ -1043,7 +1063,14 @@
 
                         <div class="strength-buttons">
                             <button class="strength-btn" id="decreasePanel">−</button>
-                            <div class="strength-value" id="panelSize">0</div>
+                            <input
+                                    type="number"
+                                    id="panelSize"
+                                    class="strength-value"
+                                    min="0"
+                                    style="width:80px;text-align:center;"
+                            />
+
                             <button class="strength-btn" id="increasePanel">+</button>
                         </div>
                     </div>
@@ -1086,7 +1113,7 @@
                             <!-- Course -->
                             <div class="form-group">
                                 <label class="form-label">Course</label>
-                                <input class="form-input" name="course" placeholder="Put course name" value="" />
+                                <input class="form-input" name="course" placeholder="Put course name" value=""/>
                             </div>
 
                             <!-- Course Date -->
@@ -1162,7 +1189,7 @@
                             <!-- Civil Qualification -->
                             <div class="form-group">
                                 <label class="form-label">Civil Qualification</label>
-                                <input class="form-input" name="qualification" placeholder="Qualification" value="" />
+                                <input class="form-input" name="qualification" placeholder="Qualification" value=""/>
                             </div>
 
                             <!-- Rank -->
@@ -1194,34 +1221,34 @@
                             <!-- Date of Commission -->
                             <div class="form-group">
                                 <label class="form-label">Date of Commission From</label>
-                                <input type="date" name="commissionFrom" class="form-input" />
+                                <input type="date" name="commissionFrom" class="form-input"/>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Date of Commission To</label>
-                                <input type="date" name="commissionTo" class="form-input" />
+                                <input type="date" name="commissionTo" class="form-input"/>
                             </div>
 
                             <!-- Date of Seniority From -->
                             <div class="form-group">
                                 <label class="form-label">Date of Seniority From</label>
-                                <input type="date" name="seniorityFrom" class="form-input" />
+                                <input type="date" name="seniorityFrom" class="form-input"/>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Date of Seniority To</label>
-                                <input type="date" name="seniorityTo" class="form-input" />
+                                <input type="date" name="seniorityTo" class="form-input"/>
                             </div>
 
                             <!-- Date of Birth From -->
                             <div class="form-group">
                                 <label class="form-label">Date of Birth From</label>
-                                <input type="date" name="dobFrom" class="form-input" />
+                                <input type="date" name="dobFrom" class="form-input"/>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">Date of Birth To</label>
-                                <input type="date" name="dobTo" class="form-input" />
+                                <input type="date" name="dobTo" class="form-input"/>
                             </div>
 
                             <!-- Apply Button -->
@@ -1407,7 +1434,7 @@
                                             class="form-textarea"
                                             id="approvalRemark"
                                             placeholder="Panel forwarded for approval"
-                                    ></textarea>                                </div>
+                                    ></textarea></div>
                                 <div style="margin-top: 24px">
                                     <button class="footer-btn success" id="sendToApproval">
                                         Send for Approval
@@ -1470,7 +1497,6 @@
                 </div>
 
 
-
                 <!-- Action Buttons -->
                 <!-- Footer Navigation -->
                 <div class="footer-nav">
@@ -1516,6 +1542,7 @@
             let attendingSet = new Set();
             const selectedSet = new Set(); // checkbox only
             let nominatedSet = new Set();
+            const statusMap = new Map();
 
     const prevNav = document.getElementById('prevNav');
     const nextNav = document.getElementById('nextNav');
@@ -1581,6 +1608,7 @@ saveToDraft.addEventListener('click', () => {
 });
 
 function handleStep3Save() {
+
   const scheduleId = sessionStorage.getItem("scheduleId");
 
   if (!scheduleId) {
@@ -1588,22 +1616,19 @@ function handleStep3Save() {
     return;
   }
 
-  // IF NOTHING SELECTED → JUST MOVE ON
   if (selectedSet.size === 0) {
     console.log("No officers selected. Skipping save.");
-
     currentStep++;
     renderStep();
     return;
   }
 
-  // BUILD PAYLOAD
-  const nominations = Array.from(selectedSet).map(personnelId => ({
-    personnelId,
-    status: attendingSet.has(personnelId)
-      ? "ATTENDING"
-      : "NOT_ATTENDING"
-  }));
+const nominations = Array.from(selectedSet).map(personnelId => ({
+  personnelId,
+  status: statusMap.get(personnelId) || "Reserve"
+}));
+
+
 
   const payload = {
     scheduleId: parseInt(scheduleId),
@@ -1621,6 +1646,8 @@ function handleStep3Save() {
       if (!res.ok) throw new Error("Failed to save panel");
 
       alert("Panel saved successfully");
+
+      currentStep++;
       renderStep();
     })
     .catch(err => {
@@ -1628,6 +1655,7 @@ function handleStep3Save() {
       alert("Personnel Already Exists");
     });
 }
+
 
 
     // Top step click
@@ -1723,8 +1751,9 @@ function handleStep3Save() {
                 courseStrength = parseInt(data.courseStrength);
                 panelSize = parseInt(data.panelSize);
 
-                courseStrengthEl.innerText = courseStrength;
-                panelSizeEl.innerText = panelSize;
+                courseStrengthEl.value = courseStrength;
+                panelSizeEl.value = panelSize;
+
 
                 logicText.innerText =
                     `Panel size (${panelSize}) = Course strength (${courseStrength}) + Buffer (10).`;
@@ -1751,23 +1780,70 @@ function handleStep3Save() {
     }
 
 
-     // ➕ Increase panel size
-    plusBtn.addEventListener("click", () => {
-        panelSize++;
-        panelSizeEl.innerText = panelSize;
-
-        sessionStorage.setItem("panelSize", panelSize);
-        sessionStorage.setItem("bufferSize", panelSize - courseStrength);
-    });
-
-    minusBtn.addEventListener("click", () => {
-        if (panelSize > courseStrength) {
-            panelSize--;
-            panelSizeEl.innerText = panelSize;
+        // ➕ Increase panel size
+        plusBtn.addEventListener("click", () => {
+            panelSize = parseInt(panelSizeEl.value) || 0;
+            panelSize++;
+            panelSizeEl.value = panelSize;
 
             sessionStorage.setItem("panelSize", panelSize);
-            sessionStorage.setItem("bufferSize", panelSize - courseStrength);
-        }
+            sessionStorage.setItem("bufferSize", panelSize - courseStrengthEl.value);
+        });
+
+        // ➖ Decrease panel size
+        minusBtn.addEventListener("click", () => {
+            panelSize = parseInt(panelSizeEl.value) || 0;
+            let courseVal = parseInt(courseStrengthEl.value) || 0;
+
+            if (panelSize > courseVal) {
+                panelSize--;
+                panelSizeEl.value = panelSize;
+
+                sessionStorage.setItem("panelSize", panelSize);
+                sessionStorage.setItem("bufferSize", panelSize - courseVal);
+            }
+        });
+
+
+            // When Course Strength manually changes
+            courseStrengthEl.addEventListener("input", () => {
+                let courseVal = parseInt(courseStrengthEl.value) || 0;
+                let panelVal = parseInt(panelSizeEl.value) || 0;
+
+                if (panelVal < courseVal) {
+                    panelSizeEl.value = courseVal;
+                    panelVal = courseVal;
+                }
+
+                sessionStorage.setItem("courseStrength", courseVal);
+                sessionStorage.setItem("panelSize", panelVal);
+                sessionStorage.setItem("bufferSize", panelVal - courseVal);
+
+                logicText.innerText =
+                    `Panel size (${panelVal}) = Course strength (${courseVal}) + Buffer (${panelVal - courseVal}).`;
+            });
+
+
+            // When Panel Size manually changes
+            panelSizeEl.addEventListener("change", () => {
+                let panelVal = parseInt(panelSizeEl.value) || 0;
+                let courseVal = parseInt(courseStrengthEl.value) || 0;
+
+                if (panelVal < courseVal) {
+                    panelSizeEl.value = courseVal;
+                    panelVal = courseVal;
+                }
+
+                sessionStorage.setItem("panelSize", panelVal);
+                sessionStorage.setItem("bufferSize", panelVal - courseVal);
+
+                logicText.innerText =
+                    `Panel size (${panelVal}) = Course strength (${courseVal}) + Buffer (${panelVal - courseVal}).`;
+            });
+
+     // Auto select value when clicked
+        panelSizeEl.addEventListener("focus", () => {
+        panelSizeEl.select();
     });
 
 
@@ -1878,35 +1954,77 @@ function handleStep3Save() {
       <td>${o.city || "-"}</td>
       <td>${o.state || "-"}</td>
       <td>
-        <button class="btn ${isAttending ? "btn-success" : "btn-outline"}">
-          ✓ Attending
-        </button>
-        <button class="btn ${!isAttending ? "btn-danger" : "btn-outline"}">
-          ✗ Not Attending
-        </button>
-      </td>
+  <button type="button" class="btn retain-btn ${statusMap.get(o.personnelId) === "Retain" ? "btn-success" : "btn-outline"}">
+    Retain
+  </button>
+  <button type="button" class="btn reserve-btn ${statusMap.get(o.personnelId) === "Reserve" ? "btn-danger" : "btn-outline"}">
+    Reserve
+  </button>
+</td>
+
     `;
 
-    /* checkbox */
-    row.querySelector("input").addEventListener("change", e => {
-      e.target.checked
-        ? selectedSet.add(o.personnelId)
-        : selectedSet.delete(o.personnelId);
+   /* checkbox */
+row.querySelector("input").addEventListener("change", e => {
 
-      el("selectedCount").innerText = selectedSet.size;
-    });
+  if (e.target.checked) {
+    selectedSet.add(o.personnelId);
+  } else {
+    selectedSet.delete(o.personnelId);
+    statusMap.delete(o.personnelId);
 
-    /* attending */
-    row.querySelector(".btn-success, .btn-outline")
-      .addEventListener("click", () => {
-        markAttending(o.personnelId, true);
-      });
+    // reset buttons
+    retainBtn.classList.remove("btn-success");
+    retainBtn.classList.add("btn-outline");
 
-    /* not attending */
-    row.querySelector(".btn-danger, .btn-outline:last-child")
-      .addEventListener("click", () => {
-        markAttending(o.personnelId, false);
-      });
+    reserveBtn.classList.remove("btn-danger");
+    reserveBtn.classList.add("btn-outline");
+  }
+
+  el("selectedCount").innerText = selectedSet.size;
+});
+
+
+
+    const retainBtn = row.querySelector(".retain-btn");
+const reserveBtn = row.querySelector(".reserve-btn");
+
+retainBtn.addEventListener("click", () => {
+  if (!selectedSet.has(o.personnelId)) return;
+
+  statusMap.set(o.personnelId, "Retain");
+
+  updateButtons("Retain");
+});
+
+reserveBtn.addEventListener("click", () => {
+  if (!selectedSet.has(o.personnelId)) return;
+
+  statusMap.set(o.personnelId, "Reserve");
+
+  updateButtons("Reserve");
+});
+
+function updateButtons(type) {
+
+  if (type === "Retain") {
+    retainBtn.classList.add("btn-success");
+    retainBtn.classList.remove("btn-outline");
+
+    reserveBtn.classList.add("btn-outline");
+    reserveBtn.classList.remove("btn-danger");
+  }
+
+  if (type === "Reserve") {
+    reserveBtn.classList.add("btn-danger");
+    reserveBtn.classList.remove("btn-outline");
+
+    retainBtn.classList.add("btn-outline");
+    retainBtn.classList.remove("btn-success");
+  }
+}
+
+
 
     tbody.appendChild(row);
   });
@@ -2031,7 +2149,6 @@ function loadStep4Panel() {
     .then(panelData => {
 
       const personnelIds = panelData
-        .filter(p => p.attendanceStatus === "ATTENDING")
         .map(p => p.personnelId);
 
       if (personnelIds.length === 0) {
@@ -2063,7 +2180,7 @@ function loadStep5Panel() {
     .then(panelData => {
 
       const personnelIds = panelData
-        .filter(p => p.attendanceStatus === "ATTENDING")
+        .filter(p => p.attendanceStatus === "Retain")
         .map(p => p.personnelId);
 
       if (personnelIds.length === 0) {

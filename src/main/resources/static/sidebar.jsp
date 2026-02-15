@@ -418,6 +418,10 @@
         <div class="nav-icon">📝</div>
         <span>Course & Posting Form</span>
       </a>
+      <a href="/auth.html" class="nav-item">
+         <div class="nav-icon">📊</div>
+         <span>Auth View</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">

@@ -80,6 +80,16 @@ public class PersonnelController {
         personnelService.updateAdditionalQualifications(id, req);
     }
 
+    @PutMapping("/{personnelId}/sports")
+    public ResponseEntity<String> updateSports(
+            @PathVariable Long personnelId,
+            @RequestBody List<SportsRequest> requestList) {
+
+        personnelService.updateSports(personnelId, requestList);
+
+        return ResponseEntity.ok("Sports updated successfully");
+    }
+
     @PutMapping("/{id}/family")
     public void updateFamily(
             @PathVariable Long id,

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Unit PE / WE Update - ARMY HRMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: "Inter", sans-serif;
+  background:#f1f3f5;
+  color:#1f2937;
+}
+
+/* ================= LAYOUT ================= */
+.container {
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width:256px;
+  background:linear-gradient(180deg,#1b4332 0%,#081c15 100%);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+}
+
+.sidebar-header {
+  padding:20px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.logo-section {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo-icon {
+  width:32px;
+  height:32px;
+  background:#ffb703;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.logo-text h1 { font-size:18px; font-weight:700; }
+.logo-text p { font-size:11px; color:#52b788; }
+
+.sidebar-nav { flex:1; padding:16px 0; }
+
+.nav-item {
+  display:flex;
+  gap:12px;
+  padding:12px 20px;
+  color:white;
+  text-decoration:none;
+  border-left:4px solid transparent;
+}
+
+.nav-item.active {
+  background:rgba(255,255,255,0.1);
+  border-left-color:#ffb703;
+  font-weight:600;
+}
+
+/* ================= MAIN ================= */
+.main-content {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.header {
+  background:white;
+  border-bottom:1px solid #e5e7eb;
+  padding:16px 24px;
+}
+
+.header h2 { font-size:22px; font-weight:700; }
+.header p { font-size:13px; color:#6b7280; margin-top:4px; }
+
+.content-area {
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+}
+
+/* ================= FORM CARD ================= */
+.form-card {
+  max-width:1000px;
+  margin:auto;
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:28px;
+}
+
+.section-card {
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:24px;
+  background:#fafafa;
+}
+
+.section-title {
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:16px;
+}
+
+.form-group { margin-bottom:16px; }
+
+label {
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
+}
+
+input {
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+  font-size:14px;
+}
+
+.rank-grid {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+}
+
+.total-box {
+  background:#e5e7eb;
+  padding:10px 14px;
+  border-radius:6px;
+  font-weight:600;
+  margin-bottom:16px;
+}
+
+.radio-group {
+  display:flex;
+  gap:30px;
+  margin-top:10px;
+}
+
+.actions {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:20px;
+}
+
+.btn-primary {
+  background:#1b4332;
+  color:white;
+  border:none;
+  padding:10px 22px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-primary:hover {
+  background:#16372a;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard-new.html" class="nav-item">🏠 Dashboard</a>
+      <a href="/personnel-form.html" class="nav-item">👤 Personnel Data</a>
+      <a href="/coursepanel.html" class="nav-item">📋 Course Panel</a>
+      <a href="/unit-establishment.html" class="nav-item active">🛡️ Unit PE / WE</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div class="header">
+      <h2>Unit PE / WE Update</h2>
+      <p>Update authorized strength and hard scale establishment details</p>
+    </div>
+
+    <div class="content-area">
+
+      <div class="form-card">
+
+        <!-- UNIT SELECTION -->
+        <div class="section-card">
+          <div class="section-title">Select Unit</div>
+
+          <div class="form-group">
+            <label>Select Unit</label>
+            <select id="unitDropdown" style="width:100%; padding:10px; border-radius:8px;">
+              <option value="">-- Select Unit --</option>
+            </select>
+          </div>
+        </div>
+
+
+        <!-- AUTHORIZED STRENGTH -->
+        <div class="section-card">
+          <div class="section-title">Authorized Strength – Officers</div>
+
+          <div class="section-card">
+            <div class="section-title">Type of Establishment</div>
+            <div class="radio-group">
+              <label><input type="radio" name="estType" checked> Peace Establishment (PE)</label>
+              <label><input type="radio" name="estType"> War Establishment (WE)</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>5123 ASC Bn Total Authorized Officers</label>
+            <input type="number" id="totalAuth">
+          </div>
+
+          <div class="total-box">
+            Total (Auth): <span id="authTotalDisplay">0</span>
+          </div>
+
+          <div class="rank-grid">
+            <div><label>Lt / Capt</label><input type="number" id="authLtCapt" class="auth-rank" min="0" value="0"></div>
+            <div><label>Maj</label><input type="number" id="authMaj" class="auth-rank" min="0" value="0"></div>
+            <div><label>Lt Col</label><input type="number" id="authLtCol" class="auth-rank" min="0" value="0"></div>
+            <div><label>Col</label><input type="number" id="authCol" class="auth-rank" min="0" value="0"></div>
+            <div><label>Brig</label><input type="number" id="authBrig" class="auth-rank" min="0" value="0"></div>
+            <div><label>Maj Gen</label><input type="number" id="authMajGen" class="auth-rank" min="0" value="0"></div>
+            <div><label>Lt Gen</label><input type="number" id="authLtGen" class="auth-rank" min="0" value="0"></div>
+          </div>
+        </div>
+
+        <!-- HARD SCALE -->
+        <div class="section-card">
+          <div class="section-title">Hard Scale Establishment</div>
+
+          <div class="form-group">
+            <label>Total Hard Scale</label>
+            <input type="number" id="hardTotal">
+          </div>
+
+          <div class="total-box">
+            Total (Hard Scale): <span id="hardTotalDisplay">0</span>
+          </div>
+
+          <div class="rank-grid">
+            <div><label>Lt / Capt</label><input type="number" id="hardLtCapt" class="hard-rank" min="0" value="0"></div>
+            <div><label>Maj</label><input type="number" id="hardMaj" class="hard-rank" min="0" value="0"></div>
+            <div><label>Lt Col</label><input type="number" id="hardLtCol" class="hard-rank" min="0" value="0"></div>
+            <div><label>Col</label><input type="number" id="hardCol" class="hard-rank" min="0" value="0"></div>
+            <div><label>Brig</label><input type="number" id="hardBrig" class="hard-rank" min="0" value="0"></div>
+            <div><label>Maj Gen</label><input type="number" id="hardMajGen" class="hard-rank" min="0" value="0"></div>
+            <div><label>Lt Gen</label><input type="number" id="hardLtGen" class="hard-rank" min="0" value="0"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary">Update Establishment</button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+
+     loadUnits();
+
+     // ===============================
+     // AUTO CALCULATE AUTH TOTAL
+     // ===============================
+     document.querySelectorAll(".auth-rank").forEach(input => {
+         input.addEventListener("input", function () {
+             if (this.value < 0) this.value = 0;
+             calculateAuthTotal();
+         });
+     });
+
+     // ===============================
+     // AUTO CALCULATE HARD TOTAL
+     // ===============================
+     document.querySelectorAll(".hard-rank").forEach(input => {
+         input.addEventListener("input", function () {
+             if (this.value < 0) this.value = 0;
+             calculateHardTotal();
+         });
+     });
+
+     // ===============================
+     // UPDATE BUTTON
+     // ===============================
+     document.querySelector(".btn-primary").addEventListener("click", updateData);
+
+     // Reload on dropdown change
+     document.getElementById("unitDropdown").addEventListener("change", loadUnitData);
+
+     // Reload on PE / WE change
+     document.querySelectorAll("input[name='estType']").forEach(radio => {
+         radio.addEventListener("change", loadUnitData);
+     });
+
+ });
+
+
+ // ===============================
+ // LOAD UNITS
+ // ===============================
+ function loadUnits() {
+
+     fetch("/api/unit")
+         .then(response => response.json())
+         .then(data => {
+
+             const dropdown = document.getElementById("unitDropdown");
+             dropdown.innerHTML = "<option value=''>Select Unit</option>";
+
+             data.forEach(unit => {
+                 const option = document.createElement("option");
+                 option.value = unit.id;
+                 option.textContent = unit.unitName;
+                 dropdown.appendChild(option);
+             });
+         })
+         .catch(error => console.error("Error loading units:", error));
+ }
+
+
+ // ===============================
+ // LOAD UNIT DATA
+ // ===============================
+ function loadUnitData() {
+
+     const unitId = document.getElementById("unitDropdown").value;
+
+     if (!unitId) {
+         clearForm();
+         return;
+     }
+
+     const selectedRadio = document.querySelector("input[name='estType']:checked");
+     const type = selectedRadio.parentElement.textContent.includes("War") ? "WE" : "PE";
+
+     fetch(`/api/unit-establishment/${unitId}/${type}`)
+         .then(response => {
+             if (!response.ok) throw new Error("No data found");
+             return response.json();
+         })
+         .then(data => fillForm(data))
+         .catch(error => {
+             console.error("Error loading data:", error);
+             clearForm();
+         });
+ }
+
+
+ // ===============================
+ // FILL FORM
+ // ===============================
+ function fillForm(data) {
+
+     // Authorized
+     document.getElementById("authTotalDisplay").innerText = data.authorized.totalAuthOfficers || 0;
+
+     document.getElementById("authLtCapt").value = data.authorized.ltCapt || 0;
+     document.getElementById("authMaj").value = data.authorized.maj || 0;
+     document.getElementById("authLtCol").value = data.authorized.ltCol || 0;
+     document.getElementById("authCol").value = data.authorized.col || 0;
+     document.getElementById("authBrig").value = data.authorized.brig || 0;
+     document.getElementById("authMajGen").value = data.authorized.majGen || 0;
+     document.getElementById("authLtGen").value = data.authorized.ltGen || 0;
+
+     // Hard Scale
+     document.getElementById("hardTotalDisplay").innerText = data.hardScale.totalHardScale || 0;
+
+     document.getElementById("hardLtCapt").value = data.hardScale.ltCapt || 0;
+     document.getElementById("hardMaj").value = data.hardScale.maj || 0;
+     document.getElementById("hardLtCol").value = data.hardScale.ltCol || 0;
+     document.getElementById("hardCol").value = data.hardScale.col || 0;
+     document.getElementById("hardBrig").value = data.hardScale.brig || 0;
+     document.getElementById("hardMajGen").value = data.hardScale.majGen || 0;
+     document.getElementById("hardLtGen").value = data.hardScale.ltGen || 0;
+ }
+
+
+ // ===============================
+ // CLEAR FORM
+ // ===============================
+ function clearForm() {
+     document.querySelectorAll("input[type='number']").forEach(input => {
+         input.value = 0;
+     });
+
+     document.getElementById("authTotalDisplay").innerText = 0;
+     document.getElementById("hardTotalDisplay").innerText = 0;
+ }
+
+
+ // ===============================
+ // CALCULATE AUTH TOTAL
+ // ===============================
+ function calculateAuthTotal() {
+
+     let total = 0;
+
+     document.querySelectorAll(".auth-rank").forEach(input => {
+         total += Number(input.value) || 0;
+     });
+
+     document.getElementById("authTotalDisplay").innerText = total;
+ }
+
+
+ // ===============================
+ // CALCULATE HARD TOTAL
+ // ===============================
+ function calculateHardTotal() {
+
+     let total = 0;
+
+     document.querySelectorAll(".hard-rank").forEach(input => {
+         total += Number(input.value) || 0;
+     });
+
+     document.getElementById("hardTotalDisplay").innerText = total;
+ }
+
+
+ // ===============================
+ // UPDATE API CALL
+ // ===============================
+ function updateData() {
+
+     const unitId = document.getElementById("unitDropdown").value;
+
+     if (!unitId) {
+         alert("Please select a unit");
+         return;
+     }
+
+    const selectedRadio = document.querySelector("input[name='estType']:checked");
+
+    if (!selectedRadio) {
+        alert("Type of Establishment is required.");
+        return;
+    }
+
+    const type = selectedRadio.parentElement.textContent.includes("War") ? "WE" : "PE";
+
+    const enteredAuthTotal = Number(document.getElementById("totalAuth").value);
+    const enteredHardTotal = Number(document.getElementById("hardTotal").value);
+
+    const calculatedAuthTotal = Number(document.getElementById("authTotalDisplay").innerText);
+    const calculatedHardTotal = Number(document.getElementById("hardTotalDisplay").innerText);
+
+    // ===============================
+    // VALIDATION LOGIC
+    // ===============================
+
+    if (!enteredAuthTotal || enteredAuthTotal <= 0) {
+        alert("Total Authorized Officers is required.");
+        return;
+    }
+
+    if (!enteredHardTotal || enteredHardTotal <= 0) {
+        alert("Total Hard Scale is required.");
+        return;
+    }
+
+    if (calculatedAuthTotal > enteredAuthTotal) {
+        alert("Authorized ranks total cannot exceed Total Authorized Officers.");
+        return;
+    }
+
+    if (calculatedHardTotal > enteredHardTotal) {
+        alert("Hard Scale ranks total cannot exceed Total Hard Scale.");
+        return;
+    }
+     const payload = {
+
+         establishmentType: type,
+
+         totalAuthorizedOfficers: enteredAuthTotal,
+         totalHardScale: enteredHardTotal,
+
+         ltCapt: Number(document.getElementById("authLtCapt").value),
+         maj: Number(document.getElementById("authMaj").value),
+         ltCol: Number(document.getElementById("authLtCol").value),
+         col: Number(document.getElementById("authCol").value),
+         brig: Number(document.getElementById("authBrig").value),
+         majGen: Number(document.getElementById("authMajGen").value),
+         ltGen: Number(document.getElementById("authLtGen").value),
+
+         hsLtCapt: Number(document.getElementById("hardLtCapt").value),
+         hsMaj: Number(document.getElementById("hardMaj").value),
+         hsLtCol: Number(document.getElementById("hardLtCol").value),
+         hsCol: Number(document.getElementById("hardCol").value),
+         hsBrig: Number(document.getElementById("hardBrig").value),
+         hsMajGen: Number(document.getElementById("hardMajGen").value),
+         hsLtGen: Number(document.getElementById("hardLtGen").value)
+     };
+
+     fetch(`/api/unit-establishment/${unitId}/${type}`, {
+         method: "PUT",
+         headers: {
+             "Content-Type": "application/json"
+         },
+         body: JSON.stringify(payload)
+     })
+     .then(response => response.text())
+     .then(message => {
+         alert(message);
+     })
+     .catch(error => {
+         console.error("Update Error:", error);
+         alert("Update failed");
+     });
+ }
+
+</script>
+
+</body>
+</html>
