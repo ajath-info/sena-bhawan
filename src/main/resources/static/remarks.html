@@ -153,11 +153,11 @@
                     <div class="section-title">Before Detailment</div>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="before" value="Volunteer" onclick="toggleBefore()">
+                            <input type="radio" name="before" value="Volunteer">
                             Volunteer
                         </label>
                         <label>
-                            <input type="radio" name="before" value="NotDetail" onclick="toggleBefore()">
+                            <input type="radio" name="before" value="NotDetail">
                             Not to Detail
                         </label>
                     </div>
@@ -173,11 +173,11 @@
                     <div class="section-title">After Detailment</div>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="after" value="TakenOff" onclick="toggleAfter()">
+                            <input type="radio" name="after" value="TakenOff" >
                             Taken Off
                         </label>
                         <label>
-                            <input type="radio" name="after" value="Continuing" onclick="toggleAfter()">
+                            <input type="radio" name="after" value="Continuing" >
                             Continuing
                         </label>
                     </div>
@@ -240,30 +240,37 @@
 
     const REMARKS_API = "http://localhost:6060/api/remarks/save";
 
+
+/* save data  */
+
 function saveRemarks() {
 
     const personnelId = document.getElementById("personnelSelect").value;
 
-    if (personnelId === null) {
+    if (!personnelId || personnelId === "" || personnelId === null ) {
         alert("Please select personnel");
         return;
     }
-
-    /* BEFORE DETAILMENT */
     const beforeRadio = document.querySelector('input[name="before"]:checked');
-    const beforeDetailment = beforeRadio ? beforeRadio.value : null;
+if (beforeRadio === null) {
+    alert("Please select Before Detailment");
+    return;
+}
 
-    /* AFTER DETAILMENT */
-    const afterRadio = document.querySelector('input[name="after"]:checked');
-    const afterDetailment = afterRadio ? afterRadio.value : null;
+const afterRadio = document.querySelector('input[name="after"]:checked');
+if (afterRadio === null) {
+    alert("Please select After Detailment");
+    return;
+}
+
 
     /* GENERAL REMARKS */
 const generalRemarks = document.getElementById("generalRemarks").value.trim();
 
     const payload = {
         personnelId: Number(personnelId),
-        beforeDetailment: beforeDetailment,
-        afterDetailment: afterDetailment,
+        beforeDetailment: beforeRadio.value,
+        afterDetailment: afterRadio.value,
         generalRemarks: generalRemarks
     };
 
