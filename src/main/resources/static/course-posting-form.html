@@ -623,6 +623,7 @@
         <div class="section-title" style="margin-top:20px">Add New Posting</div>
 
         <div class="form-grid">
+
           <!-- UNIT DROPDOWN -->
           <div>
             <label>Unit Name *</label>
@@ -655,11 +656,6 @@
           <div>
             <label>To Date</label>
             <input id="postingTo" type="date">
-          </div>
-
-          <div class="full">
-            <label>Appointment *</label>
-            <input id="postingAppointment" placeholder="e.g. Company Commander">
           </div>
 
           <div class="full">
@@ -743,6 +739,68 @@
         </div>
       </div>
 
+      <!-- UNDER POSTING -->
+      <div class="card">
+        <div class="section-title">Under Posting</div>
+
+        <div class="form-grid three-col">
+
+          <div>
+            <label>Movement Date (Mov Dt)</label>
+            <input type="date" id="movementDate">
+          </div>
+
+          <div>
+            <label>Posted To (Unit / Formation)</label>
+            <input type="text" id="postedTo" placeholder="e.g. 12 INF BN">
+          </div>
+
+          <div>
+            <label>Appointment</label>
+            <select id="appointmentSelect">
+              <option value="">Select Appointment</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Posting Order Issue Date</label>
+            <input type="date" id="postingOrderIssueDate">
+          </div>
+
+          <div>
+            <label>Type of Posting</label>
+            <select id="postingTypeSelect">
+              <option value="">Select Type</option>
+            </select>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- POSTING IN -->
+      <div class="card">
+        <div class="section-title">Posting In</div>
+
+        <div class="form-grid two-col">
+
+          <div>
+            <label>TOS Update Date</label>
+            <input type="date" id="tosUpdatedDate">
+          </div>
+
+          <div>
+            <label>Rank (If On Promotion)</label>
+            <select id="rankSelect">
+              <option value="">Select Rank</option>
+            </select>
+
+          </div>
+
+        </div>
+      </div>
+
       <div style="display:flex;justify-content:flex-end;gap:12px">
         <button class="btn btn-secondary">Cancel</button>
         <button class="btn btn-secondary" id="previewParamountBtn">
@@ -755,6 +813,8 @@
   </main>
 </div>
 
+
+
 <script>
   function getOfficerImageUrl(officer) {
   if (officer.officerImage) {
@@ -766,6 +826,14 @@
   const PERSONNEL_API="http://localhost:6060/api/personnel";
   const FULL_API="http://localhost:6060/personnel-full-details";
   const SAVE_API="http://localhost:6060/personnel-full-details/save";
+
+  const movementDate = document.getElementById("movementDate");
+  const postedTo = document.getElementById("postedTo");
+  const postingOrderIssueDate = document.getElementById("postingOrderIssueDate");
+  const tosUpdatedDate = document.getElementById("tosUpdatedDate");
+  const appointmentSelect = document.getElementById("appointmentSelect");
+  const postingTypeSelect = document.getElementById("postingTypeSelect");
+  const rankSelect = document.getElementById("rankSelect");
 
   const officerSelect=document.getElementById("officerSelect");
   const officerDetails=document.getElementById("officerDetails");
@@ -921,16 +989,25 @@ function render(tbody, list, isPosting) {
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         personnelId:Number(officerSelect.value),
-        postingDetails: postingUnit.value? [{
-          unitName: postingUnit.value,
-        location: postingLocation.value,
-        command: postingCommand.value,
-          appointment:postingAppointment.value,
-          fromDate:postingFrom.value,
-          toDate:postingTo.value,
-          remarks:postingRemarks.value,
-          documentPath:"/docs/posting.pdf"
-        }]:[],
+        postingDetails: postingUnit.value ? [{
+            unitName: postingUnit.value,
+            location: postingLocation.value,
+            command: postingCommand.value,
+            appointment: appointmentSelect.value,
+            postingType: postingTypeSelect.value,
+
+            movementDate: movementDate.value,
+            postedTo: postedTo.value,
+            postingOrderIssueDate: postingOrderIssueDate.value,
+            tosUpdatedDate: tosUpdatedDate.value,
+            rank: rankSelect.value,
+
+            fromDate: postingFrom.value,
+            toDate: postingTo.value,
+            remarks: postingRemarks.value,
+            documentPath: "/docs/posting.pdf"
+        }] : [],
+
         courseDetails: courseId.value ? [{
   courseId: Number(courseId.value), // ← srno goes here
   courseSerialNo: courseSerialNo.value,
@@ -1071,6 +1148,44 @@ function render(tbody, list, isPosting) {
       console.error("Failed to load courses", err);
     });
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const DROPDOWN_API = "http://localhost:6060/api/dropdown";
+
+    const appointmentSelect = document.getElementById("appointmentSelect");
+    const postingTypeSelect = document.getElementById("postingTypeSelect");
+    const rankSelect = document.getElementById("rankSelect");
+
+    function loadDropdown(type, selectElement, defaultText) {
+
+      if (!selectElement) return; // safety check
+
+      fetch(`${DROPDOWN_API}/${type}`)
+        .then(res => res.json())
+        .then(data => {
+
+          selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+
+          data.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.name;
+            opt.textContent = item.name;
+            selectElement.appendChild(opt);
+          });
+
+        })
+        .catch(err => console.error(`Failed to load ${type}`, err));
+    }
+
+    loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
+    loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
+    loadDropdown("RANK", rankSelect, "Select Rank");
+
+  });
+</script>
+
 
 </body>
 
