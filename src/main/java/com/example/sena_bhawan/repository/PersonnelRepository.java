@@ -17,7 +17,7 @@ public interface PersonnelRepository
             "FROM Personnel p GROUP BY p.rank")
     List<Object[]> getRankCounts();
 
-
+    List<Personnel> findByIdIn(List<Long> ids);
 
 }
 

@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/OrbatStructure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/OrbatStructure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PostingDetailsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PostingDetailsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

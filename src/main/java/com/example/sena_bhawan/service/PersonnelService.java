@@ -36,5 +36,8 @@ public interface PersonnelService {
 
     List<Personnel> filterPersonnel(PersonnelFilterRequest filter);
 
+    OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId);
+
+    List<OfficerTableDTO> getOfficerTableByUnit(Long unitId);
 
 }

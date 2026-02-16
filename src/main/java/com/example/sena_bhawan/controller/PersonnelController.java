@@ -224,4 +224,21 @@ public class PersonnelController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/unit/{unitId}/summary")
+    public ResponseEntity<?> getSummary(@PathVariable Long unitId) {
+        return ResponseEntity.ok(
+                Map.of("status", "success",
+                        "data", personnelService.getOfficerSummaryByUnit(unitId))
+        );
+    }
+
+    @GetMapping("/unit/{unitId}/table")
+    public ResponseEntity<?> getTable(@PathVariable Long unitId) {
+        return ResponseEntity.ok(
+                Map.of("status", "success",
+                        "data", personnelService.getOfficerTableByUnit(unitId))
+        );
+    }
 }

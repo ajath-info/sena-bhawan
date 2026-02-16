@@ -4,6 +4,8 @@ import com.example.sena_bhawan.dto.CreatePersonnelRequest;
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.repository.PersonnelRepository;
+import com.example.sena_bhawan.repository.PostingDetailsRepository;
+import com.example.sena_bhawan.repository.UnitMasterRepository;
 import com.example.sena_bhawan.service.PersonnelService;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -18,18 +20,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
 public class PersonnelServiceImpl implements PersonnelService {
 
+    private final UnitMasterRepository unitMasterRepository;
+    private final PostingDetailsRepository postingDetailsRepository;
     private final PersonnelRepository personnelRepository;
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository) {
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository) {
         this.personnelRepository = personnelRepository;
+        this.unitMasterRepository= unitMasterRepository;
+        this.postingDetailsRepository=postingDetailsRepository;
     }
 
     // ================= COMMON =================
@@ -574,5 +579,105 @@ public class PersonnelServiceImpl implements PersonnelService {
         }
     }
 
+
+
+    @Override
+    public OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId) {
+
+        List<Personnel> personnelList = getPersonnelByUnit(unitId);
+
+        if (personnelList.isEmpty()) {
+            return new OfficerSummaryDTO(0,0,0,0,null,null,null,null);
+        }
+
+        int totalOfficers = personnelList.size();
+        int totalCoursesDone = 0;
+        int coursesTrainingYr = 0;
+        int coursesInUnit = 0;
+
+        for (int i = 0; i < totalOfficers; i++) {
+            totalCoursesDone += random(1, 4);
+            coursesTrainingYr += random(0, 1);
+            coursesInUnit += random(1, 2);
+        }
+
+        return new OfficerSummaryDTO(
+                totalOfficers,
+                totalCoursesDone,
+                coursesTrainingYr,
+                coursesInUnit,
+                minDate(personnelList, true),
+                maxDate(personnelList, true),
+                minDate(personnelList, false),
+                maxDate(personnelList, false)
+        );
+    }
+
+    // ================= TABLE =================
+
+    @Override
+    public List<OfficerTableDTO> getOfficerTableByUnit(Long unitId) {
+
+        List<Personnel> personnelList = getPersonnelByUnit(unitId);
+        List<OfficerTableDTO> response = new ArrayList<>();
+
+        for (Personnel p : personnelList) {
+            response.add(new OfficerTableDTO(
+                    p.getArmyNo(),
+                    p.getRank(),
+                    p.getFullName(),
+                    randomGender(),
+                    p.getDateOfBirth(),
+                    p.getDateOfCommission(),
+                    p.getDateOfSeniority(),
+                    random(1,4),
+                    random(0,1),
+                    random(1,2)
+            ));
+        }
+        return response;
+    }
+
+    // ================= COMMON =================
+
+    private List<Personnel> getPersonnelByUnit(Long unitId) {
+
+        UnitMaster unit = unitMasterRepository.findById(unitId)
+                .orElseThrow(() -> new RuntimeException("Unit not found"));
+
+        List<Long> ids =
+                postingDetailsRepository
+                        .findActivePersonnelIdsByUnitName(unit.getUnitName());
+
+        if (ids.isEmpty()) return Collections.emptyList();
+
+        return personnelRepository.findByIdIn(ids);
+    }
+
+    private int random(int min, int max) {
+        return ThreadLocalRandom.current().nextInt(min, max + 1);
+    }
+
+    private String randomGender() {
+        return ThreadLocalRandom.current().nextBoolean() ? "M" : "F";
+    }
+
+    private LocalDate minDate(List<Personnel> list, boolean seniority) {
+        return list.stream()
+                .map(p -> seniority ? p.getDateOfSeniority()
+                        : p.getDateOfCommission())
+                .filter(Objects::nonNull)
+                .min(LocalDate::compareTo)
+                .orElse(null);
+    }
+
+    private LocalDate maxDate(List<Personnel> list, boolean seniority) {
+        return list.stream()
+                .map(p -> seniority ? p.getDateOfSeniority()
+                        : p.getDateOfCommission())
+                .filter(Objects::nonNull)
+                .max(LocalDate::compareTo)
+                .orElse(null);
+    }
 
 }
