@@ -808,7 +808,7 @@ public class PersonnelServiceImpl implements PersonnelService {
 
 
 
-}
+
 
 
     // ================= IMAGE =================
@@ -823,22 +823,22 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setUpdatedAt(LocalDateTime.now());
     }
 
-    // ================= FILE SAVE (ONLY ONCE) =================
-    private String saveOfficerImage(MultipartFile file) {
-        try {
-            String folder = "uploads/personnel/officer/";
-            File dir = new File(folder);
-            if (!dir.exists()) dir.mkdirs();
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(folder + fileName);
-            Files.write(path, file.getBytes());
-
-            return folder + fileName;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save officer image", e);
-        }
-    }
+//    // ================= FILE SAVE (ONLY ONCE) =================
+//    private String saveOfficerImage(MultipartFile file) {
+//        try {
+//            String folder = "uploads/personnel/officer/";
+//            File dir = new File(folder);
+//            if (!dir.exists()) dir.mkdirs();
+//
+//            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//            Path path = Paths.get(folder + fileName);
+//            Files.write(path, file.getBytes());
+//
+//            return folder + fileName;
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to save officer image", e);
+//        }
+//    }
 
 
     @Override
