@@ -13,7 +13,7 @@ public interface AreaTypeMasterRepository
 
     @Query("""
         SELECT a.areaName
-        FROM AreaType a
+        FROM AreaTypeMaster a
         WHERE a.isActive = true
         ORDER BY a.areaName
     """)
