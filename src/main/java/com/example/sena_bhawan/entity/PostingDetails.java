@@ -45,4 +45,20 @@ public class PostingDetails {
 
     @Column(name = "document_path")
     private String documentPath;
+
+    @Column(name = "movement_date")
+    private LocalDate movementDate;
+
+    @Column(name = "posted_to")
+    private String postedTo;
+
+    @Column(name = "posting_order_issue_date")
+    private LocalDate postingOrderIssueDate;
+
+    @Column(name = "tos_updated_date")
+    private LocalDate tosUpdatedDate;
+
+    @Column(name = "rank")
+    private String rank;
+
 }

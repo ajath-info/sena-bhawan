@@ -435,6 +435,46 @@ public class PersonnelServiceImpl implements PersonnelService {
     }
 
     @Transactional
+    public void updateSports(Long personnelId, List<SportsRequest> reqList) {
+
+        Personnel personnel = personnelRepository.findById(personnelId)
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+
+        List<PersonnelSports> existing = personnel.getSports();
+
+        // Remove deleted
+        existing.removeIf(s ->
+                reqList.stream().noneMatch(r -> r.id != null && r.id.equals(s.getId()))
+        );
+
+        for (SportsRequest r : reqList) {
+
+            if (r.id != null) {
+                // UPDATE
+                PersonnelSports sport = existing.stream()
+                        .filter(e -> e.getId().equals(r.id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Sport not found"));
+
+                sport.setSportName(r.sportName);
+                sport.setLevel(r.level);
+                sport.setRemarks(r.remarks);
+
+            } else {
+                // ADD NEW
+                PersonnelSports sport = new PersonnelSports();
+                sport.setSportName(r.sportName);
+                sport.setLevel(r.level);
+                sport.setRemarks(r.remarks);
+
+                sport.setPersonnel(personnel);
+                existing.add(sport);
+            }
+        }
+    }
+
+
+    @Transactional
     public void updateFamily(Long personnelId, List<FamilyRequest> reqList) {
 
         Personnel personnel = personnelRepository.findById(personnelId)

@@ -92,6 +92,10 @@ public class Personnel {
 
     @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    private List<PersonnelSports> sports;
+
+    @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<PersonnelFamily> familyMembers;
 
     public Personnel(Long personnelId) {

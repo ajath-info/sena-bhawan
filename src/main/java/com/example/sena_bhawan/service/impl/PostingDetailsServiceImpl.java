@@ -31,6 +31,11 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
         pd.setDuration(dto.getDuration());
         pd.setRemarks(dto.getRemarks());
         pd.setDocumentPath(dto.getDocumentPath());
+        pd.setMovementDate(dto.getMovementDate());
+        pd.setPostedTo(dto.getPostedTo());
+        pd.setPostingOrderIssueDate(dto.getPostingOrderIssueDate());
+        pd.setTosUpdatedDate(dto.getTosUpdatedDate());
+        pd.setRank(dto.getRank());
 
         // Auto-calc duration
         if (dto.getToDate() != null) {

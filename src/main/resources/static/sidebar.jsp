@@ -414,9 +414,37 @@
         <span>Course Eligibility Form</span>
       </a>
 
+      <a href="/orbat.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Orbit Generation Form</span>
+      </a>
+
+      <a href="/add-new-user.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>New User Form</span>
+      </a>
+
+      <a href="/legal-disciplinary.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Legal And Disciplinary Form</span>
+      </a>
+
+      <a href="/course-eligibility-form.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Eligibility Form</span>
+      </a>
+
       <a href="/course-posting-form.html" class="nav-item">
         <div class="nav-icon">📝</div>
         <span>Course & Posting Form</span>
+      </a>
+      <a href="/remarks.html" class="nav-item">
+        <div class="nav-icon">📊</div>
+        <span>Course Remarks Update Form</span>
+      </a>
+      <a href="/auth.html" class="nav-item">
+         <div class="nav-icon">📊</div>
+         <span>Auth View</span>
       </a>
     </nav>
 

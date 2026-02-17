@@ -22,4 +22,10 @@ public class PostingDetailsDTO {
 
     private String remarks;
     private String documentPath;
+
+    private LocalDate movementDate;
+    private String postedTo;
+    private LocalDate postingOrderIssueDate;
+    private LocalDate tosUpdatedDate;
+    private String rank;
 }

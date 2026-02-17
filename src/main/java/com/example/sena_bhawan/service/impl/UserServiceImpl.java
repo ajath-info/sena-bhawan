@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
         user.setAppointment(req.getAppointment());
         user.setPassword(req.getPassword());
         user.setSosNo(req.getSosNo());
-        user.setName(req.getName());
+
 //        user.setUnitName(req.getUnitName());
 
         UserMaster savedUser = userRepo.save(user);

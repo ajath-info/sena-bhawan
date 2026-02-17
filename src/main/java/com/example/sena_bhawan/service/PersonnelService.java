@@ -20,6 +20,8 @@ public interface PersonnelService {
 
     void updateAdditionalQualifications(Long id, List<AdditionalQualificationRequest> req);
 
+    void updateSports(Long personnelId, List<SportsRequest> reqList);
+
     void updateFamily(Long id, List<FamilyRequest> req);
 
     void updateMedical(Long id, MedicalUpdateRequest req);
