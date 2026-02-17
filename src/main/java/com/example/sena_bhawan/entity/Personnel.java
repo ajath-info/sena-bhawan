@@ -70,8 +70,8 @@ public class Personnel {
     private String restriction;
     @Column(name = "irs_transfer")
     private String irsTransfer;
-
-
+    @Column(name = "medical_remark")
+    private String medicalRemark;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

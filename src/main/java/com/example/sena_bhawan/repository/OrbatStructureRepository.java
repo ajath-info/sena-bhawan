@@ -8,10 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface OrbatStructureRepository
         extends JpaRepository<OrbatStructure, Long> {
 
     Optional<OrbatStructure> findById(Long id);
+
 
     // 1️⃣ All Commands
     @Query("""
@@ -41,5 +43,17 @@ public interface OrbatStructureRepository
        ORDER BY o.name
        """)
     List<OrbatSimpleDTO> findCorpsByCommandName(String commandName);
+
+
+
+    @Query("select distinct o.commandName from OrbatStructure o where o.commandName is not null")
+    List<String> findDistinctCommandNames();
+
+    @Query("select distinct o.corpsName from OrbatStructure o where o.corpsName is not null")
+    List<String> findDistinctCorpsNames();
+
+    @Query("select distinct o.divisionName from OrbatStructure o where o.divisionName is not null")
+    List<String> findDistinctDivisionNames();
+
 
 }

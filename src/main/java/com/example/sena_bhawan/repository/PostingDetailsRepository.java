@@ -15,6 +15,14 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
 
     Optional<Object> findTopByPersonnelIdOrderByFromDateDesc(Long id);
 
+    @Query("""
+           SELECT DISTINCT p.personnelId
+           FROM PostingDetails p
+           WHERE p.unitName = :unitName
+           """)
+    List<Long> findActivePersonnelIdsByUnitName(
+            @Param("unitName") String unitName);
+
     // Count active postings (current date between from_date and to_date)
     @Query("SELECT COUNT(p) FROM PostingDetails p " +
             "WHERE :currentDate BETWEEN p.fromDate AND p.toDate")

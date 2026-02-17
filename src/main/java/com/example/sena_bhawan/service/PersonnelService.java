@@ -33,6 +33,32 @@ public interface PersonnelService {
     AgeBandResponse getAgeBandDistribution();
 
     MedicalCategoryResponse getMedicalCategoryDistribution();
+    void updateBasicInfo(Long id, UpdateBasicInfoRequest req);
+
+    void updateServiceDetails(Long id, UpdateServiceRequest req);
+
+    void updateAddress(Long id, UpdateAddressRequest req);
+
+    void updateContact(Long id, UpdateContactRequest req);
+
+//    void updateMedical(Long id, UpdateMedicalRequest req);
+
+//    void updateDecorations(Long id, List<CreatePersonnelRequest.DecorationDTO> list);
+
+//    void updateQualifications(Long id, List<CreatePersonnelRequest.QualificationDTO> list);
+
+//    void updateAdditionalQualifications(Long id, List<CreatePersonnelRequest.AdditionalQualificationDTO> list);
+
+//    void updateFamily(Long id, List<CreatePersonnelRequest.FamilyDTO> list);
+
+    void updateOfficerImage(Long id, MultipartFile image);
+
+    List<Personnel> filterPersonnel(PersonnelFilterRequest filter);
+
+    OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId);
+
+    List<OfficerTableDTO> getOfficerTableByUnit(Long unitId);
+
 
     RetirementForecastResponse getRetirementForecast();
 }
