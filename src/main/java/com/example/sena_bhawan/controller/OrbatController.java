@@ -46,4 +46,5 @@ public class OrbatController {
     public List<OrbatStructure> getSosList() {
         return service.getSosList();
     }
+
 }

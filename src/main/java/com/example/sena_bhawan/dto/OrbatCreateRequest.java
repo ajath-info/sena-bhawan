@@ -21,7 +21,6 @@ public class OrbatCreateRequest {
     private String unitName;
 
     private String formationCode;
-
     private String areaType;
     private String unitType;
 

@@ -43,6 +43,9 @@ public class CreatePersonnelRequest {
     public String irsTransfer;
 
 
+    public String medicalRemark;
+
+
     // CHILD LISTS
     public List<DecorationDTO> decorations;
     public List<QualificationDTO> qualifications;
@@ -53,6 +56,8 @@ public class CreatePersonnelRequest {
 
     // CHILD DTOs
     public static class DecorationDTO {
+
+        public Long id; // NEW (optional)
         public String decorationCategory;
         public String decorationName;
         public LocalDate awardDate;
@@ -61,6 +66,7 @@ public class CreatePersonnelRequest {
 
 
     public static class QualificationDTO {
+        public Long id; // NEW (optional)
         public String qualification;
         public String stream;
         public String institution;
@@ -70,6 +76,7 @@ public class CreatePersonnelRequest {
     }
 
     public static class AdditionalQualificationDTO {
+        public Long id; // NEW (optional)
         public String qualification;
         public String issuingAuthority;
         public Integer year;
@@ -77,8 +84,10 @@ public class CreatePersonnelRequest {
     }
 
     public static class FamilyDTO {
+        public Long id; // NEW (optional)
         public String name;
         public String relationship;
         public String contactNumber;
     }
+
 }

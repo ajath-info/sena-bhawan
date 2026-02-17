@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Course Master - ARMY HRMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* ✅ VERY IMPORTANT */
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* ✅ prevent global scroll */
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+
+            height: 100vh;
+            overflow-y: auto; /* ✅ sidebar scroll */
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            min-height: 72px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffb703;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #52b788;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            padding: 16px 20px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #52b788;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffb703;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d6a4f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .user-info .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-info .role {
+            font-size: 12px;
+            color: #52b788;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* ✅ isolate scrolling */
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-left h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .search-box input {
+            width: 240px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto; /* ✅ main content scroll */
+            background: #f1f3f5;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #1b4332;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            background: #f9fafb;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .icon-btn.edit { color: #3b82f6; border-color: #3b82f6; }
+        .icon-btn.delete { color: #ef4444; border-color: #ef4444; }
+    </style>
+</head>
+
+<body>
+
+<script src="auth.js"></script>
+<script src="logout.js"></script>
+<div class="container">
+
+    <div id="sidebar"></div>
+
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <h2>Unit Master</h2>
+                <p>Manage Unit Information</p>
+            </div>
+
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Search unit..." />
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <div class="content-area">
+            <div class="card">
+
+                <!-- CARD HEADER -->
+                <div class="card-header">
+                    <span class="badge">Unit</span>
+                    <button class="btn-primary">+ Add unit</button>
+                </div>
+
+                <!-- TABLE -->
+                <table>
+                    <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Unit Name</th>
+                        <th>Location</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+
+</div>
+<script>
+    const API_BASE = "http://localhost:6060/api/unit"; // change if needed
+
+    // Load units when page opens
+    document.addEventListener("DOMContentLoaded", loadUnits);
+
+    function loadUnits() {
+        fetch(API_BASE)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.querySelector("tbody");
+                tbody.innerHTML = ""; // clear previous rows
+
+                data.forEach((unit, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${unit.unitName}</td>
+                            <td>${unit.location}</td>
+                            <td class="actions">
+                                <div class="icon-btn edit" onclick="editUnit(${unit.id})">✏️</div>
+                                <div class="icon-btn delete" onclick="deleteUnit(${unit.id})">🗑️</div>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    // Add new unit
+    document.querySelector(".btn-primary").addEventListener("click", function () {
+        const unitName = prompt("Enter Unit Name:");
+        const location = prompt("Enter Location:");
+
+        if (!unitName || !location) {
+            alert("Unit Name and Location are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(API_BASE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    });
+
+    // Edit unit
+    function editUnit(id) {
+        const unitName = prompt("Enter new Unit Name:");
+        const location = prompt("Enter new Location:");
+
+        if (!unitName || !location) {
+            alert("All fields are required.");
+            return;
+        }
+
+        const payload = { unitName, location };
+
+        fetch(`${API_BASE}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(() => loadUnits());
+    }
+
+    // Delete unit
+    function deleteUnit(id) {
+        if (!confirm("Are you sure you want to delete this unit?")) return;
+
+        fetch(`${API_BASE}/${id}`, { method: "DELETE" })
+            .then(() => loadUnits());
+    }
+</script>
+
+</body>
+</html>

@@ -29,6 +29,7 @@ public class OrbatServiceImpl implements OrbatService {
         row.setSosNo(req.getSosNo());
         row.setPin(req.getPin());
         row.setUnitName(req.getUnitName()); // client requirement
+        row.setUnitName(null); // client requirement
 
         // Fill parent names (same as your existing logic)
         if (req.getCommandId() != null) {
@@ -145,4 +146,5 @@ public class OrbatServiceImpl implements OrbatService {
 
         return node;
     }
+
 }

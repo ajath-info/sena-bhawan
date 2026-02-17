@@ -9,8 +9,8 @@ import com.example.sena_bhawan.repository.CoursePanelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
@@ -75,4 +75,5 @@ public class CoursePanelService {
                 .title("Ongoing Courses – Officer Strength")
                 .build();
     }
+
 }

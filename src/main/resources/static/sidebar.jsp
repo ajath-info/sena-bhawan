@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:src/main/resources/static/sidebar.jsp
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -472,3 +473,896 @@
   }
 
 </script>
+========
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - ARMY HRMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+
+      height: 100vh;
+      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-x: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      min-height: 72px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1b4332;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: #52b788;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+    }
+
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .user-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-info .role {
+      font-size: 12px;
+      color: #52b788;
+    }
+    /* ================= MAIN ================= */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+     .alert-item {
+       cursor: pointer;
+       transition: transform 0.1s ease;
+     }
+    .alert-item:hover {
+      transform: scale(1.01);
+    }
+
+
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .header-right input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      width: 240px;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* ================= STATS ================= */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat-title {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1b4332;
+    }
+
+    .stat-change {
+      font-size: 12px;
+      margin-top: 6px;
+      color: #16a34a;
+    }
+
+    /* ================= SECTIONS ================= */
+    .section {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #1b4332;
+    }
+
+    /* ================= PROGRESS ================= */
+    .rank-row {
+      margin-bottom: 12px;
+    }
+
+    .rank-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .progress {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: #22c55e;
+    }
+
+    /* ================= ALERTS ================= */
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .alert.green { background: #ecfdf5; color: #065f46; }
+    .alert.yellow { background: #fffbeb; color: #92400e; }
+    .alert.red { background: #fef2f2; color: #991b1b; }
+
+    /* ================= ACTIVITY ================= */
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    /* ================= QUICK ACTIONS ================= */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .action-card {
+      border: 1px dashed #d1d5db;
+      padding: 20px;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fafafa;
+    }
+  </style>
+	
+</head>
+
+<body>
+
+<script src="auth.js"></script>
+
+<div class="container">
+
+  <div id="sidebar"></div>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="header">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Welcome back, Admin</p>
+      </div>
+      <div class="header-right">
+        <input placeholder="Search personnel, units..." />
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total Personnel</div>
+          <div class="stat-value">15</div>
+          <div class="stat-change">100%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Active Postings</div>
+          <div class="stat-value">10</div>
+          <div class="stat-change">75%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Courses Ongoing</div>
+          <div class="stat-value">5</div>
+          <div class="stat-change" style="color:#dc2626">50%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Pending Transfers</div>
+          <div class="stat-value">0</div>
+          <div class="stat-change">100%</div>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="section">
+        <div class="section-title">Alerts & Reminders</div>
+
+        <div class="alert green alert-item" data-type="retirement">
+          2 personnel retiring next month
+        </div>
+
+        <div class="alert yellow alert-item" data-type="medical">
+          0 medical exams pending
+        </div>
+
+        <div class="alert green alert-item" data-type="staffcollege">
+          2 eligible for Staff College
+        </div>
+
+        <div class="alert red alert-item" data-type="tenure">
+          1 personnel tenure completing
+        </div>
+
+        <!-- DETAILS PANEL -->
+        <div id="alertDetails" style="display:none; margin-top:16px;">
+          <h4 id="alertTitle" style="color:#1b4332; margin-bottom:10px;"></h4>
+
+          <table style="width:100%; border-collapse:collapse; font-size:14px;">
+            <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="padding:10px; border:1px solid #e5e7eb;">Name</th>
+              <th style="padding:10px; border:1px solid #e5e7eb;">Rank</th>
+              <th style="padding:10px; border:1px solid #e5e7eb;">Unit</th>
+              <th style="padding:10px; border:1px solid #e5e7eb;">Remarks</th>
+            </tr>
+            </thead>
+            <tbody id="alertTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="filter-box">
+        <label for="rankFilter">Filter by Rank:</label>
+        <select id="rankFilter" onchange="filterRank()">
+          <option value="all">All</option>
+          <option value="COL">COL</option>
+          <option value="LT COL">LT COL</option>
+          <option value="Maj">MAJ</option>
+          <option value="Capt">Capt</option>
+        </select>
+      </div>
+      <div class="chart-grid">
+
+        <div class="chart-card">
+          <div class="chart-title">Officer Strength by Rank</div>
+          <canvas id="rankStrengthChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Authorized vs Vacant Positions</div>
+          <canvas id="vacancyChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Age Band Distribution</div>
+          <canvas id="ageChart"></canvas>
+        </div>
+
+      </div>
+      <div class="chart-grid">
+
+        <div class="chart-card">
+          <div class="chart-title">Retirement Forecast</div>
+          <canvas id="retirementChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Discipline Cases Status</div>
+          <canvas id="disciplineChart"></canvas>
+        </div>
+<!--        <div class="chart-card">-->
+<!--          <div class="chart-title">Promotion Pipeline</div>-->
+<!--          <canvas id="promotionChart"></canvas>-->
+<!--        </div>-->
+
+        <div class="chart-card">
+          <div class="chart-title">Posting Tenure Balance</div>
+          <canvas id="postingChart"></canvas>
+        </div>
+
+      </div>
+      <div class="chart-grid">
+
+        <div class="chart-card">
+          <div class="chart-title">Course Readiness Status</div>
+          <canvas id="courseChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Medical Category Distribution</div>
+          <canvas id="medicalChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Active Courses (By rank)</div>
+          <canvas id="Courses"></canvas>
+        </div>
+      </div>
+
+      <!-- ACTIVITIES -->
+      <div class="section">
+        <div class="section-title">Recent Activities</div>
+        <div class="activity-item"><span>Maj. Rajesh Kumar promoted to Lt. Col.</span><span>2 hrs ago</span></div>
+        <div class="activity-item"><span>Capt. Amit Singh posted to 15 RAJPUT</span><span>5 hrs ago</span></div>
+        <div class="activity-item"><span>Hav. Suresh Yadav completed JCO Course</span><span>1 day ago</span></div>
+        <div class="activity-item"><span>Lt. Priya Sharma leave approved</span><span>2 days ago</span></div>
+      </div>
+
+      <canvas id="rankStrengthChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('rankStrengthChart'), {
+          type: 'bar',
+          data: {
+            labels: ['Lt', 'Capt', 'Maj', 'Lt Col', 'Col'],
+            datasets: [{
+              label: 'Officers',
+              data: [820, 2100, 1850, 960, 420],
+              backgroundColor: '#1b4332',
+              borderRadius: 8
+            }]
+          },
+          options: {
+            plugins:{legend:{display:false}},
+            onClick:(e,el)=> el.length && alert('Open officer list'),
+            scales:{y:{beginAtZero:true}}
+          }
+        });
+      </script>
+      <canvas id="vacancyChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('vacancyChart'), {
+          type: 'bar',
+          data: {
+            labels: ['Lt', 'Capt', 'Maj', 'Lt Col'],
+            datasets: [
+              { label:'Posted', data:[700,1900,1600,820], backgroundColor:'#40916c' },
+              { label:'Vacant', data:[120,200,250,140], backgroundColor:'#dc2626' }
+            ]
+          },
+          options: {
+            responsive:true,
+            scales:{x:{stacked:true},y:{stacked:true}}
+          }
+        });
+      </script>
+      <canvas id="ageChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('ageChart'), {
+          type: 'bar',
+          data: {
+            labels:['<30','31-35','36-40','41-45','46-50','50+'],
+            datasets:[{
+              label:'Officers',
+              data:[520,1400,1800,1100,620,290],
+              backgroundColor:'#74c69d'
+            }]
+          },
+          options:{plugins:{legend:{display:false}}}
+        });
+      </script>
+      <canvas id="retirementChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('retirementChart'), {
+          type:'line',
+          data:{
+            labels:['2025','2026','2027','2028','2029'],
+            datasets:[{
+              data:[180,240,310,380,420],
+              borderColor:'#1b4332',
+              fill:true,
+              tension:0.4
+            }]
+          },
+          options:{plugins:{legend:{display:false}}}
+        });
+      </script>
+
+      <canvas id="postingChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('postingChart'), {
+          type:'bar',
+          data:{
+            labels:['Lt','Capt','Maj'],
+            datasets:[
+              {label:'Peace',data:[40,35,30],backgroundColor:'#b7e4c7'},
+              {label:'Field',data:[45,50,55],backgroundColor:'#40916c'},
+              {label:'CI',data:[15,15,15],backgroundColor:'#1b4332'}
+            ]
+          },
+          options:{scales:{x:{stacked:true},y:{stacked:true}}}
+        });
+      </script>
+      <canvas id="courseChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('courseChart'), {
+          type:'doughnut',
+          data:{
+            labels:['Completed','Pending','Overdue'],
+            datasets:[{
+              data:[68,22,10],
+              backgroundColor:['#22c55e','#facc15','#dc2626']
+            }]
+          },
+          options:{cutout:'65%'}
+        });
+      </script>
+      <script>
+        new Chart(document.getElementById('disciplineChart'), {
+          type: 'bar',
+          data: {
+            labels: ['Capt', 'Maj', 'Lt Col'],
+            datasets: [
+              {
+                label: 'Pending',
+                data: [12, 9, 4],
+                backgroundColor: '#facc15'
+              },
+              {
+                label: 'Under Investigation',
+                data: [6, 5, 3],
+                backgroundColor: '#fb923c'
+              },
+              {
+                label: 'Closed',
+                data: [28, 24, 16],
+                backgroundColor: '#22c55e'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: { stacked: true },
+              y: {
+                stacked: true,
+                beginAtZero: true,
+                ticks: { precision: 0 }
+              }
+            },
+            plugins: {
+              legend: { position: 'bottom' }
+            },
+            onClick: (evt, elements) => {
+              if (elements.length > 0) {
+                const rank = elements[0].element.$context.raw;
+                alert('Open discipline case list for selected rank');
+              }
+            }
+          }
+        });
+      </script>
+
+      <canvas id="medicalChart"></canvas>
+
+      <script>
+        new Chart(document.getElementById('medicalChart'), {
+          type:'doughnut',
+          data:{
+            labels:['A1','A2','B','C'],
+            datasets:[{
+              data:[72,18,8,2],
+              backgroundColor:['#16a34a','#84cc16','#facc15','#dc2626']
+            }]
+          }
+        });
+      </script>
+      <script>
+        new Chart(document.getElementById('Courses'), {
+          type:'doughnut',
+          data:{
+            labels:['SCO','JC','CC','HC'],
+            datasets:[{
+              data:[72,18,8,2],
+              backgroundColor:['#16a34a','#84cc16','#facc15','#dc2626']
+            }]
+          }
+        });
+      </script>
+
+      <!-- QUICK ACTIONS -->
+      <div class="section">
+        <div class="section-title">Quick Actions</div>
+        <div class="actions-grid">
+          <div class="action-card">➕ Add Personnel</div>
+          <div class="action-card">📍 New Posting</div>
+          <div class="action-card">🎓 Course Nomination</div>
+          <div class="action-card">📄 Generate Report</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+
+  
+</div>
+		
+<script>
+  const rankData = {
+    Officers: 1245,
+    JCOs: 2890,
+    NCOs: 4123,
+    Soldiers: 4200
+  };
+
+  const detailedData = {
+    Officers: [
+      { label: 'Lt / Capt', value: 420 },
+      { label: 'Major', value: 310 },
+      { label: 'Lt Col', value: 265 },
+      { label: 'Col & Above', value: 250 }
+    ],
+    JCOs: [
+      { label: 'Sub Maj', value: 340 },
+      { label: 'Sub', value: 980 },
+      { label: 'Nb Sub', value: 1570 }
+    ],
+    NCOs: [
+      { label: 'Hav', value: 1200 },
+      { label: 'Nk', value: 1323 },
+      { label: 'Lance Nk', value: 1600 }
+    ],
+    Soldiers: [
+      { label: 'GD', value: 2600 },
+      { label: 'Tradesmen', value: 1600 }
+    ]
+  };
+</script>
+<script>
+  const ctx = document.getElementById('rankBarChart');
+  let rankChart;
+
+  function loadChart(labels, values) {
+    if (rankChart) rankChart.destroy();
+
+    rankChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Personnel Count',
+          data: values,
+          backgroundColor: '#1b4332',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        onClick: (evt, elements) => {
+          if (elements.length > 0) {
+            const idx = elements[0].index;
+            const rank = labels[idx];
+            showRankDetails(rank);
+          }
+        },
+        scales: {
+          y: { beginAtZero: true },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  /* INITIAL LOAD */
+  loadChart(Object.keys(rankData), Object.values(rankData));
+</script>
+<script>
+  document.getElementById('rankFilter').addEventListener('change', applyFilters);
+  document.getElementById('viewFilter').addEventListener('change', applyFilters);
+
+  function applyFilters() {
+    const selectedRank = document.getElementById('rankFilter').value;
+    const view = document.getElementById('viewFilter').value;
+
+    if (selectedRank === 'ALL') {
+      loadChart(Object.keys(rankData), Object.values(rankData));
+      document.getElementById('rankDetails').style.display = 'none';
+      return;
+    }
+
+    if (view === 'SUMMARY') {
+      loadChart([selectedRank], [rankData[selectedRank]]);
+    } else {
+      const details = detailedData[selectedRank];
+      loadChart(
+              details.map(d => d.label),
+              details.map(d => d.value)
+      );
+    }
+  }
+</script>
+<script>
+  /* ================= ALERT DETAILS DATA ================= */
+  const alertData = {
+    retirement: {
+      title: 'Personnel Retiring Next Month',
+      rows: [
+        { name: 'Col. R. Mehta', rank: 'Colonel', unit: 'HQ Command', remarks: 'Superannuation' },
+        { name: 'Sub Maj A. Singh', rank: 'Sub Major', unit: '10 INF', remarks: 'Age limit' },
+        { name: 'Hav S. Yadav', rank: 'Havildar', unit: '5 GARH RIF', remarks: 'Pension due' }
+      ]
+    },
+    medical: {
+      title: 'Pending Medical Examinations',
+      rows: [
+        { name: 'Capt. N. Verma', rank: 'Captain', unit: 'AMC', remarks: 'Annual review' },
+        { name: 'Nb Sub R. Khan', rank: 'Naib Subedar', unit: 'ASC', remarks: 'Category update' }
+      ]
+    },
+    staffcollege: {
+      title: 'Eligible for Staff College',
+      rows: [
+        { name: 'Maj. P. Sharma', rank: 'Major', unit: 'INF', remarks: 'Merit list' },
+        { name: 'Maj. A. Joseph', rank: 'Major', unit: 'ARTY', remarks: 'Clear ACR' }
+      ]
+    },
+    tenure: {
+      title: 'Personnel Completing Tenure',
+      rows: [
+        { name: 'Lt Col S. Rao', rank: 'Lt Colonel', unit: 'MECH INF', remarks: 'Posting due' },
+        { name: 'Sub R. Das', rank: 'Subedar', unit: 'SIG', remarks: 'Rotation required' }
+      ]
+    }
+  };
+
+
+  /* ================= CLICK HANDLER ================= */
+  document.querySelectorAll('.alert-item').forEach(alert => {
+    alert.addEventListener('click', () => {
+      const type = alert.dataset.type;
+      showAlertDetails(type);
+    });
+  });
+
+
+  /* ================= RENDER DETAILS ================= */
+  function showAlertDetails(type) {
+    const detailBox = document.getElementById('alertDetails');
+    const title = document.getElementById('alertTitle');
+    const table = document.getElementById('alertTable');
+
+    title.innerText = alertData[type].title;
+    table.innerHTML = '';
+
+    alertData[type].rows.forEach(row => {
+      table.innerHTML += `
+      <tr>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.name}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.rank}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.unit}</td>
+        <td style="padding:10px; border:1px solid #e5e7eb;">${row.remarks}</td>
+      </tr>
+    `;
+    });
+
+    detailBox.style.display = 'block';
+  }
+</script>
+
+<script>
+  // Load sidebar
+  fetch("sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+          document.getElementById("sidebar").innerHTML = html;
+
+          // Attach logout after sidebar loads
+          document.getElementById("logoutBtn")
+              .addEventListener("click", function () {
+                  sessionStorage.clear();
+                  window.location.replace("/login.html");
+              });
+
+          (function () {
+            const currentPage = location.pathname.split('/').pop();
+            const menuLinks = document.querySelectorAll('.sidebar-nav a');
+
+            menuLinks.forEach(link => {
+                const linkPath = link.getAttribute('href').split('/').pop();
+                if (currentPage === linkPath) {
+                    link.classList.add('active');
+                }
+            });
+        })();
+
+      });
+</script>
+</body>
+</html>
+>>>>>>>> dev-karan:target/classes/static/dashboard-new.html

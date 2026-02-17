@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add New Personnel - ARMY HRMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; overflow:hidden; }
+    body {
+      background: #f3f4f6;
+    }
+
+    .form-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 28px;
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin-bottom: 14px;
+    }
+
+    .btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Primary (Save Personnel) */
+    .btn-primary {
+      background: #1b4332;
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #16372a;
+    }
+
+    /* Secondary (Add / Cancel / Remove) */
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .section button.btn-secondary {
+      margin-top: 10px;
+    }
+
+    .grid > button.btn-secondary {
+      align-self: flex-end;
+      margin-top: 22px;
+      height: 36px;
+      font-size: 12px;
+    }
+    .medical-item span {
+      color: #dc2626;
+      font-size: 12px;
+    }
+
+    .medical-box {
+      background: #ffffff;
+      border: 1.5px solid #d1d5db;
+      height: 38px;
+      width: 38px;
+      border-radius: 6px;
+    }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .actions .btn {
+      min-width: 140px;
+    }
+
+
+    /* ================= INPUT STATES ================= */
+
+    input,
+    select,
+    textarea {
+      transition:
+              border-color 0.15s ease,
+              box-shadow 0.15s ease,
+              background-color 0.15s ease;
+    }
+
+    /* Hover */
+    input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: #9ca3af;
+    }
+
+    /* Focus */
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #1b4332;
+      box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.12);
+      background-color: #ffffff;
+    }
+
+    /* Disabled / readonly (optional but PDF-like) */
+    input:disabled,
+    textarea:disabled {
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+    /* ================= REPEATER ANIMATION ================= */
+
+    .repeater-item {
+      animation: fadeInSlide 0.25s ease forwards;
+    }
+
+    .repeater-item.removing {
+      animation: fadeOutSlide 0.2s ease forwards;
+    }
+
+    @keyframes fadeInSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOutSlide {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background:#f1f3f5;
+      color:#1f2937;
+    }
+
+    .container {
+      display:flex;
+      height:100vh;
+      overflow:hidden;
+    }
+
+
+
+    /* ========== SIDEBAR ========== */
+    .sidebar {
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+
+      height: 100vh;
+      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-x: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      min-height: 72px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ffb703;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: #52b788;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+    }
+
+    .nav-section-title {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .user-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-info .role {
+      font-size: 12px;
+      color: #52b788;
+    }
+
+    /* ========== MAIN ========== */
+    .main-content {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+
+    .header {
+      background:white;
+      border-bottom:1px solid #e5e7eb;
+      padding:16px 24px;
+    }
+
+    .header h2 { font-size:22px; font-weight:700; }
+    .header p { font-size:13px; color:#6b7280; margin-top:4px; }
+
+    .content-area {
+      flex:1;
+      overflow-y:auto;
+      padding:24px;
+    }
+
+    /* ========== FORM CARD ========== */
+    .form-card {
+      max-width:900px;
+      margin:auto;
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:24px;
+    }
+
+    .form-title {
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .form-subtitle {
+      font-size:13px;
+      color:#6b7280;
+      margin-bottom:20px;
+    }
+
+    .upload-box {
+      border:2px dashed #d1d5db;
+      border-radius:10px;
+      padding:20px;
+      text-align:center;
+      font-size:13px;
+      color:#6b7280;
+      margin-bottom:24px;
+    }
+
+    .section {
+      margin-bottom:24px;
+    }
+
+    .section-title {
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:12px;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+
+      gap:16px;
+    }
+
+
+    .grid-1 { grid-template-columns:1fr; }
+
+    label {
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:6px;
+      display:block;
+    }
+
+    input, select, textarea {
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #d1d5db;
+      font-size:14px;
+    }
+
+    textarea { resize:vertical; min-height:80px; }
+
+    /* ========== MEDICAL CATEGORY (FIXED) ========== */
+    .medical-category {
+      display:flex;
+      gap:18px;
+      margin-top:10px;
+    }
+
+    .medical-item {
+      text-align:center;
+      font-size:12px;
+      font-weight:600;
+      color:#374151;
+    }
+
+    .medical-item span {
+      display:block;
+      margin-bottom:6px;
+      color:#ef4444;
+      font-weight:700;
+    }
+
+    .medical-box {
+      width:44px;
+      height:40px;
+      border:1.5px solid #d1d5db;
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+      font-weight:700;
+      background:#fff;
+    }
+
+    /* ========== ACTIONS ========== */
+    .actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+      margin-top:20px;
+    }
+
+    .btn {
+      padding:10px 16px;
+      border-radius:8px;
+      font-weight:600;
+      border:none;
+      cursor:pointer;
+    }
+
+    .btn-secondary {
+      background:white;
+      border:1px solid #d1d5db;
+    }
+
+    .btn-primary {
+      background:#1b4332;
+      color:white;
+    }
+
+    /* ================= DECORATION CARD BACKGROUND ================= */
+    #decorations-container .repeater-item {
+      background: #f0f7f3;              /* light army green */
+      border: 1px solid #d7ebe1;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* ================= ADD BUTTON (GREEN) ================= */
+    .section > button.btn-secondary {
+      background: #1b4332;
+      color: #ffffff;
+      border: 1px solid #1b4332;
+    }
+
+    .section > button.btn-secondary:hover {
+      background: #16372a;
+      border-color: #16372a;
+    }
+
+
+    #civil-qualifications-container .repeater-item,
+    #additional-qualifications-container .repeater-item,
+    #family-container .repeater-item {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    /* ================= REMOVE BUTTON (RED + SMALL) ================= */
+    /* ================= FIX REMOVE BUTTON SIZE & ALIGNMENT ================= */
+    .grid button.btn-secondary {
+      width: auto;                 /* 🔑 stop full width */
+      min-width: 120px;            /* same feel as Add */
+      height: 40px;                /* exact height as Add */
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 600;
+
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+
+      justify-self: end;            /* 🔑 align right */
+      align-self: center;           /* vertical alignment */
+    }
+
+    .grid button.btn-secondary:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #7f1d1d;
+    }
+
+    .medical-box {
+      cursor: pointer;
+      transition: background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+    }
+
+    .medical-box.selected {
+      background: #1b4332;   /* Army green */
+      border-color: #1b4332;
+      color: #ffffff;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<script src="auth.js"></script>
+<script src="logout.js"></script>
+
+<div class="container">
+
+  <div id="sidebar"></div>
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="header">
+      <h2>Add New Personnel</h2>
+      <p>Fill in all required fields to add personnel to the system</p>
+    </div>
+
+    <div class="content-area">
+      <div class="form-card">
+
+        <div class="form-title">Personnel Information Form</div>
+        <div class="form-subtitle">
+          Complete officer profile with photograph and address details
+        </div>
+
+        <div class="upload-box">
+          📷 Upload Officer Image<br>
+          JPG / PNG, Max 2MB
+          <br><br>
+          <input type="file" id="officerImageFile" accept="image/*">
+        </div>
+
+
+        <!-- BASIC INFORMATION -->
+        <div class="section">
+          <div class="section-title">🧾 Basic Information</div>
+          <div class="grid">
+            <div><label>Army No *</label><input id="armyNo"></div>
+            <div><label>Rank *</label><input id="rank"></div>
+            <div><label>Full Name *</label><input id="fullName"></div>
+            <div><label>Date of Commission *</label><input type="date" id="dateOfCommission"></div>
+
+            <!-- ✅ ADDED -->
+            <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority"></div>
+
+            <div><label>Date of Birth *</label><input type="date" id="dateOfBirth"></div>
+            <div><label>Place of Birth *</label><input id="placeOfBirth"></div>
+          </div>
+        </div>
+
+        <!-- DECORATIONS -->
+        <div class="section">
+          <div class="section-title">🏅 Decorations</div>
+
+          <div id="decorations-container"></div>
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="addDecoration()">
+            + Add Decoration
+          </button>
+        </div>
+
+        <!-- SERVICE DETAILS -->
+        <div class="section">
+          <div class="section-title">🎖️ Service Details</div>
+          <div class="grid">
+            <div><label>NRS *</label><input id="nrs"></div>
+            <div><label>Religion *</label><input id="religion"></div>
+            <div><label>Aadhaar Number *</label><input id="aadhaarNumber"></div>
+            <div><label>PAN Card *</label><input id="panCard"></div>
+            <div><label>Marital Status *</label><input id="maritalStatus"></div>
+            <div><label>CDA Account No *</label><input id="cdaAccountNo"></div>
+          </div>
+        </div>
+
+
+        <!-- ADDRESS -->
+        <div class="section">
+          <div class="section-title">🏠 Address Details</div>
+
+          <div class="grid grid-1">
+            <div>
+              <label>Permanent Address *</label>
+              <textarea id="permanentAddress"></textarea>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div><label>City *</label><input id="city"></div>
+            <div><label>State *</label><input id="district"></div>
+            <div><label>District *</label><input id="state"></div>
+            <div><label>PIN Code *</label><input id="pinCode"></div>
+          </div>
+        </div>
+
+
+
+        <!-- CONTACT -->
+        <div class="section">
+          <div class="section-title">📞 Contact Details</div>
+          <div class="grid">
+            <div><label>Mobile Number *</label><input id="mobileNumber"></div>
+            <div><label>Alternate Mobile</label><input id="alternateMobile"></div>
+            <div class="grid-1">
+              <label>Email Address *</label>
+              <input type="email" id="emailAddress">
+            </div>
+          </div>
+        </div>
+
+        <!-- QUALIFICATION DETAILS -->
+        <div class="section">
+          <div class="section-title">🎓 Qualification Details</div>
+
+          <h4>Civil Qualifications</h4>
+          <div id="civil-qualifications-container"></div>
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="addCivilQualification()">
+            + Add Civil Qualification
+          </button>
+
+          <h4 style="margin-top:16px;">Additional Qualifications</h4>
+          <div id="additional-qualifications-container"></div>
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="addAdditionalQualification()">
+            + Add Additional Qualification
+          </button>
+        </div>
+
+
+        <!-- FAMILY DETAILS -->
+        <div class="section">
+          <div class="section-title">👪 Family Details</div>
+
+          <div id="family-container"></div>
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="addFamilyMember()">
+            + Add Family Member
+          </button>
+        </div>
+
+
+        <!-- MEDICAL CATEGORY -->
+<!--        <div class="medical-category">-->
+<!--          <div class="medical-item">-->
+<!--            <span>S*</span>-->
+<!--            <div class="medical-box" data-group="S">1</div>-->
+<!--          </div>-->
+
+<!--          <div class="medical-item">-->
+<!--            <span>H*</span>-->
+<!--            <div class="medical-box" data-group="H">2</div>-->
+<!--          </div>-->
+
+<!--          <div class="medical-item">-->
+<!--            <span>A*</span>-->
+<!--            <div class="medical-box" data-group="A">3</div>-->
+<!--          </div>-->
+
+<!--          <div class="medical-item">-->
+<!--            <span>P*</span>-->
+<!--            <div class="medical-box" data-group="P">4</div>-->
+<!--          </div>-->
+
+<!--          <div class="medical-item">-->
+<!--            <span>E*</span>-->
+<!--            <div class="medical-box" data-group="E">5</div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+        <!-- MEDICAL CATEGORY -->
+        <div class="section">
+          <div class="section-title">🩺 Medical Category</div>
+
+
+          <div class="medical-category">
+            <div class="medical-item">
+              <span>S</span>
+              <div class="medical-box" data-letter="S" data-value="1">1</div>
+            </div>
+
+            <div class="medical-item">
+              <span>H</span>
+              <div class="medical-box" data-letter="H" data-value="2">2</div>
+            </div>
+
+            <div class="medical-item">
+              <span>A</span>
+              <div class="medical-box" data-letter="A" data-value="3">3</div>
+            </div>
+
+            <div class="medical-item">
+              <span>P</span>
+              <div class="medical-box" data-letter="P" data-value="4">4</div>
+            </div>
+
+            <div class="medical-item">
+              <span>E</span>
+              <div class="medical-box" data-letter="E" data-value="5">5</div>
+            </div>
+          </div>
+
+          <div class="grid grid-1" style="margin-top:16px;">
+            <div>
+              <label>Medical Remarks</label>
+              <textarea
+                      id="medicalRemark"
+                      placeholder="Enter any medical observations, limitations, or remarks..."
+                      rows="3">
+              </textarea>
+            </div>
+          </div>
+
+        </div>
+
+
+
+        <!-- ACTIONS -->
+        <div class="actions">
+          <button class="btn btn-secondary">Cancel</button>
+          <button class="btn btn-primary" id="savePersonnelBtn">
+            Save Personnel
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+</div>
+<script>
+
+  /* =======================================================
+     REMOVE BLOCK WITH ANIMATION
+  ======================================================= */
+  function removeBlock(id) {
+    const el = document.getElementById(id);
+    el.classList.add("removing");
+    setTimeout(() => el.remove(), 200);
+  }
+
+
+  /* =======================================================
+     DECORATION SECTION (FIXED WITH DROPDOWNS)
+  ======================================================= */
+  let decorationIndex = 0;
+
+  async function addDecoration(isFirst = false) {
+    const index = decorationIndex++;
+    const id = `decoration-${index}`;
+
+    document.getElementById("decorations-container").insertAdjacentHTML(
+      "beforeend",
+      `
+      <div class="grid repeater-item" id="${id}">
+
+        <div>
+          <label>Decoration Category *</label>
+          <select name="decorations[${index}][category]"
+                  id="decorationCategory-${index}"
+                  onchange="loadAwardsForCategory(this.value, ${index})">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Decoration Name *</label>
+          <select name="decorations[${index}][name]" id="decorationName-${index}">
+            <option value="">Select Award</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Award Date *</label>
+          <input type="date" name="decorations[${index}][date]">
+        </div>
+
+        <div class="grid-1">
+          <label>Citation / Remarks</label>
+          <textarea name="decorations[${index}][remarks]"></textarea>
+        </div>
+
+        ${isFirst ? "" : `
+          <button type="button" class="btn btn-secondary"
+                  onclick="removeBlock('${id}')">
+            Remove
+          </button>
+        `}
+      </div>
+      `
+    );
+
+    loadDecorationCategories(index);
+  }
+
+
+  /* LOAD CATEGORIES */
+  async function loadDecorationCategories(index) {
+    try {
+      const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
+      const categories = await res.json();
+
+      const dropdown = document.getElementById(`decorationCategory-${index}`);
+      dropdown.innerHTML = `<option value="">Select Category</option>`;
+
+      categories.forEach(cat => {
+        dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
+
+    } catch (err) {
+      console.error("Failed loading categories:", err);
+    }
+  }
+
+
+  /* LOAD AWARDS WHEN CATEGORY SELECTED */
+  async function loadAwardsForCategory(category, index) {
+    const awardDropdown = document.getElementById(`decorationName-${index}`);
+
+    if (!category) {
+      awardDropdown.innerHTML = `<option value="">Select Award</option>`;
+      return;
+    }
+
+    awardDropdown.innerHTML = `<option value="">Loading...</option>`;
+
+    try {
+      const res = await fetch(
+        `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
+      );
+      const awards = await res.json();
+
+      awardDropdown.innerHTML = `<option value="">Select Award</option>`;
+
+      awards.forEach(a => {
+        awardDropdown.innerHTML += `
+          <option value="${a.name}">${a.name} (${a.suffix})</option>
+        `;
+      });
+
+    } catch (err) {
+      console.error("Failed loading awards:", err);
+      awardDropdown.innerHTML = `<option>Error Loading</option>`;
+    }
+  }
+
+
+  /* COLLECT DECORATIONS PAYLOAD */
+  function collectDecorationsIntoPayload(payload) {
+    payload.decorations = [];
+
+    document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
+      payload.decorations.push({
+        decorationCategory: item.querySelector('select[name*="[category]"]').value,
+        decorationName: item.querySelector('select[name*="[name]"]').value,
+        awardDate: item.querySelector('input[type="date"]').value,
+        citation: item.querySelector("textarea").value
+      });
+    });
+  }
+
+
+  /* =======================================================
+     CIVIL, ADDITIONAL, FAMILY
+  ======================================================= */
+  let civilIndex = 0, additionalIndex = 0, familyIndex = 0;
+
+  function addCivilQualification(isFirst = false) {
+    const index = civilIndex++;
+    const id = `civil-${index}`;
+
+    document.getElementById("civil-qualifications-container").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="grid repeater-item" id="${id}">
+          <div><label>Qualification *</label><input></div>
+          <div><label>Institution</label><input></div>
+          <div><label>Year</label><input></div>
+          <div><label>Grade / Percentage</label><input></div>
+
+          ${isFirst ? "" : `
+          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+          `}
+        </div>
+      `
+    );
+  }
+
+  function addAdditionalQualification(isFirst = false) {
+    const index = additionalIndex++;
+    const id = `additional-${index}`;
+
+    document.getElementById("additional-qualifications-container").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="grid repeater-item" id="${id}">
+          <div><label>Qualification *</label><input></div>
+          <div><label>Authority</label><input></div>
+          <div><label>Year</label><input></div>
+          <div><label>Validity</label><input type="date"></div>
+
+          ${isFirst ? "" : `
+          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+          `}
+        </div>
+      `
+    );
+  }
+
+  function addFamilyMember(isFirst = false) {
+    const index = familyIndex++;
+    const id = `family-${index}`;
+
+    document.getElementById("family-container").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="grid repeater-item" id="${id}">
+          <div><label>Name *</label><input></div>
+          <div><label>Relationship *</label><input></div>
+
+          ${isFirst ? "" : `
+          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+          `}
+        </div>
+      `
+    );
+  }
+
+
+  /* =======================================================
+     MEDICAL SELECTION
+  ======================================================= */
+  let selectedMedicals = {};
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+  // Medical category click handling
+  document.querySelectorAll(".medical-box").forEach(box => {
+    box.addEventListener("click", () => {
+      const letter = box.dataset.letter;
+      const value = box.dataset.value;
+
+      if (box.classList.contains("selected")) {
+        box.classList.remove("selected");
+        delete selectedMedicals[letter];
+      } else {
+        box.classList.add("selected");
+        selectedMedicals[letter] = value;
+      }
+    });
+  });
+
+  // Load first rows
+  addDecoration(true);
+  addCivilQualification(true);
+  addAdditionalQualification(true);
+  addFamilyMember(true);
+
+});
+
+
+  function getMedicalCategoryString() {
+    return Object.keys(selectedMedicals)
+      .sort()
+      .map(l => l + selectedMedicals[l])
+      .join("");
+  }
+
+
+  /* =======================================================
+     SAVE PERSONNEL
+  ======================================================= */
+  document.getElementById("savePersonnelBtn").addEventListener("click", async () => {
+
+  // ---------- BUILD PAYLOAD ----------
+  const payload = {
+    armyNo: armyNo.value,
+    rank: rank.value,
+    fullName: fullName.value,
+    dateOfCommission: dateOfCommission.value,
+    dateOfSeniority: dateOfSeniority.value,
+    dateOfBirth: dateOfBirth.value,
+    placeOfBirth: placeOfBirth.value,
+    nrs: nrs.value,
+    religion: religion.value,
+    aadhaarNumber: aadhaarNumber.value,
+    panCard: panCard.value,
+    maritalStatus: maritalStatus.value,
+    cdaAccountNo: cdaAccountNo.value,
+    permanentAddress: permanentAddress.value,
+    city: city.value,
+    district: district.value,
+    state: state.value,
+    pinCode: pinCode.value,
+    mobileNumber: mobileNumber.value,
+    alternateMobile: alternateMobile.value,
+    emailAddress: emailAddress.value,
+    medicalCategory: getMedicalCategoryString(),
+    medicalRemark: document.getElementById("medicalRemark").value,
+
+    decorations: [],
+    qualifications: [],
+    additionalQualifications: [],
+    family: []
+  };
+
+  // ---------- COLLECT CHILD DATA ----------
+  collectDecorationsIntoPayload(payload);
+
+  document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.qualifications.push({
+      qualification: inputs[0].value,
+      institution: inputs[1].value,
+      yearOfCompletion: inputs[2].value,
+      gradePercentage: inputs[3].value
+    });
+  });
+
+  document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.additionalQualifications.push({
+      qualification: inputs[0].value,
+      issuingAuthority: inputs[1].value,
+      year: inputs[2].value,
+      validity: inputs[3].value
+    });
+  });
+
+  document.querySelectorAll("#family-container .repeater-item").forEach(item => {
+    const inputs = item.querySelectorAll("input");
+    payload.family.push({
+      name: inputs[0].value,
+      relationship: inputs[1].value,
+      contactNumber: ""
+    });
+  });
+
+  // ---------- MULTIPART FORM ----------
+  const formData = new FormData();
+
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(payload)], { type: "application/json" })
+  );
+
+  const imageFile = document.getElementById("officerImageFile").files[0];
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+
+  // ---------- API CALL ----------
+  try {
+    const res = await fetch("http://localhost:6060/api/personnel/add", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) throw new Error("API Error");
+
+    alert("Personnel saved successfully.");
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save personnel.");
+  }
+
+});
+
+
+
+
+
+</script>
+
+</body>
+</html>

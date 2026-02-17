@@ -4,6 +4,7 @@ import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,12 +12,19 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Repository
-public interface PersonnelRepository extends JpaRepository<Personnel, Long> {
+public interface PersonnelRepository
+        extends JpaRepository<Personnel, Long>,
+        JpaSpecificationExecutor<Personnel> {
 
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")
     List<Object[]> getRankCounts();
+
+    List<Personnel> findByIdIn(List<Long> ids);
+
+
 
     @Query("SELECT COUNT(p) FROM Personnel p WHERE LOWER(p.rank) LIKE LOWER(CONCAT('%', :term, '%'))")
     long countByRankContaining(@Param("term") String term);
@@ -44,5 +52,6 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long> {
             "WHERE p.medicalCategory IS NOT NULL AND p.medicalCategory <> '' " +
             "GROUP BY p.medicalCategory")
     List<MedicalCategoryProjection> getMedicalCategoryCounts();
+
 }
 

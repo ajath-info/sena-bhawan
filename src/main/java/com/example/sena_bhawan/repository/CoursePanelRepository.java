@@ -4,6 +4,7 @@ import com.example.sena_bhawan.entity.CoursePanelNomination;
 import com.example.sena_bhawan.projection.OngoingCoursesProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -31,4 +32,5 @@ public interface CoursePanelRepository
             "AND cpn.attendance_status = 'ATTENDING' " +
             "GROUP BY cm.course_name", nativeQuery = true)
     List<OngoingCoursesProjection> getOngoingCoursesWithCountsAlternative();
+
 }
