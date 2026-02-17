@@ -200,77 +200,77 @@ public class PersonnelController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/medical")
-    public ResponseEntity<?> updateMedical(
-            @PathVariable Long id,
-            @RequestBody UpdateMedicalRequest req) {
-
-        personnelService.updateMedical(id, req);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Medical updated successfully");
-
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping("/{id}/medical")
+//    public ResponseEntity<?> updateMedical(
+//            @PathVariable Long id,
+//            @RequestBody UpdateMedicalRequest req) {
+//
+//        personnelService.updateMedical(id, req);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Medical updated successfully");
+//
+//        return ResponseEntity.ok(response);
+//    }
 
     // ================= CHILD SECTION UPDATES =================
+//
+//    @PutMapping("/{id}/decorations")
+//    public ResponseEntity<?> updateDecorations(
+//            @PathVariable Long id,
+//            @RequestBody List<CreatePersonnelRequest.DecorationDTO> list) {
+//
+//        personnelService.updateDecorations(id, list);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Decorations updated successfully");
+//
+//        return ResponseEntity.ok(response);
+//    }
 
-    @PutMapping("/{id}/decorations")
-    public ResponseEntity<?> updateDecorations(
-            @PathVariable Long id,
-            @RequestBody List<CreatePersonnelRequest.DecorationDTO> list) {
+//    @PutMapping("/{id}/qualifications")
+//    public ResponseEntity<?> updateQualifications(
+//            @PathVariable Long id,
+//            @RequestBody List<CreatePersonnelRequest.QualificationDTO> list) {
+//
+//        personnelService.updateQualifications(id, list);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Qualifications updated successfully");
+//
+//        return ResponseEntity.ok(response);
+//    }
 
-        personnelService.updateDecorations(id, list);
+//    @PutMapping("/{id}/additional-qualifications")
+//    public ResponseEntity<?> updateAdditionalQualifications(
+//            @PathVariable Long id,
+//            @RequestBody List<CreatePersonnelRequest.AdditionalQualificationDTO> list) {
+//
+//        personnelService.updateAdditionalQualifications(id, list);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Additional qualifications updated successfully");
+//
+//        return ResponseEntity.ok(response);
+//    }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Decorations updated successfully");
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}/qualifications")
-    public ResponseEntity<?> updateQualifications(
-            @PathVariable Long id,
-            @RequestBody List<CreatePersonnelRequest.QualificationDTO> list) {
-
-        personnelService.updateQualifications(id, list);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Qualifications updated successfully");
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}/additional-qualifications")
-    public ResponseEntity<?> updateAdditionalQualifications(
-            @PathVariable Long id,
-            @RequestBody List<CreatePersonnelRequest.AdditionalQualificationDTO> list) {
-
-        personnelService.updateAdditionalQualifications(id, list);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Additional qualifications updated successfully");
-
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}/family")
-    public ResponseEntity<?> updateFamily(
-            @PathVariable Long id,
-            @RequestBody List<CreatePersonnelRequest.FamilyDTO> list) {
-
-        personnelService.updateFamily(id, list);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Family updated successfully");
-
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping("/{id}/family")
+//    public ResponseEntity<?> updateFamily(
+//            @PathVariable Long id,
+//            @RequestBody List<CreatePersonnelRequest.FamilyDTO> list) {
+//
+//        personnelService.updateFamily(id, list);
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Family updated successfully");
+//
+//        return ResponseEntity.ok(response);
+//    }
 
     // ================= IMAGE UPDATE =================
 
