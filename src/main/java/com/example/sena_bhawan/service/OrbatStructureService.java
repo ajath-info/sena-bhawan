@@ -11,4 +11,11 @@ public interface OrbatStructureService {
     List<OrbatSimpleDTO> getAllCorps();
 
     List<OrbatSimpleDTO> getCorpsByCommand(String commandName);
+
+    List<String> getCommandDropdown();
+
+    List<String> getCorpsDropdown();
+
+    List<String> getDivisionDropdown();
+
 }

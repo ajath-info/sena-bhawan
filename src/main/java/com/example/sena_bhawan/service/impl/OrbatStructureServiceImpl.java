@@ -30,4 +30,19 @@ public class OrbatStructureServiceImpl implements OrbatStructureService {
     public List<OrbatSimpleDTO> getCorpsByCommand(String commandName) {
         return repository.findCorpsByCommandName(commandName);
     }
+
+    @Override
+    public List<String> getCommandDropdown() {
+        return repository.findDistinctCommandNames();
+    }
+
+    @Override
+    public List<String> getCorpsDropdown() {
+        return repository.findDistinctCorpsNames();
+    }
+
+    @Override
+    public List<String> getDivisionDropdown() {
+        return repository.findDistinctDivisionNames();
+    }
 }
