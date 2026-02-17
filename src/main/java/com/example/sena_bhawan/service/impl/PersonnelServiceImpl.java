@@ -4,6 +4,7 @@ import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
+import com.example.sena_bhawan.projection.RetirementYearProjection;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.PersonnelService;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,7 @@ import java.nio.file.Paths;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +44,38 @@ public class PersonnelServiceImpl implements PersonnelService {
             "Lt Col", Arrays.asList("lt col", "lieutenant col", "lt colonel", "lieutenant colonel"),
             "Col", Arrays.asList("col", "colonel")
     );
+
+    @Override
+    public RetirementForecastResponse getRetirementForecast() {
+        int currentYear = LocalDate.now().getYear();
+        int endYear = currentYear + 4;  // 5 years forecast
+
+        // Using Projection instead of Object[]
+        List<RetirementYearProjection> projections =
+                personnelRepository.getRetirementForecast(currentYear, endYear);
+
+        // Create map of year -> count
+        Map<Integer, Long> forecastMap = new HashMap<>();
+        for (RetirementYearProjection projection : projections) {
+            forecastMap.put(projection.getRetirementYear(), projection.getCount());
+        }
+
+        // Prepare labels and data in correct order
+        List<String> labels = new ArrayList<>();
+        List<Integer> data = new ArrayList<>();
+
+        for (int year = currentYear; year <= endYear; year++) {
+            labels.add(String.valueOf(year));
+            data.add(forecastMap.getOrDefault(year, 0L).intValue());
+        }
+
+        return RetirementForecastResponse.builder()
+                .labels(labels)
+                .data(data)
+                .chartType("line")
+                .title("Retirement Forecast")
+                .build();
+    }
 
     @Override
     public MedicalCategoryResponse getMedicalCategoryDistribution() {

@@ -5,6 +5,8 @@ out/                # IntelliJ IDEA output
 *.jar               # Compiled jar files
 *.war               # Compiled war files
 target
+/target
+/target/*
 
 
 # --- IDE Settings ---

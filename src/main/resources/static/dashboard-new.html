@@ -507,50 +507,78 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-title">Total Personnel</div>
-          <div class="stat-value">12,458</div>
-          <div class="stat-change">+2.5%</div>
+          <div class="stat-value" id="totalPersonnel">Loading...</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Active Postings</div>
-          <div class="stat-value">8,234</div>
-          <div class="stat-change">+5.2%</div>
+          <div class="stat-value" id="activePostings">Loading...</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Courses Ongoing</div>
-          <div class="stat-value">156</div>
-          <div class="stat-change" style="color:#dc2626">-1.2%</div>
+          <div class="stat-value" id="coursesOngoing">Loading...</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Pending Transfers</div>
-          <div class="stat-value">89</div>
-          <div class="stat-change">+8.3%</div>
+          <div class="stat-value" id="pendingTransfers">Loading...</div>
         </div>
+
       </div>
+
+      <script>
+        fetch('http://localhost:6060/api/dashboard/stats')
+                .then(response => response.json())
+                .then(data => {
+                  // Format numbers with commas
+                  document.getElementById('totalPersonnel').textContent = data.totalPersonnel.toLocaleString();
+                  document.getElementById('activePostings').textContent = data.activePostings.toLocaleString();
+                  document.getElementById('coursesOngoing').textContent = data.coursesOngoing.toLocaleString();
+                  document.getElementById('pendingTransfers').textContent = data.pendingTransfers.toLocaleString();
+
+                })
+                .catch(error => {
+                  console.error('Error loading stats:', error);
+                  document.querySelectorAll('.stat-value').forEach(el => el.textContent = 'Error');
+                });
+      </script>
 
       <!-- DISTRIBUTION -->
       <div class="section">
         <div class="section-title">Personnel Distribution by Rank</div>
-
-        <div class="rank-row">
-          <div class="rank-label"><span>Officers</span><span>1,245</span></div>
-          <div class="progress"><div class="progress-bar" style="width:30%"></div></div>
-        </div>
-
-        <div class="rank-row">
-          <div class="rank-label"><span>JCOs</span><span>2,890</span></div>
-          <div class="progress"><div class="progress-bar" style="width:55%"></div></div>
-        </div>
-
-        <div class="rank-row">
-          <div class="rank-label"><span>NCOs</span><span>4,123</span></div>
-          <div class="progress"><div class="progress-bar" style="width:75%"></div></div>
-        </div>
-
-        <div class="rank-row">
-          <div class="rank-label"><span>Soldiers</span><span>4,200</span></div>
-          <div class="progress"><div class="progress-bar" style="width:80%"></div></div>
-        </div>
+        <div id="rankDistribution"></div>
       </div>
+
+      <script>
+        fetch('http://localhost:6060/api/personnel/officer-strength')
+                .then(response => response.json())
+                .then(data => {
+                  // Calculate total for percentages
+                  const total = data.data.reduce((sum, count) => sum + count, 0);
+
+                  // Create distribution HTML using only API labels and data
+                  const distributionHtml = data.labels.map((label, index) => {
+                    const count = data.data[index];
+                    const percentage = total > 0 ? Math.round((count * 100) / total) : 0;
+
+                    return `
+                        <div class="rank-row">
+                          <div class="rank-label">
+                            <span>${label}</span>
+                            <span>${count.toLocaleString()}</span>
+                          </div>
+                          <div class="progress">
+                            <div class="progress-bar" style="width:${percentage}%"></div>
+                          </div>
+                        </div>
+                      `;
+                  }).join('');
+
+                  document.getElementById('rankDistribution').innerHTML = distributionHtml;
+                })
+                .catch(error => {
+                  console.error('Error loading distribution:', error);
+                  document.getElementById('rankDistribution').innerHTML = '<p style="color: red; padding: 10px;">Failed to load distribution data</p>';
+                });
+      </script>
 
       <!-- GRAPHS -->
       <div class="chart-grid">
@@ -674,48 +702,36 @@
           <div class="chart-title">Retirement Forecast</div>
           <canvas id="retirementChart"></canvas>
           <script>
-            new Chart(document.getElementById('retirementChart'), {
-              type: 'line',
-              data: {
-                labels: ['2025', '2026', '2027', '2028', '2029'],
-                datasets: [
-                  {
-                    label: 'Retirement',
-                    data: [180, 240, 310, 380, 420],
-                    borderColor: '#1b4332',
-                    backgroundColor: 'rgba(27, 67, 50, 0.15)',
-                    fill: true,
-                    tension: 0.4
-                  },
-                  {
-                    label: 'Intake',
-                    data: [260, 300, 340, 360, 390],
-                    borderColor: '#2a9d8f',
-                    backgroundColor: 'rgba(42, 157, 143, 0.15)',
-                    fill: true,
-                    tension: 0.4
-                  }
-                ]
-              },
-              options: {
-                responsive: true,
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: 'bottom'
-                  }
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    title: {
-                      display: true,
-                      text: 'Number of Officers'
-                    }
-                  }
-                }
-              }
-            });
+            fetch('http://localhost:6060/api/personnel/retirement-forecast')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('retirementChart'), {
+                        type: 'line',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            label: 'Retirement',
+                            data: data.data,
+                            borderColor: '#1b4332',
+                            backgroundColor: 'rgba(27, 67, 50, 0.15)',
+                            fill: true,
+                            tension: 0.4
+                          }]
+                        },
+                        options: {
+                          responsive: true,
+                          plugins: {
+                            legend: { display: true, position: 'bottom' }
+                          },
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              title: { display: true, text: 'Number of Officers' }
+                            }
+                          }
+                        }
+                      });
+                    });
           </script>
         </div>
 
@@ -750,48 +766,23 @@
           <div class="chart-title">Officer Status Overview</div>
           <canvas id="officerStatusChart"></canvas>
           <script>
-            new Chart(document.getElementById('officerStatusChart'), {
-              type: 'doughnut',
-              data: {
-                labels: [
-                  'Under Posting',
-                  'On Study Leave',
-                  'On Deputation',
-                  'Available for Duty'
-                ],
-                datasets: [{
-                  data: [
-                    140,
-                    60,
-                    90,
-                    710
-                  ],
-                  backgroundColor: [
-                    '#e63946',
-                    '#f4a261',
-                    '#457b9d',
-                    '#2a9d8f'
-                  ],
-                  borderWidth: 0
-                }]
-              },
-              options: {
-                responsive: true,
-                cutout: '65%',
-                plugins: {
-                  legend: {
-                    position: 'bottom'
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function(context) {
-                        return context.label + ': ' + context.parsed + ' Officers';
-                      }
-                    }
-                  }
-                }
-              }
-            });
+            fetch('http://localhost:6060/api/course-panel/officer-status')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('officerStatusChart'), {
+                        type: 'doughnut',
+                        data: {
+                          labels: data.labels,  // Raw from DB: ['ATTENDING', 'NOT_ATTENDING', ...]
+                          datasets: [{
+                            data: data.data,     // [140, 60, 90, 710]
+                            backgroundColor: ['#e63946', '#f4a261', '#457b9d', '#2a9d8f']
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { position: 'bottom' } }
+                        }
+                      });
+                    });
           </script>
         </div>
       </div>

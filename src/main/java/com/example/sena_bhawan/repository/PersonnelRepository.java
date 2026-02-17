@@ -3,6 +3,7 @@ package com.example.sena_bhawan.repository;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
+import com.example.sena_bhawan.projection.RetirementYearProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,5 +45,23 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long> {
             "WHERE p.medicalCategory IS NOT NULL AND p.medicalCategory <> '' " +
             "GROUP BY p.medicalCategory")
     List<MedicalCategoryProjection> getMedicalCategoryCounts();
+
+    // Method 3: Combined - uses seniority if available, otherwise commission
+    @Query(value = "SELECT retirement_year as retirementYear, COUNT(*) as count FROM (" +
+            "SELECT CASE " +
+            "  WHEN date_of_seniority IS NOT NULL THEN EXTRACT(YEAR FROM (date_of_seniority + INTERVAL '10 years')) " +
+            "  ELSE EXTRACT(YEAR FROM (date_of_commission + INTERVAL '10 years')) " +
+            "END as retirement_year " +
+            "FROM personnel " +
+            "WHERE date_of_commission IS NOT NULL" +
+            ") AS retirements " +
+            "WHERE retirement_year BETWEEN :startYear AND :endYear " +
+            "GROUP BY retirement_year " +
+            "ORDER BY retirement_year", nativeQuery = true)
+    List<RetirementYearProjection> getRetirementForecast(@Param("startYear") int startYear, @Param("endYear") int endYear);
+
+    // Add to your existing PersonnelRepository
+    @Query("SELECT COUNT(p) FROM Personnel p")
+    long getTotalPersonnelCount();
 }
 

@@ -132,4 +132,10 @@ public class PersonnelController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/retirement-forecast")
+    public ResponseEntity<RetirementForecastResponse> getRetirementForecast() {
+        RetirementForecastResponse response = personnelService.getRetirementForecast();
+        return ResponseEntity.ok(response);
+    }
+
 }

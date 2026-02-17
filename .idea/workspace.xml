@@ -5,212 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/DropdownMasterController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/RemarksUpdateController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/UnitEstablishmentController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/DropdownDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/RemarksUpdateDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/SportsRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/UnitEstablishmentRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/UnitEstablishmentResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/DropdownMaster.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/PersonnelSports.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/RemarksUpdate.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/UnitEstablishment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/DropdownMasterRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/RemarksUpdateRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/UnitEstablishmentRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/RemarksUpdateService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/UnitEstablishmentService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/DropdownMasterServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/MasterDropdownService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/RemarksUpdateServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/UnitEstablishmentImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/auth.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/remarks.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/config/WebConfig.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseEligibilityController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CoursePanelController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/CourseScheduleRoleStatusController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/DecorationMasterController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/ModuleController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OfficerPostingController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OrbatController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/OrbatStructureController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PanelSelectionController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PermissionController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/PostingTypeController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RankMasterController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RoleController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/RolePermissionController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UnitMasterController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UserController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/controller/UserPermissionController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AdditionalQualificationRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AgeBandResponse$AgeBandResponseBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AgeBandResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AttendanceRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/AttendanceResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseEligibilityDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CoursePanelView.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleRoleStatusRequestDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseScheduleRoleStatusResponseDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/CourseStep1DTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/DecorationRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/FamilyRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/LoginRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/LoginResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalCategoryResponse$MedicalCategoryResponseBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalCategoryResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalUpdateRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/MedicalUpdateRequestDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/ModuleResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/NominationDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OfficerPostingRequestDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OngoingCoursesResponse$OngoingCoursesResponseBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OngoingCoursesResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatCreateRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatDropdownResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatSimpleDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/OrbatTreeResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PanelOfficerDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/PermissionResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/QualificationRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RankStrengthResponse$RankStrengthResponseBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RankStrengthResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse$ModuleDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse$PermissionDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsSaveRequest$PermissionEntry.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RolePermissionsSaveRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/RoleSummaryDto.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/Step2PanelStrengthDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/SusDropdownDTO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UpdatePersonnelRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserCreateRequest.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserPermissionProjection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/dto/UserPermissionsResponse.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/AppointmentMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibilityMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligiblePostingType.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibleRank.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseEligibleUnit.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CoursePanelNomination$CoursePanelNominationBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CoursePanelNomination.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/CourseScheduleRoleStatus.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/DecorationMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/MedicalCategoryHistory.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/ModuleEntity.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OfficerPosting$OfficerPostingBuilder.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OfficerPosting.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/OrbatStructure.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PanelAttendance.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Permission.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/PostingTypeMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RankMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/Role.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RoleMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/RolePermission.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UnitMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UserMaster.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/entity/UserRoleInfo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/projection/AgeBandProjection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/projection/MedicalCategoryProjection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/projection/OngoingCoursesProjection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/projection/RankCountProjection.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/AppointmentRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibilityRepo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligiblePostingTypeRepo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibleRankRepo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseEligibleUnitRepo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CoursePanelRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/CourseScheduleRoleStatusRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/DecorationMasterRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/MedicalCategoryHistoryRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/ModuleRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OfficerPostingRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OrbatRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/OrbatStructureRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PanelAttendanceRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PermissionRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/PostingTypeMasterRepo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RankMasterRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RoleMasterRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RolePermissionRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/RoleRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UnitMasterRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserMasterRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserPermissionRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/repository/UserRoleInfoRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AdminServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/AppointmentService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseEligibilityService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CoursePanelService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/CourseScheduleRoleStatusService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/DecorationMasterService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/ModuleService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OfficerPostingService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OrbatService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/OrbatStructureService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PanelSelectionService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PermissionService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PersonnelMedicalService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/PostingTypeService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RankMasterService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleCrud.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RolePermissionService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/RoleSummaryService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UnitMasterService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UserPermissionService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/UserService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/AppointmentServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/CourseScheduleRoleStatusServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl$1.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl$2.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/DecorationMasterServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/ModuleServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/OrbatServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/OrbatStructureServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PanelSelectionServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/PermissionServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleCrudImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RolePermissionServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/RoleSummaryServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/UserServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/service/impl/officerPostingServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/example/sena_bhawan/util/JwtUtil.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/UserSession.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/Usermmaster.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/add-new-user.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/auth.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/course-eligibility-form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/decoration-matser.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/legal-disciplinary.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/logout.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/orbat.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/paramount.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/session.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/sidebar.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/static/sidebar.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CoursePanelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CoursePanelController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PostingDetailsDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PostingDetailsDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/Personnel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/Personnel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/PostingDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/PostingDetails.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/UserMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/UserMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/CourseMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/CourseMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PersonnelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CoursePanelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CoursePanelService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PostingDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PostingDetailsServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/sidebar.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,52 +67,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.SenaBhawanApplication.executor": "Run",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Maven.sena-bhawan [clean].executor": "Run",
-    "Maven.sena-bhawan [compile].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.SenaBhawanApplication.executor": "Run",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#1 on Merging dev-vipan",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/diwakarjha/Downloads/sena-bhawan",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "MavenSettings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.SenaBhawanApplication.executor&quot;: &quot;Run&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev-vipan&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/diwakarjha/Downloads/sena-bhawan&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\uploads\personnel\officer" />
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\src\main\resources\static" />
     </key>
-  </component>
-  <component name="RunAnythingCache">
-    <option name="myCommands">
-      <command value="mvn compile" />
-      <command value="mvn clean" />
-    </option>
   </component>
   <component name="RunManager">
     <configuration name="SenaBhawanApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">

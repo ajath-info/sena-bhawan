@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -29,6 +30,11 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
         ORDER BY cs.startDate DESC
         """)
     List<CourseSchedule> findByCourseId(@Param("courseId") Integer courseId);
+
+    // Count ongoing courses (current date between start_date and end_date)
+    @Query("SELECT COUNT(c) FROM CourseSchedule c " +
+            "WHERE :currentDate BETWEEN c.startDate AND c.endDate")
+    long countOngoingCourses(@Param("currentDate") LocalDate currentDate);
 }
 
 
