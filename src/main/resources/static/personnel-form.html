@@ -26,6 +26,9 @@
 
     .section-title {
       margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .btn {
@@ -41,7 +44,6 @@
       gap: 6px;
     }
 
-    /* Primary (Save Personnel) */
     .btn-primary {
       background: #1b4332;
       color: #ffffff;
@@ -52,7 +54,6 @@
       background: #16372a;
     }
 
-    /* Secondary (Add / Cancel / Remove) */
     .btn-secondary {
       background: #ffffff;
       border: 1px solid #d1d5db;
@@ -61,6 +62,12 @@
 
     .btn-secondary:hover {
       background: #f9fafb;
+    }
+
+    .btn-success {
+      background: #0b5e42;
+      color: white;
+      border: none;
     }
 
     .section button.btn-secondary {
@@ -73,6 +80,7 @@
       height: 36px;
       font-size: 12px;
     }
+
     .medical-item span {
       color: #dc2626;
       font-size: 12px;
@@ -85,6 +93,7 @@
       width: 38px;
       border-radius: 6px;
     }
+
     .actions {
       display: flex;
       justify-content: flex-end;
@@ -96,9 +105,6 @@
       min-width: 140px;
     }
 
-
-    /* ================= INPUT STATES ================= */
-
     input,
     select,
     textarea {
@@ -108,14 +114,12 @@
               background-color 0.15s ease;
     }
 
-    /* Hover */
     input:hover,
     select:hover,
     textarea:hover {
       border-color: #9ca3af;
     }
 
-    /* Focus */
     input:focus,
     select:focus,
     textarea:focus {
@@ -125,14 +129,12 @@
       background-color: #ffffff;
     }
 
-    /* Disabled / readonly (optional but PDF-like) */
     input:disabled,
     textarea:disabled {
       background: #f9fafb;
       color: #6b7280;
       cursor: not-allowed;
     }
-    /* ================= REPEATER ANIMATION ================= */
 
     .repeater-item {
       animation: fadeInSlide 0.25s ease forwards;
@@ -176,18 +178,14 @@
       overflow:hidden;
     }
 
-
-
-    /* ========== SIDEBAR ========== */
     .sidebar {
       width: 256px;
       background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
       color: white;
       display: flex;
       flex-direction: column;
-
       height: 100vh;
-      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-y: auto;
       overflow-x: hidden;
       flex-shrink: 0;
     }
@@ -292,7 +290,6 @@
       color: #52b788;
     }
 
-    /* ========== MAIN ========== */
     .main-content {
       flex:1;
       display:flex;
@@ -304,10 +301,25 @@
       background:white;
       border-bottom:1px solid #e5e7eb;
       padding:16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .header h2 { font-size:22px; font-weight:700; }
     .header p { font-size:13px; color:#6b7280; margin-top:4px; }
+
+    .section-selector {
+      width: 250px;
+    }
+
+    .section-selector select {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
 
     .content-area {
       flex:1;
@@ -315,7 +327,6 @@
       padding:24px;
     }
 
-    /* ========== FORM CARD ========== */
     .form-card {
       max-width:900px;
       margin:auto;
@@ -363,10 +374,8 @@
     .grid {
       display:grid;
       grid-template-columns: repeat(2, 1fr);
-
       gap:16px;
     }
-
 
     .grid-1 { grid-template-columns:1fr; }
 
@@ -387,7 +396,6 @@
 
     textarea { resize:vertical; min-height:80px; }
 
-    /* ========== MEDICAL CATEGORY (FIXED) ========== */
     .medical-category {
       display:flex;
       gap:18px;
@@ -421,7 +429,6 @@
       background:#fff;
     }
 
-    /* ========== ACTIONS ========== */
     .actions {
       display:flex;
       justify-content:flex-end;
@@ -447,16 +454,14 @@
       color:white;
     }
 
-    /* ================= DECORATION CARD BACKGROUND ================= */
     #decorations-container .repeater-item {
-      background: #f0f7f3;              /* light army green */
+      background: #f0f7f3;
       border: 1px solid #d7ebe1;
       border-radius: 10px;
       padding: 16px;
       margin-bottom: 12px;
     }
 
-    /* ================= ADD BUTTON (GREEN) ================= */
     .section > button.btn-secondary {
       background: #1b4332;
       color: #ffffff;
@@ -468,7 +473,6 @@
       border-color: #16372a;
     }
 
-
     #civil-qualifications-container .repeater-item,
     #additional-qualifications-container .repeater-item,
     #family-container .repeater-item {
@@ -478,23 +482,20 @@
       padding: 16px;
       margin-bottom: 12px;
     }
-    /* ================= REMOVE BUTTON (RED + SMALL) ================= */
-    /* ================= FIX REMOVE BUTTON SIZE & ALIGNMENT ================= */
+
     .grid button.btn-secondary {
-      width: auto;                 /* 🔑 stop full width */
-      min-width: 120px;            /* same feel as Add */
-      height: 40px;                /* exact height as Add */
+      width: auto;
+      min-width: 120px;
+      height: 40px;
       padding: 0 16px;
       font-size: 13px;
       font-weight: 600;
-
       background: #fee2e2;
       color: #991b1b;
       border: 1px solid #fca5a5;
       border-radius: 8px;
-
-      justify-self: end;            /* 🔑 align right */
-      align-self: center;           /* vertical alignment */
+      justify-self: end;
+      align-self: center;
     }
 
     .grid button.btn-secondary:hover {
@@ -511,11 +512,43 @@
     }
 
     .medical-box.selected {
-      background: #1b4332;   /* Army green */
+      background: #1b4332;
       border-color: #1b4332;
       color: #ffffff;
     }
 
+    .update-btn {
+      background: #0b5e42;
+      color: white;
+      margin-left: auto;
+    }
+
+    .update-btn:hover {
+      background: #0a4a35;
+    }
+
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -527,14 +560,35 @@
 <div class="container">
 
   <div id="sidebar"></div>
-  <!-- MAIN -->
+
   <main class="main-content">
     <div class="header">
-      <h2>Add New Personnel</h2>
-      <p>Fill in all required fields to add personnel to the system</p>
+      <div>
+        <h2>Edit Personnel</h2>
+        <p>Update personnel information section by section</p>
+      </div>
+      <div class="section-selector">
+        <select id="sectionSelector" onchange="showSection()">
+          <option value="">-- Select Section to Update --</option>
+          <option value="basic">Basic Information</option>
+          <option value="service">Service Details</option>
+          <option value="address">Address Details</option>
+          <option value="contact">Contact Details</option>
+          <option value="decorations">Decorations</option>
+          <option value="qualifications">Qualifications</option>
+          <option value="additional-qualifications">Additional Qualifications</option>
+          <option value="sports">Sports Details</option>
+          <option value="family">Family Details</option>
+          <option value="medical">Medical Category</option>
+          <option value="image">Officer Image</option>
+        </select>
+      </div>
     </div>
 
     <div class="content-area">
+      <div id="successMessage" class="success-message"></div>
+      <div id="errorMessage" class="error-message"></div>
+
       <div class="form-card">
 
         <div class="form-title">Personnel Information Form</div>
@@ -542,305 +596,735 @@
           Complete officer profile with photograph and address details
         </div>
 
-        <div class="upload-box">
-          📷 Upload Officer Image<br>
-          JPG / PNG, Max 2MB
-          <br><br>
-          <input type="file" id="officerImageFile" accept="image/*">
-        </div>
-
-
-        <!-- BASIC INFORMATION -->
-        <div class="section">
-          <div class="section-title">🧾 Basic Information</div>
+        <!-- BASIC INFORMATION SECTION -->
+        <div id="section-basic" class="section">
+          <div class="section-title">
+            <span>🧾 Basic Information</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('basic')">Update Basic Info</button>
+          </div>
           <div class="grid">
-            <div><label>Types of Commisiion *</label><input id="commission"></div>
-            <div><label>Army No *</label><input id="armyNo"></div>
-            <div><label>Rank *</label><input id="rank"></div>
-            <div><label>Full Name *</label><input id="fullName"></div>
-            <div><label>Date of Commission *</label><input type="date" id="dateOfCommission"></div>
-
-            <!-- ✅ ADDED -->
-            <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority"></div>
-
-            <div><label>Date of Birth *</label><input type="date" id="dateOfBirth"></div>
-            <div><label>Place of Birth *</label><input id="placeOfBirth"></div>
+            <div><label>Types of Commission *</label><input id="commission" class="basic-field"></div>
+            <div><label>Army No *</label><input id="armyNo" class="basic-field"></div>
+            <div><label>Rank *</label><input id="rank" class="basic-field"></div>
+            <div><label>Full Name *</label><input id="fullName" class="basic-field"></div>
+            <div><label>Date of Commission *</label><input type="date" id="dateOfCommission" class="basic-field"></div>
+            <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority" class="basic-field"></div>
+            <div><label>Date of Birth *</label><input type="date" id="dateOfBirth" class="basic-field"></div>
+            <div><label>Place of Birth *</label><input id="placeOfBirth" class="basic-field"></div>
           </div>
         </div>
 
-        <!-- DECORATIONS -->
-        <div class="section">
-          <div class="section-title">🏅 Decorations</div>
+        <!-- SERVICE DETAILS SECTION -->
+        <div id="section-service" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🎖️ Service Details</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('service')">Update Service Details</button>
+          </div>
+          <div class="grid">
+            <div><label>NRS *</label><input id="nrs" class="service-field"></div>
+            <div><label>Religion *</label><select id="religion" class="service-field">
+              <option value="">Select Religion</option>
+              <option value="Hindu">Hindu</option>
+              <option value="Muslim">Muslim</option>
+              <option value="Sikh">Sikh</option>
+              <option value="Christian">Christian</option>
+            </select></div>
+            <div><label>Aadhaar Number *</label><input id="aadhaarNumber" class="service-field"></div>
+            <div><label>PAN Card *</label><input id="panCard" class="service-field"></div>
+            <div><label>Marital Status *</label><select id="maritalStatus" class="service-field">
+              <option value="">Select Marital Status</option>
+              <option value="Married">Married</option>
+              <option value="Unmarried">Unmarried</option>
+            </select></div>
+            <div><label>CDA Account No *</label><input id="cdaAccountNo" class="service-field"></div>
+          </div>
+        </div>
 
+        <!-- ADDRESS SECTION -->
+        <div id="section-address" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🏠 Address Details</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('address')">Update Address</button>
+          </div>
+          <div class="grid grid-1">
+            <div>
+              <label>Permanent Address *</label>
+              <textarea id="permanentAddress" class="address-field"></textarea>
+            </div>
+          </div>
+          <div class="grid">
+            <div><label>City *</label><input id="city" class="address-field"></div>
+            <div><label>District *</label><input id="district" class="address-field"></div>
+            <div><label>State *</label><input id="state" class="address-field"></div>
+            <div><label>PIN Code *</label><input id="pinCode" class="address-field"></div>
+          </div>
+        </div>
+
+        <!-- CONTACT SECTION -->
+        <div id="section-contact" class="section" style="display: none;">
+          <div class="section-title">
+            <span>📞 Contact Details</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('contact')">Update Contact</button>
+          </div>
+          <div class="grid">
+            <div><label>Mobile Number *</label><input id="mobileNumber" class="contact-field"></div>
+            <div><label>Alternate Mobile</label><input id="alternateMobile" class="contact-field"></div>
+            <div class="grid-1">
+              <label>Email Address *</label>
+              <input type="email" id="emailAddress" class="contact-field">
+            </div>
+            <div class="grid-1">
+              <label>NSG Email *</label>
+              <input type="email" id="nsgEmail" class="contact-field">
+            </div>
+          </div>
+        </div>
+
+        <!-- DECORATIONS SECTION -->
+        <div id="section-decorations" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🏅 Decorations</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('decorations')">Update Decorations</button>
+          </div>
           <div id="decorations-container"></div>
-
-          <button type="button"
-                  class="btn btn-secondary"
-                  onclick="addDecoration()">
+          <button type="button" class="btn btn-secondary" onclick="addDecoration()">
             + Add Decoration
           </button>
         </div>
 
-        <!-- SERVICE DETAILS -->
-        <div class="section">
-          <div class="section-title">🎖️ Service Details</div>
-          <div class="grid">
-            <div><label>NRS *</label><input id="nrs"></div>
-            <div><label>Religion *</label><select id="religion">
-              <option value="">Select Religion</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Muslim">Muslim</option>
-              <option value="Sikhs">Sikhs</option>
-              <option value="Christian">Christian</option>
-            </select></div>
-            <div><label>Aadhaar Number *</label><input id="aadhaarNumber"></div>
-            <div><label>PAN Card *</label><input id="panCard"></div>
-            <div><label>Marital Status *</label><select id="maritalStatus">
-              <option value="">Select Religion</option>
-              <option value="Married">Married</option>
-              <option value="Unmarried">Unmarried</option>
-            </select></div>
-
-            <div><label>CDA Account No *</label><input id="cdaAccountNo"></div>
+        <!-- QUALIFICATIONS SECTION -->
+        <div id="section-qualifications" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🎓 Civil Qualifications</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('qualifications')">Update Qualifications</button>
           </div>
-        </div>
-
-
-        <!-- ADDRESS -->
-        <div class="section">
-          <div class="section-title">🏠 Address Details</div>
-
-          <div class="grid grid-1">
-            <div>
-              <label>Permanent Address *</label>
-              <textarea id="permanentAddress"></textarea>
-            </div>
-          </div>
-
-          <div class="grid">
-            <div><label>City *</label><input id="city"></div>
-            <div><label>State *</label><input id="district"></div>
-            <div><label>District *</label><input id="state"></div>
-            <div><label>PIN Code *</label><input id="pinCode"></div>
-          </div>
-        </div>
-
-
-
-        <!-- CONTACT -->
-        <div class="section">
-          <div class="section-title">📞 Contact Details</div>
-          <div class="grid">
-            <div><label>Mobile Number *</label><input id="mobileNumber"></div>
-            <div><label>Alternate Mobile</label><input id="alternateMobile"></div>
-            <div class="grid-1">
-              <label>Email Address *</label>
-              <input type="email" id="emailAddress">
-            </div>
-            <div class="grid-1">
-              <label>NSG Email *</label>
-              <input type="email" id="nsgEmail">
-            </div>
-          </div>
-        </div>
-
-        <!-- QUALIFICATION DETAILS -->
-        <div class="section">
-          <div class="section-title">🎓 Qualification Details</div>
-
-          <h4>Civil Qualifications</h4>
           <div id="civil-qualifications-container"></div>
-          <button type="button"
-                  class="btn btn-secondary"
-                  onclick="addCivilQualification()">
+          <button type="button" class="btn btn-secondary" onclick="addCivilQualification()">
             + Add Civil Qualification
           </button>
+        </div>
 
-          <h4 style="margin-top:16px;">Additional Qualifications</h4>
+        <!-- ADDITIONAL QUALIFICATIONS SECTION -->
+        <div id="section-additional-qualifications" class="section" style="display: none;">
+          <div class="section-title">
+            <span>📚 Additional Qualifications</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('additional-qualifications')">Update Additional Qualifications</button>
+          </div>
           <div id="additional-qualifications-container"></div>
-          <button type="button"
-                  class="btn btn-secondary"
-                  onclick="addAdditionalQualification()">
+          <button type="button" class="btn btn-secondary" onclick="addAdditionalQualification()">
             + Add Additional Qualification
           </button>
         </div>
 
-        <!-- SPORTS DETAILS -->
-        <div class="section">
-          <div class="section-title">🏆 Sports Details</div>
-
+        <!-- SPORTS SECTION -->
+        <div id="section-sports" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🏆 Sports Details</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('sports')">Update Sports</button>
+          </div>
           <div id="sports-container"></div>
-
-          <button type="button"
-                  class="btn btn-primary"
-                  onclick="addSport()">
+          <button type="button" class="btn btn-secondary" onclick="addSport()">
             + Add Sport
           </button>
         </div>
 
-        <!-- FAMILY DETAILS -->
-        <div class="section">
-          <div class="section-title">👪 Family Details</div>
-
+        <!-- FAMILY SECTION -->
+        <div id="section-family" class="section" style="display: none;">
+          <div class="section-title">
+            <span>👪 Family Details</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('family')">Update Family</button>
+          </div>
           <div id="family-container"></div>
-
-          <button type="button"
-                  class="btn btn-secondary"
-                  onclick="addFamilyMember()">
+          <button type="button" class="btn btn-secondary" onclick="addFamilyMember()">
             + Add Family Member
           </button>
         </div>
 
-
-        <!-- MEDICAL CATEGORY -->
-<!--        <div class="medical-category">-->
-<!--          <div class="medical-item">-->
-<!--            <span>S*</span>-->
-<!--            <div class="medical-box" data-group="S">1</div>-->
-<!--          </div>-->
-
-<!--          <div class="medical-item">-->
-<!--            <span>H*</span>-->
-<!--            <div class="medical-box" data-group="H">2</div>-->
-<!--          </div>-->
-
-<!--          <div class="medical-item">-->
-<!--            <span>A*</span>-->
-<!--            <div class="medical-box" data-group="A">3</div>-->
-<!--          </div>-->
-
-<!--          <div class="medical-item">-->
-<!--            <span>P*</span>-->
-<!--            <div class="medical-box" data-group="P">4</div>-->
-<!--          </div>-->
-
-<!--          <div class="medical-item">-->
-<!--            <span>E*</span>-->
-<!--            <div class="medical-box" data-group="E">5</div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-        <!-- MEDICAL CATEGORY -->
-        <div class="section">
-          <div class="section-title">🩺 Medical Category</div>
-
+        <!-- MEDICAL SECTION -->
+        <div id="section-medical" class="section" style="display: none;">
+          <div class="section-title">
+            <span>🩺 Medical Category</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('medical')">Update Medical</button>
+          </div>
           <div class="medical-category">
-
             <div class="medical-item">
               <label>S</label>
-              <select class="medical-select" data-letter="S">
+              <select class="medical-select" data-letter="S" id="medicalS">
                 <option value="">Select</option>
-                <option value="1" selected>1</option>
+                <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
             </div>
-
             <div class="medical-item">
               <label>H</label>
-              <select class="medical-select" data-letter="H">
+              <select class="medical-select" data-letter="H" id="medicalH">
                 <option value="">Select</option>
-                <option value="1" selected>1</option>
+                <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
             </div>
-
             <div class="medical-item">
               <label>A</label>
-              <select class="medical-select" data-letter="A">
+              <select class="medical-select" data-letter="A" id="medicalA">
                 <option value="">Select</option>
-                <option value="1" selected>1</option>
+                <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
             </div>
-
             <div class="medical-item">
               <label>P</label>
-              <select class="medical-select" data-letter="P">
+              <select class="medical-select" data-letter="P" id="medicalP">
                 <option value="">Select</option>
-                <option value="1" selected>1</option>
+                <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
             </div>
-
             <div class="medical-item">
               <label>E</label>
-              <select class="medical-select" data-letter="E">
+              <select class="medical-select" data-letter="E" id="medicalE">
                 <option value="">Select</option>
-                <option value="1" selected>1</option>
+                <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
             </div>
-
           </div>
-
           <div class="grid grid-1" style="margin-top:16px;">
             <div>
               <label>Medical Remarks</label>
-              <textarea
-                      id="medicalRemark"
-                      placeholder="Enter any medical observations..."
-                      rows="3">
-                            </textarea>
+              <textarea id="medicalRemark" placeholder="Enter any medical observations..." rows="3"></textarea>
             </div>
           </div>
-
         </div>
 
-        <!-- ACTIONS -->
+        <!-- IMAGE SECTION -->
+        <div id="section-image" class="section" style="display: none;">
+          <div class="section-title">
+            <span>📷 Officer Image</span>
+            <button class="btn btn-success update-btn" onclick="updateSection('image')">Update Image</button>
+          </div>
+          <div class="upload-box">
+            📷 Upload Officer Image<br>
+            JPG / PNG, Max 2MB
+            <br><br>
+            <input type="file" id="officerImageFile" accept="image/*">
+            <div id="currentImage" style="margin-top: 10px; display: none;">
+              <img id="previewImage" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Save Button (Optional) -->
         <div class="actions">
-          <button class="btn btn-secondary">Cancel</button>
-          <button class="btn btn-primary" id="savePersonnelBtn">
-            Save Personnel
-          </button>
+          <button class="btn btn-secondary" onclick="window.location.href='personnel-list.html'">Cancel</button>
+          <button class="btn btn-primary" id="saveAllBtn" onclick="saveAllSections()">Save All Changes</button>
         </div>
 
       </div>
-
     </div>
   </main>
-
 </div>
-<script>
 
-  /* =======================================================
-     REMOVE BLOCK WITH ANIMATION
-  ======================================================= */
+<script>
+  // Global variables
+  let personnelId = null;
+  let decorationIndex = 0;
+  let sportIndex = 0;
+  let civilIndex = 0;
+  let additionalIndex = 0;
+  let familyIndex = 0;
+
+  // Get ID from URL
+  function getPersonnelIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+  }
+
+  // Show selected section
+  function showSection() {
+    const selected = document.getElementById("sectionSelector").value;
+    const sections = document.querySelectorAll(".section");
+
+    sections.forEach(section => {
+      section.style.display = "none";
+    });
+
+    if (selected) {
+      document.getElementById(`section-${selected}`).style.display = "block";
+    }
+  }
+
+  // Load personnel data
+  async function loadPersonnelData() {
+    if (!personnelId) return;
+
+    try {
+      const response = await fetch(`http://localhost:6060/api/personnel/${personnelId}`);
+      if (!response.ok) throw new Error('Failed to fetch personnel data');
+
+      const data = await response.json();
+
+      // Basic Info
+      document.getElementById('commission').value = data.commissionType || '';
+      document.getElementById('armyNo').value = data.armyNo || '';
+      document.getElementById('rank').value = data.rank || '';
+      document.getElementById('fullName').value = data.fullName || '';
+      document.getElementById('dateOfCommission').value = data.dateOfCommission ? data.dateOfCommission.split('T')[0] : '';
+      document.getElementById('dateOfSeniority').value = data.dateOfSeniority ? data.dateOfSeniority.split('T')[0] : '';
+      document.getElementById('dateOfBirth').value = data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '';
+      document.getElementById('placeOfBirth').value = data.placeOfBirth || '';
+
+      // Service Details
+      document.getElementById('nrs').value = data.nrs || '';
+      document.getElementById('religion').value = data.religion || '';
+      document.getElementById('aadhaarNumber').value = data.aadhaarNumber || '';
+      document.getElementById('panCard').value = data.panCard || '';
+      document.getElementById('maritalStatus').value = data.maritalStatus || '';
+      document.getElementById('cdaAccountNo').value = data.cdaAccountNo || '';
+
+      // Address
+      document.getElementById('permanentAddress').value = data.permanentAddress || '';
+      document.getElementById('city').value = data.city || '';
+      document.getElementById('district').value = data.district || '';
+      document.getElementById('state').value = data.state || '';
+      document.getElementById('pinCode').value = data.pinCode || '';
+
+      // Contact
+      document.getElementById('mobileNumber').value = data.mobileNumber || '';
+      document.getElementById('alternateMobile').value = data.alternateMobile || '';
+      document.getElementById('emailAddress').value = data.emailAddress || '';
+      document.getElementById('nsgEmail').value = data.nsgEmail || '';
+
+      // Medical
+      if (data.medicalCategory) {
+        const medical = data.medicalCategory;
+        document.getElementById('medicalS').value = medical.match(/S(\d)/)?.[1] || '';
+        document.getElementById('medicalH').value = medical.match(/H(\d)/)?.[1] || '';
+        document.getElementById('medicalA').value = medical.match(/A(\d)/)?.[1] || '';
+        document.getElementById('medicalP').value = medical.match(/P(\d)/)?.[1] || '';
+        document.getElementById('medicalE').value = medical.match(/E(\d)/)?.[1] || '';
+      }
+      document.getElementById('medicalRemark').value = data.medicalRemark || '';
+
+      // Image preview
+      if (data.officerImage) {
+        document.getElementById('currentImage').style.display = 'block';
+        document.getElementById('previewImage').src = `http://localhost:6060/${data.officerImage}`;
+      }
+
+      // Load nested data
+      await loadDecorations(data.decorations);
+      await loadQualifications(data.qualifications);
+      await loadAdditionalQualifications(data.additionalQualifications);
+      await loadSports(data.sports);
+      await loadFamily(data.familyMembers);
+
+    } catch (error) {
+      console.error('Error loading personnel data:', error);
+      showMessage('error', 'Failed to load personnel data');
+    }
+  }
+
+  // Load decorations
+  function loadDecorations(decorations) {
+    const container = document.getElementById('decorations-container');
+    container.innerHTML = '';
+    decorationIndex = 0;
+
+    if (decorations && decorations.length > 0) {
+      decorations.forEach((dec, index) => {
+        addDecoration(true, dec);
+      });
+    } else {
+      addDecoration(true);
+    }
+  }
+
+  // Load qualifications
+  function loadQualifications(qualifications) {
+    const container = document.getElementById('civil-qualifications-container');
+    container.innerHTML = '';
+    civilIndex = 0;
+
+    if (qualifications && qualifications.length > 0) {
+      qualifications.forEach((qual, index) => {
+        addCivilQualification(true, qual);
+      });
+    } else {
+      addCivilQualification(true);
+    }
+  }
+
+  // Load additional qualifications
+  function loadAdditionalQualifications(additionalQuals) {
+    const container = document.getElementById('additional-qualifications-container');
+    container.innerHTML = '';
+    additionalIndex = 0;
+
+    if (additionalQuals && additionalQuals.length > 0) {
+      additionalQuals.forEach((qual, index) => {
+        addAdditionalQualification(true, qual);
+      });
+    } else {
+      addAdditionalQualification(true);
+    }
+  }
+
+  // Load sports
+  function loadSports(sports) {
+    const container = document.getElementById('sports-container');
+    container.innerHTML = '';
+    sportIndex = 0;
+
+    if (sports && sports.length > 0) {
+      sports.forEach((sport, index) => {
+        addSport(true, sport);
+      });
+    } else {
+      addSport(true);
+    }
+  }
+
+  // Load family
+  function loadFamily(family) {
+    const container = document.getElementById('family-container');
+    container.innerHTML = '';
+    familyIndex = 0;
+
+    if (family && family.length > 0) {
+      family.forEach((member, index) => {
+        addFamilyMember(true, member);
+      });
+    } else {
+      addFamilyMember(true);
+    }
+  }
+
+  // Update section
+  async function updateSection(section) {
+    if (!personnelId) {
+      showMessage('error', 'Personnel ID not found');
+      return;
+    }
+
+    const updateBtn = event.target;
+    updateBtn.classList.add('loading');
+
+    try {
+      let response;
+
+      switch(section) {
+        case 'basic':
+          response = await updateBasicInfo();
+          break;
+        case 'service':
+          response = await updateServiceDetails();
+          break;
+        case 'address':
+          response = await updateAddress();
+          break;
+        case 'contact':
+          response = await updateContact();
+          break;
+        case 'decorations':
+          response = await updateDecorations();
+          break;
+        case 'qualifications':
+          response = await updateQualifications();
+          break;
+        case 'additional-qualifications':
+          response = await updateAdditionalQualifications();
+          break;
+        case 'sports':
+          response = await updateSports();
+          break;
+        case 'family':
+          response = await updateFamily();
+          break;
+        case 'medical':
+          response = await updateMedical();
+          break;
+        case 'image':
+          response = await updateImage();
+          break;
+      }
+
+      if (response && response.ok) {
+        showMessage('success', `${section.replace('-', ' ')} updated successfully`);
+      } else {
+        throw new Error('Update failed');
+      }
+    } catch (error) {
+      console.error('Error updating section:', error);
+      showMessage('error', `Failed to update ${section}`);
+    } finally {
+      updateBtn.classList.remove('loading');
+    }
+  }
+
+  // Update functions for each section
+  async function updateBasicInfo() {
+    const data = {
+      armyNo: document.getElementById('armyNo').value,
+      rank: document.getElementById('rank').value,
+      fullName: document.getElementById('fullName').value,
+      dateOfCommission: document.getElementById('dateOfCommission').value,
+      dateOfSeniority: document.getElementById('dateOfSeniority').value,
+      dateOfBirth: document.getElementById('dateOfBirth').value,
+      placeOfBirth: document.getElementById('placeOfBirth').value
+    };
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/basic-info`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  async function updateServiceDetails() {
+    const data = {
+      nrs: document.getElementById('nrs').value,
+      religion: document.getElementById('religion').value,
+      aadhaarNumber: document.getElementById('aadhaarNumber').value,
+      panCard: document.getElementById('panCard').value,
+      maritalStatus: document.getElementById('maritalStatus').value,
+      cdaAccountNo: document.getElementById('cdaAccountNo').value
+    };
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/service`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  async function updateAddress() {
+    const data = {
+      permanentAddress: document.getElementById('permanentAddress').value,
+      city: document.getElementById('city').value,
+      district: document.getElementById('district').value,
+      state: document.getElementById('state').value,
+      pinCode: document.getElementById('pinCode').value
+    };
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/address`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  async function updateContact() {
+    const data = {
+      mobileNumber: document.getElementById('mobileNumber').value,
+      alternateMobile: document.getElementById('alternateMobile').value,
+      emailAddress: document.getElementById('emailAddress').value
+    };
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/contact`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  async function updateDecorations() {
+    const decorations = [];
+    document.querySelectorAll('#decorations-container .repeater-item').forEach(item => {
+      decorations.push({
+        id: item.dataset.id ? parseInt(item.dataset.id) : null,
+        decorationCategory: item.querySelector('select[name*="[category]"]').value,
+        decorationName: item.querySelector('select[name*="[name]"]').value,
+        awardDate: item.querySelector('input[type="date"]').value,
+        citation: item.querySelector('textarea').value
+      });
+    });
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/decorations`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(decorations)
+    });
+  }
+
+  async function updateQualifications() {
+    const qualifications = [];
+    document.querySelectorAll('#civil-qualifications-container .repeater-item').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      qualifications.push({
+        id: item.dataset.id ? parseInt(item.dataset.id) : null,
+        qualification: inputs[0]?.value || '',
+        institution: inputs[1]?.value || '',
+        yearOfCompletion: inputs[2]?.value || '',
+        gradePercentage: inputs[3]?.value || ''
+      });
+    });
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/qualifications`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(qualifications)
+    });
+  }
+
+  async function updateAdditionalQualifications() {
+    const additionalQualifications = [];
+    document.querySelectorAll('#additional-qualifications-container .repeater-item').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      additionalQualifications.push({
+        id: item.dataset.id ? parseInt(item.dataset.id) : null,
+        qualification: inputs[0]?.value || '',
+        issuingAuthority: inputs[1]?.value || '',
+        year: inputs[2]?.value || '',
+        validity: inputs[3]?.value || ''
+      });
+    });
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/additional-qualifications`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(additionalQualifications)
+    });
+  }
+
+  async function updateSports() {
+    const sports = [];
+    document.querySelectorAll('#sports-container .repeater-item').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      const selects = item.querySelectorAll('select');
+      sports.push({
+        id: item.dataset.id ? parseInt(item.dataset.id) : null,
+        sportName: inputs[0]?.value || '',
+        level: selects[0]?.value || '',
+        remarks: item.querySelector('textarea')?.value || ''
+      });
+    });
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/sports`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sports)
+    });
+  }
+
+  async function updateFamily() {
+    const family = [];
+    document.querySelectorAll('#family-container .repeater-item').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      family.push({
+        id: item.dataset.id ? parseInt(item.dataset.id) : null,
+        name: inputs[0]?.value || '',
+        relationship: inputs[1]?.value || '',
+        contactNumber: inputs[2]?.value || ''
+      });
+    });
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/family`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(family)
+    });
+  }
+
+  async function updateMedical() {
+    const medicalCategory = getMedicalCategoryString();
+    const data = {
+      medicalCategory: medicalCategory,
+      medicalDate: null,
+      diagnosis: document.getElementById('medicalRemark').value,
+      reviewDate: null,
+      restriction: null,
+      injuryCategory: null
+    };
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/medical`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  async function updateImage() {
+    const imageFile = document.getElementById('officerImageFile').files[0];
+    if (!imageFile) {
+      showMessage('error', 'Please select an image');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/image`, {
+      method: 'PUT',
+      body: formData
+    });
+  }
+
+  // Helper functions
+  function getMedicalCategoryString() {
+    let result = "";
+    document.querySelectorAll(".medical-select").forEach(select => {
+      const letter = select.dataset.letter;
+      const value = select.value;
+      if (value) {
+        result += letter + value;
+      }
+    });
+    return result;
+  }
+
+  function showMessage(type, message) {
+    const successMsg = document.getElementById('successMessage');
+    const errorMsg = document.getElementById('errorMessage');
+
+    if (type === 'success') {
+      successMsg.style.display = 'block';
+      successMsg.textContent = message;
+      errorMsg.style.display = 'none';
+      setTimeout(() => {
+        successMsg.style.display = 'none';
+      }, 3000);
+    } else {
+      errorMsg.style.display = 'block';
+      errorMsg.textContent = message;
+      successMsg.style.display = 'none';
+      setTimeout(() => {
+        errorMsg.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  // Remove block with animation
   function removeBlock(id) {
     const el = document.getElementById(id);
     el.classList.add("removing");
     setTimeout(() => el.remove(), 200);
   }
 
-
-  /* =======================================================
-     DECORATION SECTION (FIXED WITH DROPDOWNS)
-  ======================================================= */
-  let decorationIndex = 0;
-
-  async function addDecoration(isFirst = false) {
+  // Add decoration
+  async function addDecoration(isFirst = false, data = null) {
     const index = decorationIndex++;
     const id = `decoration-${index}`;
+    const container = document.getElementById("decorations-container");
 
-    document.getElementById("decorations-container").insertAdjacentHTML(
-      "beforeend",
-      `
-      <div class="grid repeater-item" id="${id}">
-
+    container.insertAdjacentHTML(
+            "beforeend",
+            `
+      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
         <div>
           <label>Decoration Category *</label>
           <select name="decorations[${index}][category]"
@@ -849,24 +1333,20 @@
             <option value="">Loading...</option>
           </select>
         </div>
-
         <div>
           <label>Decoration Name *</label>
           <select name="decorations[${index}][name]" id="decorationName-${index}">
             <option value="">Select Award</option>
           </select>
         </div>
-
         <div>
           <label>Award Date *</label>
-          <input type="date" name="decorations[${index}][date]">
+          <input type="date" name="decorations[${index}][date]" value="${data?.awardDate ? data.awardDate.split('T')[0] : ''}">
         </div>
-
         <div class="grid-1">
           <label>Citation / Remarks</label>
-          <textarea name="decorations[${index}][remarks]"></textarea>
+          <textarea name="decorations[${index}][remarks]">${data?.citation || ''}</textarea>
         </div>
-
         ${isFirst ? "" : `
           <button type="button" class="btn btn-secondary"
                   onclick="removeBlock('${id}')">
@@ -877,35 +1357,50 @@
       `
     );
 
-    loadDecorationCategories(index);
+    await loadDecorationCategories(index);
+
+    if (data) {
+      // Set selected values after categories are loaded
+      setTimeout(() => {
+        const categorySelect = document.getElementById(`decorationCategory-${index}`);
+        if (categorySelect) {
+          categorySelect.value = data.decorationCategory || '';
+          loadAwardsForCategory(data.decorationCategory, index);
+
+          setTimeout(() => {
+            const nameSelect = document.getElementById(`decorationName-${index}`);
+            if (nameSelect) {
+              nameSelect.value = data.decorationName || '';
+            }
+          }, 500);
+        }
+      }, 500);
+    }
   }
 
-
-  /* LOAD CATEGORIES */
+  // Load decoration categories
   async function loadDecorationCategories(index) {
     try {
       const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
       const categories = await res.json();
 
       const dropdown = document.getElementById(`decorationCategory-${index}`);
-      dropdown.innerHTML = `<option value="">Select Category</option>`;
-
-      categories.forEach(cat => {
-        dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
-      });
-
+      if (dropdown) {
+        dropdown.innerHTML = `<option value="">Select Category</option>`;
+        categories.forEach(cat => {
+          dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+      }
     } catch (err) {
       console.error("Failed loading categories:", err);
     }
   }
 
-
-  /* LOAD AWARDS WHEN CATEGORY SELECTED */
+  // Load awards for category
   async function loadAwardsForCategory(category, index) {
     const awardDropdown = document.getElementById(`decorationName-${index}`);
 
-    if (!category) {
-      awardDropdown.innerHTML = `<option value="">Select Award</option>`;
+    if (!category || !awardDropdown) {
       return;
     }
 
@@ -913,7 +1408,7 @@
 
     try {
       const res = await fetch(
-        `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
+              `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
       );
       const awards = await res.json();
 
@@ -924,294 +1419,128 @@
           <option value="${a.name}">${a.name} (${a.suffix})</option>
         `;
       });
-
     } catch (err) {
       console.error("Failed loading awards:", err);
       awardDropdown.innerHTML = `<option>Error Loading</option>`;
     }
   }
 
-
-  /* COLLECT DECORATIONS PAYLOAD */
-  function collectDecorationsIntoPayload(payload) {
-    payload.decorations = [];
-
-    document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
-      payload.decorations.push({
-        decorationCategory: item.querySelector('select[name*="[category]"]').value,
-        decorationName: item.querySelector('select[name*="[name]"]').value,
-        awardDate: item.querySelector('input[type="date"]').value,
-        citation: item.querySelector("textarea").value
-      });
-    });
-  }
-
-//----------------------------------SPORTS-------------
-let sportIndex = 0;
-
-function addSport(isFirst = false) {
-
-    const index = sportIndex++;
-    const id = `sport-${index}`;
-
-    document.getElementById("sports-container")
-        .insertAdjacentHTML("beforeend", `
-        <div class="grid repeater-item" id="${id}">
-
-            <div>
-                <label>Sport Name *</label>
-                <input type="text">
-            </div>
-
-            <div>
-                <label>Sports Level *</label>
-                <select>
-                    <option value="">Select Level</option>
-                    <option value="Domestic">Domestic</option>
-                    <option value="National">National</option>
-                    <option value="International">International</option>
-                </select>
-            </div>
-
-            <div class="grid-1">
-                <label>Achievements / Remarks</label>
-                <textarea rows="2"></textarea>
-            </div>
-
-            ${isFirst ? "" : `
-                <button type="button"
-                        class="btn btn-secondary"
-                        onclick="removeBlock('${id}')">
-                    Remove
-                </button>
-            `}
-        </div>
-    `);
-}
-
-
-  /* =======================================================
-     CIVIL, ADDITIONAL, FAMILY
-  ======================================================= */
-  let civilIndex = 0, additionalIndex = 0, familyIndex = 0;
-
-  function addCivilQualification(isFirst = false) {
+  // Add civil qualification
+  function addCivilQualification(isFirst = false, data = null) {
     const index = civilIndex++;
     const id = `civil-${index}`;
 
     document.getElementById("civil-qualifications-container").insertAdjacentHTML(
-      "beforeend",
-      `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Qualification *</label><input></div>
-          <div><label>Institution</label><input></div>
-          <div><label>Year</label><input></div>
-          <div><label>Grade / Percentage</label><input></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
+            "beforeend",
+            `
+      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
+        <div><label>Qualification *</label><input value="${data?.qualification || ''}"></div>
+        <div><label>Institution</label><input value="${data?.institution || ''}"></div>
+        <div><label>Year</label><input value="${data?.yearOfCompletion || ''}"></div>
+        <div><label>Grade / Percentage</label><input value="${data?.gradePercentage || ''}"></div>
+        ${isFirst ? "" : `
+        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+        `}
+      </div>
       `
     );
   }
 
-  function addAdditionalQualification(isFirst = false) {
+  // Add additional qualification
+  function addAdditionalQualification(isFirst = false, data = null) {
     const index = additionalIndex++;
     const id = `additional-${index}`;
 
     document.getElementById("additional-qualifications-container").insertAdjacentHTML(
-      "beforeend",
-      `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Qualification *</label><input></div>
-          <div><label>Authority</label><input></div>
-          <div><label>Year</label><input></div>
-          <div><label>Validity</label><input type="date"></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
+            "beforeend",
+            `
+      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
+        <div><label>Qualification *</label><input value="${data?.qualification || ''}"></div>
+        <div><label>Authority</label><input value="${data?.issuingAuthority || ''}"></div>
+        <div><label>Year</label><input value="${data?.year || ''}"></div>
+        <div><label>Validity</label><input type="date" value="${data?.validity ? data.validity.split('T')[0] : ''}"></div>
+        ${isFirst ? "" : `
+        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+        `}
+      </div>
       `
     );
   }
 
-  function addFamilyMember(isFirst = false) {
+  // Add sport
+  function addSport(isFirst = false, data = null) {
+    const index = sportIndex++;
+    const id = `sport-${index}`;
+
+    document.getElementById("sports-container").insertAdjacentHTML(
+            "beforeend",
+            `
+      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
+        <div>
+          <label>Sport Name *</label>
+          <input type="text" value="${data?.sportName || ''}">
+        </div>
+        <div>
+          <label>Sports Level *</label>
+          <select>
+            <option value="">Select Level</option>
+            <option value="Domestic" ${data?.level === 'Domestic' ? 'selected' : ''}>Domestic</option>
+            <option value="National" ${data?.level === 'National' ? 'selected' : ''}>National</option>
+            <option value="International" ${data?.level === 'International' ? 'selected' : ''}>International</option>
+          </select>
+        </div>
+        <div class="grid-1">
+          <label>Achievements / Remarks</label>
+          <textarea rows="2">${data?.remarks || ''}</textarea>
+        </div>
+        ${isFirst ? "" : `
+          <button type="button"
+                  class="btn btn-secondary"
+                  onclick="removeBlock('${id}')">
+            Remove
+          </button>
+        `}
+      </div>
+      `
+    );
+  }
+
+  // Add family member
+  function addFamilyMember(isFirst = false, data = null) {
     const index = familyIndex++;
     const id = `family-${index}`;
 
     document.getElementById("family-container").insertAdjacentHTML(
-      "beforeend",
-      `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Name *</label><input></div>
-          <div><label>Relationship *</label><input></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
+            "beforeend",
+            `
+      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
+        <div><label>Name *</label><input value="${data?.name || ''}"></div>
+        <div><label>Relationship *</label><input value="${data?.relationship || ''}"></div>
+        <div><label>Contact Number</label><input value="${data?.contactNumber || ''}"></div>
+        ${isFirst ? "" : `
+        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+        `}
+      </div>
       `
     );
   }
 
-
-  /* =======================================================
-     MEDICAL SELECTION
-  ======================================================= */
-  let selectedMedicals = {};
-
-  document.addEventListener("DOMContentLoaded", () => {
-
-  // Medical category click handling
-  document.querySelectorAll(".medical-box").forEach(box => {
-    box.addEventListener("click", () => {
-      const letter = box.dataset.letter;
-      const value = box.dataset.value;
-
-      if (box.classList.contains("selected")) {
-        box.classList.remove("selected");
-        delete selectedMedicals[letter];
-      } else {
-        box.classList.add("selected");
-        selectedMedicals[letter] = value;
-      }
-    });
-  });
-
-  // Load first rows
-  addDecoration(true);
-  addCivilQualification(true);
-  addAdditionalQualification(true);
-  addFamilyMember(true);
-  addSport(true);
-
-});
-
-
-        function getMedicalCategoryString() {
-
-          let result = "";
-
-          document.querySelectorAll(".medical-select").forEach(select => {
-            const letter = select.dataset.letter;
-            const value = select.value;
-
-            if (value) {
-              result += letter + value;
-            }
-          });
-
-          return result;
-        }
-
-
-  /* =======================================================
-     SAVE PERSONNEL
-  ======================================================= */
-  document.getElementById("savePersonnelBtn").addEventListener("click", async () => {
-
-  // ---------- BUILD PAYLOAD ----------
-  const payload = {
-    commission: commission.value,
-    armyNo: armyNo.value,
-    rank: rank.value,
-    fullName: fullName.value,
-    dateOfCommission: dateOfCommission.value,
-    dateOfSeniority: dateOfSeniority.value,
-    dateOfBirth: dateOfBirth.value,
-    placeOfBirth: placeOfBirth.value,
-    nrs: nrs.value,
-    religion: religion.value,
-    aadhaarNumber: aadhaarNumber.value,
-    panCard: panCard.value,
-    maritalStatus: maritalStatus.value,
-    cdaAccountNo: cdaAccountNo.value,
-    permanentAddress: permanentAddress.value,
-    city: city.value,
-    district: district.value,
-    state: state.value,
-    pinCode: pinCode.value,
-    mobileNumber: mobileNumber.value,
-    alternateMobile: alternateMobile.value,
-    emailAddress: emailAddress.value,
-    nsgEmail: nsgEmail.value,
-    medicalCategory: getMedicalCategoryString(),
-    medicalRemark: document.getElementById("medicalRemark").value,
-    sports: [],
-    decorations: [],
-    qualifications: [],
-    additionalQualifications: [],
-    family: []
-  };
-
-  // ---------- COLLECT CHILD DATA ----------
-  collectDecorationsIntoPayload(payload);
-
-  document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
-    const inputs = item.querySelectorAll("input");
-    payload.qualifications.push({
-      qualification: inputs[0].value,
-      institution: inputs[1].value,
-      yearOfCompletion: inputs[2].value,
-      gradePercentage: inputs[3].value
-    });
-  });
-
-  document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
-    const inputs = item.querySelectorAll("input");
-    payload.additionalQualifications.push({
-      qualification: inputs[0].value,
-      issuingAuthority: inputs[1].value,
-      year: inputs[2].value,
-      validity: inputs[3].value
-    });
-  });
-
-  document.querySelectorAll("#family-container .repeater-item").forEach(item => {
-    const inputs = item.querySelectorAll("input");
-    payload.family.push({
-      name: inputs[0].value,
-      relationship: inputs[1].value,
-      contactNumber: ""
-    });
-  });
-
-  // ---------- MULTIPART FORM ----------
-  const formData = new FormData();
-
-  formData.append(
-    "data",
-    new Blob([JSON.stringify(payload)], { type: "application/json" })
-  );
-
-  const imageFile = document.getElementById("officerImageFile").files[0];
-  if (imageFile) {
-    formData.append("image", imageFile);
+  // Save all sections (optional)
+  async function saveAllSections() {
+    showMessage('info', 'Please update sections individually for better control');
   }
 
-  // ---------- API CALL ----------
-  try {
-    const res = await fetch("http://localhost:6060/api/personnel/add", {
-      method: "POST",
-      body: formData
-    });
+  // Initialize on page load
+  document.addEventListener("DOMContentLoaded", async () => {
+    personnelId = getPersonnelIdFromUrl();
 
-    if (!res.ok) throw new Error("API Error");
+    if (!personnelId) {
+      showMessage('error', 'No personnel ID found in URL');
+      return;
+    }
 
-    alert("Personnel saved successfully.");
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to save personnel.");
-  }
-
-});
-
-
-
-
+    await loadPersonnelData();
+  });
 
 </script>
 

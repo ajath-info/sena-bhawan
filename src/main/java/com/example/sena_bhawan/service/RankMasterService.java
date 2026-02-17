@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.entity.RankMaster;
+import com.example.sena_bhawan.projection.RankOnly;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.repository.RankMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,12 @@ public class RankMasterService {
         return rankMasterRepo.findAll();
     }
 
+
+    public List<String> getAllRanks() {
+        return rankMasterRepo.findAllBy()
+                .stream()
+                .map(RankOnly::getRank)
+                .toList();
+    }
 }
 

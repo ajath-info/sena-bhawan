@@ -3,6 +3,7 @@ package com.example.sena_bhawan.controller;
 import com.example.sena_bhawan.entity.RankMaster;
 import com.example.sena_bhawan.service.RankMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,11 @@ public class RankMasterController {
     @GetMapping("/master")
     public List<RankMaster> getRankMasterList() {
         return service.refreshAndGetRankMaster();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<String>> getAllRanks() {
+        return ResponseEntity.ok(service.getAllRanks());
     }
 }
 

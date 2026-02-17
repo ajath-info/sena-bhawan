@@ -946,7 +946,7 @@
 
 <script>
   // API Base URL
-  const API_BASE_URL = 'http://localhost:6060/api/orbat';
+  const API_BASE_URL = 'http://localhost:6060/api';
 
   // Global state
   let currentPage = 1;
@@ -1041,7 +1041,7 @@
 
   async function loadRankDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/rank`);
+      const response = await fetch(`${API_BASE_URL}/ranks`);
       if (response.ok) {
         const ranks = await response.json();
         const select = document.getElementById('rankFilter');
@@ -1059,7 +1059,7 @@
 
   async function loadMedicalDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/medical-category`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/medical-category`);
       if (response.ok) {
         const categories = await response.json();
         const select = document.getElementById('medicalFilter');
@@ -1131,7 +1131,7 @@
 
   async function loadEstablishmentDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/establishment-type`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/establishment-type`);
       if (response.ok) {
         const types = await response.json();
         const select = document.getElementById('estFilter');
@@ -1149,7 +1149,7 @@
 
   async function loadAreaTypeDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/area-type`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/area-type`);
       if (response.ok) {
         const areas = await response.json();
         const select = document.getElementById('areaTypeFilter');
@@ -1167,7 +1167,7 @@
 
   async function loadCivilDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/civil-qualification`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/civil-qualification`);
       if (response.ok) {
         const quals = await response.json();
         const select = document.getElementById('civilFilter');
@@ -1185,7 +1185,7 @@
 
   async function loadSportsDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/sports`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/sports`);
       if (response.ok) {
         const sportsList = await response.json();
         const select = document.getElementById('sportsFilter');
@@ -1203,7 +1203,7 @@
 
   async function loadPostingDueDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/filter/posting-due-months`);
+      const response = await fetch(`${API_BASE_URL}/master/filter/posting-due-months`);
       if (response.ok) {
         const months = await response.json();
         const select = document.getElementById('postingDueFilter');
@@ -1251,11 +1251,14 @@
       sports: document.getElementById('sportsFilter').value || null,
 
       postingDueMonths: document.getElementById('postingDueFilter').value ?
-              parseInt(document.getElementById('postingDueFilter').value) : null
+              parseInt(document.getElementById('postingDueFilter').value) : null,
+
+      // Add search query parameter (your backend might expect a different name)
+      search: document.getElementById('globalSearch').value || null
     };
   }
 
-  // Fetch filtered data
+  // Replace the fetchFilteredData function with this updated version
   async function fetchFilteredData() {
     if (isLoading) return;
 
@@ -1266,39 +1269,33 @@
       const filterRequest = buildFilterRequest();
       const searchQuery = document.getElementById('globalSearch').value;
 
-      // If search query exists, use search endpoint
+      // Add search query to filter request if present
       if (searchQuery) {
-        const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(searchQuery)}&page=${currentPage-1}&size=${itemsPerPage}`);
-        if (response.ok) {
-          const data = await response.json();
-          renderTable(data.data || []);
-          totalItems = data.total || 0;
-          totalPages = data.totalPages || 0;
-        }
-      } else {
-        // Use filter endpoint
-        const response = await fetch(`${API_BASE_URL}/filter`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(filterRequest)
-        });
+        filterRequest.searchQuery = searchQuery; // Add search term to filter request
+      }
 
-        if (response.ok) {
-          const data = await response.json();
-          // Apply pagination on client side since backend returns all results
-          const allData = data.data || [];
-          totalItems = allData.length;
-          totalPages = Math.ceil(totalItems / itemsPerPage);
+      // Use filter endpoint for both search and filters
+      const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filterRequest)
+      });
 
-          // Paginate manually
-          const start = (currentPage - 1) * itemsPerPage;
-          const end = start + itemsPerPage;
-          const paginatedData = allData.slice(start, end);
+      if (response.ok) {
+        const data = await response.json();
+        // Apply pagination on client side since backend returns all results
+        const allData = data.data || [];
+        totalItems = allData.length;
+        totalPages = Math.ceil(totalItems / itemsPerPage);
 
-          renderTable(paginatedData);
-        }
+        // Paginate manually
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedData = allData.slice(start, end);
+
+        renderTable(paginatedData);
       }
 
       updateResultsCount();
@@ -1312,6 +1309,7 @@
       showLoading(false);
     }
   }
+
 
   function renderTable(officers) {
     const tbody = document.getElementById('tableBody');

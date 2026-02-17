@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/personnel")
@@ -292,12 +293,17 @@ public class PersonnelController {
     public ResponseEntity<?> filterPersonnel(
             @RequestBody PersonnelFilterRequest filterRequest) {
 
-        List<Personnel> result = personnelService.filterPersonnel(filterRequest);
+        List<Personnel> personnelList = personnelService.filterPersonnel(filterRequest);
+
+        // Transform to DTOs
+        List<PersonnelListDTO> responseList = personnelList.stream()
+                .map(PersonnelListDTO::fromPersonnel)
+                .collect(Collectors.toList());
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
-        response.put("count", result.size());
-        response.put("data", result);
+        response.put("count", responseList.size());
+        response.put("data", responseList);
 
         return ResponseEntity.ok(response);
     }
