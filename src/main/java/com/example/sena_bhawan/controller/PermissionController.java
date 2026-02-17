@@ -3,20 +3,16 @@ package com.example.sena_bhawan.controller;
 import com.example.sena_bhawan.entity.Permission;
 import com.example.sena_bhawan.service.PermissionService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/permissions")
-@CrossOrigin("*")
 public class PermissionController {
-
-    private final PermissionService service;
-
-    public PermissionController(PermissionService service) {
-        this.service = service;
-    }
+    @Autowired(required = true)
+    PermissionService service;
 
     @GetMapping
     public List<Permission> getAllPermissions() {

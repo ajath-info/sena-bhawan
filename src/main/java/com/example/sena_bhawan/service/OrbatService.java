@@ -17,27 +17,4 @@ public interface OrbatService {
 
     List<OrbatStructure> getSosList();
 
-
-
-    // ================= ORBAT NAME DROPDOWNS =================
-    List<String> getCommandDropdown();
-
-    List<String> getCorpsDropdown();
-
-    List<String> getDivisionDropdown();
-
-    // ================= FILTER DROPDOWNS =================
-    List<String> getRankDropdown();
-
-    List<String> getMedicalCategoryDropdown();
-
-    List<String> getEstablishmentTypeDropdown();
-
-    List<String> getAreaTypeDropdown();
-
-    List<String> getCivilQualificationDropdown();
-
-    List<String> getSportsDropdown();
-
-    List<Integer> getPostingDueMonthsDropdown();
 }
