@@ -13,7 +13,7 @@ public interface CivilQualificationMasterRepository
 
     @Query("""
         SELECT c.qualificationName
-        FROM CivilQualification c
+        FROM CivilQualificationMaster c
         WHERE c.isActive = true
         ORDER BY c.qualificationName
     """)

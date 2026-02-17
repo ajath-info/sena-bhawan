@@ -12,7 +12,7 @@ public interface SportsMasterRepository
 
     @Query("""
         SELECT s.sportName
-        FROM Sports s
+        FROM SportsMaster s
         WHERE s.isActive = true
         ORDER BY s.sportName
     """)

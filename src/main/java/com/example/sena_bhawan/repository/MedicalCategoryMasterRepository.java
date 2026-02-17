@@ -13,7 +13,7 @@ public interface MedicalCategoryMasterRepository
 
     @Query("""
         SELECT m.medicalName
-        FROM MedicalCategory m
+        FROM MedicalCategoryMaster m  
         WHERE m.isActive = true
         ORDER BY m.medicalName
     """)

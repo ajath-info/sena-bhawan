@@ -12,7 +12,7 @@ public interface PostingDueMonthsMasterRepository
 
     @Query("""
         SELECT p.months
-        FROM PostingDueMonths p
+        FROM PostingDueMonthsMaster p
         WHERE p.isActive = true
         ORDER BY p.months
     """)

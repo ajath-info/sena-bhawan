@@ -11,7 +11,7 @@ public interface EstablishmentTypeMasterRepository
 
     @Query("""
         SELECT e.estName
-        FROM EstablishmentType e
+        FROM EstablishmentTypeMaster e
         WHERE e.isActive = true
         ORDER BY e.estName
     """)
