@@ -18,7 +18,6 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
            SELECT DISTINCT p.personnelId
            FROM PostingDetails p
            WHERE p.unitName = :unitName
-           AND p.toDate IS NULL
            """)
     List<Long> findActivePersonnelIdsByUnitName(
             @Param("unitName") String unitName);

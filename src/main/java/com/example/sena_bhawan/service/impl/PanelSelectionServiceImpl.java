@@ -82,7 +82,7 @@ public List<PanelOfficerDTO> getOfficers() {
                         personnel.getReligion(),
                         personnel.getMaritalStatus(),
                         personnel.getMedicalCategory(),
-                        personnel.getMedicalRemark(),   
+                        personnel.getMedicalRemark(),
 
 
 
