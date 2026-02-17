@@ -24,6 +24,9 @@ public record PanelOfficerDTO(
         String religion,
         String maritalStatus,
         String medicalCategory,
+
+        String medicalRemark,
+
         // Contact
         String mobileNumber,
         String emailAddress,

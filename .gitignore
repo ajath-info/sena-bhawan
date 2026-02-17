@@ -5,6 +5,8 @@ out/                # IntelliJ IDEA output
 *.jar               # Compiled jar files
 *.war               # Compiled war files
 target
+/target
+/target/*
 
 
 # --- IDE Settings ---
@@ -26,3 +28,7 @@ application.yml        # Optional: Only if it contains secrets
 .DS_Store           # macOS system files
 Thumbs.db           # Windows thumbnail cache
 target/*
+/.idea/.cache/.ApidogFastRequest/.toolWindow.db
+./.idea/*
+./.idea/
+./.idea/workspace.xml

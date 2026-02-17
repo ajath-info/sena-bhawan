@@ -2,6 +2,7 @@ package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.CoursePanelRequest;
 import com.example.sena_bhawan.dto.CoursePanelResponse;
+import com.example.sena_bhawan.dto.OfficerStatusResponse;
 import com.example.sena_bhawan.dto.OngoingCoursesResponse;
 import com.example.sena_bhawan.service.CoursePanelService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,10 @@ public class CoursePanelController {
     public ResponseEntity<OngoingCoursesResponse> getOngoingCoursesStrength() {
         OngoingCoursesResponse response = service.getOngoingCoursesStrength();
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/officer-status")
+    public ResponseEntity<OfficerStatusResponse> getOfficerStatusOverview() {
+        return ResponseEntity.ok(service.getOfficerStatusOverview());
     }
 }

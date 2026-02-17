@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug" />
+    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PersonnelListDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/projection/RankOnly.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/RankMasterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/RankMasterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/RankMasterRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/RankMasterRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/RankMasterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/RankMasterService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,44 +66,55 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.SenaBhawanApplication.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev-vipan&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/diwakarjha/Downloads/sena-bhawan&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SenaBhawanApplication.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Maven.sena-bhawan [clean].executor": "Run",
+    "Maven.sena-bhawan [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.SenaBhawanApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "#1 on dev-vipan",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/diwakarjha/Downloads/sena-bhawan",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\uploads\personnel\officer" />
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\src\main\resources\static" />
     </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.sena_bhawan.dto" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn compile" />
+      <command value="mvn clean" />
+    </option>
   </component>
   <component name="RunManager">
     <configuration name="SenaBhawanApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
@@ -157,7 +178,23 @@
       <option name="project" value="LOCAL" />
       <updated>1770927705849</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
+      <option name="closed" value="true" />
+      <created>1771362019180</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1771362019180</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
+      <option name="closed" value="true" />
+      <created>1771363080271</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771363080271</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

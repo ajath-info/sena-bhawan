@@ -2,6 +2,8 @@ package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 import com.example.sena_bhawan.service.OrbatStructureService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +31,6 @@ public class OrbatStructureController {
     }
 
 
-
     // 3️⃣ Get Corps by Command
     @GetMapping("/corps/by-command-name/{commandName}")
     public List<OrbatSimpleDTO> getCorpsByCommandName(
@@ -37,4 +38,18 @@ public class OrbatStructureController {
         return service.getCorpsByCommand(commandName);
     }
 
+    @GetMapping("/dropdown/command")
+    public ResponseEntity<List<String>> getCommandDropdown() {
+        return ResponseEntity.ok(service.getCommandDropdown());
+    }
+
+    @GetMapping("/dropdown/corps")
+    public ResponseEntity<List<String>> getCorpsDropdown() {
+        return ResponseEntity.ok(service.getCorpsDropdown());
+    }
+
+    @GetMapping("/dropdown/division")
+    public ResponseEntity<List<String>> getDivisionDropdown() {
+        return ResponseEntity.ok(service.getDivisionDropdown());
+    }
 }
