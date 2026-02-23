@@ -5,14 +5,14 @@
     <title>Course Eligibility / QR Setup - ARMY HRMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body {
-      font-family: "Inter", sans-serif;
-      background: #f1f3f5;
-      color: #1f2937;
-    }
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
+        }
         .container{display:flex;height:100vh}
         .main{flex:1;padding:24px;overflow:auto}
         .header h2{font-size:26px;font-weight:700}
@@ -23,214 +23,569 @@
         .input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;font-size:14px}
         textarea{min-height:90px}
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
         .mt{margin-top:16px}
         .info{background:#ecfdf5;border:1px solid #34d399;padding:12px;border-radius:8px;margin-top:12px;font-weight:600}
-        .rank-list{display:flex;flex-direction:column;gap:8px}
+        .rank-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;border:1px solid #e5e7eb;padding:12px;border-radius:8px}
         .rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:6px}
         .pills{display:flex;flex-wrap:wrap;gap:10px}
-        .pill{padding:8px 14px;border-radius:20px;border:1px solid #cfd6e0;background:#f7f9fc;cursor:pointer}
+        .pill{padding:8px 14px;border-radius:20px;border:1px solid #cfd6e0;background:#f7f9fc;cursor:pointer;user-select:none}
         .pill.active{background:#065f46;color:#fff;border-color:#065f46}
         .selected-box{margin-top:16px;padding:12px;background:#f1f4f8;border-radius:6px;display:none}
         .actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}
         .btn{padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer}
         .btn-secondary{background:#fff;border:1px solid #065f46;color:#065f46}
         .btn-primary{background:#065f46;color:#fff;border:none}
+        .section-divider{margin:20px 0;border-top:2px solid #e5e7eb}
+        .select2-container{width:100% !important;}
     </style>
 </head>
-
-<body><script src="auth.js"></script>
+<body>
+<script src="auth.js"></script>
 <script src="logout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <div class="container">
-
-<!--    <aside class="sidebar">-->
-<!--        <h1>ARMY HRMS</h1>-->
-<!--        <a href="#">Dashboard</a>-->
-<!--        <a class="active">Course Eligibility / QR</a>-->
-<!--    </aside>-->
     <div id="sidebar"></div>
 
     <main class="main">
-
         <div class="header">
             <h2>Course Eligibility / QR Setup</h2>
             <p>Define qualification requirements for automatic panel filtering</p>
         </div>
 
-        <!-- COURSE -->
+        <!-- COURSE SELECTION -->
         <div class="card">
             <div class="card-title">🎓 Select Course</div>
             <label class="label">Course Name / Number *</label>
-            <select id="courseSelect">
+            <select id="courseSelect" class="input">
                 <option value="">Select Course</option>
             </select>
             <div class="info" id="courseInfo" style="display:none"></div>
         </div>
 
-        <!-- ELIGIBILITY -->
+        <!-- ELIGIBILITY CRITERIA -->
         <div class="card">
             <div class="card-title">📋 Eligibility Criteria (QR)</div>
 
-            <div class="grid-2">
-                <div>
-                    <label class="label">Minimum Years</label>
-                    <input id="minYears" class="input" value="6">
+            <!-- Date Filters -->
+            <div class="card mt">
+                <div class="card-title">📅 Date Filters</div>
+
+                <div class="grid-2">
+                    <div>
+                        <label class="label">Commission Date From</label>
+                        <input type="date" id="commissionFrom" class="input">
+                    </div>
+                    <div>
+                        <label class="label">Commission Date To</label>
+                        <input type="date" id="commissionTo" class="input">
+                    </div>
                 </div>
-                <div>
-                    <label class="label">Maximum Years</label>
-                    <input id="maxYears" class="input" value="16">
+
+                <div class="grid-2 mt">
+                    <div>
+                        <label class="label">Seniority Date From</label>
+                        <input type="date" id="seniorityFrom" class="input">
+                    </div>
+                    <div>
+                        <label class="label">Seniority Date To</label>
+                        <input type="date" id="seniorityTo" class="input">
+                    </div>
+                </div>
+
+                <div class="grid-2 mt">
+                    <div>
+                        <label class="label">Date of Birth From</label>
+                        <input type="date" id="dobFrom" class="input">
+                    </div>
+                    <div>
+                        <label class="label">Date of Birth To</label>
+                        <input type="date" id="dobTo" class="input">
+                    </div>
                 </div>
             </div>
 
-            <!-- RANKS -->
-            <div class="card">
+            <!-- Ranks Selection -->
+            <div class="card mt">
                 <div class="card-title">🎖 Select Ranks</div>
                 <div class="rank-list" id="rankList">Loading ranks…</div>
-                <div class="selected-box" id="selectedRanks"></div>
             </div>
 
-            <!-- UNITS -->
-            <div class="card">
-                <label class="label">Specific Units / Arms / Services</label>
-                <div class="pills" id="unitPills">Loading units…</div>
-                <div class="selected-box" id="selectedUnits"></div>
+            <!-- Units Selection -->
+            <div class="card mt">
+                <div class="card-title">🏢 Select Units / Arms / Services</div>
+                <div class="rank-list" id="unitList">Loading units…</div>
+            </div>
+
+            <!-- Posting Type Selection -->
+            <div class="card mt">
+                <div class="card-title">📌 Posting Types</div>
+                <div class="rank-list" id="postingTypeList">Loading posting types…</div>
+            </div>
+
+            <!-- Multi-select Dropdowns using /api/dropdown/{type} -->
+            <div class="grid-2 mt">
+                <div>
+                    <label class="label">Minimum Course Grading</label>
+                    <select id="minCourseGrading" class="input select2-multi" multiple></select>
+                </div>
+                <div>
+                    <label class="label">Educational Qualifications</label>
+                    <select id="educationalQualifications" class="input select2-multi" multiple></select>
+                </div>
             </div>
 
             <div class="grid-2 mt">
                 <div>
-                    <label class="label">Minimum Course Grading</label>
-                    <input id="minCourseGrading" class="input" value="B in JC">
+                    <label class="label">Medical Categories</label>
+                    <select id="medicalCategories" class="input select2-multi" multiple></select>
                 </div>
                 <div>
-                    <label class="label">Educational Qualification</label>
-                    <input id="educationalQualification" class="input" value="Graduate">
+                    <label class="label">Establishment Types</label>
+                    <select id="establishmentTypes" class="input select2-multi" multiple></select>
                 </div>
             </div>
 
-            <div class="mt">
-                <label class="label">Maximum Service Limit</label>
-                <input id="maxServiceLimit" class="input" value="15 years">
-            </div>
-
-            <!-- POSTING -->
-            <div class="card">
-                <label class="label">Posting Criteria</label>
-                <div class="pills" id="postingPills">Loading posting types…</div>
-                <div class="selected-box" id="selectedPostings"></div>
-            </div>
-
-            <div class="mt">
-                <label class="label">Medical Category</label>
-                <input id="medicalCategory" class="input" value="SHAPE-1">
+            <!-- Remarks -->
+            <div class="card mt">
+                <div class="card-title">📝 Remarks</div>
+                <div class="pills" id="remarksPills">
+                    <div class="pill" data-value="Taken Off">Taken Off</div>
+                    <div class="pill" data-value="Volunteer">Volunteer</div>
+                    <div class="pill" data-value="Not to Detail">Not to Detail</div>
+                </div>
             </div>
 
             <div class="mt">
                 <label class="label">Additional Remarks</label>
-                <textarea id="additionalRemarks">Must have field tenure</textarea>
+                <textarea id="additionalRemarks" class="input">Must have field tenure</textarea>
             </div>
 
             <div class="actions">
+                <button class="btn btn-secondary" id="loadEligibility">Load Existing</button>
                 <button class="btn btn-primary" id="saveEligibility">Save Eligibility Criteria</button>
             </div>
-
         </div>
     </main>
 </div>
 
 <script>
-    let selectedCourseId=null,selectedUnits=[],selectedPostings=[];
+    // State management
+    let selectedCourseId = null;
+    let selectedRankIds = [];
+    let selectedUnitIds = [];
+    let selectedPostingTypeIds = [];
+    let selectedRemarks = [];
 
-    // COURSE
-    fetch('http://localhost:6060/api/course').then(r=>r.json()).then(data=>{
-      data.forEach(c=>{
-        let o=document.createElement('option');
-        o.value=c.srno;
-        o.textContent=c.courseName;
-        o.dataset.course=JSON.stringify(c);
-        courseSelect.appendChild(o);
-      });
-    });
-    courseSelect.onchange=function(){
-      if(!this.value)return;
-      let c=JSON.parse(this.options[this.selectedIndex].dataset.course);
-      selectedCourseId=c.srno;
-      courseInfo.style.display='block';
-      courseInfo.innerHTML=`Selected: <b>${c.courseName}</b><br>Location: ${c.location} | Duration: ${c.duration} Weeks | Strength: 30`;
+    // Mapping of dropdown types to their API endpoints and element IDs
+    const dropdownConfig = {
+        minCourseGrading: {
+            type: 'COURSE_GRADE',
+            elementId: 'minCourseGrading'
+        },
+        educationalQualifications: {
+            type: 'CIVIL_QUALIFICATION',
+            elementId: 'educationalQualifications'
+        },
+        medicalCategories: {
+            type: 'MEDICAL',
+            elementId: 'medicalCategories'
+        },
+        establishmentTypes: {
+            type: 'ESTABLISHMENT',
+            elementId: 'establishmentTypes'
+        }
+        // Additional dropdowns can be added here as needed
+        // For example:
+        // sports: { type: 'SPORTS', elementId: 'sportsDropdown' },
+        // area: { type: 'AREA', elementId: 'areaDropdown' },
+        // rank: { type: 'RANK', elementId: 'rankDropdown' },
+        // remarks: { type: 'REMARKS', elementId: 'remarksDropdown' }
     };
 
-    // RANKS
-    fetch('http://localhost:6060/api/ranks/master').then(r=>r.json()).then(ranks=>{
-      rankList.innerHTML='';
-      ranks.forEach(r=>{
-        rankList.innerHTML+=`<label class="rank-item">
-          <input type="checkbox" value="${r.id}"> ${r.rank}
-        </label>`;
-      });
+    // Initialize all event listeners and data loading
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCourses();
+        loadRanks();
+        loadUnits();
+        loadPostingTypes();
+        loadAllDropdowns(); // Load all dropdowns from the new API
+        initializePillListeners();
+        initializeSelect2();
     });
-    function getRankIds(){
-      return [...document.querySelectorAll('#rankList input:checked')].map(i=>Number(i.value));
+
+    function initializeSelect2() {
+        $('.select2-multi').select2({
+            placeholder: 'Select options',
+            allowClear: true,
+            width: '100%'
+        });
     }
 
-    // UNITS
-    fetch('http://localhost:6060/api/unit').then(r=>r.json()).then(units=>{
-      unitPills.innerHTML='';
-      units.forEach(u=>{
-        let d=document.createElement('div');
-        d.className='pill';
-        d.textContent=u.unitName;
-        d.onclick=()=>{
-          d.classList.toggle('active');
-          selectedUnits=selectedUnits.some(x=>x.id===u.id)
-            ? selectedUnits.filter(x=>x.id!==u.id)
-            : [...selectedUnits,{id:u.id}];
-        };
-        unitPills.appendChild(d);
-      });
+    // Load all dropdown data from the new API
+    function loadAllDropdowns() {
+        Object.values(dropdownConfig).forEach(config => {
+            loadDropdown(config.type, config.elementId);
+        });
+    }
+
+    // Generic function to load dropdown data from /api/dropdown/{type}
+    function loadDropdown(type, elementId) {
+        const select = document.getElementById(elementId);
+        if (!select) return;
+
+        fetch(`http://localhost:6060/api/dropdown/${type}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`Failed to load ${type} dropdown`);
+                return response.json();
+            })
+            .then(data => {
+                select.innerHTML = '';
+                // The API returns List<DropdownDTO> with id and name
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id; // Save the ID
+                    option.textContent = item.name; // Show the name
+                    select.appendChild(option);
+                });
+                // Trigger Select2 to refresh
+                $(`#${elementId}`).trigger('change');
+            })
+            .catch(error => {
+                console.error(`Error loading ${type} dropdown:`, error);
+                select.innerHTML = '<option value="">Failed to load options</option>';
+            });
+    }
+
+    // Load Courses
+    function loadCourses() {
+        fetch('http://localhost:6060/api/course')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load courses');
+                return response.json();
+            })
+            .then(data => {
+                const courseSelect = document.getElementById('courseSelect');
+                courseSelect.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.srno;
+                    option.textContent = c.courseName;
+                    option.dataset.course = JSON.stringify(c);
+                    courseSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading courses:', error);
+                alert('Failed to load courses');
+            });
+    }
+
+    // Course selection handler
+    document.getElementById('courseSelect').addEventListener('change', function() {
+        if (!this.value) {
+            document.getElementById('courseInfo').style.display = 'none';
+            return;
+        }
+
+        const selectedOption = this.options[this.selectedIndex];
+        const course = JSON.parse(selectedOption.dataset.course);
+        selectedCourseId = course.srno;
+
+        const courseInfo = document.getElementById('courseInfo');
+        courseInfo.style.display = 'block';
+        courseInfo.innerHTML = `
+            Selected: <b>${course.courseName}</b><br>
+            Location: ${course.location || 'N/A'} |
+            Duration: ${course.duration || 'N/A'} Weeks
+        `;
     });
 
-    // POSTING
-    fetch('http://localhost:6060/api/postingtypes').then(r=>r.json()).then(p=>{
-      postingPills.innerHTML='';
-      p.forEach(x=>{
-        let d=document.createElement('div');
-        d.className='pill';
-        d.textContent=x.postingType;
-        d.onclick=()=>{
-          d.classList.toggle('active');
-          selectedPostings=selectedPostings.some(y=>y.id===x.id)
-            ? selectedPostings.filter(y=>y.id!==x.id)
-            : [...selectedPostings,{id:x.id}];
-        };
-        postingPills.appendChild(d);
-      });
+    // Load Ranks
+    function loadRanks() {
+        fetch('http://localhost:6060/api/ranks/master')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load ranks');
+                return response.json();
+            })
+            .then(ranks => {
+                const rankList = document.getElementById('rankList');
+                rankList.innerHTML = '';
+
+                ranks.forEach(rank => {
+                    const label = document.createElement('label');
+                    label.className = 'rank-item';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = rank.id;
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            if (!selectedRankIds.includes(rank.id)) {
+                                selectedRankIds.push(rank.id);
+                            }
+                        } else {
+                            selectedRankIds = selectedRankIds.filter(id => id !== rank.id);
+                        }
+                    });
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${rank.rank}`));
+                    rankList.appendChild(label);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading ranks:', error);
+                document.getElementById('rankList').innerHTML = 'Failed to load ranks';
+            });
+    }
+
+    // Load Units
+    function loadUnits() {
+        fetch('http://localhost:6060/api/unit')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load units');
+                return response.json();
+            })
+            .then(units => {
+                const unitList = document.getElementById('unitList');
+                unitList.innerHTML = '';
+
+                units.forEach(unit => {
+                    const label = document.createElement('label');
+                    label.className = 'rank-item';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = unit.id;
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            if (!selectedUnitIds.includes(unit.id)) {
+                                selectedUnitIds.push(unit.id);
+                            }
+                        } else {
+                            selectedUnitIds = selectedUnitIds.filter(id => id !== unit.id);
+                        }
+                    });
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${unit.unitName}`));
+                    unitList.appendChild(label);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading units:', error);
+                document.getElementById('unitList').innerHTML = 'Failed to load units';
+            });
+    }
+
+    // Load Posting Types
+    function loadPostingTypes() {
+        fetch('http://localhost:6060/api/postingtypes')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load posting types');
+                return response.json();
+            })
+            .then(types => {
+                const postingList = document.getElementById('postingTypeList');
+                postingList.innerHTML = '';
+
+                types.forEach(type => {
+                    const label = document.createElement('label');
+                    label.className = 'rank-item';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = type.id;
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            if (!selectedPostingTypeIds.includes(type.id)) {
+                                selectedPostingTypeIds.push(type.id);
+                            }
+                        } else {
+                            selectedPostingTypeIds = selectedPostingTypeIds.filter(id => id !== type.id);
+                        }
+                    });
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${type.postingType}`));
+                    postingList.appendChild(label);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading posting types:', error);
+                document.getElementById('postingTypeList').innerHTML = 'Failed to load posting types';
+            });
+    }
+
+    // Initialize pill listeners
+    function initializePillListeners() {
+        // Remarks
+        document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const value = this.dataset.value;
+                if (this.classList.contains('active')) {
+                    if (!selectedRemarks.includes(value)) {
+                        selectedRemarks.push(value);
+                    }
+                } else {
+                    selectedRemarks = selectedRemarks.filter(v => v !== value);
+                }
+            });
+        });
+    }
+
+    // Load existing eligibility
+    document.getElementById('loadEligibility').addEventListener('click', function() {
+        if (!selectedCourseId) {
+            alert('Please select a course first');
+            return;
+        }
+
+        fetch(`http://localhost:6060/api/eligibility/course/${selectedCourseId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('No existing eligibility found');
+                return response.json();
+            })
+            .then(data => {
+                populateForm(data);
+                alert('Eligibility data loaded successfully');
+            })
+            .catch(error => {
+                console.error('Error loading eligibility:', error);
+                alert('No existing eligibility found for this course');
+            });
     });
 
-    // SAVE
-    saveEligibility.onclick=()=>{
-      const payload={
-        courseId:selectedCourseId,
-        minYears:+minYears.value,
-        maxYears:+maxYears.value,
-        rankIds:getRankIds(),
-        unitIds:selectedUnits.map(u=>u.id),
-        postingTypeIds:selectedPostings.map(p=>p.id),
-        minCourseGrading:minCourseGrading.value,
-        educationalQualification:educationalQualification.value,
-        maxServiceLimit:maxServiceLimit.value,
-        medicalCategory:medicalCategory.value,
-        additionalRemarks:additionalRemarks.value
-      };
+    // Populate form with existing data
+    function populateForm(data) {
+        // Basic fields
+        document.getElementById('additionalRemarks').value = data.additionalRemarks || '';
 
-      fetch('http://localhost:6060/api/eligibility/save',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      }).then(r=>{
-        if(!r.ok)throw Error();
-        alert('Saved successfully');
-      }).catch(()=>alert('Save failed'));
-    };
+        // Date fields
+        document.getElementById('commissionFrom').value = data.commissionDateFrom || '';
+        document.getElementById('commissionTo').value = data.commissionDateTo || '';
+        document.getElementById('seniorityFrom').value = data.seniorityDateFrom || '';
+        document.getElementById('seniorityTo').value = data.seniorityDateTo || '';
+        document.getElementById('dobFrom').value = data.dobFrom || '';
+        document.getElementById('dobTo').value = data.dobTo || '';
+
+        // Ranks
+        if (data.eligibleRanks) {
+            selectedRankIds = data.eligibleRanks.map(r => r.rank.id);
+            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedRankIds.includes(Number(cb.value));
+            });
+        }
+
+        // Units
+        if (data.eligibleUnits) {
+            selectedUnitIds = data.eligibleUnits.map(u => u.unit.id);
+            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedUnitIds.includes(Number(cb.value));
+            });
+        }
+
+        // Posting Types
+        if (data.postingTypes) {
+            selectedPostingTypeIds = data.postingTypes.map(p => p.postingType.id);
+            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedPostingTypeIds.includes(Number(cb.value));
+            });
+        }
+
+        // Multi-select dropdowns - now expecting IDs
+        if (data.minCourseGrading) {
+            $('#minCourseGrading').val(data.minCourseGrading.map(item => item.id || item)).trigger('change');
+        }
+        if (data.educationalQualifications) {
+            $('#educationalQualifications').val(data.educationalQualifications.map(item => item.id || item)).trigger('change');
+        }
+        if (data.medicalCategories) {
+            $('#medicalCategories').val(data.medicalCategories.map(item => item.id || item)).trigger('change');
+        }
+        if (data.establishmentTypes) {
+            $('#establishmentTypes').val(data.establishmentTypes.map(item => item.id || item)).trigger('change');
+        }
+
+        // Remarks
+        if (data.remarks) {
+            selectedRemarks = data.remarks;
+            document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+                pill.classList.toggle('active', data.remarks.includes(pill.dataset.value));
+            });
+        }
+    }
+
+    // Save eligibility
+    document.getElementById('saveEligibility').addEventListener('click', function() {
+        if (!selectedCourseId) {
+            alert('Please select a course');
+            return;
+        }
+
+        const payload = {
+            courseId: selectedCourseId,
+
+            // Date filters
+            commissionDateFrom: document.getElementById('commissionFrom').value || null,
+            commissionDateTo: document.getElementById('commissionTo').value || null,
+            seniorityDateFrom: document.getElementById('seniorityFrom').value || null,
+            seniorityDateTo: document.getElementById('seniorityTo').value || null,
+            dobFrom: document.getElementById('dobFrom').value || null,
+            dobTo: document.getElementById('dobTo').value || null,
+
+            // Selected IDs
+            rankIds: selectedRankIds,
+            unitIds: selectedUnitIds,
+            postingTypeIds: selectedPostingTypeIds,
+
+            // Multi-select dropdown values - now sending IDs
+            minCourseGrading: $('#minCourseGrading').val() || [], // Array of IDs
+            educationalQualifications: $('#educationalQualifications').val() || [], // Array of IDs
+            medicalCategories: $('#medicalCategories').val() || [], // Array of IDs
+            establishmentTypes: $('#establishmentTypes').val() || [], // Array of IDs
+
+            remarks: selectedRemarks,
+
+            additionalRemarks: document.getElementById('additionalRemarks').value || null
+        };
+
+        // Validate required fields
+        if (!payload.courseId) {
+            alert('Course ID is required');
+            return;
+        }
+
+        console.log('Saving payload:', payload);
+
+        fetch('http://localhost:6060/api/eligibility/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Save failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Eligibility criteria saved successfully!');
+                console.log('Saved data:', data);
+            })
+            .catch(error => {
+                console.error('Error saving eligibility:', error);
+                alert('Failed to save eligibility criteria: ' + error.message);
+            });
+    });
 </script>
-
 </body>
 </html>

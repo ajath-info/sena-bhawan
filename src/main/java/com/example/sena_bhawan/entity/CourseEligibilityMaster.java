@@ -1,17 +1,17 @@
 package com.example.sena_bhawan.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "course_eligibility_master")
-@Getter
-@Setter
+@Table(name = "course_eligibility_master",
+        uniqueConstraints = @UniqueConstraint(columnNames = "course_id"))
+@Data
 public class CourseEligibilityMaster {
 
     @Id
@@ -19,44 +19,36 @@ public class CourseEligibilityMaster {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "course_id", referencedColumnName = "srno", unique = true)
+    @JoinColumn(name = "course_id", nullable = false)
     private CourseMaster course;
 
-    @Column(name = "min_years")
-    private Integer minYears;
+    // Date Filters
+    @Column(name = "commission_date_from")
+    private LocalDate commissionDateFrom;
 
-    @Column(name = "max_years")
-    private Integer maxYears;
+    @Column(name = "commission_date_to")
+    private LocalDate commissionDateTo;
 
-    @Column(name = "min_course_grading")
-    private String minCourseGrading;
+    @Column(name = "seniority_date_from")
+    private LocalDate seniorityDateFrom;
 
-    @Column(name = "educational_qualification")
-    private String educationalQualification;
+    @Column(name = "seniority_date_to")
+    private LocalDate seniorityDateTo;
 
-    @Column(name = "max_service_limit")
-    private String maxServiceLimit;
+    @Column(name = "dob_from")
+    private LocalDate dobFrom;
 
-    @Column(name = "medical_category")
-    private String medicalCategory;
+    @Column(name = "dob_to")
+    private LocalDate dobTo;
 
-    @Column(name = "additional_remarks")
+    @Column(name = "additional_remarks", columnDefinition = "text")
     private String additionalRemarks;
 
-    @OneToMany(mappedBy = "eligibility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseEligibleRank> eligibleRanks = new ArrayList<>();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "eligibility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseEligibleUnit> eligibleUnits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "eligibility", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseEligiblePostingType> postingTypes = new ArrayList<>();
-
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }
-

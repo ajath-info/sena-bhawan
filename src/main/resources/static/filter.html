@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Master Filter & Search - ARMY HRMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
   <style>
     * {
       margin: 0;
@@ -12,9 +14,11 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f8fafc;
-      color: #0f172a;
+      font-family: 'Inter', sans-serif;
+      background: #f1f3f5;
+      color: #1f2937;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .container {
@@ -23,24 +27,25 @@
       overflow: hidden;
     }
 
-    /* Sidebar Styles */
+    /* ================= SIDEBAR ================= */
     .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #0b2c1f 0%, #04120c 100%);
+      width: 256px;
+      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
       color: white;
       display: flex;
       flex-direction: column;
-      flex-shrink: 0;
+      height: 100vh;
       overflow-y: auto;
-      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+      overflow-x: hidden;
+      flex-shrink: 0;
     }
 
     .sidebar-header {
-      padding: 24px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      min-height: 72px;
     }
 
     .logo-section {
@@ -50,73 +55,58 @@
     }
 
     .logo-icon {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       background: #ffb703;
-      border-radius: 8px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 20px;
-      color: #0b2c1f;
     }
 
     .logo-text h1 {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 4px;
     }
 
     .logo-text p {
       font-size: 11px;
-      color: #a7e0c0;
-      letter-spacing: 1px;
+      color: #52b788;
     }
 
     .sidebar-nav {
       flex: 1;
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      padding: 16px 0;
     }
 
     .nav-section-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #a7e0c0;
-      margin-top: 16px;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-      padding-left: 12px;
-    }
-
-    .nav-section-title:first-child {
-      margin-top: 0;
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #52b788;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      color: rgba(255, 255, 255, 0.85);
+      padding: 12px 20px;
+      color: white;
       text-decoration: none;
+      border-left: 4px solid transparent;
       transition: all 0.2s;
-      font-size: 14px;
-      font-weight: 500;
     }
 
     .nav-item:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
+      background: rgba(255,255,255,0.1);
     }
 
     .nav-item.active {
-      background: #2d6a4f;
-      color: white;
+      background: rgba(255,255,255,0.1);
+      border-left-color: #ffb703;
+      font-weight: 600;
     }
 
     .nav-icon {
@@ -124,8 +114,8 @@
     }
 
     .sidebar-footer {
-      padding: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
     .user-profile {
@@ -135,35 +125,34 @@
     }
 
     .user-avatar {
-      width: 42px;
-      height: 42px;
-      background: #2d6a4f;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      background: #2d6a4f;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 16px;
-      color: white;
-      border: 2px solid #52b788;
-    }
-
-    .user-info {
-      flex: 1;
+      font-weight: 700;
     }
 
     .user-info .name {
-      font-weight: 600;
       font-size: 14px;
-      margin-bottom: 2px;
+      font-weight: 600;
     }
 
     .user-info .role {
       font-size: 12px;
-      color: #a7e0c0;
+      color: #52b788;
     }
 
-    /* Main Content */
+    .logout-btn {
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    /* ================= MAIN CONTENT ================= */
     .main-content {
       flex: 1;
       display: flex;
@@ -173,24 +162,23 @@
 
     .header {
       background: white;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 20px 32px;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       flex-shrink: 0;
     }
 
-    .header-left h2 {
-      font-size: 26px;
+    .header h2 {
+      font-size: 22px;
       font-weight: 700;
-      margin-bottom: 4px;
-      color: #0f172a;
     }
 
-    .header-left p {
+    .header p {
       font-size: 14px;
-      color: #64748b;
+      color: #6b7280;
+      margin-top: 4px;
     }
 
     .header-right {
@@ -212,12 +200,12 @@
     }
 
     .btn-primary {
-      background: #0b2c1f;
+      background: #1b4332;
       color: white;
     }
 
     .btn-primary:hover {
-      background: #1a4731;
+      background: #2d6a4f;
     }
 
     .btn-primary:disabled {
@@ -227,8 +215,8 @@
 
     .btn-secondary {
       background: white;
-      color: #0b2c1f;
-      border: 2px solid #0b2c1f;
+      color: #1b4332;
+      border: 2px solid #1b4332;
     }
 
     .btn-secondary:hover {
@@ -237,13 +225,12 @@
 
     .btn-outline {
       background: white;
-      border: 1px solid #e2e8f0;
-      color: #64748b;
+      border: 1px solid #e5e7eb;
+      color: #6b7280;
     }
 
     .btn-outline:hover {
       background: #f8fafc;
-      border-color: #94a3b8;
     }
 
     .content-area {
@@ -252,11 +239,11 @@
       overflow: hidden;
     }
 
-    /* Filter Panel */
+    /* ================= FILTER PANEL ================= */
     .filter-panel {
       width: 380px;
       background: white;
-      border-right: 1px solid #e2e8f0;
+      border-right: 1px solid #e5e7eb;
       padding: 24px;
       overflow-y: auto;
       flex-shrink: 0;
@@ -272,7 +259,7 @@
     .filter-header h3 {
       font-size: 18px;
       font-weight: 700;
-      color: #0f172a;
+      color: #1f2937;
     }
 
     .clear-filters {
@@ -283,7 +270,6 @@
       padding: 6px 12px;
       border-radius: 6px;
       background: #fef2f2;
-      transition: all 0.2s;
     }
 
     .clear-filters:hover {
@@ -293,7 +279,7 @@
     .filter-section {
       margin-bottom: 24px;
       padding-bottom: 24px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e5e7eb;
     }
 
     .filter-section:last-child {
@@ -305,7 +291,7 @@
     .filter-title {
       font-size: 15px;
       font-weight: 700;
-      color: #0f172a;
+      color: #1f2937;
       margin-bottom: 16px;
       display: flex;
       align-items: center;
@@ -319,7 +305,7 @@
     .filter-label {
       font-size: 13px;
       font-weight: 600;
-      color: #475569;
+      color: #4b5563;
       margin-bottom: 6px;
       display: block;
     }
@@ -328,7 +314,7 @@
     .filter-select {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d1d5db;
       border-radius: 6px;
       font-size: 14px;
       transition: all 0.2s;
@@ -337,8 +323,33 @@
     .filter-input:focus,
     .filter-select:focus {
       outline: none;
-      border-color: #0b2c1f;
-      box-shadow: 0 0 0 3px rgba(11, 44, 31, 0.1);
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    /* Select2 Customization */
+    .select2-container--default .select2-selection--multiple {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      min-height: 42px;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+      background-color: #1b4332;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+      color: white;
+      margin-right: 4px;
     }
 
     .filter-actions {
@@ -352,7 +363,7 @@
       justify-content: center;
     }
 
-    /* Results Area */
+    /* ================= RESULTS AREA ================= */
     .results-area {
       flex: 1;
       display: flex;
@@ -364,7 +375,7 @@
     .results-header {
       background: white;
       padding: 16px 24px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e5e7eb;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -373,16 +384,16 @@
 
     .results-count {
       font-size: 14px;
-      color: #64748b;
+      color: #6b7280;
     }
 
     .results-count strong {
-      color: #0f172a;
+      color: #1f2937;
       font-weight: 700;
     }
 
     .unit-strength {
-      background: #0b2c1f;
+      background: #1b4332;
       color: white;
       padding: 6px 16px;
       border-radius: 20px;
@@ -396,14 +407,13 @@
       padding: 24px;
     }
 
-    /* Table Styles */
+    /* ================= TABLE STYLES ================= */
     .table-container {
       background: white;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e5e7eb;
       border-radius: 12px;
       overflow-x: auto;
       overflow-y: visible;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     .data-table {
@@ -425,8 +435,8 @@
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
-      color: #475569;
-      border-bottom: 2px solid #e2e8f0;
+      color: #4b5563;
+      border-bottom: 2px solid #e5e7eb;
       white-space: nowrap;
     }
 
@@ -452,7 +462,6 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
-      white-space: nowrap;
     }
 
     .badge-success {
@@ -470,19 +479,9 @@
       color: #1e40af;
     }
 
-    .badge-purple {
-      background: #f3e8ff;
-      color: #6b21a8;
-    }
-
     .badge-gray {
       background: #f1f5f9;
-      color: #475569;
-    }
-
-    .badge-red {
-      background: #fee2e2;
-      color: #dc2626;
+      color: #4b5563;
     }
 
     .action-icons {
@@ -498,10 +497,9 @@
       justify-content: center;
       border-radius: 6px;
       cursor: pointer;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e5e7eb;
       background: white;
       transition: all 0.2s;
-      font-size: 14px;
     }
 
     .icon-btn:hover {
@@ -519,7 +517,7 @@
       border-color: #2563eb;
     }
 
-    /* Pagination */
+    /* ================= PAGINATION ================= */
     .pagination {
       display: flex;
       justify-content: space-between;
@@ -528,12 +526,12 @@
       padding: 16px 20px;
       background: white;
       border-radius: 12px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e5e7eb;
     }
 
     .pagination-info {
       font-size: 14px;
-      color: #64748b;
+      color: #6b7280;
     }
 
     .pagination-controls {
@@ -546,22 +544,22 @@
       border-radius: 6px;
       font-size: 13px;
       font-weight: 500;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e5e7eb;
       background: white;
-      color: #475569;
+      color: #4b5563;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .pagination-btn:hover:not(:disabled) {
       background: #f8fafc;
-      border-color: #94a3b8;
+      border-color: #9ca3af;
     }
 
     .pagination-btn.active {
-      background: #0b2c1f;
+      background: #1b4332;
       color: white;
-      border-color: #0b2c1f;
+      border-color: #1b4332;
     }
 
     .pagination-btn:disabled {
@@ -569,7 +567,7 @@
       cursor: not-allowed;
     }
 
-    /* Loading State */
+    /* ================= LOADING ================= */
     .loading-overlay {
       position: absolute;
       top: 0;
@@ -587,8 +585,8 @@
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #e2e8f0;
-      border-top-color: #0b2c1f;
+      border: 3px solid #e5e7eb;
+      border-top-color: #1b4332;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -597,28 +595,27 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Search Bar */
+    /* ================= SEARCH ================= */
     .search-bar {
       margin-bottom: 20px;
     }
 
     .search-input {
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #e2e8f0;
+      padding: 12px 16px 12px 40px;
+      border: 1px solid #e5e7eb;
       border-radius: 8px;
       font-size: 14px;
-      padding-left: 40px;
-      background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 12px center;
+      background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 12px center;
     }
 
     .search-input:focus {
       outline: none;
-      border-color: #0b2c1f;
-      box-shadow: 0 0 0 3px rgba(11, 44, 31, 0.1);
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
     }
 
-    /* Toast Notification */
+    /* ================= TOAST ================= */
     .toast {
       position: fixed;
       top: 20px;
@@ -661,11 +658,141 @@
 <body>
 <div class="container">
   <!-- Sidebar -->
-  <div id="sidebar"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div class="logo-text">
+          <h1>ARMY HRMS</h1>
+          <p>भारतीय सेना</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Main Menu</div>
+
+      <a href="/dashboard-new.html" class="nav-item">
+        <div class="nav-icon">🏠</div>
+        <span>Dashboard</span>
+      </a>
+
+      <a href="/dashboard-officers.html" class="nav-item">
+        <div class="nav-icon">👥</div>
+        <span>Dashboard Officers</span>
+      </a>
+
+      <a href="/dashboard-training.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Dashboard Training</span>
+      </a>
+
+      <a href="/filter.html" class="nav-item active">
+        <div class="nav-icon">🔍</div>
+        <span>Master Filter & Search</span>
+      </a>
+
+      <div class="nav-section-title">Administration</div>
+
+      <a href="/role-permmissoon.html" class="nav-item">
+        <div class="nav-icon">🔐</div>
+        <span>Role & Permissions</span>
+      </a>
+
+      <div class="nav-section-title">Masters</div>
+
+      <a href="/course-master.html" class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>Course Master</span>
+      </a>
+
+      <a href="/grade-awards.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Grade & Awards</span>
+      </a>
+
+      <a href="/course-schedule.html" class="nav-item">
+        <div class="nav-icon">📅</div>
+        <span>Course Schedule</span>
+      </a>
+
+      <a href="/location-master.html" class="nav-item">
+        <div class="nav-icon">📍</div>
+        <span>Location Master</span>
+      </a>
+
+      <a href="/rank-master.html" class="nav-item">
+        <div class="nav-icon">🏅</div>
+        <span>Rank Master</span>
+      </a>
+
+      <a href="/unit-master.html" class="nav-item">
+        <div class="nav-icon">🛡️</div>
+        <span>Unit Master</span>
+      </a>
+
+      <div class="nav-section-title">Forms</div>
+
+      <a href="/personnel-form.html" class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>Personnel Data Form</span>
+      </a>
+
+      <a href="/coursepanel.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Panel Generation</span>
+      </a>
+
+      <a href="/orbat.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Orbit Generation Form</span>
+      </a>
+
+      <a href="/add-new-user.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>New User Form</span>
+      </a>
+
+      <a href="/legal-disciplinary.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Legal And Disciplinary Form</span>
+      </a>
+
+      <a href="/course-eligibility-form.html" class="nav-item">
+        <div class="nav-icon">📋</div>
+        <span>Course Eligibility Form</span>
+      </a>
+
+      <a href="/course-posting-form.html" class="nav-item">
+        <div class="nav-icon">📝</div>
+        <span>Course & Posting Form</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin User</div>
+          <div class="role">HQ Command</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar" id="avatar">U</div>
+        <div class="user-info">
+          <a href="#" class="logout-btn" id="logoutBtn" onclick="logout()">Logout</a>
+          <div class="role">User</div>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <main class="main-content">
     <header class="header">
-      <div class="header-left">
+      <div>
         <h2>Master Filter & Search</h2>
         <p>Advanced filtering for officer records</p>
       </div>
@@ -689,139 +816,99 @@
           <span class="clear-filters" onclick="clearAllFilters()">Clear All</span>
         </div>
 
-        <!-- Search Filter -->
+        <!-- Quick Search -->
         <div class="filter-section">
           <div class="filter-title">🔍 Quick Search</div>
           <div class="search-bar">
-            <input type="text" class="search-input" id="globalSearch" placeholder="Search by name, army no..." onkeyup="debounceSearch()">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search by name, army no...">
           </div>
         </div>
 
-        <!-- Rank Filter -->
+        <!-- Rank Filter (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">🏅 Rank</div>
           <div class="filter-group">
-            <select class="filter-select" id="rankFilter">
+            <select class="filter-select multi-select" id="rankFilter" multiple="multiple">
               <option value="">All Ranks</option>
             </select>
           </div>
         </div>
 
-        <!-- Date of Birth (Greater Than) -->
-        <div class="filter-section">
-          <div class="filter-title">📅 Date of Birth (Greater Than)</div>
-          <div class="filter-group">
-            <input type="date" class="filter-input" id="dobFilter">
-          </div>
-        </div>
-
-        <!-- Date of Commission Range -->
-        <div class="filter-section">
-          <div class="filter-title">📋 Date of Commission</div>
-          <div class="filter-group">
-            <label class="filter-label">From</label>
-            <input type="date" class="filter-input" id="docFrom">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">To</label>
-            <input type="date" class="filter-input" id="docTo">
-          </div>
-        </div>
-
-        <!-- Date of Seniority Range -->
-        <div class="filter-section">
-          <div class="filter-title">📊 Date of Seniority</div>
-          <div class="filter-group">
-            <label class="filter-label">From</label>
-            <input type="date" class="filter-input" id="dosFrom">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">To</label>
-            <input type="date" class="filter-input" id="dosTo">
-          </div>
-        </div>
-
-        <!-- Medical Category -->
+        <!-- Medical Category (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">⚕️ Medical Category</div>
           <div class="filter-group">
-            <select class="filter-select" id="medicalFilter">
+            <select class="filter-select multi-select" id="medicalFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
         </div>
 
-        <!-- Command Filter -->
+        <!-- Command (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">📍 Command</div>
           <div class="filter-group">
-            <select class="filter-select" id="commandFilter">
+            <select class="filter-select multi-select" id="commandFilter" multiple="multiple">
               <option value="">All Commands</option>
             </select>
           </div>
         </div>
 
-        <!-- Corps Filter -->
+        <!-- Corps (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">🎯 Corps</div>
           <div class="filter-group">
-            <select class="filter-select" id="corpsFilter">
+            <select class="filter-select multi-select" id="corpsFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
         </div>
 
-        <!-- Division Filter -->
+        <!-- Division (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">🚩 Division</div>
           <div class="filter-group">
-            <select class="filter-select" id="divisionFilter">
+            <select class="filter-select multi-select" id="divisionFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
         </div>
 
-        <!-- Type of Establishment -->
+        <!-- Type of Establishment (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">🏢 Type of Establishment</div>
           <div class="filter-group">
-            <select class="filter-select" id="estFilter">
+            <select class="filter-select multi-select" id="estFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
         </div>
 
-        <!-- TOS Date Range -->
-        <div class="filter-section">
-          <div class="filter-title">📅 TOS Date</div>
-          <div class="filter-group">
-            <label class="filter-label">From</label>
-            <input type="date" class="filter-input" id="tosFrom">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">To</label>
-            <input type="date" class="filter-input" id="tosTo">
-          </div>
-        </div>
-
-        <!-- Officer NOT on Course (During) -->
-        <div class="filter-section">
-          <div class="filter-title">🚫 NOT on Course (During)</div>
-          <div class="filter-group">
-            <label class="filter-label">From</label>
-            <input type="date" class="filter-input" id="courseFrom">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">To</label>
-            <input type="date" class="filter-input" id="courseTo">
-          </div>
-        </div>
-
-        <!-- Area Type -->
+        <!-- Area Type (Multi-select) -->
         <div class="filter-section">
           <div class="filter-title">🗺️ Area Type</div>
           <div class="filter-group">
-            <select class="filter-select" id="areaTypeFilter">
+            <select class="filter-select multi-select" id="areaTypeFilter" multiple="multiple">
+              <option value="">All</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Civil Qualification (Multi-select) -->
+        <div class="filter-section">
+          <div class="filter-title">🎓 Civil Qualification</div>
+          <div class="filter-group">
+            <select class="filter-select multi-select" id="civilFilter" multiple="multiple">
+              <option value="">All</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sports (Multi-select) -->
+        <div class="filter-section">
+          <div class="filter-title">⚽ Sports</div>
+          <div class="filter-group">
+            <select class="filter-select multi-select" id="sportsFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
@@ -835,23 +922,63 @@
           </div>
         </div>
 
-        <!-- Civil Qualification -->
+        <!-- Posting Due (Multi-select) -->
         <div class="filter-section">
-          <div class="filter-title">🎓 Civil Qualification</div>
+          <div class="filter-title">⏰ Posting Due (Months)</div>
           <div class="filter-group">
-            <select class="filter-select" id="civilFilter">
+            <select class="filter-select multi-select" id="postingDueFilter" multiple="multiple">
               <option value="">All</option>
             </select>
           </div>
         </div>
 
-        <!-- Sports -->
+        <!-- Date Filters -->
         <div class="filter-section">
-          <div class="filter-title">⚽ Sports</div>
+          <div class="filter-title">📅 Date Filters</div>
+
           <div class="filter-group">
-            <select class="filter-select" id="sportsFilter">
-              <option value="">All</option>
-            </select>
+            <label class="filter-label">DOB (Greater Than)</label>
+            <input type="date" class="filter-input" id="dobFilter">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Date of Commission From</label>
+            <input type="date" class="filter-input" id="docFrom">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Date of Commission To</label>
+            <input type="date" class="filter-input" id="docTo">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Date of Seniority From</label>
+            <input type="date" class="filter-input" id="dosFrom">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Date of Seniority To</label>
+            <input type="date" class="filter-input" id="dosTo">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">TOS From</label>
+            <input type="date" class="filter-input" id="tosFrom">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">TOS To</label>
+            <input type="date" class="filter-input" id="tosTo">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">NOT on Course From</label>
+            <input type="date" class="filter-input" id="courseFrom">
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">NOT on Course To</label>
+            <input type="date" class="filter-input" id="courseTo">
           </div>
         </div>
 
@@ -860,16 +987,6 @@
           <div class="filter-title">📍 Place of Birth</div>
           <div class="filter-group">
             <input type="text" class="filter-input" id="pobFilter" placeholder="Enter state/city">
-          </div>
-        </div>
-
-        <!-- Posting Due (Months) -->
-        <div class="filter-section">
-          <div class="filter-title">⏰ Posting Due (Months)</div>
-          <div class="filter-group">
-            <select class="filter-select" id="postingDueFilter">
-              <option value="">All</option>
-            </select>
           </div>
         </div>
 
@@ -892,7 +1009,6 @@
         </div>
 
         <div class="results-content">
-          <!-- Results Container -->
           <div id="resultsContainer">
             <div class="table-container">
               <table class="data-table">
@@ -925,7 +1041,7 @@
                 <tr>
                   <td colspan="21" style="text-align: center; padding: 40px;">
                     <div class="loading-spinner" style="margin: 0 auto;"></div>
-                    <div style="margin-top: 16px; color: #64748b;">Loading officer records...</div>
+                    <div style="margin-top: 16px; color: #6b7280;">Loading officer records...</div>
                   </td>
                 </tr>
                 </tbody>
@@ -933,7 +1049,6 @@
             </div>
           </div>
 
-          <!-- Pagination -->
           <div class="pagination" id="pagination"></div>
         </div>
       </div>
@@ -944,6 +1059,8 @@
 <!-- Toast Container -->
 <div id="toastContainer"></div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
   // API Base URL
   const API_BASE_URL = 'http://localhost:6060/api';
@@ -953,71 +1070,30 @@
   let itemsPerPage = 10;
   let totalItems = 0;
   let totalPages = 0;
-  let currentFilters = {};
   let debounceTimer;
   let isLoading = false;
 
-  // Load sidebar and initialize
-  document.addEventListener('DOMContentLoaded', async function() {
-    loadSidebar();
-    await loadDropdownData();
-    await fetchFilteredData();
-  });
-
-  function loadSidebar() {
-    const sidebarHTML = `
-      <aside class="sidebar">
-        <div class="sidebar-header">
-          <div class="logo-section">
-            <div class="logo-icon">🛡️</div>
-            <div class="logo-text">
-              <h1>ARMY HRMS</h1>
-              <p>भारतीय सेना</p>
-            </div>
-          </div>
-        </div>
-        <nav class="sidebar-nav">
-          <div class="nav-section-title">Main Menu</div>
-          <a href="/dashboard-new.html" class="nav-item">
-            <div class="nav-icon">🏠</div>
-            <span>Dashboard</span>
-          </a>
-          <a href="/filter.html" class="nav-item active">
-            <div class="nav-icon">🔍</div>
-            <span>Master Filter & Search</span>
-          </a>
-          <div class="nav-section-title">Masters</div>
-          <a href="/personnel-form.html" class="nav-item">
-            <div class="nav-icon">👤</div>
-            <span>Personnel Data Form</span>
-          </a>
-        </nav>
-        <div class="sidebar-footer">
-          <div class="user-profile">
-            <div class="user-avatar">AD</div>
-            <div class="user-info">
-              <div class="name">Admin User</div>
-              <div class="role">HQ Command</div>
-            </div>
-            <div class="nav-icon" id="logoutBtn">🚪</div>
-          </div>
-        </div>
-      </aside>
-    `;
-    document.getElementById('sidebar').innerHTML = sidebarHTML;
-
-    document.getElementById('logoutBtn')?.addEventListener('click', function() {
-      sessionStorage.clear();
-      window.location.replace('/login.html');
+  // Initialize Select2 for multi-select dropdowns
+  function initializeMultiSelects() {
+    $('.multi-select').select2({
+      placeholder: 'Select options',
+      allowClear: true,
+      width: '100%'
     });
   }
 
-  // Load all dropdown data
+  // Logout function
+  function logout() {
+    sessionStorage.clear();
+    window.location.replace("/login.html");
+    return false;
+  }
+
+  // Load dropdown data
   async function loadDropdownData() {
     try {
       showLoading(true);
 
-      // Load all dropdowns in parallel
       await Promise.all([
         loadRankDropdown(),
         loadMedicalDropdown(),
@@ -1030,6 +1106,8 @@
         loadSportsDropdown(),
         loadPostingDueDropdown()
       ]);
+
+      initializeMultiSelects();
 
     } catch (error) {
       console.error('Error loading dropdowns:', error);
@@ -1044,13 +1122,12 @@
       const response = await fetch(`${API_BASE_URL}/ranks`);
       if (response.ok) {
         const ranks = await response.json();
-        const select = document.getElementById('rankFilter');
+        const select = $('#rankFilter');
         ranks.forEach(rank => {
-          const option = document.createElement('option');
-          option.value = rank;
-          option.textContent = rank;
-          select.appendChild(option);
+          const option = new Option(rank, rank, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading ranks:', error);
@@ -1062,13 +1139,12 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/medical-category`);
       if (response.ok) {
         const categories = await response.json();
-        const select = document.getElementById('medicalFilter');
+        const select = $('#medicalFilter');
         categories.forEach(cat => {
-          const option = document.createElement('option');
-          option.value = cat;
-          option.textContent = cat;
-          select.appendChild(option);
+          const option = new Option(cat, cat, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading medical categories:', error);
@@ -1080,13 +1156,12 @@
       const response = await fetch(`${API_BASE_URL}/dropdown/command`);
       if (response.ok) {
         const commands = await response.json();
-        const select = document.getElementById('commandFilter');
+        const select = $('#commandFilter');
         commands.forEach(cmd => {
-          const option = document.createElement('option');
-          option.value = cmd;
-          option.textContent = cmd;
-          select.appendChild(option);
+          const option = new Option(cmd, cmd, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading commands:', error);
@@ -1098,13 +1173,12 @@
       const response = await fetch(`${API_BASE_URL}/dropdown/corps`);
       if (response.ok) {
         const corpsList = await response.json();
-        const select = document.getElementById('corpsFilter');
+        const select = $('#corpsFilter');
         corpsList.forEach(corps => {
-          const option = document.createElement('option');
-          option.value = corps;
-          option.textContent = corps;
-          select.appendChild(option);
+          const option = new Option(corps, corps, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading corps:', error);
@@ -1116,13 +1190,12 @@
       const response = await fetch(`${API_BASE_URL}/dropdown/division`);
       if (response.ok) {
         const divisions = await response.json();
-        const select = document.getElementById('divisionFilter');
+        const select = $('#divisionFilter');
         divisions.forEach(div => {
-          const option = document.createElement('option');
-          option.value = div;
-          option.textContent = div;
-          select.appendChild(option);
+          const option = new Option(div, div, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading divisions:', error);
@@ -1134,13 +1207,12 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/establishment-type`);
       if (response.ok) {
         const types = await response.json();
-        const select = document.getElementById('estFilter');
+        const select = $('#estFilter');
         types.forEach(type => {
-          const option = document.createElement('option');
-          option.value = type;
-          option.textContent = type;
-          select.appendChild(option);
+          const option = new Option(type, type, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading establishment types:', error);
@@ -1152,13 +1224,12 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/area-type`);
       if (response.ok) {
         const areas = await response.json();
-        const select = document.getElementById('areaTypeFilter');
+        const select = $('#areaTypeFilter');
         areas.forEach(area => {
-          const option = document.createElement('option');
-          option.value = area;
-          option.textContent = area;
-          select.appendChild(option);
+          const option = new Option(area, area, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading area types:', error);
@@ -1170,13 +1241,12 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/civil-qualification`);
       if (response.ok) {
         const quals = await response.json();
-        const select = document.getElementById('civilFilter');
+        const select = $('#civilFilter');
         quals.forEach(qual => {
-          const option = document.createElement('option');
-          option.value = qual;
-          option.textContent = qual;
-          select.appendChild(option);
+          const option = new Option(qual, qual, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading civil qualifications:', error);
@@ -1188,13 +1258,12 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/sports`);
       if (response.ok) {
         const sportsList = await response.json();
-        const select = document.getElementById('sportsFilter');
+        const select = $('#sportsFilter');
         sportsList.forEach(sport => {
-          const option = document.createElement('option');
-          option.value = sport;
-          option.textContent = sport;
-          select.appendChild(option);
+          const option = new Option(sport, sport, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading sports:', error);
@@ -1206,59 +1275,48 @@
       const response = await fetch(`${API_BASE_URL}/master/filter/posting-due-months`);
       if (response.ok) {
         const months = await response.json();
-        const select = document.getElementById('postingDueFilter');
+        const select = $('#postingDueFilter');
         months.forEach(month => {
-          const option = document.createElement('option');
-          option.value = month;
-          option.textContent = month + (month === 1 ? ' Month' : ' Months');
-          select.appendChild(option);
+          const option = new Option(month + (month === 1 ? ' Month' : ' Months'), month, false, false);
+          select.append(option);
         });
+        select.trigger('change');
       }
     } catch (error) {
       console.error('Error loading posting due months:', error);
     }
   }
 
-  // Build filter object from form
+  // Build filter request from form
   function buildFilterRequest() {
     return {
-      rank: document.getElementById('rankFilter').value || null,
-      medicalCategory: document.getElementById('medicalFilter').value || null,
+      rank: $('#rankFilter').val() && $('#rankFilter').val().length ? $('#rankFilter').val() : null,
+      medicalCategory: $('#medicalFilter').val() && $('#medicalFilter').val().length ? $('#medicalFilter').val() : null,
+      command: $('#commandFilter').val() && $('#commandFilter').val().length ? $('#commandFilter').val() : null,
+      corps: $('#corpsFilter').val() && $('#corpsFilter').val().length ? $('#corpsFilter').val() : null,
+      division: $('#divisionFilter').val() && $('#divisionFilter').val().length ? $('#divisionFilter').val() : null,
+      establishmentType: $('#estFilter').val() && $('#estFilter').val().length ? $('#estFilter').val() : null,
+      areaType: $('#areaTypeFilter').val() && $('#areaTypeFilter').val().length ? $('#areaTypeFilter').val() : null,
+      civilQualification: $('#civilFilter').val() && $('#civilFilter').val().length ? $('#civilFilter').val() : null,
+      sports: $('#sportsFilter').val() && $('#sportsFilter').val().length ? $('#sportsFilter').val() : null,
+      postingDueMonths: $('#postingDueFilter').val() && $('#postingDueFilter').val().length ?
+              $('#postingDueFilter').val().map(v => parseInt(v)) : null,
+      courseName: document.getElementById('courseNameFilter').value || null,
       placeOfBirth: document.getElementById('pobFilter').value || null,
-
       dobGreaterThan: document.getElementById('dobFilter').value || null,
-
       docFrom: document.getElementById('docFrom').value || null,
       docTo: document.getElementById('docTo').value || null,
-
       dosFrom: document.getElementById('dosFrom').value || null,
       dosTo: document.getElementById('dosTo').value || null,
-
       tosFrom: document.getElementById('tosFrom').value || null,
       tosTo: document.getElementById('tosTo').value || null,
-
-      command: document.getElementById('commandFilter').value || null,
-      corps: document.getElementById('corpsFilter').value || null,
-      division: document.getElementById('divisionFilter').value || null,
-      establishmentType: document.getElementById('estFilter').value || null,
-      areaType: document.getElementById('areaTypeFilter').value || null,
-
       courseFrom: document.getElementById('courseFrom').value || null,
       courseTo: document.getElementById('courseTo').value || null,
-      courseName: document.getElementById('courseNameFilter').value || null,
-
-      civilQualification: document.getElementById('civilFilter').value || null,
-      sports: document.getElementById('sportsFilter').value || null,
-
-      postingDueMonths: document.getElementById('postingDueFilter').value ?
-              parseInt(document.getElementById('postingDueFilter').value) : null,
-
-      // Add search query parameter (your backend might expect a different name)
       search: document.getElementById('globalSearch').value || null
     };
   }
 
-  // Replace the fetchFilteredData function with this updated version
+  // Fetch filtered data
   async function fetchFilteredData() {
     if (isLoading) return;
 
@@ -1267,14 +1325,7 @@
       showLoading(true);
 
       const filterRequest = buildFilterRequest();
-      const searchQuery = document.getElementById('globalSearch').value;
 
-      // Add search query to filter request if present
-      if (searchQuery) {
-        filterRequest.searchQuery = searchQuery; // Add search term to filter request
-      }
-
-      // Use filter endpoint for both search and filters
       const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
         method: 'POST',
         headers: {
@@ -1285,21 +1336,18 @@
 
       if (response.ok) {
         const data = await response.json();
-        // Apply pagination on client side since backend returns all results
         const allData = data.data || [];
         totalItems = allData.length;
         totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        // Paginate manually
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const paginatedData = allData.slice(start, end);
 
         renderTable(paginatedData);
+        updateResultsCount();
+        renderPagination();
       }
-
-      updateResultsCount();
-      renderPagination();
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -1310,7 +1358,7 @@
     }
   }
 
-
+  // Render table
   function renderTable(officers) {
     const tbody = document.getElementById('tableBody');
 
@@ -1320,22 +1368,20 @@
           <td colspan="21" style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
             <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
-            <div style="color: #64748b;">Try adjusting your filters</div>
+            <div style="color: #6b7280;">Try adjusting your filters</div>
           </td>
         </tr>
       `;
-      document.getElementById('unitStrength').innerText = `Unit Strength: 0`;
+      document.getElementById('unitStrength').innerText = 'Unit Strength: 0';
       return;
     }
 
     let html = '';
     officers.forEach(o => {
-      // Format dates
       const dob = o.dateOfBirth ? new Date(o.dateOfBirth).toLocaleDateString('en-GB') : '—';
       const doc = o.dateOfCommission ? new Date(o.dateOfCommission).toLocaleDateString('en-GB') : '—';
       const dos = o.dateOfSeniority ? new Date(o.dateOfSeniority).toLocaleDateString('en-GB') : '—';
 
-      // Get course info (you might need to adjust based on your data structure)
       const courseName = o.qualifications && o.qualifications.length > 0 ? o.qualifications[0].courseName || '—' : '—';
       const civilQual = o.qualifications && o.qualifications.length > 0 ? o.qualifications[0].qualification || '—' : '—';
       const sports = o.additionalQualifications && o.additionalQualifications.length > 0 ?
@@ -1377,6 +1423,7 @@
     document.getElementById('unitStrength').innerText = `Unit Strength: ${totalItems}`;
   }
 
+  // Render pagination
   function renderPagination() {
     const pagination = document.getElementById('pagination');
 
@@ -1393,14 +1440,12 @@
       <div class="pagination-controls">
     `;
 
-    // Previous button
     html += `
       <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
         ← Previous
       </button>
     `;
 
-    // Page numbers
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -1426,7 +1471,6 @@
       html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
     }
 
-    // Next button
     html += `
       <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
         Next →
@@ -1439,7 +1483,11 @@
 
   function updateResultsCount() {
     const countElement = document.getElementById('resultsCount');
-    countElement.innerHTML = `Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of <strong>${totalItems}</strong> officers matching your filters`;
+    if (totalItems > 0) {
+      countElement.innerHTML = `Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of <strong>${totalItems}</strong> officers matching your filters`;
+    } else {
+      countElement.innerHTML = 'No officers found';
+    }
   }
 
   function changePage(page) {
@@ -1462,29 +1510,22 @@
   }
 
   function resetFilters() {
-    // Reset all filter inputs
+    // Reset all select2 dropdowns
+    $('.multi-select').val(null).trigger('change');
+
+    // Reset all input fields
     document.getElementById('globalSearch').value = '';
-    document.getElementById('rankFilter').value = '';
     document.getElementById('dobFilter').value = '';
     document.getElementById('docFrom').value = '';
     document.getElementById('docTo').value = '';
     document.getElementById('dosFrom').value = '';
     document.getElementById('dosTo').value = '';
-    document.getElementById('medicalFilter').value = '';
-    document.getElementById('commandFilter').value = '';
-    document.getElementById('corpsFilter').value = '';
-    document.getElementById('divisionFilter').value = '';
-    document.getElementById('estFilter').value = '';
     document.getElementById('tosFrom').value = '';
     document.getElementById('tosTo').value = '';
     document.getElementById('courseFrom').value = '';
     document.getElementById('courseTo').value = '';
-    document.getElementById('areaTypeFilter').value = '';
     document.getElementById('courseNameFilter').value = '';
-    document.getElementById('civilFilter').value = '';
-    document.getElementById('sportsFilter').value = '';
     document.getElementById('pobFilter').value = '';
-    document.getElementById('postingDueFilter').value = '';
 
     currentPage = 1;
     fetchFilteredData();
@@ -1499,7 +1540,6 @@
       const response = await fetch(`${API_BASE_URL}/${id}`);
       if (response.ok) {
         const officer = await response.json();
-        // Store in session storage or open modal
         sessionStorage.setItem('viewOfficer', JSON.stringify(officer));
         window.location.href = `/view-officer.html?id=${id}`;
       } else {
@@ -1525,7 +1565,6 @@
     showToast('Letter generation feature coming soon!', 'info');
   }
 
-  // UI Helpers
   function showLoading(show) {
     const applyBtn = document.getElementById('applyFiltersBtn');
     if (applyBtn) {
@@ -1549,11 +1588,23 @@
     }, 3000);
   }
 
-  // Add event listeners for filter changes
-  document.querySelectorAll('.filter-select, .filter-input').forEach(element => {
-    if (element.id !== 'globalSearch') {
-      element.addEventListener('change', applyFilters);
-    }
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', async function() {
+    await loadDropdownData();
+    await fetchFilteredData();
+
+    // Add event listeners
+    document.getElementById('globalSearch').addEventListener('keyup', debounceSearch);
+    document.querySelectorAll('.filter-input[type="date"]').forEach(input => {
+      input.addEventListener('change', applyFilters);
+    });
+    document.getElementById('courseNameFilter').addEventListener('change', applyFilters);
+    document.getElementById('pobFilter').addEventListener('change', applyFilters);
+
+    // Add change listeners for select2 dropdowns
+    $('.multi-select').on('change', function() {
+      applyFilters();
+    });
   });
 </script>
 </body>
