@@ -197,12 +197,6 @@
             type: 'ESTABLISHMENT',
             elementId: 'establishmentTypes'
         }
-        // Additional dropdowns can be added here as needed
-        // For example:
-        // sports: { type: 'SPORTS', elementId: 'sportsDropdown' },
-        // area: { type: 'AREA', elementId: 'areaDropdown' },
-        // rank: { type: 'RANK', elementId: 'rankDropdown' },
-        // remarks: { type: 'REMARKS', elementId: 'remarksDropdown' }
     };
 
     // Initialize all event listeners and data loading
@@ -211,7 +205,7 @@
         loadRanks();
         loadUnits();
         loadPostingTypes();
-        loadAllDropdowns(); // Load all dropdowns from the new API
+        loadAllDropdowns();
         initializePillListeners();
         initializeSelect2();
     });
@@ -243,14 +237,12 @@
             })
             .then(data => {
                 select.innerHTML = '';
-                // The API returns List<DropdownDTO> with id and name
                 data.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = item.id; // Save the ID
-                    option.textContent = item.name; // Show the name
+                    option.value = item.id;
+                    option.textContent = item.name;
                     select.appendChild(option);
                 });
-                // Trigger Select2 to refresh
                 $(`#${elementId}`).trigger('change');
             })
             .catch(error => {
@@ -283,10 +275,11 @@
             });
     }
 
-    // Course selection handler
+    // Course selection handler - NOW WITH AUTO-LOAD
     document.getElementById('courseSelect').addEventListener('change', function() {
         if (!this.value) {
             document.getElementById('courseInfo').style.display = 'none';
+            resetForm(); // Reset all fields when no course is selected
             return;
         }
 
@@ -301,7 +294,167 @@
             Location: ${course.location || 'N/A'} |
             Duration: ${course.duration || 'N/A'} Weeks
         `;
+
+        // AUTO-LOAD eligibility data when course is selected
+        loadEligibilityForCourse(selectedCourseId);
     });
+
+    // Function to reset form
+    function resetForm() {
+        // Reset date fields
+        document.getElementById('commissionFrom').value = '';
+        document.getElementById('commissionTo').value = '';
+        document.getElementById('seniorityFrom').value = '';
+        document.getElementById('seniorityTo').value = '';
+        document.getElementById('dobFrom').value = '';
+        document.getElementById('dobTo').value = '';
+
+        // Reset additional remarks
+        document.getElementById('additionalRemarks').value = '';
+
+        // Reset checkboxes
+        document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+        document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+        document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Reset selected arrays
+        selectedRankIds = [];
+        selectedUnitIds = [];
+        selectedPostingTypeIds = [];
+
+        // Reset multi-select dropdowns
+        $('#minCourseGrading').val([]).trigger('change');
+        $('#educationalQualifications').val([]).trigger('change');
+        $('#medicalCategories').val([]).trigger('change');
+        $('#establishmentTypes').val([]).trigger('change');
+
+        // Reset remarks pills
+        selectedRemarks = [];
+        document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+            pill.classList.remove('active');
+        });
+    }
+
+    // Function to load eligibility data for a course
+    function loadEligibilityForCourse(courseId) {
+        fetch(`http://localhost:6060/api/eligibility/course/${courseId}`)
+            .then(response => {
+                if (response.status === 404) {
+                    console.log('No existing eligibility found for this course');
+                    resetForm(); // Reset form if no data exists
+                    return null;
+                }
+                if (!response.ok) throw new Error('Failed to load eligibility');
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    populateForm(data);
+                    console.log('Eligibility data auto-loaded successfully');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading eligibility:', error);
+                resetForm(); // Reset on error as well
+            });
+    }
+
+    // Populate form with existing data
+    function populateForm(data) {
+        // Date fields
+        document.getElementById('commissionFrom').value = data.commissionDateFrom || '';
+        document.getElementById('commissionTo').value = data.commissionDateTo || '';
+        document.getElementById('seniorityFrom').value = data.seniorityDateFrom || '';
+        document.getElementById('seniorityTo').value = data.seniorityDateTo || '';
+        document.getElementById('dobFrom').value = data.dobFrom || '';
+        document.getElementById('dobTo').value = data.dobTo || '';
+
+        // Additional remarks
+        document.getElementById('additionalRemarks').value = data.additionalRemarks || '';
+
+        // Ranks
+        if (data.rankIds && data.rankIds.length > 0) {
+            selectedRankIds = data.rankIds;
+            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedRankIds.includes(Number(cb.value));
+            });
+        } else {
+            selectedRankIds = [];
+            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        // Units
+        if (data.unitIds && data.unitIds.length > 0) {
+            selectedUnitIds = data.unitIds;
+            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedUnitIds.includes(Number(cb.value));
+            });
+        } else {
+            selectedUnitIds = [];
+            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        // Posting Types
+        if (data.postingTypeIds && data.postingTypeIds.length > 0) {
+            selectedPostingTypeIds = data.postingTypeIds;
+            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedPostingTypeIds.includes(Number(cb.value));
+            });
+        } else {
+            selectedPostingTypeIds = [];
+            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
+        // Multi-select dropdowns - set values by IDs
+        if (data.minCourseGrading && data.minCourseGrading.length > 0) {
+            $('#minCourseGrading').val(data.minCourseGrading.map(id => String(id))).trigger('change');
+        } else {
+            $('#minCourseGrading').val([]).trigger('change');
+        }
+
+        if (data.educationalQualifications && data.educationalQualifications.length > 0) {
+            $('#educationalQualifications').val(data.educationalQualifications.map(id => String(id))).trigger('change');
+        } else {
+            $('#educationalQualifications').val([]).trigger('change');
+        }
+
+        if (data.medicalCategories && data.medicalCategories.length > 0) {
+            $('#medicalCategories').val(data.medicalCategories.map(id => String(id))).trigger('change');
+        } else {
+            $('#medicalCategories').val([]).trigger('change');
+        }
+
+        if (data.establishmentTypes && data.establishmentTypes.length > 0) {
+            $('#establishmentTypes').val(data.establishmentTypes.map(id => String(id))).trigger('change');
+        } else {
+            $('#establishmentTypes').val([]).trigger('change');
+        }
+
+        // Remarks
+        if (data.remarks && data.remarks.length > 0) {
+            selectedRemarks = data.remarks;
+            document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+                pill.classList.toggle('active', data.remarks.includes(pill.dataset.value));
+            });
+        } else {
+            selectedRemarks = [];
+            document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+        }
+    }
 
     // Load Ranks
     function loadRanks() {
@@ -422,7 +575,6 @@
 
     // Initialize pill listeners
     function initializePillListeners() {
-        // Remarks
         document.querySelectorAll('#remarksPills .pill').forEach(pill => {
             pill.addEventListener('click', function() {
                 this.classList.toggle('active');
@@ -438,87 +590,14 @@
         });
     }
 
-    // Load existing eligibility
+    // Manual load button (kept for backward compatibility)
     document.getElementById('loadEligibility').addEventListener('click', function() {
         if (!selectedCourseId) {
             alert('Please select a course first');
             return;
         }
-
-        fetch(`http://localhost:6060/api/eligibility/course/${selectedCourseId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('No existing eligibility found');
-                return response.json();
-            })
-            .then(data => {
-                populateForm(data);
-                alert('Eligibility data loaded successfully');
-            })
-            .catch(error => {
-                console.error('Error loading eligibility:', error);
-                alert('No existing eligibility found for this course');
-            });
+        loadEligibilityForCourse(selectedCourseId);
     });
-
-    // Populate form with existing data
-    function populateForm(data) {
-        // Basic fields
-        document.getElementById('additionalRemarks').value = data.additionalRemarks || '';
-
-        // Date fields
-        document.getElementById('commissionFrom').value = data.commissionDateFrom || '';
-        document.getElementById('commissionTo').value = data.commissionDateTo || '';
-        document.getElementById('seniorityFrom').value = data.seniorityDateFrom || '';
-        document.getElementById('seniorityTo').value = data.seniorityDateTo || '';
-        document.getElementById('dobFrom').value = data.dobFrom || '';
-        document.getElementById('dobTo').value = data.dobTo || '';
-
-        // Ranks
-        if (data.eligibleRanks) {
-            selectedRankIds = data.eligibleRanks.map(r => r.rank.id);
-            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedRankIds.includes(Number(cb.value));
-            });
-        }
-
-        // Units
-        if (data.eligibleUnits) {
-            selectedUnitIds = data.eligibleUnits.map(u => u.unit.id);
-            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedUnitIds.includes(Number(cb.value));
-            });
-        }
-
-        // Posting Types
-        if (data.postingTypes) {
-            selectedPostingTypeIds = data.postingTypes.map(p => p.postingType.id);
-            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedPostingTypeIds.includes(Number(cb.value));
-            });
-        }
-
-        // Multi-select dropdowns - now expecting IDs
-        if (data.minCourseGrading) {
-            $('#minCourseGrading').val(data.minCourseGrading.map(item => item.id || item)).trigger('change');
-        }
-        if (data.educationalQualifications) {
-            $('#educationalQualifications').val(data.educationalQualifications.map(item => item.id || item)).trigger('change');
-        }
-        if (data.medicalCategories) {
-            $('#medicalCategories').val(data.medicalCategories.map(item => item.id || item)).trigger('change');
-        }
-        if (data.establishmentTypes) {
-            $('#establishmentTypes').val(data.establishmentTypes.map(item => item.id || item)).trigger('change');
-        }
-
-        // Remarks
-        if (data.remarks) {
-            selectedRemarks = data.remarks;
-            document.querySelectorAll('#remarksPills .pill').forEach(pill => {
-                pill.classList.toggle('active', data.remarks.includes(pill.dataset.value));
-            });
-        }
-    }
 
     // Save eligibility
     document.getElementById('saveEligibility').addEventListener('click', function() {
@@ -529,36 +608,22 @@
 
         const payload = {
             courseId: selectedCourseId,
-
-            // Date filters
             commissionDateFrom: document.getElementById('commissionFrom').value || null,
             commissionDateTo: document.getElementById('commissionTo').value || null,
             seniorityDateFrom: document.getElementById('seniorityFrom').value || null,
             seniorityDateTo: document.getElementById('seniorityTo').value || null,
             dobFrom: document.getElementById('dobFrom').value || null,
             dobTo: document.getElementById('dobTo').value || null,
-
-            // Selected IDs
             rankIds: selectedRankIds,
             unitIds: selectedUnitIds,
             postingTypeIds: selectedPostingTypeIds,
-
-            // Multi-select dropdown values - now sending IDs
-            minCourseGrading: $('#minCourseGrading').val() || [], // Array of IDs
-            educationalQualifications: $('#educationalQualifications').val() || [], // Array of IDs
-            medicalCategories: $('#medicalCategories').val() || [], // Array of IDs
-            establishmentTypes: $('#establishmentTypes').val() || [], // Array of IDs
-
+            minCourseGrading: $('#minCourseGrading').val() || [],
+            educationalQualifications: $('#educationalQualifications').val() || [],
+            medicalCategories: $('#medicalCategories').val() || [],
+            establishmentTypes: $('#establishmentTypes').val() || [],
             remarks: selectedRemarks,
-
             additionalRemarks: document.getElementById('additionalRemarks').value || null
         };
-
-        // Validate required fields
-        if (!payload.courseId) {
-            alert('Course ID is required');
-            return;
-        }
 
         console.log('Saving payload:', payload);
 
