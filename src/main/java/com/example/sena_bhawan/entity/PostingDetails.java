@@ -16,22 +16,22 @@ public class PostingDetails {
     @Column(name = "posting_id")
     private Long postingId;
 
-    @Column(name = "personnel_id", nullable = false)
+    @Column(name = "personnel_id")
     private Long personnelId;
 
-    @Column(name = "unit_name", nullable = false)
+    @Column(name = "unit_name")
     private String unitName;
 
-    @Column(name = "location", nullable = false)
+    @Column(name = "location")
     private String location;
 
-    @Column(name = "command", nullable = false)
+    @Column(name = "command")
     private String command;
 
-    @Column(name = "appointment", nullable = false)
+    @Column(name = "appointment")
     private String appointment;
 
-    @Column(name = "from_date", nullable = false)
+    @Column(name = "from_date")
     private LocalDate fromDate;
 
     @Column(name = "to_date")
@@ -61,4 +61,9 @@ public class PostingDetails {
     @Column(name = "rank")
     private String rank;
 
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "formation_type")
+    private String formationType;
 }

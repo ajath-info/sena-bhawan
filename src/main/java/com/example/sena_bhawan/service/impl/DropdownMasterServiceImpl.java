@@ -15,7 +15,7 @@ public class DropdownMasterServiceImpl implements MasterDropdownService{
     DropdownMasterRepository dropdownMasterRepository;
 
     public List<DropdownDTO> getByType(String type) {
-        return dropdownMasterRepository.findByTypeAndStatus(type, 0)
+        return dropdownMasterRepository.findByTypeAndStatus(type, 1)
                 .stream()
                 .map(d -> new DropdownDTO(d.getId(), d.getName()))
                 .collect(Collectors.toList());

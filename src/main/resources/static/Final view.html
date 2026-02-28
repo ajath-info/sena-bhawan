@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Army Officer Hierarchy Dashboard</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f6fa;
+            margin:0;
+        }
+        .header{
+            background:#0b3c5d;
+            color:white;
+            padding:15px;
+            font-size:20px;
+        }
+        .container{
+            padding:15px;
+        }
+        .formation-row {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px;
+        }
+        .field-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .field-group label {
+            font-weight: 600;
+            color: #0b3c5d;
+            min-width: 120px;
+        }
+        .field-group select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-width: 250px;
+            font-size: 14px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .radio-group div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .radio-group input[type="radio"] {
+            transform: scale(1.1);
+            margin-right: 3px;
+        }
+        .card{
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:15px;
+            box-shadow:0 2px 5px rgba(0,0,0,.1);
+        }
+        .card h3{
+            margin-top:0;
+            color:#0b3c5d;
+        }
+        .grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:10px;
+            font-size:14px;
+            margin-top: 10px;
+        }
+        .grid-item {
+            padding: 5px 0;
+        }
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+        th,td{
+            border:1px solid #ccc;
+            padding:7px;
+            font-size:13px;
+            text-align:center;
+        }
+        th{
+            background:#0b3c5d;
+            color:white;
+        }
+        .loading {
+            color: #0b3c5d;
+            font-style: italic;
+            padding: 5px;
+        }
+        .unit-title {
+            color: #0b3c5d;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">Army Officer Hierarchy Dashboard</div>
+
+<div class="container">
+
+    <!-- SELECT FORMATION SECTION -->
+    <div class="formation-row">
+        <div class="field-group">
+            <label>Formation Type *</label>
+            <select id="formationTypeSelect" onchange="onFormationTypeChange()">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+
+        <div class="field-group">
+            <label>Formation/Unit Name *</label>
+            <select id="unitNameSelect" onchange="onUnitChange()" disabled>
+                <option value="">-- Select Formation type first --</option>
+            </select>
+        </div>
+
+        <div class="radio-group">
+            <div>
+                <input type="radio" id="peRadio" name="estabType" value="PE" checked onchange="onEstabTypeChange()">
+                <label for="peRadio">Peace Establishment (PE)</label>
+            </div>
+            <div>
+                <input type="radio" id="weRadio" name="estabType" value="WE" onchange="onEstabTypeChange()">
+                <label for="weRadio">War Establishment (WE)</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="card">
+        <div id="hq" class="unit-title">Select Formation/Unit</div>
+
+        <!-- Authorized Officers Section -->
+        <div style="margin-bottom: 20px;">
+            <b>Authorized Officers</b>
+            <div class="grid" id="authorisedGrid">
+                <div class="grid-item">Lt Gen: -</div>
+                <div class="grid-item">Maj Gen: -</div>
+                <div class="grid-item">Brig: -</div>
+                <div class="grid-item">Col: -</div>
+                <div class="grid-item">Lt Col: -</div>
+                <div class="grid-item">Maj: -</div>
+                <div class="grid-item">Capt/Lt: -</div>
+            </div>
+        </div>
+
+        <!-- Hard Scale Section -->
+        <div>
+            <b>Hard Scale</b>
+            <div class="grid" id="hardScaleGrid">
+                <div class="grid-item">Lt Gen: -</div>
+                <div class="grid-item">Maj Gen: -</div>
+                <div class="grid-item">Brig: -</div>
+                <div class="grid-item">Col: -</div>
+                <div class="grid-item">Lt Col: -</div>
+                <div class="grid-item">Maj: -</div>
+                <div class="grid-item">Capt/Lt: -</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="card">
+        <h3>Training, Unit Courses & Seniority Summary</h3>
+        <div class="grid" id="summaryGrid">
+            <div><b>Total Officers:</b> -</div>
+            <div><b>Total Courses Done:</b> -</div>
+            <div><b>Courses (Training Yr):</b> -</div>
+            <div><b>Courses in This Unit:</b> -</div>
+            <div><b>Earliest Seniority:</b> -</div>
+            <div><b>Latest Seniority:</b> -</div>
+            <div><b>Earliest Commission:</b> -</div>
+            <div><b>Latest Commission:</b> -</div>
+        </div>
+    </div>
+
+    <!-- Officer Details Table -->
+    <div class="card">
+        <h3>Officer Details (<span id="officerCount">0</span> Officers)</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Army No</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Commission Date</th>
+                <th>Seniority Date</th>
+                <th>Courses Done</th>
+                <th>Training Yr</th>
+                <th>Courses in Unit</th>
+            </tr>
+            </thead>
+            <tbody id="officerTableBody">
+            <tr><td colspan="10" style="text-align:center;">Select Formation and Unit to view data</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Base URL for API calls
+    const BASE_URL = 'http://localhost:6060';
+
+    // State variables
+    let currentOrbatId = null;
+    let currentUnitName = '';
+    let selectedFormationType = '';
+    let selectedFormationName = '';
+    let selectedUnitName = '';
+
+    // Load formation types on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFormationTypes();
+    });
+
+    // Function to load formation types from API
+    async function loadFormationTypes() {
+        const select = document.getElementById('formationTypeSelect');
+
+        try {
+            select.innerHTML = '<option value="">Loading...</option>';
+
+            const response = await fetch(`${BASE_URL}/api/dropdown/FORMATION_TYPE`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Formation types received:', data);
+
+            select.innerHTML = '<option value="">-- Select --</option>';
+
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.name || item;
+                    option.textContent = item.name || item;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">-- No data available --</option>';
+            }
+        } catch (error) {
+            console.error('Error loading formation types:', error);
+            select.innerHTML = '<option value="">-- Error loading data --</option>';
+        }
+    }
+
+    // Handle formation type change
+    async function onFormationTypeChange() {
+        const formationSelect = document.getElementById('formationTypeSelect');
+        const unitSelect = document.getElementById('unitNameSelect');
+
+        if (!formationSelect.value) {
+            unitSelect.innerHTML = '<option value="">-- Select Formation type first --</option>';
+            unitSelect.disabled = true;
+            return;
+        }
+
+        selectedFormationName = formationSelect.value;
+        console.log('Selected formation:', selectedFormationName);
+
+        unitSelect.disabled = false;
+        unitSelect.innerHTML = '<option value="">Loading units...</option>';
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/orbat/formation-type/${encodeURIComponent(selectedFormationName)}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Units received:', data);
+
+            unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.orbatId || unit.id;
+                    option.textContent = unit.name || unit.unitName || 'Unknown';
+                    unitSelect.appendChild(option);
+                });
+            } else {
+                unitSelect.innerHTML = '<option value="">-- No units available --</option>';
+            }
+        } catch (error) {
+            console.error('Error loading units:', error);
+            unitSelect.innerHTML = '<option value="">-- Error loading units --</option>';
+        }
+    }
+
+    // Handle unit change
+    async function onUnitChange() {
+        const unitSelect = document.getElementById('unitNameSelect');
+        const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+
+        if (!unitSelect.value) {
+            currentOrbatId = null;
+            document.getElementById('hq').innerText = 'Select Formation/Unit';
+            resetAllData();
+            return;
+        }
+
+        currentOrbatId = unitSelect.value;
+        currentUnitName = selectedOption.textContent;
+        selectedUnitName = currentUnitName;
+
+        document.getElementById('hq').innerText = currentUnitName;
+
+        console.log('Selected unit ID:', currentOrbatId, 'Name:', currentUnitName);
+
+        // Load establishment data for selected unit
+        const estabType = document.querySelector('input[name="estabType"]:checked').value;
+        await fetchEstablishment(currentOrbatId, estabType);
+
+        // Load officer details
+        await fetchOfficerDetails(selectedFormationName, currentUnitName);
+    }
+
+    // Handle radio button change
+    async function onEstabTypeChange() {
+        if (!currentOrbatId) {
+            alert('Please select a Formation/Unit first');
+            document.getElementById('peRadio').checked = true;
+            return;
+        }
+
+        const type = document.querySelector('input[name="estabType"]:checked').value;
+        console.log('Establishment type changed to:', type);
+        await fetchEstablishment(currentOrbatId, type);
+    }
+
+    // Fetch establishment data
+    async function fetchEstablishment(orbatId, type) {
+        console.log(`Fetching establishment for orbatId: ${orbatId}, type: ${type}`);
+
+        document.getElementById('authorisedGrid').innerHTML = '<div class="grid-item" colspan="7">Loading...</div>';
+        document.getElementById('hardScaleGrid').innerHTML = '<div class="grid-item" colspan="7">Loading...</div>';
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/establishment/${orbatId}/${type}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Establishment data received:', data);
+
+            if (data.name) {
+                document.getElementById('hq').innerText = data.name;
+            }
+
+            updateStrengthGrids(data);
+
+        } catch (error) {
+            console.error('Error loading establishment data:', error);
+            resetStrengthGrids();
+        }
+    }
+
+    // Fetch officer details from the API we created
+    async function fetchOfficerDetails(formationType, unitName) {
+        console.log(`Fetching officer details for formation: ${formationType}, unit: ${unitName}`);
+
+        document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" class="loading">Loading officer details...</td></tr>';
+
+        try {
+            // Using the GET endpoint with query parameters
+            const response = await fetch(`${BASE_URL}/api/officers/by-formation-unit?formationType=${encodeURIComponent(formationType)}&unitName=${encodeURIComponent(unitName)}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Officer details received:', data);
+
+            // Update summary
+            updateSummary(data.summary);
+
+            // Update officer table
+            updateOfficerTable(data.officers);
+
+        } catch (error) {
+            console.error('Error loading officer details:', error);
+            document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;">Error loading officer details</td></tr>';
+            resetSummary();
+        }
+    }
+
+    // Update summary grid with API data
+    function updateSummary(summary) {
+        if (!summary) {
+            resetSummary();
+            return;
+        }
+
+        const summaryGrid = document.getElementById('summaryGrid');
+        summaryGrid.innerHTML = `
+            <div><b>Total Officers:</b> ${summary.totalOfficers || '-'}</div>
+            <div><b>Total Courses Done:</b> ${summary.totalCoursesDone || '-'}</div>
+            <div><b>Courses (Training Yr):</b> ${summary.coursesTrainingYr || '-'}</div>
+            <div><b>Courses in This Unit:</b> ${summary.coursesInUnit || '-'}</div>
+            <div><b>Earliest Seniority:</b> ${formatDate(summary.earliestSeniority) || '-'}</div>
+            <div><b>Latest Seniority:</b> ${formatDate(summary.latestSeniority) || '-'}</div>
+            <div><b>Earliest Commission:</b> ${formatDate(summary.earliestCommission) || '-'}</div>
+            <div><b>Latest Commission:</b> ${formatDate(summary.latestCommission) || '-'}</div>
+        `;
+
+        document.getElementById('officerCount').innerText = summary.totalOfficers || '0';
+    }
+
+    // Update officer table with API data
+    function updateOfficerTable(officers) {
+        const tbody = document.getElementById('officerTableBody');
+
+        if (!officers || officers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">No officers found</td></tr>';
+            return;
+        }
+
+        let html = '';
+        officers.forEach(officer => {
+            html += `
+                <tr>
+                    <td>${officer.armyNo || '-'}</td>
+                    <td>${officer.rank || '-'}</td>
+                    <td>${officer.fullName || '-'}</td>
+                    <td>${officer.gender || '-'}</td>
+                    <td>${formatDate(officer.dateOfBirth) || '-'}</td>
+                    <td>${formatDate(officer.dateOfCommission) || '-'}</td>
+                    <td>${formatDate(officer.dateOfSeniority) || '-'}</td>
+                    <td>${officer.coursesDone || '0'}</td>
+                    <td>${officer.trainingYr || '0'}</td>
+                    <td>${officer.coursesInUnit || '0'}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Format date to DD-MM-YYYY
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    // Reset summary to default
+    function resetSummary() {
+        document.getElementById('summaryGrid').innerHTML = `
+            <div><b>Total Officers:</b> -</div>
+            <div><b>Total Courses Done:</b> -</div>
+            <div><b>Courses (Training Yr):</b> -</div>
+            <div><b>Courses in This Unit:</b> -</div>
+            <div><b>Earliest Seniority:</b> -</div>
+            <div><b>Latest Seniority:</b> -</div>
+            <div><b>Earliest Commission:</b> -</div>
+            <div><b>Latest Commission:</b> -</div>
+        `;
+        document.getElementById('officerCount').innerText = '0';
+    }
+
+    // Reset all data
+    function resetAllData() {
+        resetStrengthGrids();
+        resetSummary();
+        document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;">Select Formation and Unit to view data</td></tr>';
+    }
+
+    // Update strength grids with API data
+    function updateStrengthGrids(data) {
+        const auth = data.authorized || {};
+        const hard = data.hardScale || {};
+
+        const authGrid = document.getElementById('authorisedGrid');
+        authGrid.innerHTML = `
+            <div class="grid-item">Lt Gen: ${auth.ltGen ?? auth.authLtGen ?? '-'}</div>
+            <div class="grid-item">Maj Gen: ${auth.majGen ?? auth.authMajGen ?? '-'}</div>
+            <div class="grid-item">Brig: ${auth.brig ?? auth.authBrig ?? '-'}</div>
+            <div class="grid-item">Col: ${auth.col ?? auth.authCol ?? '-'}</div>
+            <div class="grid-item">Lt Col: ${auth.ltCol ?? auth.authLtCol ?? '-'}</div>
+            <div class="grid-item">Maj: ${auth.maj ?? auth.authMaj ?? '-'}</div>
+            <div class="grid-item">Capt/Lt: ${auth.ltCapt ?? auth.authLtCapt ?? auth.captLt ?? '-'}</div>
+        `;
+
+        const hardGrid = document.getElementById('hardScaleGrid');
+        hardGrid.innerHTML = `
+            <div class="grid-item">Lt Gen: ${hard.ltGen ?? hard.hardLtGen ?? '-'}</div>
+            <div class="grid-item">Maj Gen: ${hard.majGen ?? hard.hardMajGen ?? '-'}</div>
+            <div class="grid-item">Brig: ${hard.brig ?? hard.hardBrig ?? '-'}</div>
+            <div class="grid-item">Col: ${hard.col ?? hard.hardCol ?? '-'}</div>
+            <div class="grid-item">Lt Col: ${hard.ltCol ?? hard.hardLtCol ?? '-'}</div>
+            <div class="grid-item">Maj: ${hard.maj ?? hard.hardMaj ?? '-'}</div>
+            <div class="grid-item">Capt/Lt: ${hard.ltCapt ?? hard.hardLtCapt ?? hard.captLt ?? '-'}</div>
+        `;
+    }
+
+    // Reset grids to default state
+    function resetStrengthGrids() {
+        const defaultGrid = `
+            <div class="grid-item">Lt Gen: -</div>
+            <div class="grid-item">Maj Gen: -</div>
+            <div class="grid-item">Brig: -</div>
+            <div class="grid-item">Col: -</div>
+            <div class="grid-item">Lt Col: -</div>
+            <div class="grid-item">Maj: -</div>
+            <div class="grid-item">Capt/Lt: -</div>
+        `;
+
+        document.getElementById('authorisedGrid').innerHTML = defaultGrid;
+        document.getElementById('hardScaleGrid').innerHTML = defaultGrid;
+    }
+
+</script>
+
+</body>
+</html>

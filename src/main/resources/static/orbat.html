@@ -5,7 +5,6 @@
     <title>Create ORBAT Entry - ARMY HRMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: "Inter", sans-serif; background:#f1f3f5; color:#1f2937; }
@@ -66,142 +65,31 @@
         .btn-primary:disabled { background:#6b7280; cursor:not-allowed; }
         .btn-secondary { background:white; border:1px solid #d1d5db; color:#374151; }
 
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
     </style>
 </head>
-
 <body>
-<script src="auth.js"></script>
-<script src="logout.js"></script>
 
 <div class="container">
-
     <!-- SIDEBAR -->
-<!--    <aside class="sidebar">-->
-<!--        <div class="sidebar-header">-->
-<!--            <div class="logo">-->
-<!--                <div class="logo-icon">🛡️</div>-->
-<!--                <div><strong>ARMY HRMS</strong><br><small style="color:#52b788">भारतीय सेना</small></div>-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <nav class="sidebar-nav">-->
-<!--            <div class="nav-section-title">Main Menu</div>-->
-
-<!--            <a href="/dashboard-new.html" class="nav-item">-->
-<!--                <div class="nav-icon">🏠</div>-->
-<!--                <span>Dashboard</span>-->
-<!--            </a>-->
-
-<!--            <a href="/dashboard-officers.html" class="nav-item">-->
-<!--                <div class="nav-icon">🏠</div>-->
-<!--                <span>Dashboard Officers</span>-->
-<!--            </a>-->
-
-<!--            <a href="/dashboard-training.html" class="nav-item">-->
-<!--                <div class="nav-icon">🏠</div>-->
-<!--                <span>Dashboard Training</span>-->
-<!--            </a>-->
-
-<!--            <a href="/filter.html" class="nav-item">-->
-<!--                <div class="nav-icon">🔍</div>-->
-<!--                <span>Master Filter & Search</span>-->
-<!--            </a>-->
-
-<!--            <div class="nav-section-title">Administration</div>-->
-
-<!--            <a href="/role-permmissoon.html" class="nav-item">-->
-<!--                <div class="nav-icon">🔐</div>-->
-<!--                <span>Role & Permissions</span>-->
-<!--            </a>-->
-
-<!--            &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
-<!--              <div class="nav-icon">👥</div>-->
-<!--              <span>User Management</span>-->
-<!--            </a> &ndash;&gt;-->
-
-<!--            <div class="nav-section-title">Masters</div>-->
-
-<!--            <a href="/course-master.html" class="nav-item">-->
-<!--                <div class="nav-icon">📚</div>-->
-<!--                <span>Course Master</span>-->
-<!--            </a>-->
-
-<!--            <a href="/grade-awards.html" class="nav-item">-->
-<!--                <div class="nav-icon">📝</div>-->
-<!--                <span>Grade & Awards</span>-->
-<!--            </a>-->
-
-<!--            <a href="/course-schedule.html" class="nav-item">-->
-<!--                <div class="nav-icon">📅</div>-->
-<!--                <span>Course Schedule</span>-->
-<!--            </a>-->
-
-<!--            <a href="/location-master.html" class="nav-item">-->
-<!--                <div class="nav-icon">📍</div>-->
-<!--                <span>Location Master</span>-->
-<!--            </a>-->
-
-<!--            &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
-<!--              <div class="nav-icon">🚩</div>-->
-<!--              <span>Command Master</span>-->
-<!--            </a> &ndash;&gt;-->
-
-<!--            <a href="/rank-master.html" class="nav-item">-->
-<!--                <div class="nav-icon">🏅</div>-->
-<!--                <span>Rank Master</span>-->
-<!--            </a>-->
-
-<!--            <a href="/unit-master.html" class="nav-item">-->
-<!--                <div class="nav-icon">🛡️</div>-->
-<!--                <span>Unit Master</span>-->
-<!--            </a>-->
-
-<!--            <div class="nav-section-title">Forms</div>-->
-
-<!--            <a href="/personnel-form.html" class="nav-item">-->
-<!--                <div class="nav-icon">👤</div>-->
-<!--                <span>Personnel Data Form</span>-->
-<!--            </a>-->
-
-<!--            <a href="/coursepanel.html" class="nav-item">-->
-<!--                <div class="nav-icon">📋</div>-->
-<!--                <span>Course Panel Generation</span>-->
-<!--            </a>-->
-
-<!--            <a href="/orbat.html" class="nav-item active">-->
-<!--                <div class="nav-icon">📋</div>-->
-<!--                <span>Orbit Generation Form</span>-->
-<!--            </a>-->
-
-<!--            <a href="/add-new-user.html" class="nav-item">-->
-<!--                <div class="nav-icon">📋</div>-->
-<!--                <span>New User Form</span>-->
-<!--            </a>-->
-
-<!--            <a href="/legal-disciplinary.html" class="nav-item">-->
-<!--                <div class="nav-icon">📋</div>-->
-<!--                <span>Legal And Disciplinary Form</span>-->
-<!--            </a>-->
-
-<!--            <a href="/course-posting-form.html" class="nav-item">-->
-<!--                <div class="nav-icon">📝</div>-->
-<!--                <span>Course & Posting Form</span>-->
-<!--            </a>-->
-<!--        </nav>-->
-
-<!--        <div class="sidebar-footer">-->
-<!--            <div class="user-profile">-->
-<!--                <div class="user-avatar">AD</div>-->
-<!--                <div class="user-info">-->
-<!--                    <div class="name">Admin User</div>-->
-<!--                    <div class="role">HQ Command</div>-->
-<!--                </div>-->
-<!--                <div>🚪</div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </aside>-->
-
-    <div id="sidebar"></div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <div><strong>ARMY HRMS</strong><br><small style="color:#52b788">भारतीय सेना</small></div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-title">Forms</div>
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">📋</div>
+                <span>ORBAT Creation</span>
+            </a>
+        </nav>
+    </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main">
@@ -212,341 +100,601 @@
 
         <div class="content">
             <div class="form-grid" id="formGrid">
-
-                <!-- HQ DROPDOWN -->
+                <!-- ARMY HQ Dropdown - /api/orbat/hq -->
                 <div class="form-group full">
                     <label>Army HQ *</label>
-                    <select id="hqId"></select>
+                    <select id="hqId">
+                        <option value="">Loading Army HQ...</option>
+                    </select>
                 </div>
 
-                <!-- Formation Type -->
+                <!-- Formation Type - /api/dropdown/FORMATION_TYPE -->
                 <div class="form-group full">
                     <label>What do you want to create? *</label>
                     <select id="formationType">
                         <option value="">Select Type</option>
-                        <option value="command">Command</option>
-                        <option value="corps">Corps</option>
-                        <option value="division">Division</option>
-                        <option value="brigade">Brigade</option>
-                        <option value="battalion">Battalion</option>
                     </select>
                 </div>
 
-                <!-- Dynamic hierarchy -->
-                <div id="hierarchyContainer" class="full"></div>
-
-                <!-- COMMON FIELDS -->
-                <div id="commonFields" style="display:none;">
-                    <div class="form-group full">
-                        <label>Name of Est</label>
-                        <input id="name" placeholder="Enter Name of Est">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Location *</label>
-                        <input id="location">
-                    </div>
-
-                    <div class="form-group">
-                        <label>SUS Number *</label>
-                        <input id="sosNo">
-                    </div>
-
-                    <div class="form-group">
-                        <label>PIN *</label>
-                        <input id="pin">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Area Type *</label>
-                        <select id="areaType">
-                            <option value="">Select Area Type</option>
-                            <option value="Peace Field">Peace Field</option>
-                            <option value="HAA">HAA</option>
-                            <option value="CI Peace">CI Peace</option>
-                            <option value="Modified Field">Modified Field</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group full" id="unitTypeContainer" style="display:none;">
-                        <label>Type of Unit *</label>
-                        <select id="unitType">
-                            <option value="">Select Type</option>
-                            <option value="AT">AT</option>
-                            <option value="MT">MT</option>
-                            <option value="SUP">SUP</option>
-                            <option value="2nd Line">2nd Line</option>
-                            <option value="Tktpr">Tktpr</option>
-                            <option value="3rd Line">3rd Line</option>
-                        </select>
-                    </div>
-
-
-                    <div class="form-group full" style="display: none;">
-                        <label>Formation Code (Auto)</label>
-                        <input id="formationCode" readonly>
-                    </div>
+                <!-- Command Dropdown - /api/orbat/commands -->
+                <div class="form-group full" id="commandGroup" style="display: none;">
+                    <label>Select Command *</label>
+                    <select id="commandId">
+                        <option value="">Select Command</option>
+                    </select>
                 </div>
 
-            </div> <!-- form-grid -->
+                <!-- Corps Dropdown - /api/orbat/corps -->
+                <div class="form-group full" id="corpsGroup" style="display: none;">
+                    <label>Select Corps *</label>
+                    <select id="corpsId">
+                        <option value="">Select Corps</option>
+                    </select>
+                </div>
+
+                <!-- Division Dropdown - /api/orbat/divisions -->
+                <div class="form-group full" id="divisionGroup" style="display: none;">
+                    <label>Select Division *</label>
+                    <select id="divisionId">
+                        <option value="">Select Division</option>
+                    </select>
+                </div>
+
+                <!-- Brigade Dropdown - /api/orbat/brigades -->
+                <div class="form-group full" id="brigadeGroup" style="display: none;">
+                    <label>Select Brigade *</label>
+                    <select id="brigadeId">
+                        <option value="">Select Brigade</option>
+                    </select>
+                </div>
+
+                <!-- Common Fields -->
+                <div class="form-group full" id="nameGroup" style="display: none;">
+                    <label>Name of Est *</label>
+                    <input id="name" type="text" placeholder="Enter Name of Est">
+                </div>
+
+                <div class="form-group" id="locationGroup" style="display: none;">
+                    <label>Location *</label>
+                    <input id="location" type="text" placeholder="Enter Location">
+                </div>
+
+                <div class="form-group" id="susNoGroup" style="display: none;">
+                    <label>SUS Number *</label>
+                    <input id="susNo" type="text" placeholder="Enter SUS Number">
+                </div>
+
+                <div class="form-group" id="pinGroup" style="display: none;">
+                    <label>PIN *</label>
+                    <input id="pin" type="text" placeholder="Enter PIN">
+                </div>
+
+                <!-- Area Type Dropdown - /api/dropdown/AREA_TYPE -->
+                <div class="form-group" id="areaTypeGroup" style="display: none;">
+                    <label>Area Type *</label>
+                    <select id="areaType">
+                        <option value="">Loading Area Types...</option>
+                    </select>
+                </div>
+
+                <!-- Unit Type Dropdown - /api/dropdown/UNIT_TYPE -->
+                <div class="form-group full" id="unitTypeGroup" style="display: none;">
+                    <label>Type of Unit *</label>
+                    <select id="unitType">
+                        <option value="">Loading Unit Types...</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="actions">
                 <button class="btn btn-secondary" onclick="window.location.reload()">Cancel</button>
                 <button class="btn btn-primary" id="submitBtn" disabled>Create ORBAT Entry</button>
             </div>
-
         </div>
     </main>
-
 </div>
 
-<!-- JS LOGIC -->
 <script>
-    class ORBAT {
-      constructor() {
-        this.api = "http://localhost:6060/api/orbat";
+    class ORBATCreator {
+        constructor() {
+            this.baseUrl = 'http://localhost:6060/api';
+            // Hierarchy mapping for different formation types
+            this.hierarchyMap = {
+                'Command': [],  // No parent dependencies
+                'Corps': ['command'],
+                'Division': ['command', 'corps'],
+                'Brigade': ['command', 'corps', 'division'],
+                'Unit': ['command', 'corps', 'division', 'brigade']
+            };
 
-        this.hierarchyOrder = ["command", "corps", "division", "brigade", "battalion"];
-
-        this.hierarchyLevels = {
-          command: [],
-          corps: ["command"],
-          division: ["command", "corps"],
-          brigade: ["command", "corps", "division"],
-          battalion: ["command", "corps", "division", "brigade"]
-        };
-
-        this.init();
-      }
-
-      async init() {
-        await this.loadHQ();
-        this.setupEvents();
-      }
-
-      /* Load HQ */
-      async loadHQ() {
-        const res = await fetch(`${this.api}/dropdown/hq`);
-        const hqs = await res.json();
-        document.getElementById("hqId").innerHTML =
-          hqs.map(h => `<option value="${h.id}">${h.name}</option>`).join("");
-      }
-
-      setupEvents() {
-        document.getElementById("formationType")
-          .addEventListener("change", () => this.renderHierarchy());
-
-        document.getElementById("submitBtn")
-          .addEventListener("click", () => this.submitForm());
-
-        // Watch all inputs for changes
-        document.addEventListener("change", () => this.updateSubmitState());
-        document.addEventListener("input", () => this.updateSubmitState());
-      }
-
-      /* Build hierarchy dropdowns */
-      async renderHierarchy() {
-        const type = document.getElementById("formationType").value;
-        const container = document.getElementById("hierarchyContainer");
-        container.innerHTML = "";
-
-        document.getElementById("commonFields").style.display = type ? "contents" : "none";
-
-          // Show unit type only for battalion
-          const unitTypeContainer = document.getElementById("unitTypeContainer");
-          if (type === "battalion") {
-              unitTypeContainer.style.display = "block";
-          } else {
-              unitTypeContainer.style.display = "none";
-              document.getElementById("unitType").value = "";
-          }
-
-          if (!type) return;
-
-        const levels = this.hierarchyLevels[type];
-
-        for (let lvl of levels) {
-          const label = lvl.charAt(0).toUpperCase() + lvl.slice(1);
-
-          container.insertAdjacentHTML("beforeend", `
-            <div class="form-group">
-              <label>Select ${label} *</label>
-              <select id="${lvl}Id"></select>
-            </div>
-          `);
-
-          await this.loadDropdown(lvl);
+            this.init();
         }
 
-        this.updateSubmitState();
-      }
-
-      /* Load dropdown values correctly */
-      async loadDropdown(level) {
-        let url = `${this.api}/dropdown/${level}`;
-
-        const parents = this.hierarchyLevels[level];
-        if (parents.length > 0) {
-          const parentLevel = parents[parents.length - 1];  // Correct parent
-          const parentId = document.getElementById(parentLevel + "Id")?.value;
-
-          if (parentId) url += `?parentId=${parentId}`;
+        async init() {
+            await this.loadHqDropdown();
+            await this.loadFormationTypes();
+            await this.loadAreaTypes(); // Load Area Types from /api/dropdown/AREA_TYPE
+            await this.loadUnitTypes(); // Load Unit Types from /api/dropdown/UNIT_TYPE
+            this.setupEventListeners();
         }
 
-        const res = await fetch(url);
-        const items = await res.json();
+        setupEventListeners() {
+            // Formation type change
+            document.getElementById('formationType').addEventListener('change', (e) => {
+                this.handleFormationTypeChange(e.target.value);
+            });
 
-        const select = document.getElementById(level + "Id");
+            // Hierarchy dropdown changes
+            document.getElementById('commandId').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    this.loadCorpsDropdown(e.target.value);
+                } else {
+                    this.clearLowerDropdowns('corps');
+                }
+            });
 
-        // Prevent dropdown from reverting to "Select..."
-        let previousValue = select.value;
+            document.getElementById('corpsId').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    this.loadDivisionDropdown(e.target.value);
+                } else {
+                    this.clearLowerDropdowns('division');
+                }
+            });
 
-        select.innerHTML =
-          `<option value="">Select...</option>` +
-          items.map(i => `<option value="${i.id}">${i.name}</option>`).join("");
+            document.getElementById('divisionId').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    this.loadBrigadeDropdown(e.target.value);
+                } else {
+                    this.clearLowerDropdowns('brigade');
+                }
+            });
 
-        // Try to restore previous selection
-        if (items.some(i => String(i.id) === previousValue)) {
-          select.value = previousValue;
+            // Form validation on any input change
+            document.addEventListener('input', () => this.validateForm());
+            document.addEventListener('change', () => this.validateForm());
         }
 
-        select.addEventListener("change", () => {
-          this.clearChildren(level);
-          this.updateFormationCode();
-          this.loadChildren(level);
-        });
-      }
+        clearLowerDropdowns(startLevel) {
+            const levels = ['corps', 'division', 'brigade'];
+            const startIndex = levels.indexOf(startLevel);
 
-      /* Clear child dropdowns */
-      clearChildren(level) {
-        const levelIndex = this.hierarchyOrder.indexOf(level);
-        const container = document.getElementById("hierarchyContainer");
-
-        // Remove all dropdowns BELOW current level
-        container.querySelectorAll("select").forEach(sel => {
-          const selLevel = sel.id.replace("Id", "");
-          if (this.hierarchyOrder.indexOf(selLevel) > levelIndex) {
-            sel.closest(".form-group").remove();
-          }
-        });
-      }
-
-      /* Load next-level dropdown after this level */
-      async loadChildren(level) {
-        const levelIndex = this.hierarchyOrder.indexOf(level);
-        const nextLevel = this.hierarchyOrder[levelIndex + 1];
-
-        const type = document.getElementById("formationType").value;
-        if (!nextLevel || !this.hierarchyLevels[type].includes(nextLevel)) return;
-
-        // Add dropdown HTML
-        document.getElementById("hierarchyContainer").insertAdjacentHTML("beforeend", `
-            <div class="form-group">
-              <label>Select ${nextLevel.charAt(0).toUpperCase() + nextLevel.slice(1)} *</label>
-              <select id="${nextLevel}Id"></select>
-            </div>
-        `);
-
-        await this.loadDropdown(nextLevel);
-      }
-
-      /* Build formation code */
-      updateFormationCode() {
-        const type = document.getElementById("formationType").value;
-        if (!type) return;
-
-        let code = "01"; // HQ always 01
-
-        const levels = this.hierarchyLevels[type];
-        for (let lvl of levels) {
-          const id = document.getElementById(lvl + "Id")?.value;
-          code += id ? id.toString().padStart(2, "0") : "00";
+            if (startIndex >= 0) {
+                for (let i = startIndex; i < levels.length; i++) {
+                    const level = levels[i];
+                    const select = document.getElementById(`${level}Id`);
+                    if (select) {
+                        select.innerHTML = `<option value="">Select ${level.charAt(0).toUpperCase() + level.slice(1)}</option>`;
+                        select.value = '';
+                    }
+                }
+            }
         }
 
-        const ownId = document.getElementById(type + "Id")?.value || "01";
-        code += ownId.toString().padStart(2, "0");
+        // Load Army HQ dropdown - /api/orbat/hq
+        async loadHqDropdown() {
+            const select = document.getElementById('hqId');
 
-        document.getElementById("formationCode").value = code;
-      }
+            try {
+                const response = await fetch(`${this.baseUrl}/orbat/hq`);
+                if (!response.ok) throw new Error('Failed to load HQ data');
 
-      /* Validation */
-      updateSubmitState() {
-        const btn = document.getElementById("submitBtn");
+                const data = await response.json();
 
-        const requiredFields = ["hqId", "name", "location", "sosNo", "pin", "areaType"];
-        for (let id of requiredFields) {
-          if (!document.getElementById(id)?.value.trim()) {
-            btn.disabled = true;
-            return;
-          }
+                let options = '<option value="">Select Army HQ</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.id}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading HQ:', error);
+                select.innerHTML = '<option value="">Error loading HQ</option>';
+            }
         }
 
-        const type = document.getElementById("formationType").value;
-        if (!type) {
-          btn.disabled = true;
-          return;
+        // Load Formation Types - /api/dropdown/FORMATION_TYPE
+        async loadFormationTypes() {
+            const select = document.getElementById('formationType');
+
+            try {
+                const response = await fetch(`${this.baseUrl}/dropdown/FORMATION_TYPE`);
+                if (!response.ok) throw new Error('Failed to load formation types');
+
+                const data = await response.json();
+
+                let options = '<option value="">Select Type</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.name}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading formation types:', error);
+                select.innerHTML = '<option value="">Error loading types</option>';
+            }
         }
-          // If battalion, unit type required
-          if (type === "battalion") {
-              if (!document.getElementById("unitType").value) {
-                  btn.disabled = true;
-                  return;
-              }
-          }
 
+        // Load Command dropdown - /api/orbat/commands
+        async loadCommandDropdown() {
+            const select = document.getElementById('commandId');
 
-          for (let lvl of this.hierarchyLevels[type]) {
-          const el = document.getElementById(lvl + "Id");
-          if (!el || !el.value) {
-            btn.disabled = true;
-            return;
-          }
+            try {
+                const response = await fetch(`${this.baseUrl}/orbat/commands`);
+                if (!response.ok) throw new Error('Failed to load commands');
+
+                const data = await response.json();
+
+                let options = '<option value="">Select Command</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.id}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading commands:', error);
+                select.innerHTML = '<option value="">Error loading commands</option>';
+            }
         }
 
-        btn.disabled = false;
-      }
+        // Load Corps dropdown filtered by command - /api/orbat/corps?commandId=xxx
+        async loadCorpsDropdown(commandId) {
+            const select = document.getElementById('corpsId');
+            select.innerHTML = '<option value="">Loading Corps...</option>';
 
-      /* Submit */
-      async submitForm() {
-        const type = document.getElementById("formationType").value;
+            try {
+                const url = commandId
+                    ? `${this.baseUrl}/orbat/corps?commandId=${commandId}`
+                    : `${this.baseUrl}/orbat/corps`;
 
-        const payload = {
-          hqId: Number(document.getElementById("hqId").value),
-          formationType: type,
-          formationCode: document.getElementById("formationCode").value,
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load corps');
 
-          commandId: document.getElementById("commandId")?.value || null,
-          corpsId: document.getElementById("corpsId")?.value || null,
-          divisionId: document.getElementById("divisionId")?.value || null,
-          brigadeId: document.getElementById("brigadeId")?.value || null,
+                const data = await response.json();
 
-          name: document.getElementById("name").value.trim(),
-          location: document.getElementById("location").value.trim(),
-          sosNo: document.getElementById("sosNo").value.trim(),
-          pin: document.getElementById("pin").value.trim(),
-            areaType: document.getElementById("areaType").value,
-            unitType: document.getElementById("unitType")?.value || null,
+                let options = '<option value="">Select Corps</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.id}">${item.name}</option>`
+                    ).join('');
+                }
 
-        };
-
-        const res = await fetch(`${this.api}/create`, {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-          alert("✔ ORBAT Entry Created Successfully!");
-          window.location.reload();
-        } else {
-          alert("❌ Error creating ORBAT entry");
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading corps:', error);
+                select.innerHTML = '<option value="">Error loading corps</option>';
+            }
         }
-      }
+
+        // Load Division dropdown filtered by corps - /api/orbat/divisions?corpsId=xxx
+        async loadDivisionDropdown(corpsId) {
+            const select = document.getElementById('divisionId');
+            select.innerHTML = '<option value="">Loading Divisions...</option>';
+
+            try {
+                const url = corpsId
+                    ? `${this.baseUrl}/orbat/divisions?corpsId=${corpsId}`
+                    : `${this.baseUrl}/orbat/divisions`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load divisions');
+
+                const data = await response.json();
+
+                let options = '<option value="">Select Division</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.id}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading divisions:', error);
+                select.innerHTML = '<option value="">Error loading divisions</option>';
+            }
+        }
+
+        // Load Brigade dropdown filtered by division - /api/orbat/brigades?divisionId=xxx
+        async loadBrigadeDropdown(divisionId) {
+            const select = document.getElementById('brigadeId');
+            select.innerHTML = '<option value="">Loading Brigades...</option>';
+
+            try {
+                const url = divisionId
+                    ? `${this.baseUrl}/orbat/brigades?divisionId=${divisionId}`
+                    : `${this.baseUrl}/orbat/brigades`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load brigades');
+
+                const data = await response.json();
+
+                let options = '<option value="">Select Brigade</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.id}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading brigades:', error);
+                select.innerHTML = '<option value="">Error loading brigades</option>';
+            }
+        }
+
+        // Load Area Types - /api/dropdown/AREA_TYPE
+        async loadAreaTypes() {
+            const select = document.getElementById('areaType');
+
+            try {
+                const response = await fetch(`${this.baseUrl}/dropdown/AREA_TYPE`);
+                if (!response.ok) throw new Error('Failed to load area types');
+
+                const data = await response.json();
+                console.log('Area Types loaded:', data);
+
+                let options = '<option value="">Select Area Type</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.name}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading area types:', error);
+                select.innerHTML = '<option value="">Error loading area types</option>';
+            }
+        }
+
+        // Load Unit Types - /api/dropdown/UNIT_TYPE
+        async loadUnitTypes() {
+            const select = document.getElementById('unitType');
+
+            try {
+                const response = await fetch(`${this.baseUrl}/dropdown/UNIT_TYPE`);
+                if (!response.ok) throw new Error('Failed to load unit types');
+
+                const data = await response.json();
+                console.log('Unit Types loaded:', data);
+
+                let options = '<option value="">Select Unit Type</option>';
+                if (data && data.length > 0) {
+                    options += data.map(item =>
+                        `<option value="${item.name}">${item.name}</option>`
+                    ).join('');
+                }
+
+                select.innerHTML = options;
+            } catch (error) {
+                console.error('Error loading unit types:', error);
+                select.innerHTML = '<option value="">Error loading unit types</option>';
+            }
+        }
+
+        async handleFormationTypeChange(type) {
+            // Hide all groups first
+            this.hideAllGroups();
+
+            if (!type) return;
+
+            // Show common fields
+            document.getElementById('nameGroup').style.display = 'block';
+            document.getElementById('locationGroup').style.display = 'block';
+            document.getElementById('susNoGroup').style.display = 'block';
+            document.getElementById('pinGroup').style.display = 'block';
+            document.getElementById('areaTypeGroup').style.display = 'block';
+
+            // Show/hide unit type based on selection
+            if (type === 'Unit') {
+                document.getElementById('unitTypeGroup').style.display = 'block';
+            } else {
+                document.getElementById('unitTypeGroup').style.display = 'none';
+                document.getElementById('unitType').value = '';
+            }
+
+            // Show and load hierarchy dropdowns based on type
+            const parents = this.hierarchyMap[type] || [];
+
+            // Reset all hierarchy dropdowns
+            this.resetHierarchyDropdowns();
+
+            // Show and load required dropdowns
+            for (const parent of parents) {
+                const group = document.getElementById(`${parent}Group`);
+                if (group) {
+                    group.style.display = 'block';
+
+                    // Load the dropdown data based on parent level
+                    switch(parent) {
+                        case 'command':
+                            await this.loadCommandDropdown();
+                            break;
+                        case 'corps':
+                            // Corps will be loaded when command is selected
+                            break;
+                        case 'division':
+                            // Division will be loaded when corps is selected
+                            break;
+                        case 'brigade':
+                            // Brigade will be loaded when division is selected
+                            break;
+                    }
+                }
+            }
+
+            this.validateForm();
+        }
+
+        hideAllGroups() {
+            const groups = ['commandGroup', 'corpsGroup', 'divisionGroup', 'brigadeGroup',
+                           'nameGroup', 'locationGroup', 'susNoGroup', 'pinGroup',
+                           'areaTypeGroup', 'unitTypeGroup'];
+
+            groups.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+        }
+
+        resetHierarchyDropdowns() {
+            const dropdowns = ['commandId', 'corpsId', 'divisionId', 'brigadeId'];
+
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    const level = id.replace('Id', '');
+                    select.innerHTML = `<option value="">Select ${level.charAt(0).toUpperCase() + level.slice(1)}</option>`;
+                    select.value = '';
+                }
+            });
+        }
+
+        validateForm() {
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Check required fields
+            const hqId = document.getElementById('hqId').value;
+            const formationType = document.getElementById('formationType').value;
+            const name = document.getElementById('name').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const susNo = document.getElementById('susNo').value.trim();
+            const pin = document.getElementById('pin').value.trim();
+            const areaType = document.getElementById('areaType').value;
+
+            // Basic validation
+            if (!hqId || !formationType || !name || !location || !susNo || !pin || !areaType) {
+                submitBtn.disabled = true;
+                return;
+            }
+
+            // Check hierarchy based on formation type
+            const parents = this.hierarchyMap[formationType] || [];
+            for (const parent of parents) {
+                const parentSelect = document.getElementById(`${parent}Id`);
+                if (!parentSelect || !parentSelect.value) {
+                    submitBtn.disabled = true;
+                    return;
+                }
+            }
+
+            // Check unit type for Unit formation
+            if (formationType === 'Unit') {
+                const unitType = document.getElementById('unitType').value;
+                if (!unitType) {
+                    submitBtn.disabled = true;
+                    return;
+                }
+            }
+
+            submitBtn.disabled = false;
+        }
+
+        async submitForm() {
+            const formationType = document.getElementById('formationType').value;
+
+            // Get area type name (value is already the name since we set value="${item.name}")
+            const areaType = document.getElementById('areaType').value;
+
+            // Prepare payload according to FormationRequestDTO
+            const payload = {
+                formationType: formationType,
+                hqId: parseInt(document.getElementById('hqId').value),
+                commandId: this.getHierarchyId('commandId'),
+                corpsId: this.getHierarchyId('corpsId'),
+                divisionId: this.getHierarchyId('divisionId'),
+                brigadeId: this.getHierarchyId('brigadeId'),
+                name: document.getElementById('name').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                susNo: document.getElementById('susNo').value.trim(),
+                pinNo: document.getElementById('pin').value.trim(),
+                areaType: areaType  // Now this will be the name, not the ID
+            };
+
+            // Add unit type if applicable (value is already the name)
+            if (formationType === 'Unit') {
+                payload.unitType = document.getElementById('unitType').value;
+                console.log('Unit Type being sent:', payload.unitType);
+            }
+
+            console.log('Final Payload being sent:', payload);
+
+            // Validate payload
+            if (!this.validatePayload(payload, formationType)) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${this.baseUrl}/orbat/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('ORBAT Entry created successfully!');
+                    window.location.reload();
+                } else {
+                    const error = await response.text();
+                    console.error('Error response:', error);
+                    alert(`Error: ${error}`);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Failed to create ORBAT entry');
+            }
+        }
+
+        getHierarchyId(id) {
+            const element = document.getElementById(id);
+            return element && element.value ? parseInt(element.value) : null;
+        }
+
+        validatePayload(payload, formationType) {
+            // Validate based on formation type according to your service logic
+            if (formationType === 'Command' && !payload.hqId) return false;
+            if (formationType === 'Corps' && !payload.commandId) return false;
+            if (formationType === 'Division' && !payload.corpsId) return false;
+            if (formationType === 'Brigade' && !payload.divisionId) return false;
+            if (formationType === 'Unit' && !payload.brigadeId) return false;
+
+            // Ensure areaType is present
+            if (!payload.areaType) {
+                console.error('Area Type is missing');
+                return false;
+            }
+
+            // For Unit formation, ensure unitType is present
+            if (formationType === 'Unit' && !payload.unitType) {
+                console.error('Unit Type is missing for Unit formation');
+                return false;
+            }
+
+            return true;
+        }
     }
 
-    document.addEventListener("DOMContentLoaded", () => new ORBAT());
-</script>
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+        const app = new ORBATCreator();
 
+        // Attach submit handler
+        document.getElementById('submitBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            app.submitForm();
+        });
+    });
+</script>
 
 </body>
 </html>

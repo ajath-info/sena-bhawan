@@ -1,184 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Unit PE / WE Update - ARMY HRMS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Unit PE / WE Update - ARMY HRMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
 
-body {
-  font-family: "Inter", sans-serif;
-  background:#f1f3f5;
-  color:#1f2937;
-}
+    body {
+      font-family: "Inter", sans-serif;
+      background:#f1f3f5;
+      color:#1f2937;
+    }
 
-/* ================= LAYOUT ================= */
-.container {
-  display:flex;
-  height:100vh;
-  overflow:hidden;
-}
+    /* ================= LAYOUT ================= */
+    .container {
+      display:flex;
+      height:100vh;
+      overflow:hidden;
+    }
 
-/* ================= SIDEBAR ================= */
-.sidebar {
-  width:256px;
-  background:linear-gradient(180deg,#1b4332 0%,#081c15 100%);
-  color:white;
-  display:flex;
-  flex-direction:column;
-  overflow-y:auto;
-}
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width:256px;
+      background:linear-gradient(180deg,#1b4332 0%,#081c15 100%);
+      color:white;
+      display:flex;
+      flex-direction:column;
+      overflow-y:auto;
+    }
 
-.sidebar-header {
-  padding:20px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
+    .sidebar-header {
+      padding:20px;
+      border-bottom:1px solid rgba(255,255,255,0.1);
+    }
 
-.logo-section {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+    .logo-section {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
 
-.logo-icon {
-  width:32px;
-  height:32px;
-  background:#ffb703;
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-}
+    .logo-icon {
+      width:32px;
+      height:32px;
+      background:#ffb703;
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+    }
 
-.logo-text h1 { font-size:18px; font-weight:700; }
-.logo-text p { font-size:11px; color:#52b788; }
+    .logo-text h1 { font-size:18px; font-weight:700; }
+    .logo-text p { font-size:11px; color:#52b788; }
 
-.sidebar-nav { flex:1; padding:16px 0; }
+    .sidebar-nav { flex:1; padding:16px 0; }
 
-.nav-item {
-  display:flex;
-  gap:12px;
-  padding:12px 20px;
-  color:white;
-  text-decoration:none;
-  border-left:4px solid transparent;
-}
+    .nav-item {
+      display:flex;
+      gap:12px;
+      padding:12px 20px;
+      color:white;
+      text-decoration:none;
+      border-left:4px solid transparent;
+    }
 
-.nav-item.active {
-  background:rgba(255,255,255,0.1);
-  border-left-color:#ffb703;
-  font-weight:600;
-}
+    .nav-item.active {
+      background:rgba(255,255,255,0.1);
+      border-left-color:#ffb703;
+      font-weight:600;
+    }
 
-/* ================= MAIN ================= */
-.main-content {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
+    /* ================= MAIN ================= */
+    .main-content {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
 
-.header {
-  background:white;
-  border-bottom:1px solid #e5e7eb;
-  padding:16px 24px;
-}
+    .header {
+      background:white;
+      border-bottom:1px solid #e5e7eb;
+      padding:16px 24px;
+    }
 
-.header h2 { font-size:22px; font-weight:700; }
-.header p { font-size:13px; color:#6b7280; margin-top:4px; }
+    .header h2 { font-size:22px; font-weight:700; }
+    .header p { font-size:13px; color:#6b7280; margin-top:4px; }
 
-.content-area {
-  flex:1;
-  overflow-y:auto;
-  padding:24px;
-}
+    .content-area {
+      flex:1;
+      overflow-y:auto;
+      padding:24px;
+    }
 
-/* ================= FORM CARD ================= */
-.form-card {
-  max-width:1000px;
-  margin:auto;
-  background:white;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:28px;
-}
+    /* ================= FORM CARD ================= */
+    .form-card {
+      max-width:1000px;
+      margin:auto;
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:28px;
+    }
 
-.section-card {
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:20px;
-  margin-bottom:24px;
-  background:#fafafa;
-}
+    .section-card {
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:20px;
+      margin-bottom:24px;
+      background:#fafafa;
+    }
 
-.section-title {
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:16px;
-}
+    .section-title {
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:16px;
+    }
 
-.form-group { margin-bottom:16px; }
+    .form-group { margin-bottom:16px; }
 
-label {
-  font-size:13px;
-  font-weight:600;
-  margin-bottom:6px;
-  display:block;
-}
+    label {
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:6px;
+      display:block;
+    }
 
-input {
-  width:100%;
-  padding:10px 12px;
-  border-radius:8px;
-  border:1px solid #d1d5db;
-  font-size:14px;
-}
+    input, select {
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #d1d5db;
+      font-size:14px;
+    }
 
-.rank-grid {
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:16px;
-}
+    .dropdown-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
 
-.total-box {
-  background:#e5e7eb;
-  padding:10px 14px;
-  border-radius:6px;
-  font-weight:600;
-  margin-bottom:16px;
-}
+    .rank-grid {
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:16px;
+    }
 
-.radio-group {
-  display:flex;
-  gap:30px;
-  margin-top:10px;
-}
+    .total-box {
+      background:#e5e7eb;
+      padding:10px 14px;
+      border-radius:6px;
+      font-weight:600;
+      margin-bottom:16px;
+    }
 
-.actions {
-  display:flex;
-  justify-content:flex-end;
-  margin-top:20px;
-}
+    .radio-group {
+      display:flex;
+      gap:30px;
+      margin-top:10px;
+    }
 
-.btn-primary {
-  background:#1b4332;
-  color:white;
-  border:none;
-  padding:10px 22px;
-  border-radius:8px;
-  font-weight:600;
-  cursor:pointer;
-}
+    .actions {
+      display:flex;
+      justify-content:flex-end;
+      margin-top:20px;
+    }
 
-.btn-primary:hover {
-  background:#16372a;
-}
-</style>
+    .btn-primary {
+      background:#1b4332;
+      color:white;
+      border:none;
+      padding:10px 22px;
+      border-radius:8px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .btn-primary:hover {
+      background:#16372a;
+    }
+
+    .selected-info {
+      background: #e8f0fe;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border-left: 4px solid #1b4332;
+    }
+
+    .selected-info span {
+      font-weight: 700;
+      color: #1b4332;
+    }
+  </style>
 </head>
 
 <body>
@@ -217,18 +238,32 @@ input {
 
       <div class="form-card">
 
-        <!-- UNIT SELECTION -->
+        <!-- FORMATION SELECTION - TWO DROPDOWNS -->
         <div class="section-card">
-          <div class="section-title">Select Unit</div>
+          <div class="section-title">Select Formation</div>
 
-          <div class="form-group">
-            <label>Select Unit</label>
-            <select id="unitDropdown" style="width:100%; padding:10px; border-radius:8px;">
-              <option value="">-- Select Unit --</option>
-            </select>
+          <div class="dropdown-row">
+            <div class="form-group">
+              <label>Formation Type <span style="color:red;">*</span></label>
+              <select id="formationTypeDropdown" style="width:100%; padding:10px; border-radius:8px;">
+                <option value="">-- Select Formation Type --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Formation/Unit Name <span style="color:red;">*</span></label>
+              <select id="formationNameDropdown" style="width:100%; padding:10px; border-radius:8px;" disabled>
+                <option value="">-- First Select Formation Type --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Selected Formation Info Display -->
+          <div id="selectedFormationInfo" class="selected-info" style="display: none;">
+            <span id="selectedFormationType"></span>: <span id="selectedFormationName"></span>
+            <span id="selectedOrbatId" style="display:none;"></span>
           </div>
         </div>
-
 
         <!-- AUTHORIZED STRENGTH -->
         <div class="section-card">
@@ -237,14 +272,14 @@ input {
           <div class="section-card">
             <div class="section-title">Type of Establishment</div>
             <div class="radio-group">
-              <label><input type="radio" name="estType" checked> Peace Establishment (PE)</label>
-              <label><input type="radio" name="estType"> War Establishment (WE)</label>
+              <label><input type="radio" name="estType" value="PE" checked> Peace Establishment (PE)</label>
+              <label><input type="radio" name="estType" value="WE"> War Establishment (WE)</label>
             </div>
           </div>
 
           <div class="form-group">
-            <label>5123 ASC Bn Total Authorized Officers</label>
-            <input type="number" id="totalAuth">
+            <label>Total Authorized Officers</label>
+            <input type="number" id="totalAuth" min="0" value="0">
           </div>
 
           <div class="total-box">
@@ -268,7 +303,7 @@ input {
 
           <div class="form-group">
             <label>Total Hard Scale</label>
-            <input type="number" id="hardTotal">
+            <input type="number" id="hardTotal" min="0" value="0">
           </div>
 
           <div class="total-box">
@@ -287,7 +322,7 @@ input {
         </div>
 
         <div class="actions">
-          <button class="btn-primary">Update Establishment</button>
+          <button class="btn-primary" id="updateBtn">Update Establishment</button>
         </div>
 
       </div>
@@ -298,261 +333,351 @@ input {
 </div>
 
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Load Formation Types from dropdown master API
+    loadFormationTypes();
 
-  document.addEventListener("DOMContentLoaded", function () {
+    // ===============================
+    // AUTO CALCULATE AUTH TOTAL
+    // ===============================
+    document.querySelectorAll(".auth-rank").forEach(input => {
+      input.addEventListener("input", function() {
+        if (this.value < 0) this.value = 0;
+        calculateAuthTotal();
+      });
+    });
 
-     loadUnits();
+    // ===============================
+    // AUTO CALCULATE HARD TOTAL
+    // ===============================
+    document.querySelectorAll(".hard-rank").forEach(input => {
+      input.addEventListener("input", function() {
+        if (this.value < 0) this.value = 0;
+        calculateHardTotal();
+      });
+    });
 
-     // ===============================
-     // AUTO CALCULATE AUTH TOTAL
-     // ===============================
-     document.querySelectorAll(".auth-rank").forEach(input => {
-         input.addEventListener("input", function () {
-             if (this.value < 0) this.value = 0;
-             calculateAuthTotal();
-         });
-     });
+    // ===============================
+    // FORMATION TYPE CHANGE - Load Formation Names
+    // ===============================
+    document.getElementById("formationTypeDropdown").addEventListener("change", function() {
+      const formationType = this.value;
+      console.log("Selected formation type:", formationType); // Debug log
 
-     // ===============================
-     // AUTO CALCULATE HARD TOTAL
-     // ===============================
-     document.querySelectorAll(".hard-rank").forEach(input => {
-         input.addEventListener("input", function () {
-             if (this.value < 0) this.value = 0;
-             calculateHardTotal();
-         });
-     });
+      const formationNameDropdown = document.getElementById("formationNameDropdown");
 
-     // ===============================
-     // UPDATE BUTTON
-     // ===============================
-     document.querySelector(".btn-primary").addEventListener("click", updateData);
+      if (formationType) {
+        // Enable second dropdown and load formation names from orbat table
+        formationNameDropdown.disabled = false;
+        formationNameDropdown.innerHTML = '<option value="">Loading...</option>';
 
-     // Reload on dropdown change
-     document.getElementById("unitDropdown").addEventListener("change", loadUnitData);
+        // Call orbat API to get formations by type name (not ID)
+        fetch(`/api/orbat/formation-type/${formationType}`)
+          .then(response => {
+            if (!response.ok) throw new Error("Failed to load formations");
+            return response.json();
+          })
+          .then(data => {
+            console.log(`Data for ${formationType}:`, data);
 
-     // Reload on PE / WE change
-     document.querySelectorAll("input[name='estType']").forEach(radio => {
-         radio.addEventListener("change", loadUnitData);
-     });
+            formationNameDropdown.innerHTML = '<option value="">-- Select Formation/Unit --</option>';
 
- });
+            if (data && data.length > 0) {
+              data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item.id; // Store the ID for API calls
+                option.setAttribute("data-orbat-id", item.orbatId || item.id);
+                option.setAttribute("data-name", item.name);
+                option.textContent = item.name;
+                formationNameDropdown.appendChild(option);
+              });
+            } else {
+              formationNameDropdown.innerHTML = '<option value="">No data found</option>';
+            }
+          })
+          .catch(error => {
+            console.error("Error loading formations:", error);
+            formationNameDropdown.innerHTML = '<option value="">Error loading data</option>';
+          });
+      } else {
+        formationNameDropdown.disabled = true;
+        formationNameDropdown.innerHTML = '<option value="">-- First Select Formation Type --</option>';
+        document.getElementById("selectedFormationInfo").style.display = "none";
+        clearForm();
+      }
+    });
 
+    // ===============================
+    // FORMATION NAME CHANGE - Load Establishment Data
+    // ===============================
+    document.getElementById("formationNameDropdown").addEventListener("change", function() {
+      const selectedOption = this.options[this.selectedIndex];
+      const orbatId = this.value;
 
- // ===============================
- // LOAD UNITS
- // ===============================
- function loadUnits() {
+      if (orbatId) {
+        // Get formation details for display
+        const formationType = document.getElementById("formationTypeDropdown").value;
+        const formationName = selectedOption.getAttribute("data-name") || selectedOption.textContent;
+        const orbatIdValue = selectedOption.getAttribute("data-orbat-id") || orbatId;
 
-     fetch("/api/unit")
-         .then(response => response.json())
-         .then(data => {
+        // Show selected formation info
+        document.getElementById("selectedFormationType").textContent = formationType;
+        document.getElementById("selectedFormationName").textContent = formationName;
+        document.getElementById("selectedOrbatId").textContent = orbatIdValue;
+        document.getElementById("selectedFormationInfo").style.display = "block";
 
-             const dropdown = document.getElementById("unitDropdown");
-             dropdown.innerHTML = "<option value=''>Select Unit</option>";
+        // Load establishment data
+        loadEstablishmentData(orbatId);
+      } else {
+        document.getElementById("selectedFormationInfo").style.display = "none";
+        clearForm();
+      }
+    });
 
-             data.forEach(unit => {
-                 const option = document.createElement("option");
-                 option.value = unit.id;
-                 option.textContent = unit.unitName;
-                 dropdown.appendChild(option);
-             });
-         })
-         .catch(error => console.error("Error loading units:", error));
- }
+    // ===============================
+    // PE/WE RADIO CHANGE - Reload Data
+    // ===============================
+    document.querySelectorAll("input[name='estType']").forEach(radio => {
+      radio.addEventListener("change", function() {
+        const orbatId = document.getElementById("formationNameDropdown").value;
+        if (orbatId) {
+          loadEstablishmentData(orbatId);
+        }
+      });
+    });
 
+    // ===============================
+    // UPDATE BUTTON
+    // ===============================
+    document.getElementById("updateBtn").addEventListener("click", updateData);
+  });
 
- // ===============================
- // LOAD UNIT DATA
- // ===============================
- function loadUnitData() {
+  // ===============================
+  // LOAD FORMATION TYPES FROM DROPDOWN MASTER
+  // ===============================
+  function loadFormationTypes() {
+    fetch("/api/dropdown/FORMATION_TYPE")
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to load formation types");
+        return response.json();
+      })
+      .then(data => {
+        console.log("Dropdown master data:", data); // Debug log
 
-     const unitId = document.getElementById("unitDropdown").value;
+        const dropdown = document.getElementById("formationTypeDropdown");
+        dropdown.innerHTML = '<option value="">-- Select Formation Type --</option>';
 
-     if (!unitId) {
-         clearForm();
-         return;
-     }
+        // ✅ FIX: Use item.name as value (not item.id)
+        data.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.name; // "Command", "Corps", "Division", "Brigade", "Unit"
+          option.textContent = item.name;
+          dropdown.appendChild(option);
+        });
 
-     const selectedRadio = document.querySelector("input[name='estType']:checked");
-     const type = selectedRadio.parentElement.textContent.includes("War") ? "WE" : "PE";
+        console.log("Dropdown values:", Array.from(dropdown.options).map(o => o.value));
+      })
+      .catch(error => {
+        console.error("Error loading formation types:", error);
+        // Fallback to hardcoded values
+        const dropdown = document.getElementById("formationTypeDropdown");
+        dropdown.innerHTML = `
+          <option value="">-- Select Formation Type --</option>
+          <option value="Command">Command</option>
+          <option value="Corps">Corps</option>
+          <option value="Division">Division</option>
+          <option value="Brigade">Brigade</option>
+          <option value="Unit">Unit</option>
+        `;
+      });
+  }
 
-     fetch(`/api/unit-establishment/${unitId}/${type}`)
-         .then(response => {
-             if (!response.ok) throw new Error("No data found");
-             return response.json();
-         })
-         .then(data => fillForm(data))
-         .catch(error => {
-             console.error("Error loading data:", error);
-             clearForm();
-         });
- }
-
-
- // ===============================
- // FILL FORM
- // ===============================
- function fillForm(data) {
-
-     // Authorized
-     document.getElementById("authTotalDisplay").innerText = data.authorized.totalAuthOfficers || 0;
-
-     document.getElementById("authLtCapt").value = data.authorized.ltCapt || 0;
-     document.getElementById("authMaj").value = data.authorized.maj || 0;
-     document.getElementById("authLtCol").value = data.authorized.ltCol || 0;
-     document.getElementById("authCol").value = data.authorized.col || 0;
-     document.getElementById("authBrig").value = data.authorized.brig || 0;
-     document.getElementById("authMajGen").value = data.authorized.majGen || 0;
-     document.getElementById("authLtGen").value = data.authorized.ltGen || 0;
-
-     // Hard Scale
-     document.getElementById("hardTotalDisplay").innerText = data.hardScale.totalHardScale || 0;
-
-     document.getElementById("hardLtCapt").value = data.hardScale.ltCapt || 0;
-     document.getElementById("hardMaj").value = data.hardScale.maj || 0;
-     document.getElementById("hardLtCol").value = data.hardScale.ltCol || 0;
-     document.getElementById("hardCol").value = data.hardScale.col || 0;
-     document.getElementById("hardBrig").value = data.hardScale.brig || 0;
-     document.getElementById("hardMajGen").value = data.hardScale.majGen || 0;
-     document.getElementById("hardLtGen").value = data.hardScale.ltGen || 0;
- }
-
-
- // ===============================
- // CLEAR FORM
- // ===============================
- function clearForm() {
-     document.querySelectorAll("input[type='number']").forEach(input => {
-         input.value = 0;
-     });
-
-     document.getElementById("authTotalDisplay").innerText = 0;
-     document.getElementById("hardTotalDisplay").innerText = 0;
- }
-
-
- // ===============================
- // CALCULATE AUTH TOTAL
- // ===============================
- function calculateAuthTotal() {
-
-     let total = 0;
-
-     document.querySelectorAll(".auth-rank").forEach(input => {
-         total += Number(input.value) || 0;
-     });
-
-     document.getElementById("authTotalDisplay").innerText = total;
- }
-
-
- // ===============================
- // CALCULATE HARD TOTAL
- // ===============================
- function calculateHardTotal() {
-
-     let total = 0;
-
-     document.querySelectorAll(".hard-rank").forEach(input => {
-         total += Number(input.value) || 0;
-     });
-
-     document.getElementById("hardTotalDisplay").innerText = total;
- }
-
-
- // ===============================
- // UPDATE API CALL
- // ===============================
- function updateData() {
-
-     const unitId = document.getElementById("unitDropdown").value;
-
-     if (!unitId) {
-         alert("Please select a unit");
-         return;
-     }
+  // ===============================
+  // LOAD ESTABLISHMENT DATA
+  // ===============================
+  function loadEstablishmentData(orbatId) {
+    if (!orbatId) return;
 
     const selectedRadio = document.querySelector("input[name='estType']:checked");
+    const type = selectedRadio ? selectedRadio.value : "PE";
 
-    if (!selectedRadio) {
-        alert("Type of Establishment is required.");
-        return;
+    fetch(`/api/establishment/${orbatId}/${type}`)
+      .then(response => {
+        if (!response.ok) throw new Error("No data found");
+        return response.json();
+      })
+      .then(data => fillForm(data))
+      .catch(error => {
+        console.error("Error loading data:", error);
+        clearForm();
+      });
+  }
+
+  // ===============================
+  // FILL FORM
+  // ===============================
+  function fillForm(data) {
+    // Authorized
+    document.getElementById("totalAuth").value = data.authorized?.totalAuthOfficers || 0;
+    document.getElementById("authTotalDisplay").innerText = data.authorized?.totalAuthOfficers || 0;
+
+    document.getElementById("authLtCapt").value = data.authorized?.ltCapt || 0;
+    document.getElementById("authMaj").value = data.authorized?.maj || 0;
+    document.getElementById("authLtCol").value = data.authorized?.ltCol || 0;
+    document.getElementById("authCol").value = data.authorized?.col || 0;
+    document.getElementById("authBrig").value = data.authorized?.brig || 0;
+    document.getElementById("authMajGen").value = data.authorized?.majGen || 0;
+    document.getElementById("authLtGen").value = data.authorized?.ltGen || 0;
+
+    // Hard Scale
+    document.getElementById("hardTotal").value = data.hardScale?.totalHardScale || 0;
+    document.getElementById("hardTotalDisplay").innerText = data.hardScale?.totalHardScale || 0;
+
+    document.getElementById("hardLtCapt").value = data.hardScale?.ltCapt || 0;
+    document.getElementById("hardMaj").value = data.hardScale?.maj || 0;
+    document.getElementById("hardLtCol").value = data.hardScale?.ltCol || 0;
+    document.getElementById("hardCol").value = data.hardScale?.col || 0;
+    document.getElementById("hardBrig").value = data.hardScale?.brig || 0;
+    document.getElementById("hardMajGen").value = data.hardScale?.majGen || 0;
+    document.getElementById("hardLtGen").value = data.hardScale?.ltGen || 0;
+  }
+
+  // ===============================
+  // CLEAR FORM
+  // ===============================
+  function clearForm() {
+    document.querySelectorAll("input[type='number']").forEach(input => {
+      input.value = 0;
+    });
+
+    document.getElementById("totalAuth").value = 0;
+    document.getElementById("hardTotal").value = 0;
+    document.getElementById("authTotalDisplay").innerText = 0;
+    document.getElementById("hardTotalDisplay").innerText = 0;
+  }
+
+  // ===============================
+  // CALCULATE AUTH TOTAL
+  // ===============================
+  function calculateAuthTotal() {
+    let total = 0;
+    document.querySelectorAll(".auth-rank").forEach(input => {
+      total += Number(input.value) || 0;
+    });
+    document.getElementById("authTotalDisplay").innerText = total;
+  }
+
+  // ===============================
+  // CALCULATE HARD TOTAL
+  // ===============================
+  function calculateHardTotal() {
+    let total = 0;
+    document.querySelectorAll(".hard-rank").forEach(input => {
+      total += Number(input.value) || 0;
+    });
+    document.getElementById("hardTotalDisplay").innerText = total;
+  }
+
+  // ===============================
+  // UPDATE API CALL
+  // ===============================
+  function updateData() {
+    const orbatId = document.getElementById("formationNameDropdown").value;
+    const formationType = document.getElementById("formationTypeDropdown").value;
+
+    if (!formationType) {
+      alert("Please select Formation Type");
+      return;
     }
 
-    const type = selectedRadio.parentElement.textContent.includes("War") ? "WE" : "PE";
+    if (!orbatId) {
+      alert("Please select Formation/Unit Name");
+      return;
+    }
+
+    const selectedOption = document.getElementById("formationNameDropdown").options[document.getElementById("formationNameDropdown").selectedIndex];
+    const formationName = selectedOption.getAttribute("data-name") || selectedOption.textContent;
+    const orbatIdValue = selectedOption.getAttribute("data-orbat-id") || orbatId;
+
+    const selectedRadio = document.querySelector("input[name='estType']:checked");
+    if (!selectedRadio) {
+      alert("Please select Establishment Type (PE/WE)");
+      return;
+    }
+    const type = selectedRadio.value;
 
     const enteredAuthTotal = Number(document.getElementById("totalAuth").value);
     const enteredHardTotal = Number(document.getElementById("hardTotal").value);
-
     const calculatedAuthTotal = Number(document.getElementById("authTotalDisplay").innerText);
     const calculatedHardTotal = Number(document.getElementById("hardTotalDisplay").innerText);
 
-    // ===============================
-    // VALIDATION LOGIC
-    // ===============================
-
+    // VALIDATION
     if (!enteredAuthTotal || enteredAuthTotal <= 0) {
-        alert("Total Authorized Officers is required.");
-        return;
+      alert("Total Authorized Officers is required and must be greater than 0");
+      return;
     }
 
     if (!enteredHardTotal || enteredHardTotal <= 0) {
-        alert("Total Hard Scale is required.");
-        return;
+      alert("Total Hard Scale is required and must be greater than 0");
+      return;
     }
 
     if (calculatedAuthTotal > enteredAuthTotal) {
-        alert("Authorized ranks total cannot exceed Total Authorized Officers.");
-        return;
+      alert("Sum of authorized ranks cannot exceed Total Authorized Officers");
+      return;
     }
 
     if (calculatedHardTotal > enteredHardTotal) {
-        alert("Hard Scale ranks total cannot exceed Total Hard Scale.");
-        return;
+      alert("Sum of hard scale ranks cannot exceed Total Hard Scale");
+      return;
     }
-     const payload = {
 
-         establishmentType: type,
+    const payload = {
+      establishmentType: type,
+      formationType: formationType,
+      formationName: formationName,
+      orbatId: orbatIdValue,
+      totalAuthorizedOfficers: enteredAuthTotal,
+      totalHardScale: enteredHardTotal,
+      ltCapt: Number(document.getElementById("authLtCapt").value),
+      maj: Number(document.getElementById("authMaj").value),
+      ltCol: Number(document.getElementById("authLtCol").value),
+      col: Number(document.getElementById("authCol").value),
+      brig: Number(document.getElementById("authBrig").value),
+      majGen: Number(document.getElementById("authMajGen").value),
+      ltGen: Number(document.getElementById("authLtGen").value),
+      hsLtCapt: Number(document.getElementById("hardLtCapt").value),
+      hsMaj: Number(document.getElementById("hardMaj").value),
+      hsLtCol: Number(document.getElementById("hardLtCol").value),
+      hsCol: Number(document.getElementById("hardCol").value),
+      hsBrig: Number(document.getElementById("hardBrig").value),
+      hsMajGen: Number(document.getElementById("hardMajGen").value),
+      hsLtGen: Number(document.getElementById("hardLtGen").value)
+    };
 
-         totalAuthorizedOfficers: enteredAuthTotal,
-         totalHardScale: enteredHardTotal,
+    console.log("Sending payload:", payload);
 
-         ltCapt: Number(document.getElementById("authLtCapt").value),
-         maj: Number(document.getElementById("authMaj").value),
-         ltCol: Number(document.getElementById("authLtCol").value),
-         col: Number(document.getElementById("authCol").value),
-         brig: Number(document.getElementById("authBrig").value),
-         majGen: Number(document.getElementById("authMajGen").value),
-         ltGen: Number(document.getElementById("authLtGen").value),
-
-         hsLtCapt: Number(document.getElementById("hardLtCapt").value),
-         hsMaj: Number(document.getElementById("hardMaj").value),
-         hsLtCol: Number(document.getElementById("hardLtCol").value),
-         hsCol: Number(document.getElementById("hardCol").value),
-         hsBrig: Number(document.getElementById("hardBrig").value),
-         hsMajGen: Number(document.getElementById("hardMajGen").value),
-         hsLtGen: Number(document.getElementById("hardLtGen").value)
-     };
-
-     fetch(`/api/unit-establishment/${unitId}/${type}`, {
-         method: "PUT",
-         headers: {
-             "Content-Type": "application/json"
-         },
-         body: JSON.stringify(payload)
-     })
-     .then(response => response.text())
-     .then(message => {
-         alert(message);
-     })
-     .catch(error => {
-         console.error("Update Error:", error);
-         alert("Update failed");
-     });
- }
-
+    fetch(`/api/establishment/${orbatId}/${type}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Update failed");
+      return response.text();
+    })
+    .then(message => {
+      alert(message);
+      // Reload data to show updated values
+      loadEstablishmentData(orbatId);
+    })
+    .catch(error => {
+      console.error("Update Error:", error);
+      alert("Update failed: " + error.message);
+    });
+  }
 </script>
 
 </body>

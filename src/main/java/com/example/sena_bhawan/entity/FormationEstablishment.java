@@ -9,26 +9,31 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "unit_establishment")
+@Table(name = "formation_establishment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UnitEstablishment {
+public class FormationEstablishment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // ================= RELATION =================
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitMaster unitId;
+    @Column(name = "orbat_id", nullable = false)
+    private Long orbatId;
 
     // ================= ENUM =================
     @Enumerated(EnumType.STRING)
     @Column(name = "establishment_type", nullable = false )
     private EstablishmentType establishmentType;
+
+    @Column(name = "formation_Type")
+    private String formationType;
+
+    @Column(name = "name")
+    private String name;
 
     // ================= AUTHORIZED =================
     @Column(name = "total_authorized_officers")

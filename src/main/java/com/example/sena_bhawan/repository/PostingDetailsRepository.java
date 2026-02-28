@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.repository;
 
+import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.entity.PostingDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +38,19 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
     // Count all records where from_date is in the future
     @Query("SELECT COUNT(p) FROM PostingDetails p WHERE p.fromDate > :currentDate")
     long countPendingTransfers(@Param("currentDate") LocalDate currentDate);
+
+
+    @Query("SELECT DISTINCT pd.personnelId FROM PostingDetails pd " +
+            "WHERE pd.formationType = :formationType AND pd.unitName = :unitName")
+    List<Long> findPersonnelIdsByFormationTypeAndUnitName(
+            @Param("formationType") String formationType,
+            @Param("unitName") String unitName);
+
+    @Query("SELECT pd FROM PostingDetails pd " +
+            "WHERE pd.personnelId IN :personnelIds AND pd.formationType = :formationType " +
+            "AND pd.unitName = :unitName ORDER BY pd.fromDate DESC")
+    List<PostingDetails> findPostingsByPersonnelIdsAndUnit(
+            @Param("personnelIds") List<Long> personnelIds,
+            @Param("formationType") String formationType,
+            @Param("unitName") String unitName);
 }

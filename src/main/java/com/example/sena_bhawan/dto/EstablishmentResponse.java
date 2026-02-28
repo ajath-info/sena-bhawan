@@ -1,18 +1,20 @@
 package com.example.sena_bhawan.dto;
 
-import com.example.sena_bhawan.entity.UnitEstablishment;
+import com.example.sena_bhawan.entity.FormationEstablishment;
 import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UnitEstablishmentResponse {
+public class EstablishmentResponse {
 
-    private Long unitId;
+    private Long orbatId;
     private Authorized authorized;
     private HardScale hardScale;
-    private UnitEstablishment.EstablishmentType establishmentType;
+    private FormationEstablishment.EstablishmentType establishmentType;
+    private String formationType;
+    private String name;
 
     @Data
     public static class Authorized {
