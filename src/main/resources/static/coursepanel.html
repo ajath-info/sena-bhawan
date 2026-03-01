@@ -1715,11 +1715,12 @@
                     option.dataset.courseId = course.courseId;
                     option.dataset.startDate = course.startDate;
                     option.dataset.endDate = course.endDate;
+                    option.dataset.scheduleId = course.scheduleId;
                     courseSelect.appendChild(option);
                 });
             });
 
-        courseSelect.addEventListener("change", function () {
+        courseSelect.addEventListener("change", async function () {
             const selectedOption = this.options[this.selectedIndex];
             const scheduleId = this.value;
             const courseId = selectedOption.dataset.courseId;
@@ -1733,9 +1734,120 @@
             document.getElementById("courseStartDate").value = selectedOption.dataset.startDate;
             document.getElementById("courseEndDate").value = selectedOption.dataset.endDate;
 
+            // Load course strength for step 2
             loadStep2PanelStrength(courseId);
+
+            // NEW: Fetch eligibility criteria and apply filters automatically
+            if (courseId) {
+                try {
+                    showLoading(true);
+                    // Call eligibility API
+                    const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/course/${courseId}`);
+                    const eligibilityData = await eligibilityResponse.json();
+
+                    console.log("Eligibility data:", eligibilityData);
+
+                    // Transform eligibility data to filter request format
+                    const filterRequest = transformEligibilityToFilter(eligibilityData);
+                    console.log("Filter request:", filterRequest);
+
+                    // Call filter API with eligibility criteria
+                    const filterResponse = await fetch('http://localhost:6060/api/personnel/filter', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(filterRequest)
+                    });
+
+                    if (filterResponse.ok) {
+                        const filterResult = await filterResponse.json();
+                        console.log("Filter result:", filterResult);
+
+                        // Update officers array with filtered data
+                        officers = filterResult.data || [];
+
+                        // Clear previous selections
+                        selectedSet.clear();
+                        statusMap.clear();
+
+                        // Update UI
+                        document.getElementById("totalEligible").innerText = officers.length;
+                        document.getElementById("selectedCount").innerText = "0";
+
+                        // Render the table with filtered officers
+                        renderOfficerTable();
+
+                        // Update panel summary
+                        updatePanelSummary();
+
+                        showToast(`Found ${officers.length} eligible officers`, 'success');
+                    }
+                } catch (error) {
+                    console.error("Error fetching eligibility or filters:", error);
+                    showToast("Error loading eligible officers", 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
         });
     });
+
+    // ===============================
+    // TRANSFORM ELIGIBILITY DATA TO FILTER REQUEST
+    // ===============================
+    function transformEligibilityToFilter(eligibilityData) {
+        // Map rank IDs to rank names (you'll need to maintain this mapping)
+        const rankIdToName = {
+            37: "Major",
+            38: "Lieutenant Colonel",
+            40: "Lieutenant Colonel",
+            41: "Colonel",
+            43: "Brigadier"
+            // Add more mappings as needed
+        };
+
+        // Map medical category IDs to names
+        const medicalIdToName = {
+            21: "S1"
+            // Add more mappings as needed
+        };
+
+        // Map unit IDs to unit names if needed
+        // For now, we'll keep unitIds as is or you can fetch unit names
+
+        const filterRequest = {
+            rank: (eligibilityData.rankIds || []).map(id => rankIdToName[id] || null).filter(Boolean),
+            medicalCategory: (eligibilityData.medicalCategories || []).map(id => medicalIdToName[id] || null).filter(Boolean),
+            command: null,
+            corps: null,
+            division: null,
+            establishmentType: eligibilityData.establishmentTypes || null,
+            areaType: null,
+            civilQualification: eligibilityData.educationalQualifications || null,
+            sports: null,
+            postingDueMonths: null,
+            courseName: null,
+            placeOfBirth: null,
+            dobGreaterThan: eligibilityData.dobFrom || null,
+            docFrom: eligibilityData.commissionDateFrom || null,
+            docTo: eligibilityData.commissionDateTo || null,
+            dosFrom: eligibilityData.seniorityDateFrom || null,
+            dosTo: eligibilityData.seniorityDateTo || null,
+            tosFrom: null,
+            tosTo: null,
+            courseFrom: null,
+            courseTo: null,
+            search: null,
+            unitIds: eligibilityData.unitIds || null,
+            remarks: eligibilityData.remarks || null,
+            minCourseGrading: eligibilityData.minCourseGrading || null,
+            postingTypeIds: eligibilityData.postingTypeIds || null,
+            additionalRemarks: eligibilityData.additionalRemarks || null
+        };
+
+        return filterRequest;
+    }
 
     // ===============================
     // STEP 2: PANEL STRENGTH
@@ -2178,7 +2290,9 @@
         };
     }
 
-    // Apply advanced filters
+    // ===============================
+    // MODIFIED APPLY ADVANCED FILTERS
+    // ===============================
     async function applyAdvancedFilters() {
         showLoading(true);
 
@@ -2197,6 +2311,14 @@
                 const data = await response.json();
                 filterResults = data.data || [];
 
+                // If this is called from the main page (not popup), update officers
+                if (!document.getElementById('filterPopup').style.display ||
+                    document.getElementById('filterPopup').style.display === 'none') {
+                    officers = filterResults;
+                    renderOfficerTable();
+                    document.getElementById("totalEligible").innerText = officers.length;
+                }
+
                 renderFilterResultsTable();
                 updateFilterCount();
             }
@@ -2207,6 +2329,42 @@
             showLoading(false);
         }
     }
+
+
+    // Add loading indicator to the page
+    function addLoadingIndicator() {
+        const style = document.createElement('style');
+        style.textContent = `
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1b4332;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+        document.head.appendChild(style);
+    }
+
+    // Call this on page load
+    addLoadingIndicator();
 
     // Render results in popup table
     function renderFilterResultsTable() {
@@ -2361,10 +2519,18 @@
     // OFFICER TABLE FUNCTIONS
     // ===============================
     function loadOfficers() {
-        fetch("http://localhost:6060/api/panel/officers")
+        // This function is now modified to use the filter API instead of the panel/officers API
+        // But we'll keep it for initial load or fallback
+        fetch("http://localhost:6060/api/personnel/filter", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}) // Empty filter to get all officers
+        })
             .then(res => res.json())
             .then(data => {
-                officers = Array.isArray(data) ? data : [];
+                officers = Array.isArray(data.data) ? data.data : [];
                 document.getElementById("totalEligible").innerText = officers.length;
                 renderOfficerTable();
                 updatePanelSummary();
@@ -2380,64 +2546,66 @@
 
         if (!officers || officers.length === 0) {
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="17" style="text-align: center; padding: 40px;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
-                        <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers selected</div>
-                        <div style="color: #6b7280;">Click "Open Advanced Filters" to add officers</div>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td colspan="17" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No eligible officers found</div>
+                    <div style="color: #6b7280;">Select a course to view eligible officers</div>
+                </td>
+            </tr>
+        `;
             return;
         }
 
         officers.forEach((o, index) => {
-            const isSelected = selectedSet.has(o.personnelId);
-            const isAttending = attendingSet.has(o.personnelId);
-            const status = statusMap.get(o.personnelId) || 'Reserve';
+            const isSelected = selectedSet.has(o.id || o.personnelId);
+            const isAttending = attendingSet.has(o.id || o.personnelId);
+            const status = statusMap.get(o.id || o.personnelId) || 'Reserve';
 
             const row = document.createElement("tr");
 
             row.innerHTML = `
-                <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${o.personnelId}" class="officer-checkbox"></td>
-                <td>${index + 1}</td>
-                <td>
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
-                             style="width:36px;height:36px;border-radius:50%;object-fit:cover" />
-                        <div>
-                            <div style="font-weight:600">${o.fullName}</div>
-                            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
-                        </div>
+            <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${o.id || o.personnelId}" class="officer-checkbox"></td>
+            <td>${index + 1}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
+                         style="width:36px;height:36px;border-radius:50%;object-fit:cover"
+                         onerror="this.src='http://localhost:6060/uploads/default.png'" />
+                    <div>
+                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
                     </div>
-                </td>
-                <td>${o.rank || "-"}</td>
-                <td>${o.unit || "-"}</td>
-                <td>${o.command || "-"}</td>
-                <td>${formatDate(o.dateOfCommission)}</td>
-                <td>${formatDate(o.dateOfSeniority)}</td>
-                <td>${formatDate(o.dateOfBirth)}</td>
-                <td>${o.religion || "-"}</td>
-                <td>${o.maritalStatus || "-"}</td>
-                <td>${o.medicalCategory || "-"}</td>
-                <td>${o.mobileNumber || "-"}</td>
-                <td>${o.emailAddress || "-"}</td>
-                <td>${o.city || "-"}</td>
-                <td>${o.state || "-"}</td>
-                <td>
-                    <span class="badge ${status === 'Retain' ? 'badge-success' : 'badge-warning'}">${status}</span>
-                </td>
-            `;
+                </div>
+            </td>
+            <td>${o.rank || "-"}</td>
+            <td>${o.unit || "-"}</td>
+            <td>${o.command || "-"}</td>
+            <td>${formatDate(o.dateOfCommission)}</td>
+            <td>${formatDate(o.dateOfSeniority)}</td>
+            <td>${formatDate(o.dateOfBirth)}</td>
+            <td>${o.religion || "-"}</td>
+            <td>${o.maritalStatus || "-"}</td>
+            <td>${o.medicalCategory || "-"}</td>
+            <td>${o.mobileNumber || o.mobile || "-"}</td>
+            <td>${o.emailAddress || o.email || "-"}</td>
+            <td>${o.city || "-"}</td>
+            <td>${o.state || "-"}</td>
+            <td>
+                <span class="badge ${status === 'Retain' ? 'badge-success' : 'badge-warning'}">${status}</span>
+            </td>
+        `;
 
             tbody.appendChild(row);
 
             const checkbox = row.querySelector('.officer-checkbox');
             checkbox.addEventListener('change', function() {
+                const personnelId = parseInt(this.dataset.personnelid);
                 if (this.checked) {
-                    selectedSet.add(o.personnelId);
+                    selectedSet.add(personnelId);
                 } else {
-                    selectedSet.delete(o.personnelId);
-                    statusMap.delete(o.personnelId);
+                    selectedSet.delete(personnelId);
+                    statusMap.delete(personnelId);
                 }
                 document.getElementById('selectedCount').innerText = selectedSet.size;
                 updatePanelSummary();
@@ -2446,6 +2614,7 @@
 
         document.getElementById('selectedCount').innerText = selectedSet.size;
     }
+
 
     // ===============================
     // PANEL SUMMARY
@@ -2812,11 +2981,11 @@
     }
 
     // ===============================
-    // INITIALIZATION
+    // UPDATE INITIALIZATION
     // ===============================
     document.addEventListener("DOMContentLoaded", function() {
-        // Load officers
-        loadOfficers();
+        // Don't load officers immediately - wait for course selection
+        // loadOfficers(); - Comment this out or remove it
 
         // Load roles for step 4
         loadSendToRoles();
@@ -2838,16 +3007,6 @@
         document.getElementById('courseNameFilter')?.addEventListener('change', applyAdvancedFilters);
         document.getElementById('pobFilter')?.addEventListener('change', applyAdvancedFilters);
 
-        const selectIds = [
-            'rankFilter', 'medicalFilter', 'commandFilter', 'corpsFilter',
-            'divisionFilter', 'estFilter', 'areaTypeFilter', 'civilFilter',
-            'sportsFilter', 'postingDueFilter'
-        ];
-
-        selectIds.forEach(id => {
-            document.getElementById(id)?.addEventListener('change', applyAdvancedFilters);
-        });
-
         // Close popup when clicking outside
         window.addEventListener('click', function(event) {
             const popup = document.getElementById('filterPopup');
@@ -2855,6 +3014,10 @@
                 closeFilterPopup();
             }
         });
+
+        // Initialize with empty officers array
+        officers = [];
+        renderOfficerTable();
     });
 </script>
 </body>
