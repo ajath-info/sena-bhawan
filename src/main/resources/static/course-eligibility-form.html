@@ -126,25 +126,38 @@
             </div>
 
             <!-- Multi-select Dropdowns using /api/dropdown/{type} -->
+            <!-- Multi-select Dropdowns using custom dropdown style -->
             <div class="grid-2 mt">
                 <div>
                     <label class="label">Minimum Course Grading</label>
-                    <select id="minCourseGrading" class="input select2-multi" multiple></select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="grading">Select Options</div>
+                        <div class="dropdown-content" id="dropdown-grading" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
                 <div>
                     <label class="label">Educational Qualifications</label>
-                    <select id="educationalQualifications" class="input select2-multi" multiple></select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="edu">Select Options</div>
+                        <div class="dropdown-content" id="dropdown-edu" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="grid-2 mt">
                 <div>
                     <label class="label">Medical Categories</label>
-                    <select id="medicalCategories" class="input select2-multi" multiple></select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="medical">Select Options</div>
+                        <div class="dropdown-content" id="dropdown-medical" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
                 <div>
                     <label class="label">Establishment Types</label>
-                    <select id="establishmentTypes" class="input select2-multi" multiple></select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="estab">Select Options</div>
+                        <div class="dropdown-content" id="dropdown-estab" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -178,6 +191,85 @@
     let selectedUnitIds = [];
     let selectedPostingTypeIds = [];
     let selectedRemarks = [];
+    let gradingSelected = [];
+    let eduSelected = [];
+    let medicalSelected = [];
+    let estabSelected = [];
+
+    // Custom dropdown toggle functionality
+    document.addEventListener('click', function(e) {
+        // Close all dropdowns if click outside
+        const isDropdown = e.target.closest('.dropdown');
+        if (!isDropdown) {
+            document.querySelectorAll('.dropdown-content').forEach(dd => dd.style.display = 'none');
+        }
+    });
+
+    // Initialize dropdown buttons
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const targetKey = this.dataset.target;
+            const content = document.getElementById(`dropdown-${targetKey}`);
+            if (!content) return;
+
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(dd => {
+                if (dd !== content) dd.style.display = 'none';
+            });
+
+            // Toggle current
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    // Function to populate dropdown with checkboxes
+    function populateDropdown(dropdownId, items, selectedArrayRef) {
+        const container = document.getElementById(dropdownId);
+        if (!container) return;
+        container.innerHTML = '';
+        items.forEach(item => {
+            const label = document.createElement('label');
+            label.style.display = 'block';
+            label.style.padding = '8px';
+            label.style.cursor = 'pointer';
+            label.innerHTML = `<input type="checkbox" value="${item.id}" ${selectedArrayRef.includes(item.id) ? 'checked' : ''}> ${item.name}`;
+            label.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const checkbox = label.querySelector('input');
+                const val = Number(checkbox.value);
+                if (checkbox.checked) {
+                    if (!selectedArrayRef.includes(val)) selectedArrayRef.push(val);
+                } else {
+                    const idx = selectedArrayRef.indexOf(val);
+                    if (idx > -1) selectedArrayRef.splice(idx, 1);
+                }
+                // Update button text
+                updateDropdownButtonText(dropdownId);
+            });
+            container.appendChild(label);
+        });
+    }
+
+    function updateDropdownButtonText(dropdownId) {
+        let target = '';
+        if (dropdownId.includes('grading')) target = 'grading';
+        else if (dropdownId.includes('edu')) target = 'edu';
+        else if (dropdownId.includes('medical')) target = 'medical';
+        else if (dropdownId.includes('estab')) target = 'estab';
+        if (!target) return;
+
+        const btn = document.querySelector(`.dropdown-btn[data-target="${target}"]`);
+        if (!btn) return;
+
+        let selectedArray = [];
+        if (target === 'grading') selectedArray = gradingSelected;
+        else if (target === 'edu') selectedArray = eduSelected;
+        else if (target === 'medical') selectedArray = medicalSelected;
+        else if (target === 'estab') selectedArray = estabSelected;
+
+        btn.innerText = selectedArray.length === 0 ? 'Select Options' : `${selectedArray.length} selected`;
+    }
 
     // Mapping of dropdown types to their API endpoints and element IDs
     const dropdownConfig = {
@@ -220,9 +312,25 @@
 
     // Load all dropdown data from the new API
     function loadAllDropdowns() {
-        Object.values(dropdownConfig).forEach(config => {
-            loadDropdown(config.type, config.elementId);
-        });
+        fetch('http://localhost:6060/api/dropdown/COURSE_GRADE')
+            .then(r => r.json())
+            .then(data => populateDropdown('dropdown-grading', data, gradingSelected))
+            .catch(e => console.log('Using mock data for grading', e));
+
+        fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATION')
+            .then(r => r.json())
+            .then(data => populateDropdown('dropdown-edu', data, eduSelected))
+            .catch(e => console.log('Using mock data for edu', e));
+
+        fetch('http://localhost:6060/api/dropdown/MEDICAL')
+            .then(r => r.json())
+            .then(data => populateDropdown('dropdown-medical', data, medicalSelected))
+            .catch(e => console.log('Using mock data for medical', e));
+
+        fetch('http://localhost:6060/api/dropdown/ESTABLISHMENT')
+            .then(r => r.json())
+            .then(data => populateDropdown('dropdown-estab', data, estabSelected))
+            .catch(e => console.log('Using mock data for estab', e));
     }
 
     // Generic function to load dropdown data from /api/dropdown/{type}
@@ -301,6 +409,11 @@
 
     // Function to reset form
     function resetForm() {
+        // reset custom dropdown selections
+        gradingSelected = []; eduSelected = []; medicalSelected = []; estabSelected = [];
+        document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.dropdown-btn').forEach(btn => btn.innerText = 'Select Options');
+
         // Reset date fields
         document.getElementById('commissionFrom').value = '';
         document.getElementById('commissionTo').value = '';
@@ -367,6 +480,19 @@
 
     // Populate form with existing data
     function populateForm(data) {
+        // Custom dropdowns
+        gradingSelected = data.minCourseGrading ? data.minCourseGrading.map(id => Number(id)) : [];
+        eduSelected = data.educationalQualifications ? data.educationalQualifications.map(id => Number(id)) : [];
+        medicalSelected = data.medicalCategories ? data.medicalCategories.map(id => Number(id)) : [];
+        estabSelected = data.establishmentTypes ? data.establishmentTypes.map(id => Number(id)) : [];
+        // Reload dropdowns to reflect selections
+        loadAllDropdowns();
+
+        document.querySelector('.dropdown-btn[data-target="grading"]').innerText = gradingSelected.length ? gradingSelected.length + ' selected' : 'Select Options';
+        document.querySelector('.dropdown-btn[data-target="edu"]').innerText = eduSelected.length ? eduSelected.length + ' selected' : 'Select Options';
+        document.querySelector('.dropdown-btn[data-target="medical"]').innerText = medicalSelected.length ? medicalSelected.length + ' selected' : 'Select Options';
+        document.querySelector('.dropdown-btn[data-target="estab"]').innerText = estabSelected.length ? estabSelected.length + ' selected' : 'Select Options';
+
         // Date fields
         document.getElementById('commissionFrom').value = data.commissionDateFrom || '';
         document.getElementById('commissionTo').value = data.commissionDateTo || '';
@@ -536,7 +662,7 @@
 
     // Load Posting Types
     function loadPostingTypes() {
-        fetch('http://localhost:6060/api/postingtypes')
+        fetch('http://localhost:6060/api/dropdown/POST_TYPES')
             .then(response => {
                 if (!response.ok) throw new Error('Failed to load posting types');
                 return response.json();
@@ -563,7 +689,7 @@
                     });
 
                     label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${type.postingType}`));
+                    label.appendChild(document.createTextNode(` ${type.name}`));
                     postingList.appendChild(label);
                 });
             })
@@ -617,10 +743,10 @@
             rankIds: selectedRankIds,
             unitIds: selectedUnitIds,
             postingTypeIds: selectedPostingTypeIds,
-            minCourseGrading: $('#minCourseGrading').val() || [],
-            educationalQualifications: $('#educationalQualifications').val() || [],
-            medicalCategories: $('#medicalCategories').val() || [],
-            establishmentTypes: $('#establishmentTypes').val() || [],
+            minCourseGrading: gradingSelected,
+            educationalQualifications: eduSelected,
+            medicalCategories: medicalSelected,
+            establishmentTypes: estabSelected,
             remarks: selectedRemarks,
             additionalRemarks: document.getElementById('additionalRemarks').value || null
         };

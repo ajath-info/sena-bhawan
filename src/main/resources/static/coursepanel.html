@@ -707,6 +707,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
+            position: relative;
         }
 
         @media (max-width: 1200px) {
@@ -730,6 +731,11 @@
             width: 18px;
             height: 18px;
             cursor: pointer;
+        }
+
+        .filter-grid .form-group {
+            position: relative;
+            z-index: auto;
         }
 
         .toast {
@@ -782,6 +788,103 @@
 
         .clear-filters:hover {
             background: #fee2e2;
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-btn {
+            border: 1px solid #ccc;
+            padding: 10px;
+            cursor: pointer;
+            background: #f9f9f9;
+            border-radius: 8px;
+            user-select: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999 !important; /* Force highest z-index */
+            border-radius: 8px;
+            margin-top: 2px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .dropdown-content label {
+            display: block;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-content label:hover {
+            background: #f1f1f1;
+        }
+
+        .dropdown-content label:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        /* Show dropdown when focused or when active class is added */
+        .dropdown:focus-within .dropdown-content,
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999; /* Increased z-index */
+            border-radius: 8px;
+            margin-top: 2px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Ensure dropdown appears above other elements */
+        .dropdown {
+            position: relative;
+            /*z-index: 100;*/
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999;
+            border-radius: 8px;
+            margin-top: 2px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .dropdown-content.show {
+            display: block !important;
         }
     </style>
 </head>
@@ -1294,73 +1397,82 @@
                 <!-- Rank Filter -->
                 <div class="form-group">
                     <label class="form-label">🏅 Rank</label>
-                    <select class="form-select filter-select" id="rankFilter" multiple size="5">
-                        <option value="">All Ranks</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="rankFilter">Select Ranks</div>
+                        <div class="dropdown-content" id="dropdown-rankFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Medical Category -->
                 <div class="form-group">
                     <label class="form-label">⚕️ Medical Category</label>
-                    <select class="form-select filter-select" id="medicalFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="medicalFilter">Select Medical Categories</div>
+                        <div class="dropdown-content" id="dropdown-medicalFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Command -->
                 <div class="form-group">
                     <label class="form-label">📍 Command</label>
-                    <select class="form-select filter-select" id="commandFilter" multiple size="5">
-                        <option value="">All Commands</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="commandFilter">Select Commands</div>
+                        <div class="dropdown-content" id="dropdown-commandFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Corps -->
                 <div class="form-group">
                     <label class="form-label">🎯 Corps</label>
-                    <select class="form-select filter-select" id="corpsFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="corpsFilter">Select Corps</div>
+                        <div class="dropdown-content" id="dropdown-corpsFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Division -->
                 <div class="form-group">
                     <label class="form-label">🚩 Division</label>
-                    <select class="form-select filter-select" id="divisionFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="divisionFilter">Select Divisions</div>
+                        <div class="dropdown-content" id="dropdown-divisionFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Type of Establishment -->
                 <div class="form-group">
                     <label class="form-label">🏢 Type of Establishment</label>
-                    <select class="form-select filter-select" id="estFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="estFilter">Select Establishment Types</div>
+                        <div class="dropdown-content" id="dropdown-estFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Area Type -->
                 <div class="form-group">
                     <label class="form-label">🗺️ Area Type</label>
-                    <select class="form-select filter-select" id="areaTypeFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="areaTypeFilter">Select Area Types</div>
+                        <div class="dropdown-content" id="dropdown-areaTypeFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Civil Qualification -->
                 <div class="form-group">
                     <label class="form-label">🎓 Civil Qualification</label>
-                    <select class="form-select filter-select" id="civilFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="civilFilter">Select Qualifications</div>
+                        <div class="dropdown-content" id="dropdown-civilFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Sports -->
                 <div class="form-group">
                     <label class="form-label">⚽ Sports</label>
-                    <select class="form-select filter-select" id="sportsFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="sportsFilter">Select Sports</div>
+                        <div class="dropdown-content" id="dropdown-sportsFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Course Name -->
@@ -1369,12 +1481,13 @@
                     <input type="text" class="form-input" id="courseNameFilter" placeholder="e.g. DSSC">
                 </div>
 
-                <!-- Posting Due -->
+                <!-- Posting Due (Months) -->
                 <div class="form-group">
                     <label class="form-label">⏰ Posting Due (Months)</label>
-                    <select class="form-select filter-select" id="postingDueFilter" multiple size="5">
-                        <option value="">All</option>
-                    </select>
+                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
+                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="postingDueFilter">Select Months</div>
+                        <div class="dropdown-content" id="dropdown-postingDueFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    </div>
                 </div>
 
                 <!-- Place of Birth -->
@@ -1498,6 +1611,18 @@
     let courseStrength = 0;
     let panelSize = 0;
     const BUFFER = 10;
+
+    // Add these filter state arrays here - GLOBAL SCOPE
+    let rankSelected = [];
+    let medicalSelected = [];
+    let commandSelected = [];
+    let corpsSelected = [];
+    let divisionSelected = [];
+    let areaTypeSelected = [];
+    let estSelected = [];
+    let civilSelected = [];
+    let sportsSelected = [];
+    let postingDueSelected = [];
 
     // DOM Elements
     const prevNav = document.getElementById('prevNav');
@@ -1700,18 +1825,77 @@
     // FILTER POPUP FUNCTIONS
     // ===============================
     function openFilterPopup() {
+        console.log("Opening filter popup");
+
+        // Check if dropdown containers exist
+        const rankDropdown = document.getElementById('dropdown-rankFilter');
+        console.log("Rank dropdown container:", rankDropdown);
+
         document.getElementById('filterPopup').style.display = 'block';
         document.body.style.overflow = 'hidden';
-        loadFilterDropdowns();
+
+        // Close any open dropdowns first
+        document.querySelectorAll('.dropdown-content').forEach(dd => {
+            dd.classList.remove('show');
+        });
+
+        // Initialize dropdown buttons AFTER popup is visible
+        setTimeout(() => {
+            initializeDropdowns();
+            loadFilterDropdowns();
+        }, 100);
+    }
+
+    // New function to initialize dropdowns
+    function initializeDropdowns() {
+        console.log("Initializing dropdowns");
+
+        // Remove all existing click listeners from dropdown buttons
+        document.querySelectorAll('.dropdown-btn').forEach(btn => {
+            // Remove old listener
+            btn.removeEventListener('click', dropdownClickHandler);
+            // Add fresh listener
+            btn.addEventListener('click', dropdownClickHandler);
+        });
+    }
+
+    // Separate click handler function
+    function dropdownClickHandler(e) {
+        e.stopPropagation();
+        const targetKey = this.dataset.target;
+        const content = document.getElementById(`dropdown-${targetKey}`);
+        if (!content) return;
+
+        // Check if this dropdown is currently open
+        const isOpen = content.classList.contains('show');
+
+        // Close all dropdowns first
+        document.querySelectorAll('.dropdown-content').forEach(dd => {
+            dd.classList.remove('show');
+        });
+
+        // If it wasn't open, open it (toggle behavior)
+        if (!isOpen) {
+            content.classList.add('show');
+            console.log(`Opened dropdown: ${targetKey}`);
+        } else {
+            console.log(`Closed dropdown: ${targetKey}`);
+        }
     }
 
     function closeFilterPopup() {
+        // Close all dropdowns when closing popup
+        document.querySelectorAll('.dropdown-content').forEach(dd => {
+            dd.classList.remove('show');
+        });
+
         document.getElementById('filterPopup').style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 
     // Load all dropdown data for filters
     async function loadFilterDropdowns() {
+        console.log("Loading filter dropdowns..."); // Debug log
         try {
             await Promise.all([
                 loadRankDropdown(),
@@ -1725,24 +1909,124 @@
                 loadSportsDropdown(),
                 loadPostingDueDropdown()
             ]);
+            console.log("All dropdowns loaded"); // Debug log
         } catch (error) {
             console.error('Error loading filter dropdowns:', error);
         }
     }
 
+    // Global click handler to close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        const isDropdownBtn = e.target.closest('.dropdown-btn');
+        const isDropdownContent = e.target.closest('.dropdown-content');
+
+        // If click is NOT on a dropdown button or content, close all dropdowns
+        if (!isDropdownBtn && !isDropdownContent) {
+            document.querySelectorAll('.dropdown-content').forEach(dd => {
+                dd.classList.remove('show');
+            });
+        }
+    });
+
+    // Function to populate filter dropdown with checkboxes
+    function populateFilterDropdown(dropdownId, items, selectedArrayRef, filterType) {
+        const container = document.getElementById(dropdownId);
+        if (!container) {
+            console.error(`Container ${dropdownId} not found - retrying in 100ms`);
+            setTimeout(() => {
+                populateFilterDropdown(dropdownId, items, selectedArrayRef, filterType);
+            }, 100);
+            return;
+        }
+
+        console.log(`Populating ${dropdownId} with`, items.length, "items");
+        container.innerHTML = '';
+
+        if (!items || items.length === 0) {
+            container.innerHTML = '<div style="padding:8px;color:#999;">No options available</div>';
+            return;
+        }
+
+        items.forEach(item => {
+            const label = document.createElement('label');
+            label.style.display = 'block';
+            label.style.padding = '8px 12px';
+            label.style.cursor = 'pointer';
+            label.style.borderBottom = '1px solid #f0f0f0';
+            label.style.userSelect = 'none';
+
+            const itemValue = typeof item === 'object' ? item.value || item.id || item : item;
+            const itemText = typeof item === 'object' ? item.name || item.label || item : item;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = itemValue;
+            checkbox.style.marginRight = '8px';
+            checkbox.checked = selectedArrayRef.includes(itemValue);
+
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const val = checkbox.value;
+                if (checkbox.checked) {
+                    if (!selectedArrayRef.includes(val)) selectedArrayRef.push(val);
+                } else {
+                    const idx = selectedArrayRef.indexOf(val);
+                    if (idx > -1) selectedArrayRef.splice(idx, 1);
+                }
+                updateFilterButtonText(dropdownId);
+                applyAdvancedFilters();
+            });
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(itemText));
+
+            // Prevent dropdown from closing when clicking on the label
+            label.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            container.appendChild(label);
+        });
+
+        updateFilterButtonText(dropdownId);
+    }
+
+    function updateFilterButtonText(dropdownId) {
+        const target = dropdownId.replace('dropdown-', '');
+        const btn = document.querySelector(`.dropdown-btn[data-target="${target}"]`);
+        if (!btn) return;
+
+        let selectedArray = [];
+        if (target === 'rankFilter') selectedArray = rankSelected;
+        else if (target === 'medicalFilter') selectedArray = medicalSelected;
+        else if (target === 'commandFilter') selectedArray = commandSelected;
+        else if (target === 'corpsFilter') selectedArray = corpsSelected;
+        else if (target === 'divisionFilter') selectedArray = divisionSelected;
+        else if (target === 'areaTypeFilter') selectedArray = areaTypeSelected;
+        else if (target === 'estFilter') selectedArray = estSelected;
+        else if (target === 'civilFilter') selectedArray = civilSelected;
+        else if (target === 'sportsFilter') selectedArray = sportsSelected;
+        else if (target === 'postingDueFilter') selectedArray = postingDueSelected;
+
+        btn.innerText = selectedArray.length === 0 ?
+            btn.innerText.split('(')[0].trim() :
+            `${btn.innerText.split('(')[0].trim()} (${selectedArray.length} selected)`;
+    }
+
     async function loadRankDropdown() {
         try {
+            console.log("Fetching ranks..."); // Debug log
             const response = await fetch('http://localhost:6060/api/ranks');
             if (response.ok) {
                 const ranks = await response.json();
-                const select = document.getElementById('rankFilter');
-                select.innerHTML = '<option value="">All Ranks</option>';
-                ranks.forEach(rank => {
-                    const option = document.createElement('option');
-                    option.value = rank;
-                    option.textContent = rank;
-                    select.appendChild(option);
-                });
+                console.log("Ranks received:", ranks); // Debug log
+
+                const items = ranks.map(rank => ({ value: rank, name: rank }));
+                console.log("Rank items prepared:", items); // Debug log
+
+                populateFilterDropdown('dropdown-rankFilter', items, rankSelected, 'rank');
+            } else {
+                console.error("Rank API returned:", response.status);
             }
         } catch (error) {
             console.error('Error loading ranks:', error);
@@ -1754,14 +2038,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/medical-category');
             if (response.ok) {
                 const categories = await response.json();
-                const select = document.getElementById('medicalFilter');
-                select.innerHTML = '<option value="">All</option>';
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat;
-                    option.textContent = cat;
-                    select.appendChild(option);
-                });
+                const items = categories.map(cat => ({ value: cat, name: cat }));
+                populateFilterDropdown('dropdown-medicalFilter', items, medicalSelected, 'medical');
             }
         } catch (error) {
             console.error('Error loading medical categories:', error);
@@ -1773,14 +2051,8 @@
             const response = await fetch('http://localhost:6060/api/dropdown/command');
             if (response.ok) {
                 const commands = await response.json();
-                const select = document.getElementById('commandFilter');
-                select.innerHTML = '<option value="">All Commands</option>';
-                commands.forEach(cmd => {
-                    const option = document.createElement('option');
-                    option.value = cmd;
-                    option.textContent = cmd;
-                    select.appendChild(option);
-                });
+                const items = commands.map(cmd => ({ value: cmd, name: cmd }));
+                populateFilterDropdown('dropdown-commandFilter', items, commandSelected, 'command');
             }
         } catch (error) {
             console.error('Error loading commands:', error);
@@ -1792,14 +2064,8 @@
             const response = await fetch('http://localhost:6060/api/dropdown/corps');
             if (response.ok) {
                 const corpsList = await response.json();
-                const select = document.getElementById('corpsFilter');
-                select.innerHTML = '<option value="">All</option>';
-                corpsList.forEach(corps => {
-                    const option = document.createElement('option');
-                    option.value = corps;
-                    option.textContent = corps;
-                    select.appendChild(option);
-                });
+                const items = corpsList.map(corps => ({ value: corps, name: corps }));
+                populateFilterDropdown('dropdown-corpsFilter', items, corpsSelected, 'corps');
             }
         } catch (error) {
             console.error('Error loading corps:', error);
@@ -1811,14 +2077,8 @@
             const response = await fetch('http://localhost:6060/api/dropdown/division');
             if (response.ok) {
                 const divisions = await response.json();
-                const select = document.getElementById('divisionFilter');
-                select.innerHTML = '<option value="">All</option>';
-                divisions.forEach(div => {
-                    const option = document.createElement('option');
-                    option.value = div;
-                    option.textContent = div;
-                    select.appendChild(option);
-                });
+                const items = divisions.map(div => ({ value: div, name: div }));
+                populateFilterDropdown('dropdown-divisionFilter', items, divisionSelected, 'division');
             }
         } catch (error) {
             console.error('Error loading divisions:', error);
@@ -1830,14 +2090,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/establishment-type');
             if (response.ok) {
                 const types = await response.json();
-                const select = document.getElementById('estFilter');
-                select.innerHTML = '<option value="">All</option>';
-                types.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    select.appendChild(option);
-                });
+                const items = types.map(type => ({ value: type, name: type }));
+                populateFilterDropdown('dropdown-estFilter', items, estSelected, 'est');
             }
         } catch (error) {
             console.error('Error loading establishment types:', error);
@@ -1849,14 +2103,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/area-type');
             if (response.ok) {
                 const areas = await response.json();
-                const select = document.getElementById('areaTypeFilter');
-                select.innerHTML = '<option value="">All</option>';
-                areas.forEach(area => {
-                    const option = document.createElement('option');
-                    option.value = area;
-                    option.textContent = area;
-                    select.appendChild(option);
-                });
+                const items = areas.map(area => ({ value: area, name: area }));
+                populateFilterDropdown('dropdown-areaTypeFilter', items, areaTypeSelected, 'areaType');
             }
         } catch (error) {
             console.error('Error loading area types:', error);
@@ -1868,14 +2116,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/civil-qualification');
             if (response.ok) {
                 const quals = await response.json();
-                const select = document.getElementById('civilFilter');
-                select.innerHTML = '<option value="">All</option>';
-                quals.forEach(qual => {
-                    const option = document.createElement('option');
-                    option.value = qual;
-                    option.textContent = qual;
-                    select.appendChild(option);
-                });
+                const items = quals.map(qual => ({ value: qual, name: qual }));
+                populateFilterDropdown('dropdown-civilFilter', items, civilSelected, 'civil');
             }
         } catch (error) {
             console.error('Error loading civil qualifications:', error);
@@ -1887,14 +2129,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/sports');
             if (response.ok) {
                 const sportsList = await response.json();
-                const select = document.getElementById('sportsFilter');
-                select.innerHTML = '<option value="">All</option>';
-                sportsList.forEach(sport => {
-                    const option = document.createElement('option');
-                    option.value = sport;
-                    option.textContent = sport;
-                    select.appendChild(option);
-                });
+                const items = sportsList.map(sport => ({ value: sport, name: sport }));
+                populateFilterDropdown('dropdown-sportsFilter', items, sportsSelected, 'sports');
             }
         } catch (error) {
             console.error('Error loading sports:', error);
@@ -1906,14 +2142,8 @@
             const response = await fetch('http://localhost:6060/api/master/filter/posting-due-months');
             if (response.ok) {
                 const months = await response.json();
-                const select = document.getElementById('postingDueFilter');
-                select.innerHTML = '<option value="">All</option>';
-                months.forEach(month => {
-                    const option = document.createElement('option');
-                    option.value = month;
-                    option.textContent = month + (month === 1 ? ' Month' : ' Months');
-                    select.appendChild(option);
-                });
+                const items = months.map(month => ({ value: month, name: month + (month === 1 ? ' Month' : ' Months') }));
+                populateFilterDropdown('dropdown-postingDueFilter', items, postingDueSelected, 'postingDue');
             }
         } catch (error) {
             console.error('Error loading posting due months:', error);
@@ -1923,16 +2153,16 @@
     // Build filter request from form
     function buildAdvancedFilterRequest() {
         return {
-            rank: getSelectedValues('rankFilter'),
-            medicalCategory: getSelectedValues('medicalFilter'),
-            command: getSelectedValues('commandFilter'),
-            corps: getSelectedValues('corpsFilter'),
-            division: getSelectedValues('divisionFilter'),
-            establishmentType: getSelectedValues('estFilter'),
-            areaType: getSelectedValues('areaTypeFilter'),
-            civilQualification: getSelectedValues('civilFilter'),
-            sports: getSelectedValues('sportsFilter'),
-            postingDueMonths: getSelectedValues('postingDueFilter')?.map(v => parseInt(v)),
+            rank: rankSelected.length ? rankSelected : null,
+            medicalCategory: medicalSelected.length ? medicalSelected : null,
+            command: commandSelected.length ? commandSelected : null,
+            corps: corpsSelected.length ? corpsSelected : null,
+            division: divisionSelected.length ? divisionSelected : null,
+            establishmentType: estSelected.length ? estSelected : null,
+            areaType: areaTypeSelected.length ? areaTypeSelected : null,
+            civilQualification: civilSelected.length ? civilSelected : null,
+            sports: sportsSelected.length ? sportsSelected : null,
+            postingDueMonths: postingDueSelected.length ? postingDueSelected.map(v => parseInt(v)) : null,
             courseName: document.getElementById('courseNameFilter').value || null,
             placeOfBirth: document.getElementById('pobFilter').value || null,
             dobGreaterThan: document.getElementById('dobFilter').value || null,
@@ -1946,12 +2176,6 @@
             courseTo: document.getElementById('courseTo').value || null,
             search: document.getElementById('globalSearch').value || null
         };
-    }
-
-    function getSelectedValues(elementId) {
-        const select = document.getElementById(elementId);
-        const selected = Array.from(select.selectedOptions).map(opt => opt.value).filter(v => v !== '');
-        return selected.length ? selected : null;
     }
 
     // Apply advanced filters
@@ -2083,17 +2307,27 @@
 
     // Reset all filters
     function resetFilters() {
-        const selectIds = [
-            'rankFilter', 'medicalFilter', 'commandFilter', 'corpsFilter',
-            'divisionFilter', 'estFilter', 'areaTypeFilter', 'civilFilter',
-            'sportsFilter', 'postingDueFilter'
-        ];
+        // Clear all selected arrays
+        rankSelected = [];
+        medicalSelected = [];
+        commandSelected = [];
+        corpsSelected = [];
+        divisionSelected = [];
+        areaTypeSelected = [];
+        estSelected = [];
+        civilSelected = [];
+        sportsSelected = [];
+        postingDueSelected = [];
 
-        selectIds.forEach(id => {
-            const select = document.getElementById(id);
-            if (select) {
-                Array.from(select.options).forEach(opt => opt.selected = false);
-            }
+        // Clear all dropdown checkboxes
+        document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Reset button texts
+        document.querySelectorAll('.dropdown-btn').forEach(btn => {
+            const originalText = btn.innerText.split('(')[0].trim();
+            btn.innerText = originalText;
         });
 
         const inputIds = [
@@ -2109,12 +2343,12 @@
 
         filterResults = [];
         document.getElementById('filterResultsBody').innerHTML = `
-            <tr>
-                <td colspan="10" style="text-align: center; padding: 40px;">
-                    <div style="color: #6b7280;">Click "Apply Filters" to load results</div>
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td colspan="10" style="text-align: center; padding: 40px;">
+                <div style="color: #6b7280;">Click "Apply Filters" to load results</div>
+            </td>
+        </tr>
+    `;
 
         document.getElementById('activeFilterCount').innerText = '0 filters applied';
     }
