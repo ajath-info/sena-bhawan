@@ -886,6 +886,44 @@
         .dropdown-content.show {
             display: block !important;
         }
+
+        /* Add this to your existing CSS styles */
+        .data-table tr.disabled-row {
+            opacity: 0.6;
+            background-color: #f5f5f5;
+            pointer-events: none;
+        }
+
+        .data-table tr.disabled-row td {
+            color: #999;
+        }
+
+        .data-table tr.disabled-row .result-checkbox {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Tooltip for disabled rows */
+        .data-table tr.disabled-row:hover {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .data-table tr.disabled-row td:first-child {
+            position: relative;
+        }
+
+        .data-table tr.disabled-row td:first-child::after {
+            content: "✓ Already in panel";
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #15803d;
+            font-weight: 600;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -1936,12 +1974,11 @@
     // ===============================
     // FILTER POPUP FUNCTIONS
     // ===============================
+    // Track if dropdowns have been loaded
+    let dropdownsLoaded = false;
+
     function openFilterPopup() {
         console.log("Opening filter popup");
-
-        // Check if dropdown containers exist
-        const rankDropdown = document.getElementById('dropdown-rankFilter');
-        console.log("Rank dropdown container:", rankDropdown);
 
         document.getElementById('filterPopup').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -1951,10 +1988,15 @@
             dd.classList.remove('show');
         });
 
-        // Initialize dropdown buttons AFTER popup is visible
+        // Initialize dropdown buttons
         setTimeout(() => {
             initializeDropdowns();
-            loadFilterDropdowns();
+
+            // Load dropdown data only if not loaded before
+            if (!dropdownsLoaded) {
+                loadFilterDropdowns();
+                dropdownsLoaded = true;
+            }
         }, 100);
     }
 
@@ -2086,7 +2128,7 @@
                     if (idx > -1) selectedArrayRef.splice(idx, 1);
                 }
                 updateFilterButtonText(dropdownId);
-                applyAdvancedFilters();
+                // REMOVED: applyAdvancedFilters() call from here
             });
 
             label.appendChild(checkbox);
@@ -2291,13 +2333,14 @@
     }
 
     // ===============================
-    // MODIFIED APPLY ADVANCED FILTERS
+    // APPLY ADVANCED FILTERS - Called only from button click
     // ===============================
     async function applyAdvancedFilters() {
         showLoading(true);
 
         try {
             const filterRequest = buildAdvancedFilterRequest();
+            console.log("Applying filters with request:", filterRequest);
 
             const response = await fetch('http://localhost:6060/api/personnel/filter', {
                 method: 'POST',
@@ -2311,16 +2354,16 @@
                 const data = await response.json();
                 filterResults = data.data || [];
 
-                // If this is called from the main page (not popup), update officers
-                if (!document.getElementById('filterPopup').style.display ||
-                    document.getElementById('filterPopup').style.display === 'none') {
-                    officers = filterResults;
-                    renderOfficerTable();
-                    document.getElementById("totalEligible").innerText = officers.length;
-                }
-
+                // Render the filter results table in popup
                 renderFilterResultsTable();
+
+                // Update filter count
                 updateFilterCount();
+
+                console.log('Filter results:', filterResults.length, 'officers found');
+
+                // DON'T automatically add all filtered officers to main table
+                // Only show them in the popup for selection
             }
         } catch (error) {
             console.error('Error applying filters:', error);
@@ -2372,50 +2415,101 @@
 
         if (!filterResults || filterResults.length === 0) {
             tbody.innerHTML = `
-                <tr>
-                    <td colspan="10" style="text-align: center; padding: 40px;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-                        <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
-                        <div style="color: #6b7280;">Try adjusting your filters</div>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
+                    <div style="color: #6b7280;">Try adjusting your filters</div>
+                </td>
+            </tr>
+        `;
             return;
         }
 
+        // Create a Set of army numbers from the main table for quick lookup
+        const mainTableArmyNos = new Set(
+            officers.map(o => o.armyNo).filter(Boolean)
+        );
+
         let html = '';
         filterResults.forEach((o, index) => {
-            const isSelected = selectedSet.has(o.personnelId);
+            const personnelId = o.personnelId || o.id;
+            const armyNo = o.armyNo;
+
+            // Check if this officer is already in the main table (based on armyNo)
+            const isInMainTable = mainTableArmyNos.has(armyNo);
+
+            // Check if this officer is selected (only applicable if not disabled)
+            const isSelected = selectedSet.has(personnelId) && !isInMainTable;
+
+            // Add disabled class and styling for rows that are in main table
+            const rowClass = isInMainTable ? 'disabled-row' : '';
+            const disabledAttr = isInMainTable ? 'disabled' : '';
+            const checkboxDisabled = isInMainTable ? 'disabled' : '';
+
+            // Style for disabled rows
+            const rowStyle = isInMainTable ? 'opacity: 0.6; background-color: #f5f5f5;' : '';
+
             html += `
-                <tr>
-                    <td>
-                        <input type="checkbox" class="result-checkbox" data-personnelid="${o.personnelId}" ${isSelected ? 'checked' : ''}>
-                    </td>
-                    <td>${o.armyNo || '—'}</td>
-                    <td>
-                        <div style="font-weight: 600">${o.fullName || '—'}</div>
-                    </td>
-                    <td>${o.rank || '—'}</td>
-                    <td>${o.unit || '—'}</td>
-                    <td>${o.command || '—'}</td>
-                    <td>${o.medicalCategory || '—'}</td>
-                    <td>${formatDate(o.dateOfBirth)}</td>
-                    <td>${formatDate(o.dateOfCommission)}</td>
-                    <td>${o.mobileNumber || '—'}</td>
-                </tr>
-            `;
+            <tr class="${rowClass}" style="${rowStyle}" data-armyno="${armyNo}" data-personnelid="${personnelId}">
+                <td>
+                    <input type="checkbox"
+                           class="result-checkbox"
+                           data-personnelid="${personnelId}"
+                           data-armyno="${armyNo}"
+                           ${isSelected ? 'checked' : ''}
+                           ${checkboxDisabled}
+                           ${disabledAttr}>
+                    ${isInMainTable ? '<span style="margin-left: 5px; color: #666;" title="Already in panel">✓</span>' : ''}
+                </td>
+                <td>${armyNo || '—'}</td>
+                <td>
+                    <div style="font-weight: 600">${o.fullName || o.name || '—'}</div>
+                </td>
+                <td>${o.rank || '—'}</td>
+                <td>${o.unit || '—'}</td>
+                <td>${o.command || '—'}</td>
+                <td>${o.medicalCategory || '—'}</td>
+                <td>${formatDate(o.dateOfBirth)}</td>
+                <td>${formatDate(o.dateOfCommission)}</td>
+                <td>${o.mobileNumber || o.mobile || '—'}</td>
+            </tr>
+        `;
         });
 
         tbody.innerHTML = html;
 
-        document.querySelectorAll('.result-checkbox').forEach(checkbox => {
+        // Add event listeners to checkboxes (only enabled ones)
+        document.querySelectorAll('.result-checkbox:not([disabled])').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
+                const armyNo = this.dataset.armyno;
+
                 if (this.checked) {
+                    // Add to selected set
                     selectedSet.add(personnelId);
                 } else {
+                    // Remove from selected set
                     selectedSet.delete(personnelId);
+
+                    // Also remove from main table if they exist there
+                    const officerIndex = officers.findIndex(o => o.armyNo === armyNo);
+                    if (officerIndex !== -1) {
+                        // Remove from officers array
+                        officers.splice(officerIndex, 1);
+
+                        // Re-render the main table
+                        renderOfficerTable();
+
+                        // Update counts
+                        document.getElementById('selectedCount').innerText = selectedSet.size;
+                        document.getElementById('totalEligible').innerText = officers.length;
+
+                        // Update panel summary
+                        updatePanelSummary();
+                    }
                 }
+
                 document.getElementById('selectedCount').innerText = selectedSet.size;
             });
         });
@@ -2423,26 +2517,82 @@
 
     // Add selected officers from popup to main panel
     function addSelectedOfficers() {
-        const selectedFromPopup = Array.from(document.querySelectorAll('.result-checkbox:checked'))
-            .map(cb => parseInt(cb.dataset.personnelid));
+        // Get all checked checkboxes from the filter results table that are NOT disabled
+        const selectedFromPopup = Array.from(document.querySelectorAll('.result-checkbox:checked:not([disabled])'))
+            .map(cb => ({
+                id: parseInt(cb.dataset.personnelid),
+                armyNo: cb.dataset.armyno
+            }));
 
-        selectedFromPopup.forEach(id => selectedSet.add(id));
+        // Get all unchecked checkboxes (to remove from main table)
+        const uncheckedFromPopup = Array.from(document.querySelectorAll('.result-checkbox:not(:checked):not([disabled])'))
+            .map(cb => ({
+                id: parseInt(cb.dataset.personnelid),
+                armyNo: cb.dataset.armyno
+            }));
 
-        if (filterResults.length > 0) {
-            const existingIds = new Set(officers.map(o => o.personnelId));
-            const newOfficers = filterResults.filter(o => !existingIds.has(o.personnelId));
+        if (selectedFromPopup.length === 0 && uncheckedFromPopup.length === 0) {
+            showToast('No changes to apply', 'info');
+            return;
+        }
+
+        // Get the selected officers data from filterResults
+        const selectedOfficersData = filterResults.filter(o =>
+            selectedFromPopup.some(s => s.id === (o.personnelId || o.id))
+        );
+
+        // Get the current officers in the main table
+        const currentOfficerIds = new Set(officers.map(o => o.personnelId || o.id));
+        const currentArmyNos = new Set(officers.map(o => o.armyNo).filter(Boolean));
+
+        // Find which selected officers are NOT already in the main table
+        const newOfficers = selectedOfficersData.filter(o =>
+            !currentOfficerIds.has(o.personnelId || o.id)
+        );
+
+        // Add new officers to the main officers array
+        if (newOfficers.length > 0) {
             officers = [...officers, ...newOfficers];
         }
 
+        // Remove officers that were unchecked
+        if (uncheckedFromPopup.length > 0) {
+            const armyNosToRemove = new Set(uncheckedFromPopup.map(u => u.armyNo));
+            officers = officers.filter(o => !armyNosToRemove.has(o.armyNo));
+
+            // Also remove from selectedSet
+            uncheckedFromPopup.forEach(u => selectedSet.delete(u.id));
+        }
+
+        // Add all selected IDs to the selectedSet (including existing ones)
+        selectedFromPopup.forEach(s => selectedSet.add(s.id));
+
+        // Re-render the main table
         renderOfficerTable();
 
+        // Update counts
         document.getElementById('selectedCount').innerText = selectedSet.size;
         document.getElementById('totalEligible').innerText = officers.length;
 
+        // Update panel summary
         updatePanelSummary();
+
+        // Close the popup
         closeFilterPopup();
 
-        showToast(`${selectedFromPopup.length} officers added to panel`, 'success');
+        // Show success message
+        const addedCount = selectedFromPopup.length;
+        const removedCount = uncheckedFromPopup.length;
+        let message = '';
+        if (addedCount > 0 && removedCount > 0) {
+            message = `${addedCount} officers added, ${removedCount} removed from panel`;
+        } else if (addedCount > 0) {
+            message = `${addedCount} officers added to panel`;
+        } else if (removedCount > 0) {
+            message = `${removedCount} officers removed from panel`;
+        }
+
+        showToast(message, 'success');
     }
 
     // Update filter count badge
@@ -2569,9 +2719,6 @@
             <td>${index + 1}</td>
             <td>
                 <div style="display:flex;align-items:center;gap:10px">
-                    <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
-                         style="width:36px;height:36px;border-radius:50%;object-fit:cover"
-                         onerror="this.src='http://localhost:6060/uploads/default.png'" />
                     <div>
                         <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
                         <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
@@ -2990,22 +3137,8 @@
         // Load roles for step 4
         loadSendToRoles();
 
-        // Set up filter event listeners
-        document.getElementById('globalSearch')?.addEventListener('keyup', debounce(function() {
-            applyAdvancedFilters();
-        }, 500));
-
-        const dateInputs = [
-            'dobFilter', 'docFrom', 'docTo', 'dosFrom', 'dosTo',
-            'tosFrom', 'tosTo', 'courseFrom', 'courseTo'
-        ];
-
-        dateInputs.forEach(id => {
-            document.getElementById(id)?.addEventListener('change', applyAdvancedFilters);
-        });
-
-        document.getElementById('courseNameFilter')?.addEventListener('change', applyAdvancedFilters);
-        document.getElementById('pobFilter')?.addEventListener('change', applyAdvancedFilters);
+        // REMOVED: All automatic filter triggers
+        // The filter API should only be called when clicking "Apply Filters"
 
         // Close popup when clicking outside
         window.addEventListener('click', function(event) {
