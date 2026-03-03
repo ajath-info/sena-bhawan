@@ -107,6 +107,21 @@
             font-size: 18px;
             font-weight: bold;
         }
+        .error-message {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .no-data {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -223,7 +238,6 @@
     // State variables
     let currentOrbatId = null;
     let currentUnitName = '';
-    let selectedFormationType = '';
     let selectedFormationName = '';
     let selectedUnitName = '';
 
@@ -274,6 +288,7 @@
         if (!formationSelect.value) {
             unitSelect.innerHTML = '<option value="">-- Select Formation type first --</option>';
             unitSelect.disabled = true;
+            resetAllData();
             return;
         }
 
@@ -335,7 +350,7 @@
         const estabType = document.querySelector('input[name="estabType"]:checked').value;
         await fetchEstablishment(currentOrbatId, estabType);
 
-        // Load officer details
+        // Load officer details (NOW INCLUDES SUMMARY)
         await fetchOfficerDetails(selectedFormationName, currentUnitName);
     }
 
@@ -381,56 +396,84 @@
         }
     }
 
-    // Fetch officer details from the API we created
+    // Fetch officer details from the API (NOW INCLUDES SUMMARY)
     async function fetchOfficerDetails(formationType, unitName) {
         console.log(`Fetching officer details for formation: ${formationType}, unit: ${unitName}`);
+
+        // Show loading states
+        document.getElementById('summaryGrid').innerHTML = `
+            <div><b>Total Officers:</b> Loading...</div>
+            <div><b>Total Courses Done:</b> Loading...</div>
+            <div><b>Courses (Training Yr):</b> Loading...</div>
+            <div><b>Courses in This Unit:</b> Loading...</div>
+            <div><b>Earliest Seniority:</b> Loading...</div>
+            <div><b>Latest Seniority:</b> Loading...</div>
+            <div><b>Earliest Commission:</b> Loading...</div>
+            <div><b>Latest Commission:</b> Loading...</div>
+        `;
 
         document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" class="loading">Loading officer details...</td></tr>';
 
         try {
-            // Using the GET endpoint with query parameters
+            // Call your single API that returns both summary and table data
             const response = await fetch(`${BASE_URL}/api/officers/by-formation-unit?formationType=${encodeURIComponent(formationType)}&unitName=${encodeURIComponent(unitName)}`);
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('Officer details received:', data);
+            console.log('API Response received:', data);
 
-            // Update summary
-            updateSummary(data.summary);
+            // Update officer count
+            document.getElementById('officerCount').innerText = data.officers?.length || '0';
 
-            // Update officer table
+            // Update SUMMARY section (from the same API response)
+            updateSummarySection(data.summary);
+
+            // Update TABLE section
             updateOfficerTable(data.officers);
 
         } catch (error) {
             console.error('Error loading officer details:', error);
-            document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;color:red;">Error loading officer details</td></tr>';
-            resetSummary();
+
+            // Show error in summary
+            document.getElementById('summaryGrid').innerHTML = `
+                <div><b>Total Officers:</b> Error</div>
+                <div><b>Total Courses Done:</b> Error</div>
+                <div><b>Courses (Training Yr):</b> Error</div>
+                <div><b>Courses in This Unit:</b> Error</div>
+                <div><b>Earliest Seniority:</b> Error</div>
+                <div><b>Latest Seniority:</b> Error</div>
+                <div><b>Earliest Commission:</b> Error</div>
+                <div><b>Latest Commission:</b> Error</div>
+            `;
+
+            // Show error in table
+            document.getElementById('officerTableBody').innerHTML =
+                '<tr><td colspan="10" style="text-align:center;color:red;">Error loading officer details: ' + error.message + '</td></tr>';
         }
     }
 
-    // Update summary grid with API data
-    function updateSummary(summary) {
+    // Update summary section with data from API
+    function updateSummarySection(summary) {
         if (!summary) {
-            resetSummary();
+            resetUnitSummary();
             return;
         }
 
         const summaryGrid = document.getElementById('summaryGrid');
         summaryGrid.innerHTML = `
-            <div><b>Total Officers:</b> ${summary.totalOfficers || '-'}</div>
-            <div><b>Total Courses Done:</b> ${summary.totalCoursesDone || '-'}</div>
-            <div><b>Courses (Training Yr):</b> ${summary.coursesTrainingYr || '-'}</div>
-            <div><b>Courses in This Unit:</b> ${summary.coursesInUnit || '-'}</div>
+            <div><b>Total Officers:</b> ${summary.totalOfficers ?? '-'}</div>
+            <div><b>Total Courses Done:</b> ${summary.totalCoursesDone ?? '-'}</div>
+            <div><b>Courses (Training Yr):</b> ${summary.coursesTrainingYr ?? '-'}</div>
+            <div><b>Courses in This Unit:</b> ${summary.coursesInUnit ?? '-'}</div>
             <div><b>Earliest Seniority:</b> ${formatDate(summary.earliestSeniority) || '-'}</div>
             <div><b>Latest Seniority:</b> ${formatDate(summary.latestSeniority) || '-'}</div>
             <div><b>Earliest Commission:</b> ${formatDate(summary.earliestCommission) || '-'}</div>
             <div><b>Latest Commission:</b> ${formatDate(summary.latestCommission) || '-'}</div>
         `;
-
-        document.getElementById('officerCount').innerText = summary.totalOfficers || '0';
     }
 
     // Update officer table with API data
@@ -468,6 +511,7 @@
         if (!dateStr) return '-';
         try {
             const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '-';
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
@@ -477,8 +521,8 @@
         }
     }
 
-    // Reset summary to default
-    function resetSummary() {
+    // Reset unit summary to default
+    function resetUnitSummary() {
         document.getElementById('summaryGrid').innerHTML = `
             <div><b>Total Officers:</b> -</div>
             <div><b>Total Courses Done:</b> -</div>
@@ -489,14 +533,15 @@
             <div><b>Earliest Commission:</b> -</div>
             <div><b>Latest Commission:</b> -</div>
         `;
-        document.getElementById('officerCount').innerText = '0';
     }
 
     // Reset all data
     function resetAllData() {
         resetStrengthGrids();
-        resetSummary();
+        resetUnitSummary();
         document.getElementById('officerTableBody').innerHTML = '<tr><td colspan="10" style="text-align:center;">Select Formation and Unit to view data</td></tr>';
+        document.getElementById('officerCount').innerText = '0';
+        document.getElementById('hq').innerText = 'Select Formation/Unit';
     }
 
     // Update strength grids with API data

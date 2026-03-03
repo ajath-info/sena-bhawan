@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -66,4 +67,7 @@ public class PostingDetails {
 
     @Column(name = "formation_type")
     private String formationType;
+
+    @Column(name = "sos_date")
+    private LocalDate sosDate;
 }

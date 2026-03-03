@@ -53,4 +53,8 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
             @Param("personnelIds") List<Long> personnelIds,
             @Param("formationType") String formationType,
             @Param("unitName") String unitName);
-}
+
+    // ✅ Sorted order ke liye ye method chahiye
+    List<PostingDetails> findByPersonnelIdOrderByFromDateDesc(Long personnelId);
+
+    }
