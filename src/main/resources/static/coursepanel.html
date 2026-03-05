@@ -924,6 +924,29 @@
             font-weight: 600;
             white-space: nowrap;
         }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-danger:active {
+            background: #991b1b;
+        }
     </style>
 </head>
 <body>
@@ -1261,7 +1284,8 @@
                                         <th>Email</th>
                                         <th>City</th>
                                         <th>State</th>
-                                        <th>Attendance Status</th>
+                                        <th>Course Panel Status</th>
+                                        <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody id="officerTableBody"></tbody>
@@ -2696,52 +2720,59 @@
 
         if (!officers || officers.length === 0) {
             tbody.innerHTML = `
-            <tr>
-                <td colspan="17" style="text-align: center; padding: 40px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No eligible officers found</div>
-                    <div style="color: #6b7280;">Select a course to view eligible officers</div>
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td colspan="18" style="text-align: center; padding: 40px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+                <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No eligible officers found</div>
+                <div style="color: #6b7280;">Select a course to view eligible officers</div>
+            </td>
+        </tr>
+    `;
             return;
         }
 
         officers.forEach((o, index) => {
-            const isSelected = selectedSet.has(o.id || o.personnelId);
-            const isAttending = attendingSet.has(o.id || o.personnelId);
-            const status = statusMap.get(o.id || o.personnelId) || 'Reserve';
+            const personnelId = o.id || o.personnelId;
+            const isSelected = selectedSet.has(personnelId);
+            const isAttending = attendingSet.has(personnelId);
+            // Get panelStatus from the response, default to 'Reserve' if not present
+            const status = o.panelStatus || statusMap.get(personnelId) || 'Reserve';
 
             const row = document.createElement("tr");
 
             row.innerHTML = `
-            <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${o.id || o.personnelId}" class="officer-checkbox"></td>
-            <td>${index + 1}</td>
-            <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <div>
-                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
-                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
-                    </div>
+        <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${personnelId}" class="officer-checkbox"></td>
+        <td>${index + 1}</td>
+        <td>
+            <div style="display:flex;align-items:center;gap:10px">
+                <div>
+                    <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                    <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
                 </div>
-            </td>
-            <td>${o.rank || "-"}</td>
-            <td>${o.unit || "-"}</td>
-            <td>${o.command || "-"}</td>
-            <td>${formatDate(o.dateOfCommission)}</td>
-            <td>${formatDate(o.dateOfSeniority)}</td>
-            <td>${formatDate(o.dateOfBirth)}</td>
-            <td>${o.religion || "-"}</td>
-            <td>${o.maritalStatus || "-"}</td>
-            <td>${o.medicalCategory || "-"}</td>
-            <td>${o.mobileNumber || o.mobile || "-"}</td>
-            <td>${o.emailAddress || o.email || "-"}</td>
-            <td>${o.city || "-"}</td>
-            <td>${o.state || "-"}</td>
-            <td>
-                <span class="badge ${status === 'Retain' ? 'badge-success' : 'badge-warning'}">${status}</span>
-            </td>
-        `;
+            </div>
+        </td>
+        <td>${o.rank || "-"}</td>
+        <td>${o.unit || "-"}</td>
+        <td>${o.command || "-"}</td>
+        <td>${formatDate(o.dateOfCommission)}</td>
+        <td>${formatDate(o.dateOfSeniority)}</td>
+        <td>${formatDate(o.dateOfBirth)}</td>
+        <td>${o.religion || "-"}</td>
+        <td>${o.maritalStatus || "-"}</td>
+        <td>${o.medicalCategory || "-"}</td>
+        <td>${o.mobileNumber || o.mobile || "-"}</td>
+        <td>${o.emailAddress || o.email || "-"}</td>
+        <td>${o.city || "-"}</td>
+        <td>${o.state || "-"}</td>
+        <td>
+            <span class="badge ${status === 'Retain' ? 'badge-success' : status === 'Reserve' ? 'badge-warning' : 'badge-info'}">${status}</span>
+        </td>
+        <td>
+            <button class="btn btn-danger remove-officer-btn" data-personnelid="${personnelId}" data-name="${o.fullName || o.name}" style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+                🗑️ Remove
+            </button>
+        </td>
+    `;
 
             tbody.appendChild(row);
 
@@ -2757,11 +2788,54 @@
                 document.getElementById('selectedCount').innerText = selectedSet.size;
                 updatePanelSummary();
             });
+
+            // Add remove button event listener
+            const removeBtn = row.querySelector('.remove-officer-btn');
+            removeBtn.addEventListener('click', function() {
+                const personnelId = parseInt(this.dataset.personnelid);
+                const officerName = this.dataset.name;
+                removeOfficer(personnelId, officerName);
+            });
         });
 
         document.getElementById('selectedCount').innerText = selectedSet.size;
     }
 
+
+    // ===============================
+    // REMOVE OFFICER FUNCTION
+    // ===============================
+    function removeOfficer(personnelId, officerName) {
+        // Confirm removal
+        if (!confirm(`Are you sure you want to remove ${officerName} from the panel?`)) {
+            return;
+        }
+
+        // Remove from officers array
+        officers = officers.filter(o => (o.id || o.personnelId) !== personnelId);
+
+        // Remove from selectedSet
+        selectedSet.delete(personnelId);
+
+        // Remove from statusMap
+        statusMap.delete(personnelId);
+
+        // Remove from attendingSet if present
+        attendingSet.delete(personnelId);
+
+        // Re-render the table
+        renderOfficerTable();
+
+        // Update counts
+        document.getElementById('selectedCount').innerText = selectedSet.size;
+        document.getElementById('totalEligible').innerText = officers.length;
+
+        // Update panel summary
+        updatePanelSummary();
+
+        // Show success message
+        showToast(`${officerName} removed from panel`, 'success');
+    }
 
     // ===============================
     // PANEL SUMMARY

@@ -6,6 +6,7 @@ import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import com.example.sena_bhawan.projection.RetirementYearProjection;
+import com.example.sena_bhawan.repository.CoursePanelRepository;
 import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.repository.PostingDetailsRepository;
 import com.example.sena_bhawan.repository.UnitMasterRepository;
@@ -35,6 +36,8 @@ public class PersonnelServiceImpl implements PersonnelService {
     private final UnitMasterRepository unitMasterRepository;
     private final PostingDetailsRepository postingDetailsRepository;
     private final PersonnelRepository personnelRepository;
+    private final CoursePanelRepository coursePanelRepository;
+
     // STATIC labels in EXACT order as frontend
     private final List<String> STATIC_RANK_LABELS = Arrays.asList(
             "Lt", "Capt", "Maj", "Lt Col", "Col"
@@ -168,10 +171,11 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository) {
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository) {
         this.personnelRepository = personnelRepository;
         this.unitMasterRepository= unitMasterRepository;
         this.postingDetailsRepository=postingDetailsRepository;
+        this.coursePanelRepository=coursePanelRepository;
     }
 
     // ================= COMMON =================
@@ -885,8 +889,8 @@ public class PersonnelServiceImpl implements PersonnelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Personnel> filterPersonnel(PersonnelFilterRequest f) {
-        return personnelRepository.findAll((root, query, cb) -> {
+    public List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest f) {
+        List<Personnel> personnelList = personnelRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             // ================= SEARCH =================
@@ -1014,6 +1018,27 @@ public class PersonnelServiceImpl implements PersonnelService {
             query.orderBy(cb.asc(root.get("rank")));
             return cb.and(predicates.toArray(new Predicate[0]));
         });
+
+        List<Long> personnelIds = personnelList.stream().map(Personnel::getId).toList();
+
+        // Create a map of personnelId -> panelStatus
+        Map<Long, String> panelStatusMap = new HashMap<>();
+
+        if (!personnelIds.isEmpty()) {
+            List<CoursePanelNomination> nominations = coursePanelRepository.findByPersonnelIdIn(personnelIds);
+
+            panelStatusMap = nominations.stream()
+                    .collect(Collectors.toMap(
+                            CoursePanelNomination::getPersonnelId,
+                            CoursePanelNomination::getAttendanceStatus,
+                            (existing, replacement) -> existing // In case of duplicates, keep the first
+                    ));
+        }
+        final Map<Long, String> finalPanelStatusMap = panelStatusMap;
+        return personnelList.stream()
+                .map(personnel -> PersonnelListDTO.fromPersonnel(personnel, finalPanelStatusMap))
+                .collect(Collectors.toList());
+
     }
 
     private boolean hasField(Root<Personnel> root, String fieldName) {

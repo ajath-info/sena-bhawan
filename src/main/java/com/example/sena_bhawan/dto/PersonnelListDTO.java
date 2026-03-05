@@ -6,6 +6,8 @@ import com.example.sena_bhawan.entity.PersonnelQualifications;
 import lombok.Data;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class PersonnelListDTO {
@@ -30,12 +32,23 @@ public class PersonnelListDTO {
     private String placeOfBirth;
     private String areaType;
     private String postingDueMonths;
-    
-    // Transform from entity
-    public static PersonnelListDTO fromPersonnel(Personnel personnel) {
+
+    // New fields
+    private String religion;
+    private String maritalStatus;
+    private String mobileNumber;
+    private String emailAddress;
+    private String city;
+    private String state;
+
+    // Course Panel Status
+    private String panelStatus; // ATTENDING / NOT_ATTENDING / null
+
+    // Transform from entity with panel status map
+    public static PersonnelListDTO fromPersonnel(Personnel personnel, Map<Long, String> panelStatusMap) {
         PersonnelListDTO dto = new PersonnelListDTO();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
+
         dto.setId(personnel.getId());
         dto.setArmyNo(personnel.getArmyNo());
         dto.setRank(personnel.getRank());
@@ -45,7 +58,18 @@ public class PersonnelListDTO {
         dto.setDateOfSeniority(personnel.getDateOfSeniority() != null ? personnel.getDateOfSeniority().format(formatter) : "—");
         dto.setPlaceOfBirth(personnel.getPlaceOfBirth());
         dto.setMedicalCategory(personnel.getMedicalCategory() != null ? personnel.getMedicalCategory() : "—");
-        
+
+        // New fields mapping
+        dto.setReligion(personnel.getReligion() != null ? personnel.getReligion() : "—");
+        dto.setMaritalStatus(personnel.getMaritalStatus() != null ? personnel.getMaritalStatus() : "—");
+        dto.setMobileNumber(personnel.getMobileNumber() != null ? personnel.getMobileNumber() : "—");
+        dto.setEmailAddress(personnel.getEmailAddress() != null ? personnel.getEmailAddress() : "—");
+        dto.setCity(personnel.getCity() != null ? personnel.getCity() : "—");
+        dto.setState(personnel.getState() != null ? personnel.getState() : "—");
+
+        // Set panel status from map
+        dto.setPanelStatus(panelStatusMap.getOrDefault(personnel.getId(), "—"));
+
         // Handle nested data
         if (personnel.getQualifications() != null && !personnel.getQualifications().isEmpty()) {
             PersonnelQualifications qual = personnel.getQualifications().get(0);
@@ -56,7 +80,7 @@ public class PersonnelListDTO {
             dto.setCivilQual("—");
             dto.setCourseName("—");
         }
-        
+
         // Handle sports from additionalQualifications
         if (personnel.getAdditionalQualifications() != null && !personnel.getAdditionalQualifications().isEmpty()) {
             // Assuming sports field exists in additionalQualifications
@@ -64,7 +88,7 @@ public class PersonnelListDTO {
         } else {
             dto.setSports("—");
         }
-        
+
         // Set default values for fields that don't exist in your entity
         dto.setUnit("—");
         dto.setCommand("—");
@@ -75,7 +99,12 @@ public class PersonnelListDTO {
         dto.setTosEnd("—");
         dto.setAreaType("—");
         dto.setPostingDueMonths("—");
-        
+
         return dto;
+    }
+
+    // Overloaded method for backward compatibility
+    public static PersonnelListDTO fromPersonnel(Personnel personnel) {
+        return fromPersonnel(personnel, new HashMap<>());
     }
 }

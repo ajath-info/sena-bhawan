@@ -11,6 +11,9 @@ import java.util.List;
 public interface CoursePanelRepository
         extends JpaRepository<CoursePanelNomination, Long> {
 
+    // Find all nominations for given personnel IDs
+    List<CoursePanelNomination> findByPersonnelIdIn(List<Long> personnelIds);
+
     void deleteByScheduleId(Long scheduleId);
 
     List<CoursePanelNomination> findByScheduleId(Long scheduleId);

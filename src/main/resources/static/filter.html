@@ -653,6 +653,244 @@
         opacity: 1;
       }
     }
+
+    /* ================= MODAL STYLES ================= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-container {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border-radius: 16px 16px 0 0;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #fee2e2;
+      border: none;
+      color: #dc2626;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #fecaca;
+      transform: scale(1.05);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    /* Officer Profile Section */
+    .officer-profile {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .officer-avatar-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #1b4332;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 700;
+      border: 4px solid #ffb703;
+      flex-shrink: 0;
+    }
+
+    .officer-avatar-large img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .officer-info-summary {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .summary-value.badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      width: fit-content;
+    }
+
+    /* Details Grid */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .detail-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .detail-card:hover {
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-card.full-width {
+      grid-column: span 3;
+    }
+
+    .detail-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1b4332;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .detail-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+
+    .detail-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    /* Qualifications Table */
+    .qualifications-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .qualifications-table th {
+      text-align: left;
+      padding: 8px;
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .qualifications-table td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1411,8 +1649,8 @@
           <td>${o.postingDueMonths || '—'} M</td>
           <td>
             <div class="action-icons">
-              <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">👁️</div>
-              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">✏️</div>
+              <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
+              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit️</div>
             </div>
           </td>
         </tr>
@@ -1537,17 +1775,412 @@
 
   async function viewOfficer(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`);
+      showLoading(true);
+      const response = await fetch(`${API_BASE_URL}/personnel/${id}`);
       if (response.ok) {
         const officer = await response.json();
-        sessionStorage.setItem('viewOfficer', JSON.stringify(officer));
-        window.location.href = `/view-officer.html?id=${id}`;
+        showOfficerModal(officer);
       } else {
         showToast('Officer not found', 'error');
       }
     } catch (error) {
       console.error('Error fetching officer:', error);
       showToast('Error loading officer details', 'error');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function showOfficerModal(officer) {
+    // Create modal overlay
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-overlay';
+    modalOverlay.id = 'officerModal';
+
+    // Format dates helper
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '—';
+      return new Date(dateStr).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    };
+
+    // Get initials for avatar
+    const getInitials = (name) => {
+      if (!name) return 'O';
+      return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    };
+
+    // Build qualifications HTML
+    const qualificationsHtml = officer.qualifications && officer.qualifications.length > 0 ? `
+    <div class="detail-card full-width">
+      <div class="detail-card-title">
+        <span>🎓</span> Educational Qualifications
+      </div>
+      <table class="qualifications-table">
+        <thead>
+          <tr>
+            <th>Qualification</th>
+            <th>Institution</th>
+            <th>Year</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${officer.qualifications.map(q => `
+            <tr>
+              <td><strong>${q.qualification || '—'}</strong></td>
+              <td>${q.institution || '—'}</td>
+              <td>${q.yearOfCompletion || '—'}</td>
+              <td>${q.gradePercentage || '—'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  ` : '';
+
+    // Build additional qualifications HTML
+    const additionalQualHtml = officer.additionalQualifications && officer.additionalQualifications.length > 0 ? `
+    <div class="detail-card full-width">
+      <div class="detail-card-title">
+        <span>📋</span> Additional Qualifications
+      </div>
+      <table class="qualifications-table">
+        <thead>
+          <tr>
+            <th>Qualification</th>
+            <th>Issuing Authority</th>
+            <th>Year</th>
+            <th>Valid Till</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${officer.additionalQualifications.map(aq => `
+            <tr>
+              <td><strong>${aq.qualification || '—'}</strong></td>
+              <td>${aq.issuingAuthority || '—'}</td>
+              <td>${aq.year || '—'}</td>
+              <td>${formatDate(aq.validity)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  ` : '';
+
+    // Build family members HTML
+    const familyHtml = officer.familyMembers && officer.familyMembers.length > 0 ? `
+    <div class="detail-card full-width">
+      <div class="detail-card-title">
+        <span>👨‍👩‍👧‍👦</span> Family Members
+      </div>
+      <table class="qualifications-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Relationship</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${officer.familyMembers.map(fm => `
+            <tr>
+              <td><strong>${fm.name || '—'}</strong></td>
+              <td>${fm.relationship || '—'}</td>
+              <td>${fm.contactNumber || '—'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  ` : '';
+
+    // Build decorations HTML
+    const decorationsHtml = officer.decorations && officer.decorations.length > 0 ? `
+    <div class="detail-card full-width">
+      <div class="detail-card-title">
+        <span>🏅</span> Decorations & Awards
+      </div>
+      <table class="qualifications-table">
+        <thead>
+          <tr>
+            <th>Award</th>
+            <th>Date</th>
+            <th>Citation</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${officer.decorations.map(d => `
+            <tr>
+              <td><strong>${d.decorationName || '—'}</strong></td>
+              <td>${formatDate(d.awardDate)}</td>
+              <td>${d.citation || '—'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  ` : '';
+
+    modalOverlay.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>
+          <span>👤</span>
+          Officer Details: ${officer.armyNo || ''}
+        </h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Profile Summary -->
+        <div class="officer-profile">
+          <div class="officer-avatar-large">
+            ${officer.officerImage ?
+            `<img src="http://localhost:6060/${officer.officerImage}" alt="${officer.fullName}" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%231b4332%22%2F%3E%3Ctext%20x%3D%2260%22%20y%3D%2270%22%20font-size%3D%2248%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-family%3D%22Inter%22%3E${getInitials(officer.fullName)}%3C%2Ftext%3E%3C%2Fsvg%3E'">`
+            : getInitials(officer.fullName)
+    }
+          </div>
+          <div class="officer-info-summary">
+            <div class="summary-item">
+              <span class="summary-label">Full Name</span>
+              <span class="summary-value">${officer.fullName || '—'}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Rank</span>
+              <span class="summary-value badge badge-info">${officer.rank || '—'}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Army No</span>
+              <span class="summary-value">${officer.armyNo || '—'}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Medical Category</span>
+              <span class="summary-value badge ${officer.medicalCategory === 'S1' ? 'badge-success' : 'badge-gray'}">${officer.medicalCategory || '—'}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Date of Birth</span>
+              <span class="summary-value">${formatDate(officer.dateOfBirth)}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Date of Commission</span>
+              <span class="summary-value">${formatDate(officer.dateOfCommission)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="details-grid">
+          <!-- Personal Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>📋</span> Personal Details
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Place of Birth:</span>
+                <span class="detail-value">${officer.placeOfBirth || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Religion:</span>
+                <span class="detail-value">${officer.religion || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Marital Status:</span>
+                <span class="detail-value">${officer.maritalStatus || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">PAN Card:</span>
+                <span class="detail-value">${officer.panCard || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Aadhaar:</span>
+                <span class="detail-value">${officer.aadhaarNumber || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>📞</span> Contact Details
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Mobile:</span>
+                <span class="detail-value">${officer.mobileNumber || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Alternate:</span>
+                <span class="detail-value">${officer.alternateMobile || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">${officer.emailAddress || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">NSG Email:</span>
+                <span class="detail-value">${officer.nsgEmail || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">CDA Account:</span>
+                <span class="detail-value">${officer.cdaAccountNo || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">NRS:</span>
+                <span class="detail-value">${officer.nrs || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>🏠</span> Address
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Permanent Address:</span>
+                <span class="detail-value">${officer.permanentAddress || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">City/District:</span>
+                <span class="detail-value">${officer.city || '—'} / ${officer.district || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">State:</span>
+                <span class="detail-value">${officer.state || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Pin Code:</span>
+                <span class="detail-value">${officer.pinCode || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medical Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>⚕️</span> Medical Information
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Medical Category:</span>
+                <span class="detail-value">${officer.medicalCategory || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Medical Date:</span>
+                <span class="detail-value">${formatDate(officer.medicalDate)}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Injury Category:</span>
+                <span class="detail-value">${officer.injuryCategory || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Diagnosis:</span>
+                <span class="detail-value">${officer.diagnosis || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Remarks:</span>
+                <span class="detail-value">${officer.medicalRemark || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service Details -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>📅</span> Service Details
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Commission Type:</span>
+                <span class="detail-value">${officer.commissionType || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Date of Seniority:</span>
+                <span class="detail-value">${formatDate(officer.dateOfSeniority)}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">IRS Transfer:</span>
+                <span class="detail-value">${officer.irsTransfer || '—'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Restriction:</span>
+                <span class="detail-value">${officer.restriction || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sports -->
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>⚽</span> Sports
+            </div>
+            <div class="detail-content">
+              ${officer.sports && officer.sports.length > 0 ?
+            officer.sports.map(sport => `
+                  <div class="detail-row">
+                    <span class="detail-value">${sport}</span>
+                  </div>
+                `).join('') :
+            '<div class="detail-row"><span class="detail-value">—</span></div>'
+    }
+            </div>
+          </div>
+        </div>
+
+        <!-- Qualifications Sections -->
+        ${qualificationsHtml}
+        ${additionalQualHtml}
+        ${familyHtml}
+        ${decorationsHtml}
+
+        <!-- Metadata -->
+        <div class="details-grid" style="margin-top: 16px;">
+          <div class="detail-card">
+            <div class="detail-card-title">
+              <span>⏰</span> Record Information
+            </div>
+            <div class="detail-content">
+              <div class="detail-row">
+                <span class="detail-label">Created:</span>
+                <span class="detail-value">${formatDate(officer.createdAt)}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Last Updated:</span>
+                <span class="detail-value">${formatDate(officer.updatedAt)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(modalOverlay);
+
+    // Close modal when clicking outside
+    modalOverlay.addEventListener('click', function(e) {
+      if (e.target === modalOverlay) {
+        closeModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('officerModal');
+    if (modal) {
+      modal.remove();
     }
   }
 

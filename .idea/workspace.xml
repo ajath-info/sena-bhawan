@@ -4,15 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="QR page Filters Save with all Mapping">
+    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="feat: Complete Advanced Filter System with Bidirectional Sync and Optimized API Calls&#10;&#10;- Add selected officers from popup to main table with armyNo-based comparison&#10;- Disable and gray out already added officers with visual indicators&#10;- Implement bidirectional sync - unchecking removes from main table&#10;- Optimize performance by loading dropdowns once and calling filter API only on Apply Filters click&#10;- Prevent automatic population and ensure only explicitly selected officers are added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseEligibilityController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseEligibilityController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseEligibilityService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseEligibilityService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PersonnelListDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/dto/PersonnelListDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CoursePanelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/PersonnelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/PersonnelServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-eligibility-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-eligibility-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-edit.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +177,15 @@
       <workItem from="1771752351766" duration="15963000" />
       <workItem from="1771857425774" duration="4336000" />
       <workItem from="1771944872907" duration="7145000" />
-      <workItem from="1772116935847" duration="1288000" />
+      <workItem from="1772116935847" duration="3592000" />
+      <workItem from="1772257491877" duration="121000" />
+      <workItem from="1772351370030" duration="18241000" />
+      <workItem from="1772467337796" duration="7244000" />
+      <workItem from="1772557051794" duration="3853000" />
+      <workItem from="1772564872400" duration="95000" />
+      <workItem from="1772595092996" duration="2672000" />
+      <workItem from="1772654261316" duration="7626000" />
+      <workItem from="1772724487102" duration="5038000" />
     </task>
     <task id="LOCAL-00001" summary="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug">
       <option name="closed" value="true" />
@@ -218,7 +227,39 @@
       <option name="project" value="LOCAL" />
       <updated>1771857824950</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Course page and personnel form for Add Personnel is done">
+      <option name="closed" value="true" />
+      <created>1772120322334</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1772120322334</updated>
+    </task>
+    <task id="LOCAL-00007" summary="course-eligibility-form.html and coursepanel.html&#10;Advance filter fixed UI">
+      <option name="closed" value="true" />
+      <created>1772393839444</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1772393839444</updated>
+    </task>
+    <task id="LOCAL-00008" summary="coursepanel.html&#10;Advance filter fixed and apply QR Filters init now">
+      <option name="closed" value="true" />
+      <created>1772397227170</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1772397227170</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat: Complete Advanced Filter System with Bidirectional Sync and Optimized API Calls&#10;&#10;- Add selected officers from popup to main table with armyNo-based comparison&#10;- Disable and gray out already added officers with visual indicators&#10;- Implement bidirectional sync - unchecking removes from main table&#10;- Optimize performance by loading dropdowns once and calling filter API only on Apply Filters click&#10;- Prevent automatic population and ensure only explicitly selected officers are added">
+      <option name="closed" value="true" />
+      <created>1772485015052</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1772485015052</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -228,7 +269,22 @@
     <MESSAGE value="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug" />
     <MESSAGE value="Filter Page and Edit personnel Form Page &#10;with api Integration - by Vipan Kumar" />
     <MESSAGE value="QR page Filters Save with all Mapping" />
-    <option name="LAST_COMMIT_MESSAGE" value="QR page Filters Save with all Mapping" />
+    <MESSAGE value="Course page and personnel form for Add Personnel is done" />
+    <MESSAGE value="course-eligibility-form.html and coursepanel.html&#10;Advance filter fixed UI" />
+    <MESSAGE value="coursepanel.html&#10;Advance filter fixed and apply QR Filters init now" />
+    <MESSAGE value="feat: Complete Advanced Filter System with Bidirectional Sync and Optimized API Calls&#10;&#10;- Add selected officers from popup to main table with armyNo-based comparison&#10;- Disable and gray out already added officers with visual indicators&#10;- Implement bidirectional sync - unchecking removes from main table&#10;- Optimize performance by loading dropdowns once and calling filter API only on Apply Filters click&#10;- Prevent automatic population and ensure only explicitly selected officers are added" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Complete Advanced Filter System with Bidirectional Sync and Optimized API Calls&#10;&#10;- Add selected officers from popup to main table with armyNo-based comparison&#10;- Disable and gray out already added officers with visual indicators&#10;- Implement bidirectional sync - unchecking removes from main table&#10;- Optimize performance by loading dropdowns once and calling filter API only on Apply Filters click&#10;- Prevent automatic population and ensure only explicitly selected officers are added" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/main/resources/static/course-eligibility-form.html</url>
+          <line>664</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
