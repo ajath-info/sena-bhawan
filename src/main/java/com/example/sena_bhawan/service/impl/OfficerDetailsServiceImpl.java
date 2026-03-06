@@ -26,6 +26,12 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
     private final PersonnelRepository personnelRepository;
     private final CourseDetailsRepository courseDetailsRepository;
 
+    // Financial year constants (1 April to 31 March)
+    private static final int FINANCIAL_YEAR_START_MONTH = 4; // April
+    private static final int FINANCIAL_YEAR_START_DAY = 1;
+    private static final int FINANCIAL_YEAR_END_MONTH = 3; // March
+    private static final int FINANCIAL_YEAR_END_DAY = 31;
+
     @Override
     public OfficerListResponseDto getOfficersByFormationAndUnit(OfficerListRequestDto requestDto) {
         try {
@@ -39,7 +45,8 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
                 throw new IllegalArgumentException("Formation type and unit name cannot be null");
             }
 
-            // Step 1: Get personnel IDs from posting_details (currently in this unit)
+            // Step 1: Get personnel IDs from posting_details (currently in this formation/unit)
+            // This uses both formationType AND unitName to get current officers in selected unit/formation
             List<Long> personnelIds = postingDetailsRepository
                     .findPersonnelIdsByFormationTypeAndUnitName(formationType, unitName);
 
@@ -55,39 +62,44 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
                 return buildEmptyResponse(formationType, unitName);
             }
 
-            // Step 3: Fetch all courses for these personnel
+            // Step 3: Fetch ALL courses for these personnel (entire service history)
             List<CourseDetails> allCourses = courseDetailsRepository.findByPersonnelIdIn(personnelIds);
 
-            // Step 4: Fetch current postings in this unit
+            // Step 4: Fetch current postings in this formation/unit
             List<PostingDetails> currentPostings = postingDetailsRepository
                     .findPostingsByPersonnelIdsAndUnit(personnelIds, formationType, unitName);
 
-            // Step 5: Create maps for efficient lookup
-            Map<Long, List<CourseDetails>> coursesByPersonnel = createCoursesMap(allCourses);
-            Map<Long, List<PostingDetails>> postingsByPersonnel = createPostingsMap(currentPostings);
+            // Step 5: Fetch ALL postings for these personnel (to determine when they were in which unit)
+            // This is needed to filter courses that were done specifically in this unit
+            List<PostingDetails> allPostings = getAllPostingsForPersonnel(personnelIds);
 
-            // Step 6: Create map of current posting periods
+            // Step 6: Create maps for efficient lookup
+            Map<Long, List<CourseDetails>> allCoursesByPersonnel = createCoursesMap(allCourses);
+            Map<Long, List<PostingDetails>> allPostingsByPersonnel = createPostingsMap(allPostings);
+
+            // Step 7: Create map of current posting periods (for this specific formation/unit)
             Map<Long, PostingDetails> currentPostingMap = createCurrentPostingMap(currentPostings);
 
-            // Step 7: Calculate SUMMARY section data (using UnitSummaryServiceImpl logic)
+            // Step 8: Calculate SUMMARY section data with correct logic
             OfficerSummaryResponseDto summary = calculateSummarySection(
                     personnelList,
-                    personnelIds,
-                    coursesByPersonnel,
-                    currentPostingMap
+                    allCoursesByPersonnel,      // For total courses across service
+                    currentPostingMap,           // For unit-specific filtering
+                    allPostingsByPersonnel       // For complete posting history
             );
 
-            // Step 8: Map to officer details for TABLE section
+            // Step 9: Map to officer details for TABLE section with correct logic
             List<OfficerDetailResponseDto> officerDetails = mapToOfficerDetails(
                     personnelList,
-                    coursesByPersonnel,
-                    postingsByPersonnel
+                    allCoursesByPersonnel,       // For total courses across service
+                    currentPostingMap,            // For unit-specific filtering
+                    allPostingsByPersonnel        // For complete posting history
             );
 
-            // Step 9: Log summary for debugging
+            // Step 10: Log summary for debugging
             logSummary(summary, formationType, unitName);
 
-            // Step 10: Build and return response
+            // Step 11: Build and return response
             return OfficerListResponseDto.builder()
                     .formationType(formationType)
                     .unitName(unitName)
@@ -128,7 +140,26 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
     }
 
     /**
-     * Creates map of personnel ID to their courses list
+     * Fetch all postings for given personnel IDs (complete service history)
+     */
+    private List<PostingDetails> getAllPostingsForPersonnel(List<Long> personnelIds) {
+        if (CollectionUtils.isEmpty(personnelIds)) {
+            return new ArrayList<>();
+        }
+
+        List<PostingDetails> allPostings = new ArrayList<>();
+        for (Long personnelId : personnelIds) {
+            List<PostingDetails> personPostings = postingDetailsRepository
+                    .findByPersonnelIdOrderByFromDateDesc(personnelId);
+            if (!CollectionUtils.isEmpty(personPostings)) {
+                allPostings.addAll(personPostings);
+            }
+        }
+        return allPostings;
+    }
+
+    /**
+     * Creates map of personnel ID to their courses list (sorted by date)
      */
     private Map<Long, List<CourseDetails>> createCoursesMap(List<CourseDetails> courses) {
         if (CollectionUtils.isEmpty(courses)) {
@@ -142,6 +173,8 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
                                 Collectors.toList(),
                                 list -> list.stream()
                                         .filter(Objects::nonNull)
+                                        .sorted(Comparator.comparing(CourseDetails::getFromDate,
+                                                Comparator.nullsLast(Comparator.naturalOrder())))
                                         .collect(Collectors.toList())
                         )
                 ));
@@ -170,14 +203,14 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
     }
 
     /**
-     * Creates map of personnel ID to their current posting
+     * Creates map of personnel ID to their current posting in selected formation/unit
      */
     private Map<Long, PostingDetails> createCurrentPostingMap(List<PostingDetails> postings) {
         if (CollectionUtils.isEmpty(postings)) {
             return new HashMap<>();
         }
 
-        // For each personnel, get their latest posting in this unit
+        // For each personnel, get their latest posting in this formation/unit
         return postings.stream()
                 .filter(p -> p != null && p.getPersonnelId() != null)
                 .collect(Collectors.toMap(
@@ -194,38 +227,41 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
     }
 
     /**
-     * Calculates SUMMARY section data (as per UnitSummaryServiceImpl logic)
+     * Calculates SUMMARY section data with correct logic as per UI
      *
      * UI Summary Section:
-     * - Total Officers
-     * - Total Courses Done (in current unit)
-     * - Courses (Training Yr) - current year courses in current unit
-     * - Courses in This Unit - total courses in current unit
+     * - Total Officers: Current officers in selected formation/unit
+     * - Total Courses Done: ALL courses by personnel (entire service)
+     * - Courses (Training Yr): Courses in current financial year (while in this unit)
+     * - Courses in This Unit: Total courses done while in this unit (distinct course IDs)
      * - Earliest/Latest Seniority
      * - Earliest/Latest Commission
      */
     private OfficerSummaryResponseDto calculateSummarySection(
             List<Personnel> personnelList,
-            List<Long> personnelIds,
-            Map<Long, List<CourseDetails>> coursesByPersonnel,
-            Map<Long, PostingDetails> currentPostingMap) {
+            Map<Long, List<CourseDetails>> allCoursesByPersonnel,
+            Map<Long, PostingDetails> currentPostingMap,
+            Map<Long, List<PostingDetails>> allPostingsByPersonnel) {
 
         int totalOfficers = personnelList.size();
-        int currentYear = LocalDate.now().getYear();
+
+        // Get current financial year range (1 April to 31 March)
+        FinancialYearRange currentFY = getCurrentFinancialYear();
 
         // Collect seniority and commission dates
         List<LocalDate> seniorityDates = new ArrayList<>();
         List<LocalDate> commissionDates = new ArrayList<>();
 
-        // Track courses statistics
-        Set<Integer> uniqueCourseIds = new HashSet<>();  // For courses in this unit
-        int totalCoursesInUnit = 0;                       // Total courses done in current unit
-        int trainingYearCourses = 0;                       // Current year courses in current unit
+        // Track statistics
+        int totalCoursesAllService = 0;                 // Total Courses Done (entire service)
+        int totalCoursesInCurrentUnit = 0;               // Courses in This Unit (actual count)
+        int totalCoursesTrainingYr = 0;                   // Courses (Training Yr) - current FY in this unit
+        Set<Integer> uniqueUnitCourseIds = new HashSet<>(); // For distinct courses in this unit
 
         for (Personnel p : personnelList) {
             if (p == null || p.getId() == null) continue;
 
-            // Collect dates
+            // Collect dates for summary
             if (p.getDateOfSeniority() != null) {
                 seniorityDates.add(p.getDateOfSeniority());
             }
@@ -233,36 +269,38 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
                 commissionDates.add(p.getDateOfCommission());
             }
 
-            // Get current posting for this personnel
+            // Get ALL courses for this personnel (entire service)
+            List<CourseDetails> personAllCourses = allCoursesByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
+
+            // Add to total courses count (entire service) - for "Total Courses Done"
+            totalCoursesAllService += personAllCourses.size();
+
+            // Get current posting in selected formation/unit
             PostingDetails currentPosting = currentPostingMap.get(p.getId());
 
             if (currentPosting != null) {
-                // Get courses for this personnel
-                List<CourseDetails> allPersonnelCourses = coursesByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
-
-                // Get courses done during current posting period
+                // Get courses done during current posting period (in this unit)
                 List<CourseDetails> currentUnitCourses = filterCoursesByPostingPeriod(
-                        allPersonnelCourses,
+                        personAllCourses,
                         currentPosting
                 );
 
-                // Update statistics
-                totalCoursesInUnit += currentUnitCourses.size();
+                // Update unit-specific statistics
+                totalCoursesInCurrentUnit += currentUnitCourses.size(); // For "Courses in This Unit" count
 
-                // Track unique course IDs for "Courses in This Unit"
+                // Track unique course IDs for "Courses in This Unit" (distinct courses)
                 currentUnitCourses.forEach(c -> {
                     if (c.getCourseId() != null) {
-                        uniqueCourseIds.add(c.getCourseId());
+                        uniqueUnitCourseIds.add(c.getCourseId());
                     }
                 });
 
-                // Count training year courses (current year in current unit)
+                // Count training year courses (current financial year in this unit) - for "Courses (Training Yr)"
                 long trainingCount = currentUnitCourses.stream()
-                        .filter(c -> c.getFromDate() != null &&
-                                c.getFromDate().getYear() == currentYear)
+                        .filter(c -> isCourseInFinancialYear(c, currentFY))
                         .count();
 
-                trainingYearCourses += trainingCount;
+                totalCoursesTrainingYr += trainingCount;
             }
         }
 
@@ -272,70 +310,91 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
         LocalDate earliestCommission = commissionDates.stream().min(LocalDate::compareTo).orElse(null);
         LocalDate latestCommission = commissionDates.stream().max(LocalDate::compareTo).orElse(null);
 
-        // Build summary for UI
+        // Build summary for UI with correct field mapping
         return OfficerSummaryResponseDto.builder()
-                .totalOfficers(totalOfficers)
+                .totalOfficers(totalOfficers)                          // Current officers in unit
                 .earliestSeniority(earliestSeniority)
                 .latestSeniority(latestSeniority)
-                // Total Courses Done = Courses done in current unit (as per UnitSummaryServiceImpl)
-                .totalCoursesDone(totalCoursesInUnit)
+                .totalCoursesDone(totalCoursesAllService)             // ALL courses across service
                 .earliestCommission(earliestCommission)
                 .latestCommission(latestCommission)
-                // Courses (Training Yr) = Current year courses in current unit
-                .coursesTrainingYr(trainingYearCourses)
-                // Courses in This Unit = Total courses in current unit (distinct course IDs)
-                .coursesInUnit(uniqueCourseIds.size())
+                .coursesTrainingYr(totalCoursesTrainingYr)            // Current FY courses in this unit
+                .coursesInUnit(uniqueUnitCourseIds.size())            // Distinct courses in this unit
                 .build();
     }
 
+    private boolean isCourseInFinancialYear(CourseDetails course, FinancialYearRange fyRange) {
+        if (course == null) return false;
+
+        LocalDate fromDate = course.getFromDate();
+        LocalDate toDate = course.getToDate() != null ? course.getToDate() : fromDate;
+
+        if (fromDate == null) return false;
+
+        // Check if ANY PART of course falls in financial year
+        return !(toDate.isBefore(fyRange.startDate) || fromDate.isAfter(fyRange.endDate));
+    }
     /**
-     * Maps personnel to officer details for TABLE section
+     * Maps personnel to officer details for TABLE section with correct logic
      *
-     * Table Columns:
+     * Table Columns (as per UI):
      * - Army No, Rank, Name, Gender, DOB, Commission Date, Seniority Date
-     * - Courses Done (in current unit)
-     * - Training Yr (current year courses in current unit)
-     * - Courses in Unit (same as Courses Done)
+     * - Courses Done: TOTAL courses across entire service
+     * - Training Yr: Current financial year courses in this unit
+     * - Courses in Unit: Courses done in this unit only
      */
     private List<OfficerDetailResponseDto> mapToOfficerDetails(
             List<Personnel> personnelList,
-            Map<Long, List<CourseDetails>> coursesByPersonnel,
-            Map<Long, List<PostingDetails>> postingsByPersonnel) {
+            Map<Long, List<CourseDetails>> allCoursesByPersonnel,
+            Map<Long, PostingDetails> currentPostingMap,
+            Map<Long, List<PostingDetails>> allPostingsByPersonnel) {
 
         return personnelList.stream()
                 .filter(Objects::nonNull)
                 .map(p -> {
-                    List<CourseDetails> allCourses = coursesByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
-                    List<PostingDetails> postings = postingsByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
-                    return mapToOfficerDetail(p, allCourses, postings);
+                    List<CourseDetails> allCourses = allCoursesByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
+                    PostingDetails currentPosting = currentPostingMap.get(p.getId());
+                    List<PostingDetails> allPostings = allPostingsByPersonnel.getOrDefault(p.getId(), new ArrayList<>());
+                    return mapToOfficerDetail(p, allCourses, currentPosting, allPostings);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Maps single personnel to officer detail DTO
+     * Maps single personnel to officer detail DTO with correct field values
      */
     private OfficerDetailResponseDto mapToOfficerDetail(
             Personnel p,
             List<CourseDetails> allCourses,
-            List<PostingDetails> postings) {
+            PostingDetails currentPosting,
+            List<PostingDetails> allPostings) {
 
         if (p == null) return null;
 
         try {
-            // Get current unit courses (based on latest posting)
-            List<CourseDetails> currentUnitCourses = getCurrentUnitCourses(allCourses, postings);
+            // Get current financial year range
+            FinancialYearRange currentFY = getCurrentFinancialYear();
+
+            // 1. Courses Done = TOTAL courses across entire service (for table)
+            int totalCoursesCount = allCourses.size();
+
+            // 2. Get courses done in current unit (for "Courses in Unit" column)
+            List<CourseDetails> currentUnitCourses = new ArrayList<>();
+            if (currentPosting != null) {
+                currentUnitCourses = filterCoursesByPostingPeriod(allCourses, currentPosting);
+            }
             int currentUnitCoursesCount = currentUnitCourses.size();
 
-            // Calculate training year courses (current year in current unit)
-            int currentYear = LocalDate.now().getYear();
-            int trainingYrCourses = (int) currentUnitCourses.stream()
-                    .filter(c -> c.getFromDate() != null &&
-                            c.getFromDate().getYear() == currentYear)
-                    .count();
+            // 3. Calculate training year courses (current financial year in current unit) - for "Training Yr" column
+            int trainingYrCourses = 0;
+            if (currentPosting != null) {
+                 trainingYrCourses = (int)currentUnitCourses.stream()
+                        .filter(c -> isCourseInFinancialYear(c, currentFY))
+                        .count();
+            }
 
-            // Build officer detail for table display
+            // Build officer detail for table display with correct field mapping
             return OfficerDetailResponseDto.builder()
                     .armyNo(p.getArmyNo())
                     .rank(p.getRank())
@@ -344,11 +403,11 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
                     .dateOfBirth(p.getDateOfBirth())
                     .dateOfCommission(p.getDateOfCommission())
                     .dateOfSeniority(p.getDateOfSeniority())
-                    // Courses Done = Current unit courses only
-                    .coursesDone(currentUnitCoursesCount)
-                    // Training Yr = Current year courses in current unit
+                    // Courses Done = TOTAL courses across entire service
+                    .coursesDone(totalCoursesCount)
+                    // Training Yr = Current financial year courses in current unit
                     .trainingYr(trainingYrCourses)
-                    // Courses in Unit = Same as Courses Done
+                    // Courses in Unit = Courses done in current unit only
                     .coursesInUnit(currentUnitCoursesCount)
                     .build();
 
@@ -356,31 +415,6 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
             log.error("Error mapping officer detail for personnel ID: {}", p.getId(), e);
             return null;
         }
-    }
-
-    /**
-     * Gets courses done during current unit's posting period
-     */
-    private List<CourseDetails> getCurrentUnitCourses(
-            List<CourseDetails> allCourses,
-            List<PostingDetails> postings) {
-
-        if (CollectionUtils.isEmpty(postings) || CollectionUtils.isEmpty(allCourses)) {
-            return new ArrayList<>();
-        }
-
-        // Get the latest posting in current unit
-        PostingDetails latestPosting = postings.stream()
-                .filter(Objects::nonNull)
-                .max(Comparator.comparing(PostingDetails::getFromDate,
-                        Comparator.nullsLast(Comparator.naturalOrder())))
-                .orElse(null);
-
-        if (latestPosting == null) {
-            return new ArrayList<>();
-        }
-
-        return filterCoursesByPostingPeriod(allCourses, latestPosting);
     }
 
     /**
@@ -407,18 +441,69 @@ public class OfficerDetailsServiceImpl implements OfficerDetailsService {
     }
 
     /**
-     * Logs summary for debugging
+     * Inner class to represent financial year range (1 April to 31 March)
+     */
+    private static class FinancialYearRange {
+        LocalDate startDate;
+        LocalDate endDate;
+
+        FinancialYearRange(LocalDate start, LocalDate end) {
+            this.startDate = start;
+            this.endDate = end;
+        }
+    }
+
+    /**
+     * Get current financial year range (1 April to 31 March)
+     */
+    private FinancialYearRange getCurrentFinancialYear() {
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+
+        LocalDate startDate;
+        LocalDate endDate;
+
+        // If current date is before April 1, financial year is (previous_year-04-01 to current_year-03-31)
+        if (now.getMonthValue() < FINANCIAL_YEAR_START_MONTH) {
+            startDate = LocalDate.of(currentYear - 1, FINANCIAL_YEAR_START_MONTH, FINANCIAL_YEAR_START_DAY);
+            endDate = LocalDate.of(currentYear, FINANCIAL_YEAR_END_MONTH, FINANCIAL_YEAR_END_DAY);
+        }
+        // If current date is on or after April 1, financial year is (current_year-04-01 to next_year-03-31)
+        else {
+            startDate = LocalDate.of(currentYear, FINANCIAL_YEAR_START_MONTH, FINANCIAL_YEAR_START_DAY);
+            endDate = LocalDate.of(currentYear + 1, FINANCIAL_YEAR_END_MONTH, FINANCIAL_YEAR_END_DAY);
+        }
+
+        return new FinancialYearRange(startDate, endDate);
+    }
+
+    /**
+     * Check if a date falls within a given financial year
+     */
+//    private boolean isDateInFinancialYear(LocalDate date, FinancialYearRange fyRange) {
+//        if (date == null || fyRange == null) return false;
+//        return !date.isBefore(fyRange.startDate) && !date.isAfter(fyRange.endDate);
+//    }
+
+    /**
+     * Logs summary for debugging - updated to show correct field mapping
      */
     private void logSummary(OfficerSummaryResponseDto summary, String formationType, String unitName) {
-        log.info("=== SUMMARY for {} - {} ===", formationType, unitName);
-        log.info("Total Officers: {}", summary.getTotalOfficers());
-        log.info("Total Courses Done (in unit): {}", summary.getTotalCoursesDone());
-        log.info("Courses (Training Yr): {}", summary.getCoursesTrainingYr());
-        log.info("Courses in This Unit: {}", summary.getCoursesInUnit());
+        log.info("=== SUMMARY for {} - {} (Correct Logic) ===", formationType, unitName);
+        log.info("Total Officers (Current in unit): {}", summary.getTotalOfficers());
+        log.info("Total Courses Done (Entire Service - UI field): {}", summary.getTotalCoursesDone());
+        log.info("Courses (Training Yr - Current FY in unit - UI field): {}", summary.getCoursesTrainingYr());
+        log.info("Courses in This Unit (Distinct - UI field): {}", summary.getCoursesInUnit());
         log.info("Earliest Seniority: {}", summary.getEarliestSeniority());
         log.info("Latest Seniority: {}", summary.getLatestSeniority());
         log.info("Earliest Commission: {}", summary.getEarliestCommission());
         log.info("Latest Commission: {}", summary.getLatestCommission());
         log.info("================================");
+
+        // Also log what each officer will show in table
+        log.info("TABLE columns mapping:");
+        log.info("- Courses Done: Total courses across entire service");
+        log.info("- Training Yr: Current FY courses in current unit");
+        log.info("- Courses in Unit: Courses done in current unit only");
     }
 }
