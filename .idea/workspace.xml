@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="feat: Complete Advanced Filter System with Bidirectional Sync and Optimized API Calls&#10;&#10;- Add selected officers from popup to main table with armyNo-based comparison&#10;- Disable and gray out already added officers with visual indicators&#10;- Implement bidirectional sync - unchecking removes from main table&#10;- Optimize performance by loading dropdowns once and calling filter API only on Apply Filters click&#10;- Prevent automatic population and ensure only explicitly selected officers are added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/PersonnelController.java" afterDir="false" />
@@ -14,6 +15,17 @@
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
+=======
+    <list default="true" id="c0ea6598-d365-42ca-a9d8-78811cad129c" name="Changes" comment="apply first commit on dev2 pragalbh branch">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/OfficerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/OfficerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/PostingDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/PostingDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PostingDetailsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/PostingDetailsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/OfficerDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/OfficerDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/OfficerListService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/OfficerListService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/Final view.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/Final view.html" afterDir="false" />
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +42,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -41,7 +58,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ajath-info/sena-bhawan.git&quot;,
-    &quot;accountId&quot;: &quot;465459c3-4ec9-4833-a838-d66a81685772&quot;
+    &quot;accountId&quot;: &quot;bfe8c00e-b902-4642-b88a-bdd9400dc253&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -70,6 +87,10 @@
   &quot;keyToString&quot;: {
     &quot;Application.SenaBhawanApplication.executor&quot;: &quot;Run&quot;,
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+<<<<<<< HEAD
+=======
+    &quot;Maven.sena-bhawan [clean,install].executor&quot;: &quot;Run&quot;,
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
     &quot;Maven.sena-bhawan [clean].executor&quot;: &quot;Run&quot;,
     &quot;Maven.sena-bhawan [compile].executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
@@ -84,6 +105,7 @@
     &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+<<<<<<< HEAD
     &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Debug&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;dev-vipan&quot;,
@@ -91,18 +113,32 @@
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/diwakarjha/Downloads/sena-bhawan&quot;,
+=======
+    &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Run&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev2-pragalbh&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/ajath/sena-bhawan/src/main/resources/static&quot;,
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+<<<<<<< HEAD
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+=======
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\ajath\sena-bhawan\src\main\resources\static" />
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\uploads\personnel\officer" />
       <recent name="C:\Users\Harsh\Desktop\sena-bhawan\src\main\resources\static" />
     </key>
@@ -114,6 +150,7 @@
     <option name="myCommands">
       <command value="mvn compile" />
       <command value="mvn clean" />
+      <command value="mvn clean install" />
     </option>
   </component>
   <component name="RunManager">
@@ -131,8 +168,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>
@@ -211,6 +247,7 @@
       <option name="project" value="LOCAL" />
       <updated>1771363080271</updated>
     </task>
+<<<<<<< HEAD
     <task id="LOCAL-00004" summary="Filter Page and Edit personnel Form Page &#10;with api Integration - by Vipan Kumar">
       <option name="closed" value="true" />
       <created>1771363802333</created>
@@ -260,6 +297,17 @@
       <updated>1772485015052</updated>
     </task>
     <option name="localTasksCounter" value="10" />
+=======
+    <task id="LOCAL-00004" summary="apply first commit on dev2 pragalbh branch">
+      <option name="closed" value="true" />
+      <created>1772265586377</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772265586380</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -267,6 +315,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Dashboard New page Modified with charts and API implementions&#10;Orbat page modification&#10;Fix the default Bug" />
+<<<<<<< HEAD
     <MESSAGE value="Filter Page and Edit personnel Form Page &#10;with api Integration - by Vipan Kumar" />
     <MESSAGE value="QR page Filters Save with all Mapping" />
     <MESSAGE value="Course page and personnel form for Add Personnel is done" />
@@ -285,6 +334,10 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+=======
+    <MESSAGE value="apply first commit on dev2 pragalbh branch" />
+    <option name="LAST_COMMIT_MESSAGE" value="apply first commit on dev2 pragalbh branch" />
+>>>>>>> fd75a0ba6aa10323748d4137c9fbdaaf7d4a5b16
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

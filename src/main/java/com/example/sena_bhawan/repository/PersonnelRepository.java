@@ -12,18 +12,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
-public interface PersonnelRepository
-        extends JpaRepository<Personnel, Long>,
-        JpaSpecificationExecutor<Personnel> {
+public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
 
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")
     List<Object[]> getRankCounts();
 
-    List<Personnel> findByIdIn(List<Long> ids);
 
     @Query("SELECT COUNT(p) FROM Personnel p WHERE LOWER(p.rank) LIKE LOWER(CONCAT('%', :term, '%'))")
     long countByRankContaining(@Param("term") String term);
@@ -69,5 +67,20 @@ public interface PersonnelRepository
     // Add to your existing PersonnelRepository
     @Query("SELECT COUNT(p) FROM Personnel p")
     long getTotalPersonnelCount();
+
+
+    List<Personnel> findByIdIn(List<Long> personnelIds);
+
+    @Query("SELECT MIN(p.dateOfSeniority) FROM Personnel p WHERE p.id IN :personnelIds")
+    Optional<LocalDate> findEarliestSeniority(@Param("personnelIds") List<Long> personnelIds);
+
+    @Query("SELECT MAX(p.dateOfSeniority) FROM Personnel p WHERE p.id IN :personnelIds")
+    Optional<LocalDate> findLatestSeniority(@Param("personnelIds") List<Long> personnelIds);
+
+    @Query("SELECT MIN(p.dateOfCommission) FROM Personnel p WHERE p.id IN :personnelIds")
+    Optional<LocalDate> findEarliestCommission(@Param("personnelIds") List<Long> personnelIds);
+
+    @Query("SELECT MAX(p.dateOfCommission) FROM Personnel p WHERE p.id IN :personnelIds")
+    Optional<LocalDate> findLatestCommission(@Param("personnelIds") List<Long> personnelIds);
 }
 

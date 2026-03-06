@@ -3,6 +3,7 @@ package com.example.sena_bhawan.controller;
 import com.example.sena_bhawan.dto.CourseDetailsRequestDTO;
 import com.example.sena_bhawan.dto.PersonnelFullDetailsDTO;
 import com.example.sena_bhawan.dto.PostingDetailsDTO;
+import com.example.sena_bhawan.dto.PostingRequestDTO;
 import com.example.sena_bhawan.service.CourseDetailsService;
 import com.example.sena_bhawan.service.PostingDetailsService;
 import com.example.sena_bhawan.entity.PostingDetails;
@@ -28,22 +29,39 @@ public class PersonnelFullDetailsController {
 
         Long personnelId = dto.getPersonnelId();
 
-        if (dto.getPostingDetails() != null) {
-            for (PostingDetailsDTO posting : dto.getPostingDetails()) {
-                posting.setPersonnelId(personnelId);
-                postingService.addPosting(posting);
-            }
+        if (personnelId == null) {
+            return "Error: Personnel ID is required";
         }
 
-        if (dto.getCourseDetails() != null) {
-            for (CourseDetailsRequestDTO course : dto.getCourseDetails()) {
-                course.setPersonnelId(personnelId);
-                courseService.addCourse(course);
-            }
+        // ✅ Check if postingRequest is null or empty
+        if (dto.getPostingRequest() == null || dto.getPostingRequest().isEmpty()) {
+            return "No posting details to save";  // Yeh return hoga
         }
 
-        return "All posting & course details saved successfully!";
+        // Agar yahan tak pahuncha matlab data hai save karne ko
+        for (PostingRequestDTO posting : dto.getPostingRequest()) {
+            posting.setPersonnelId(personnelId);
+            postingService.upsertPosting(posting);  // ek method mein INSERT/UPDATE
+        }
+
+        return "All posting details saved successfully!";
     }
+
+//    @PostMapping("/save")
+//    @Transactional
+//    public String saveAllDetails(@RequestBody PersonnelFullDetailsDTO dto) {
+//
+//        Long personnelId = dto.getPersonnelId();
+//
+//        if (dto.getPostingDetails() != null) {
+//            for (PostingDetailsDTO posting : dto.getPostingDetails()) {
+//                posting.setPersonnelId(personnelId);
+//                postingService.addPosting(posting);
+//            }
+//        }
+//
+//        return "All posting & course details saved successfully!";
+//    }
 
     @GetMapping("/{personnelId}")
     public PersonnelFullDetailsDTO getAllDetails(@PathVariable Long personnelId) {

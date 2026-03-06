@@ -43,6 +43,7 @@ public class Personnel {
     private String panCard;
     private String maritalStatus;
     private String cdaAccountNo;
+    private String gender;
 
     private String permanentAddress;
     private String city;

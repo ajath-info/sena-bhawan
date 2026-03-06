@@ -4,16 +4,17 @@ import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-
-public interface OrbatStructureRepository
-        extends JpaRepository<OrbatStructure, Long> {
+@Repository
+public interface OrbatStructureRepository extends JpaRepository<OrbatStructure, Long> {
 
     Optional<OrbatStructure> findById(Long id);
 
+    List<OrbatStructure> findByFormationType(String formationType);
 
     // 1️⃣ All Commands
     @Query("""

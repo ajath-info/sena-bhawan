@@ -11,5 +11,7 @@ public class PersonnelFullDetailsDTO {
 
     private List<PostingDetailsDTO> postingDetails;
 
+    private List<PostingRequestDTO> postingRequest;
+
     private List<CourseDetailsRequestDTO> courseDetails;
 }

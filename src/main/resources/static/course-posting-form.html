@@ -36,7 +36,7 @@
       flex-direction: column;
 
       height: 100vh;
-      overflow-y: auto; /* ✅ sidebar scroll */
+      overflow-y: auto;
       overflow-x: hidden;
       flex-shrink: 0;
     }
@@ -453,135 +453,8 @@
 
 <div class="container">
 
-  <!-- SIDEBAR -->
-<!--  <aside class="sidebar">-->
-<!--    <div class="sidebar-header">-->
-<!--      <div class="logo-section">-->
-<!--        <div class="logo-icon">🛡️</div>-->
-<!--        <div class="logo-text">-->
-<!--          <h1>ARMY HRMS</h1>-->
-<!--          <p>भारतीय सेना</p>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <nav class="sidebar-nav">-->
-<!--      <div class="nav-section-title">Main Menu</div>-->
-
-<!--      <a href="/dashboard-new.html" class="nav-item ">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-officers.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Officers</span>-->
-<!--      </a>-->
-
-<!--      <a href="/dashboard-training.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏠</div>-->
-<!--        <span>Dashboard Training</span>-->
-<!--      </a>-->
-
-<!--      <a href="/filter.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔍</div>-->
-<!--        <span>Master Filter & Search</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Administration</div>-->
-
-<!--      <a href="/role-permmissoon.html" class="nav-item">-->
-<!--        <div class="nav-icon">🔐</div>-->
-<!--        <span>Role & Permissions</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/user-management.html" class="nav-item">-->
-<!--        <div class="nav-icon">👥</div>-->
-<!--        <span>User Management</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <div class="nav-section-title">Masters</div>-->
-
-<!--      <a href="/course-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📚</div>-->
-<!--        <span>Course Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/grade-awards.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Grade & Awards</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-schedule.html" class="nav-item">-->
-<!--        <div class="nav-icon">📅</div>-->
-<!--        <span>Course Schedule</span>-->
-<!--      </a>-->
-
-<!--      <a href="/location-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">📍</div>-->
-<!--        <span>Location Master</span>-->
-<!--      </a>-->
-
-<!--      &lt;!&ndash; <a href="/command-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🚩</div>-->
-<!--        <span>Command Master</span>-->
-<!--      </a> &ndash;&gt;-->
-
-<!--      <a href="/rank-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🏅</div>-->
-<!--        <span>Rank Master</span>-->
-<!--      </a>-->
-
-<!--      <a href="/unit-master.html" class="nav-item">-->
-<!--        <div class="nav-icon">🛡️</div>-->
-<!--        <span>Unit Master</span>-->
-<!--      </a>-->
-
-<!--      <div class="nav-section-title">Forms</div>-->
-
-<!--      <a href="/personnel-form.html" class="nav-item active">-->
-<!--        <div class="nav-icon">👤</div>-->
-<!--        <span>Personnel Data Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/coursepanel.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Course Panel Generation</span>-->
-<!--      </a>-->
-
-<!--      <a href="/orbat.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Orbit Generation Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/add-new-user.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>New User Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/legal-disciplinary.html" class="nav-item">-->
-<!--        <div class="nav-icon">📋</div>-->
-<!--        <span>Legal And Disciplinary Form</span>-->
-<!--      </a>-->
-
-<!--      <a href="/course-posting-form.html" class="nav-item">-->
-<!--        <div class="nav-icon">📝</div>-->
-<!--        <span>Course & Posting Form</span>-->
-<!--      </a>-->
-<!--    </nav>-->
-
-<!--    <div class="sidebar-footer">-->
-<!--      <div class="user-profile">-->
-<!--        <div class="user-avatar">AD</div>-->
-<!--        <div class="user-info">-->
-<!--          <div class="name">Admin User</div>-->
-<!--          <div class="role">HQ Command</div>-->
-<!--        </div>-->
-<!--        <div>🚪</div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </aside>-->
-
   <div id="sidebar"></div>
+
   <!-- MAIN -->
   <main class="main-content">
 
@@ -595,148 +468,13 @@
       <!-- Officer Selection -->
       <div class="card">
         <div class="section-title">Officer Selection</div>
-        <label>Select Army Number *</label>
-        <select id="officerSelect">
-          <option value="">Select Army No</option>
-        </select>
+        <label>Enter Army Number *</label>
+        <input type="text" id="officerInput" placeholder="Enter Army Number">
         <div id="officerDetails" style="display:none"></div>
       </div>
 
       <div class="tabs">
         <div class="tab active" data-tab="posting">Posting Details</div>
-<!--        <div class="tab" data-tab="course">Course Details</div>-->
-      </div>
-
-      <!-- POSTING TAB -->
-      <div class="card" id="postingTab">
-        <div class="section-title">Previous Postings</div>
-        <table>
-          <thead>
-          <tr>
-            <th>S.No</th><th>Unit</th><th>Location</th><th>Command</th>
-            <th>Appointment</th><th>From</th><th>To</th><th>Duration</th><th>Actions</th>
-          </tr>
-          </thead>
-          <tbody id="previousPostingsBody"></tbody>
-        </table>
-
-        <div class="section-title" style="margin-top:20px">Add New Posting</div>
-
-        <div class="form-grid">
-
-          <!-- UNIT DROPDOWN -->
-          <div>
-            <label>Unit Name *</label>
-            <select id="postingUnit">
-              <option value="">Select Unit</option>
-            </select>
-          </div>
-
-          <!-- LOCATION DROPDOWN -->
-          <div>
-            <label>Location *</label>
-            <select id="postingLocation">
-              <option value="">Select Location</option>
-            </select>
-          </div>
-
-          <!-- COMMAND DROPDOWN -->
-          <div>
-            <label>Command *</label>
-            <select id="postingCommand">
-              <option value="">Select Command</option>
-            </select>
-          </div>
-
-          <div>
-            <label>From Date *</label>
-            <input id="postingFrom" type="date">
-          </div>
-
-          <div>
-            <label>To Date</label>
-            <input id="postingTo" type="date">
-          </div>
-
-          <div class="full">
-            <label>Remarks</label>
-            <textarea id="postingRemarks" placeholder="Posting remarks"></textarea>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- COURSE TAB -->
-      <div class="card" id="courseTab" style="display:none">
-        <div class="section-title">Previous Courses</div>
-        <table>
-          <thead>
-          <tr>
-            <th>S.No</th><th>Course</th><th>From</th><th>To</th>
-            <th>Duration</th><th>Grade</th><th>Actions</th>
-          </tr>
-          </thead>
-          <tbody id="previousCoursesBody"></tbody>
-        </table>
-
-        <div class="section-title" style="margin-top:20px">Add New Course</div>
-
-        <div class="form-grid">
-
-          <div>
-            <label>Course ID *</label>
-            <select id="courseId">
-              <option value="">Select Course</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Course Serial No *</label>
-            <input id="courseSerialNo" placeholder="e.g. COI-1343243">
-          </div>
-
-          <div>
-            <label>From Date *</label>
-            <input id="courseFrom" type="date">
-          </div>
-
-          <div>
-            <label>To Date *</label>
-            <input id="courseTo" type="date">
-          </div>
-
-          <div>
-            <label>Grading *</label>
-            <input id="courseGrading" placeholder="A+, A, B+">
-          </div>
-
-          <div class="full">
-            <label>Remarks</label>
-            <textarea id="courseRemarks" placeholder="Course remarks"></textarea>
-          </div>
-
-          <div>
-            <label>Letter No</label>
-            <input id="courseLetterNo" placeholder="AHQ/2024/COURSE/5678">
-          </div>
-
-          <div>
-            <label>Letter Date</label>
-            <input id="courseLetterDate" type="date">
-          </div>
-        </div>
-
-      </div>
-
-      <div class="card" id="paramountPreview" style="display:none;border:2px solid #fbbf24;background:#fffbeb">
-        <div class="section-title">
-          Paramount Card Preview
-          <span style="float:right;font-size:12px;color:#92400e">Auto-Updated</span>
-        </div>
-
-        <div class="officer-card" id="paramountContent"
-             style="background:#ecfdf5;color:#065f46">
-        </div>
       </div>
 
       <!-- UNDER POSTING -->
@@ -772,12 +510,10 @@
             <select id="postingTypeSelect">
               <option value="">Select Type</option>
             </select>
-
           </div>
 
         </div>
       </div>
-
 
       <!-- POSTING IN -->
       <div class="card">
@@ -795,17 +531,13 @@
             <select id="rankSelect">
               <option value="">Select Rank</option>
             </select>
-
           </div>
 
         </div>
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:12px">
-        <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-secondary" id="previewParamountBtn">
-          👁 Preview Paramount Card
-        </button>
+        <button class="btn btn-secondary">Delete/Cancel</button>
         <button class="btn btn-primary" id="saveBtn">Save Details</button>
       </div>
 
@@ -813,19 +545,21 @@
   </main>
 </div>
 
-
-
 <script>
   function getOfficerImageUrl(officer) {
-  if (officer.officerImage) {
-    return `http://localhost:6060/${officer.officerImage}`;
+    if (officer.officerImage) {
+      return `http://localhost:6060/${officer.officerImage}`;
+    }
+    return "/assets/default-avatar.png";
   }
-  return "/assets/default-avatar.png"; // optional fallback
-}
 
-  const PERSONNEL_API="http://localhost:6060/api/personnel";
-  const FULL_API="http://localhost:6060/personnel-full-details";
-  const SAVE_API="http://localhost:6060/personnel-full-details/save";
+  function fmt(d) {
+    if (!d) return "-";
+    return new Date(d).toLocaleDateString("en-GB");
+  }
+
+  const PERSONNEL_API = "http://localhost:6060/api/personnel";
+  const SAVE_API = "http://localhost:6060/personnel-full-details/save";
 
   const movementDate = document.getElementById("movementDate");
   const postedTo = document.getElementById("postedTo");
@@ -834,324 +568,112 @@
   const appointmentSelect = document.getElementById("appointmentSelect");
   const postingTypeSelect = document.getElementById("postingTypeSelect");
   const rankSelect = document.getElementById("rankSelect");
+  const officerDetails = document.getElementById("officerDetails");
+  const officerInput = document.getElementById("officerInput");
 
-  const officerSelect=document.getElementById("officerSelect");
-  const officerDetails=document.getElementById("officerDetails");
-  const postingsBody=document.getElementById("previousPostingsBody");
-  const coursesBody=document.getElementById("previousCoursesBody");
-	
-  const UNIT_API = "http://localhost:6060/api/unit";
-  const LOCATION_API = "http://localhost:6060/api/location";
-  const COMMAND_API = "http://localhost:6060/api/orbat/commands";
+  let personnel = [];
 
-  const unitSelect = document.getElementById("postingUnit");
-  const locationSelect = document.getElementById("postingLocation");
-  const commandSelect = document.getElementById("postingCommand");
-	
-  let personnel=[];
+  // Load personnel once
+  fetch(PERSONNEL_API)
+    .then(r => r.json())
+    .then(data => {
+      personnel = data;
+    })
+    .catch(err => console.error("Error loading personnel:", err));
 
+  // Detect typing
+  officerInput.addEventListener("input", () => {
+    const armyNo = officerInput.value.trim().toLowerCase();
 
-  /* LOAD UNITS */
-  fetch(UNIT_API)
-    .then(res => res.json())
-    .then(units => {
-      units.forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u.unitName;
-        opt.textContent = `${u.unitName} (${u.location})`;
-        unitSelect.appendChild(opt);
-      });
-    });
-
-  /* LOAD LOCATIONS */
-  fetch(LOCATION_API)
-    .then(res => res.json())
-    .then(locations => {
-      locations.forEach(l => {
-        const opt = document.createElement("option");
-        opt.value = l.locationName;
-        opt.textContent = `${l.locationName}, ${l.state}`;
-        locationSelect.appendChild(opt);
-      });
-    });
-
-  /* LOAD COMMANDS */
-  fetch(COMMAND_API)
-    .then(res => res.json())
-    .then(commands => {
-      commands.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c.name;
-        opt.textContent = c.name.toUpperCase();
-        commandSelect.appendChild(opt);
-      });
-    });	
-  	
-  /* Load personnel */
-  fetch(PERSONNEL_API).then(r=>r.json()).then(d=>{
-    personnel=d;
-    d.forEach(p=>{
-      const o=document.createElement("option");
-      o.value=p.id;
-      o.textContent=`${p.armyNo} - ${p.fullName}`;
-      officerSelect.appendChild(o);
-    });
-  });
-
-  /* On select */
-  officerSelect.addEventListener("change",()=>{
-    const id=officerSelect.value;
-    if(!id){officerDetails.style.display="none";return;}
-    const o=personnel.find(p=>p.id==id);
-    officerDetails.style.display="flex";
-    officerDetails.className="officer-card";
-    officerDetails.innerHTML = `
-  <div class="officer-avatar">
-    <img
-      src="${getOfficerImageUrl(o)}"
-      onerror="this.style.display='none'"
-      style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
-    />
-  </div>
-  <div class="officer-info">
-    <h4>${o.rank} ${o.fullName}</h4>
-    <p>Army No: ${o.armyNo}</p>
-    <p>DOB: ${fmt(o.dateOfBirth)}</p>
-  </div>
-`;
-
-    loadDetails(id);
-  });
-
-  /* Load postings & courses */
-  function loadDetails(id){
-    fetch(`${FULL_API}/${id}`).then(r=>r.json()).then(d=>{
-      render(postingsBody,d.postingDetails||[],true);
-      render(coursesBody,d.courseDetails||[],false);
-    });
-  }
-
-
-function render(tbody, list, isPosting) {
-  tbody.innerHTML = "";
-
-  if (!list.length) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="${isPosting ? 9 : 7}" style="text-align:center;color:#6b7280">
-          No data found
-        </td>
-      </tr>`;
-    return;
-  }
-
-  list.forEach((x, i) => {
-    if (isPosting) {
-      tbody.insertAdjacentHTML("beforeend", `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${x.unitName}</td>
-          <td>${x.location}</td>
-          <td>${x.command}</td>
-          <td>${x.appointment}</td>
-          <td>${fmt(x.fromDate)}</td>
-          <td>${fmt(x.toDate)}</td>
-          <td>${x.duration || "-"}</td>
-          <td class="actions">
-            <div class="icon-btn delete">🗑️</div>
-          </td>
-        </tr>
-      `);
-    } else {
-      /* ✅ COURSE RENDERING — FIX IS HERE */
-      tbody.insertAdjacentHTML("beforeend", `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${x.courseName || "-"}</td>
-          <td>${fmt(x.fromDate)}</td>
-          <td>${fmt(x.toDate)}</td>
-          <td>${x.duration || "-"}</td>
-          <td>${x.grading || "-"}</td>
-          <td class="actions">
-            <div class="icon-btn delete">🗑️</div>
-          </td>
-        </tr>
-      `);
-    }
-  });
-}
-
-  /* Save */
-  document.getElementById("saveBtn").onclick=()=>{
-    if(!officerSelect.value)return alert("Select officer");
-    fetch(SAVE_API,{
-      method:"POST",
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        personnelId:Number(officerSelect.value),
-        postingDetails: postingUnit.value ? [{
-            unitName: postingUnit.value,
-            location: postingLocation.value,
-            command: postingCommand.value,
-            appointment: appointmentSelect.value,
-            postingType: postingTypeSelect.value,
-
-            movementDate: movementDate.value,
-            postedTo: postedTo.value,
-            postingOrderIssueDate: postingOrderIssueDate.value,
-            tosUpdatedDate: tosUpdatedDate.value,
-            rank: rankSelect.value,
-
-            fromDate: postingFrom.value,
-            toDate: postingTo.value,
-            remarks: postingRemarks.value,
-            documentPath: "/docs/posting.pdf"
-        }] : [],
-
-        courseDetails: courseId.value ? [{
-  courseId: Number(courseId.value), // ← srno goes here
-  courseSerialNo: courseSerialNo.value,
-  fromDate: courseFrom.value,
-  toDate: courseTo.value,
-  grading: courseGrading.value,
-  remarks: courseRemarks.value,
-  letterNo: courseLetterNo.value,
-  letterDate: courseLetterDate.value,
-  gradeCardPath: "/docs/grade.pdf",
-  supportingDocumentPath: "/docs/support.pdf"
-}] : []
-      })
-    }).then(r=>r.ok?alert("Saved successfully"):alert("Save failed"));
-  };
-
-  /* Tabs */
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.onclick=()=>{
-      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-      postingTab.style.display=t.dataset.tab==="posting"?"block":"none";
-      courseTab.style.display=t.dataset.tab==="course"?"block":"none";
-    };
-  });
-</script>
-
-<script>
-  const previewBtn = document.getElementById("previewParamountBtn");
-  const previewCard = document.getElementById("paramountPreview");
-  const previewContent = document.getElementById("paramountContent");
-
-  /* date formatter */
-  function fmt(d) {
-    if (!d) return "Present";
-    return new Date(d).toLocaleDateString("en-GB");
-  }
-
-  previewBtn.addEventListener("click", async () => {
-    const isVisible = previewCard.style.display === "block";
-
-    /* HIDE MODE */
-    if (isVisible) {
-      previewCard.style.display = "none";
-      previewBtn.innerHTML = "👁 Preview Paramount Card";
+    if (!armyNo) {
+      officerDetails.style.display = "none";
       return;
     }
 
-    /* SHOW MODE */
-    const personnelId = officerSelect.value;
-    if (!personnelId) {
-      alert("Please select an Army Number first");
-      return;
-    }
+    const officer = personnel.find(p =>
+      p.armyNo.toLowerCase().includes(armyNo)
+    );
 
-    const officer = personnel.find(p => p.id == personnelId);
     if (!officer) {
-      alert("Officer not found");
+      officerDetails.style.display = "none";
       return;
     }
 
-    try {
-      const res = await fetch(`${FULL_API}/${personnelId}`);
-      const data = await res.json();
+    officerDetails.style.display = "flex";
+    officerDetails.className = "officer-card";
 
-      const latestPosting = data.postingDetails?.slice(-1)[0];
-      const latestCourse  = data.courseDetails?.slice(-1)[0];
-
-      previewContent.innerHTML = `
-  <div class="officer-avatar">
-    <img
-      src="${getOfficerImageUrl(officer)}"
-      onerror="this.style.display='none'"
-      style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
-    />
-  </div>
-  <div class="officer-info">
-    <h4>${officer.rank} ${officer.fullName}</h4>
-
-    <p>Army No: ${officer.armyNo} | Rank: ${officer.rank}</p>
-    <p>DOB: ${fmt(officer.dateOfBirth)} | DOC: ${fmt(officer.dateOfCommission)}</p>
-
-    ${latestPosting ? `
-    <div style="margin-top:10px;background:#d1fae5;padding:10px;border-radius:6px">
-      <strong>Current Posting:</strong><br>
-      ${latestPosting.unitName}, ${latestPosting.location}
-      – ${latestPosting.appointment}<br>
-      <small>
-        ${fmt(latestPosting.fromDate)} to ${fmt(latestPosting.toDate)}
-        | ${latestPosting.command}
-      </small>
-    </div>` : ""}
-
-    ${latestCourse ? `
-    <div style="margin-top:10px;background:#e0f2fe;padding:10px;border-radius:6px">
-      <strong>Latest Course:</strong><br>
-      Course ID: ${latestCourse.courseId}<br>
-      <small>
-        ${fmt(latestCourse.fromDate)} to ${fmt(latestCourse.toDate)}
-        | Grade ${latestCourse.grading}
-      </small>
-    </div>` : ""}
-
-    <div style="margin-top:10px;background:#fef3c7;padding:10px;border-radius:6px">
-      <strong>Latest Remark:</strong><br>
-      ${latestPosting?.remarks || latestCourse?.remarks || "No remarks available"}
-    </div>
-  </div>
-`;
-
-
-      previewCard.style.display = "block";
-      previewCard.scrollIntoView({ behavior: "smooth", block: "start" });
-      previewBtn.innerHTML = "🙈 Hide Paramount Card";
-
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load Paramount Card data");
-    }
+    officerDetails.innerHTML = `
+      <div class="officer-avatar">
+        <img
+          src="${getOfficerImageUrl(officer)}"
+          onerror="this.style.display='none'"
+          style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
+        />
+      </div>
+      <div class="officer-info">
+        <h4>${officer.rank} ${officer.fullName}</h4>
+        <p>Army No: ${officer.armyNo}</p>
+        <p>DOB: ${fmt(officer.dateOfBirth)}</p>
+      </div>
+    `;
   });
-</script>
-<script>
-  const COURSE_API = "http://localhost:6060/api/course";
-  const courseSelect = document.getElementById("courseId");
 
-  /* Load course master */
-  fetch(COURSE_API)
-    .then(res => res.json())
-    .then(courses => {
-      courses.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c.srno;                 // ✅ value = srno
-        opt.textContent = c.courseName;     // ✅ label = courseName
-        courseSelect.appendChild(opt);
-      });
+  // Save button click handler - FIXED VERSION
+  document.getElementById("saveBtn").onclick = () => {
+    const armyNo = officerInput.value.trim().toLowerCase();
+    const officer = personnel.find(p => p.armyNo.toLowerCase() === armyNo);
+
+    if (!officer) {
+      alert("Valid Army Number required");
+      return;
+    }
+
+    // Create request object with CORRECT field name "postingRequest"
+    const requestData = {
+      personnelId: officer.id,
+      postingRequest: [{
+        appointment: appointmentSelect.value,
+        postingType: postingTypeSelect.value,
+        movementDate: movementDate.value,
+        postedTo: postedTo.value,
+        postingOrderIssueDate: postingOrderIssueDate.value,
+        tosUpdatedDate: tosUpdatedDate.value,
+        rank: rankSelect.value
+      }]
+    };
+
+    console.log("Sending data:", requestData);
+
+    fetch(SAVE_API, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    })
+    .then(async r => {
+      const text = await r.text();
+      if (r.ok) {
+        alert("✅ " + text);
+        // Optional: Clear form after successful save
+        // movementDate.value = "";
+        // postedTo.value = "";
+        // postingOrderIssueDate.value = "";
+        // tosUpdatedDate.value = "";
+        // appointmentSelect.value = "";
+        // postingTypeSelect.value = "";
+        // rankSelect.value = "";
+      } else {
+        alert("❌ " + text);
+      }
     })
     .catch(err => {
-      console.error("Failed to load courses", err);
+      console.error("Network error:", err);
+      alert("❌ Network error occurred");
     });
+  };
 </script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-
     const DROPDOWN_API = "http://localhost:6060/api/dropdown";
 
     const appointmentSelect = document.getElementById("appointmentSelect");
@@ -1159,22 +681,18 @@ function render(tbody, list, isPosting) {
     const rankSelect = document.getElementById("rankSelect");
 
     function loadDropdown(type, selectElement, defaultText) {
-
-      if (!selectElement) return; // safety check
+      if (!selectElement) return;
 
       fetch(`${DROPDOWN_API}/${type}`)
         .then(res => res.json())
         .then(data => {
-
           selectElement.innerHTML = `<option value="">${defaultText}</option>`;
-
           data.forEach(item => {
             const opt = document.createElement("option");
             opt.value = item.name;
             opt.textContent = item.name;
             selectElement.appendChild(opt);
           });
-
         })
         .catch(err => console.error(`Failed to load ${type}`, err));
     }
@@ -1182,11 +700,8 @@ function render(tbody, list, isPosting) {
     loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
     loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
     loadDropdown("RANK", rankSelect, "Select Rank");
-
   });
 </script>
 
-
 </body>
-
 </html>
