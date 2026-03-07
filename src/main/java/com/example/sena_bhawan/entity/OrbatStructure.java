@@ -41,7 +41,7 @@ public class OrbatStructure {
 
     @Column(name = "formation_type")
     private String formationType;  // command / corps / division / brigade / battalion
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;           // actual formation name
 
     @Column(name = "hq_id")

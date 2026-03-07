@@ -2,7 +2,9 @@ package com.example.sena_bhawan.repository;
 
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.entity.PostingDetails;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -56,5 +58,32 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
 
     // ✅ Sorted order ke liye ye method chahiye
     List<PostingDetails> findByPersonnelIdOrderByFromDateDesc(Long personnelId);
+
+    // Find current posting (status = UNDER_POSTING)
+    Optional<PostingDetails> findByPersonnelIdAndStatus(Long personnelId, String status);
+
+    // Find current posting using @Query
+    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'UNDER_POSTING'")
+    Optional<PostingDetails> findCurrentPosting(@Param("personnelId") Long personnelId);
+
+    // Find all historical postings (status = POSTED)
+    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'POSTED' ORDER BY p.toDate DESC")
+    List<PostingDetails> findPostingHistory(@Param("personnelId") Long personnelId);
+
+    // Check if personnel has any posting
+    boolean existsByPersonnelId(Long personnelId);
+
+    // Complete current posting (change status to POSTED)
+    @Modifying
+    @Transactional
+    @Query("UPDATE PostingDetails p SET p.status = 'POSTED', p.toDate = :tosDate, p.sosDate = :tosDate WHERE p.personnelId = :personnelId AND p.status = 'UNDER_POSTING'")
+    int completeCurrentPosting(@Param("personnelId") Long personnelId, @Param("tosDate") LocalDate tosDate);
+
+    // Find by ORBAT ID (for reporting)
+    List<PostingDetails> findByOrbatIdAndStatus(Long orbatId, String status);
+
+    // Count personnel in a unit
+    @Query("SELECT COUNT(p) FROM PostingDetails p WHERE p.orbatId = :orbatId AND p.status = 'UNDER_POSTING'")
+    long countCurrentPersonnelInUnit(@Param("orbatId") Long orbatId);
 
     }

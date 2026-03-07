@@ -82,5 +82,8 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
 
     @Query("SELECT MAX(p.dateOfCommission) FROM Personnel p WHERE p.id IN :personnelIds")
     Optional<LocalDate> findLatestCommission(@Param("personnelIds") List<Long> personnelIds);
+
+    Optional<Personnel> findByArmyNo(String armyNo);
+    boolean existsByArmyNo(String armyNo);
 }
 

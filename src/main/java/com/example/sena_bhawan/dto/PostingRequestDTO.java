@@ -9,7 +9,9 @@ import java.time.LocalDate;
 @Setter
 public class PostingRequestDTO {
 
+    private String armyNo;
     private Long personnelId;
+    private Long postingId;
 
     // -------- Under Posting --------
     private LocalDate movementDate;
@@ -21,4 +23,8 @@ public class PostingRequestDTO {
     // -------- Posting In --------
     private LocalDate tosUpdatedDate;
     private String rank;
+
+    // Internal fields (set by service)
+    private Long orbatId;
+    private String status;
 }
