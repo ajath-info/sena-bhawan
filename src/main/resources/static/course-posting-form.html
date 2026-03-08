@@ -479,6 +479,7 @@
         <label>Enter Army Number *</label>
         <input type="text" id="officerInput" placeholder="Enter Army Number">
         <div id="officerDetails" style="display:none"></div>
+        <input type="hidden" id="currentPostingId">
       </div>
 
       <div class="tabs">
@@ -545,7 +546,7 @@
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:12px">
-        <button class="btn btn-secondary">Delete/Cancel</button>
+        <button class="btn btn-secondary" id="cancelBtn">Delete/Cancel</button>
         <button class="btn btn-primary" id="saveBtn">Save Details</button>
       </div>
 
@@ -553,22 +554,14 @@
   </main>
 </div>
 
+
 <script>
-  function getOfficerImageUrl(officer) {
-    if (officer.officerImage) {
-      return `http://localhost:6060/${officer.officerImage}`;
-    }
-    return "/assets/default-avatar.png";
-  }
-
-  function fmt(d) {
-    if (!d) return "-";
-    return new Date(d).toLocaleDateString("en-GB");
-  }
-
-  const PERSONNEL_API = "http://localhost:6060/api/personnel";
+  // ✅ APIs
+  const DROPDOWN_API = "http://localhost:6060/api/dropdown";
   const SAVE_API = "http://localhost:6060/personnel-full-details/save";
+  const DELETE_API = "http://localhost:6060/personnel-full-details";
 
+  // DOM Elements
   const movementDate = document.getElementById("movementDate");
   const postedTo = document.getElementById("postedTo");
   const postingOrderIssueDate = document.getElementById("postingOrderIssueDate");
@@ -578,136 +571,175 @@
   const rankSelect = document.getElementById("rankSelect");
   const officerDetails = document.getElementById("officerDetails");
   const officerInput = document.getElementById("officerInput");
+  const currentPostingId = document.getElementById("currentPostingId");
+  const saveBtn = document.getElementById("saveBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
 
-  let personnel = [];
+  // State
+  let currentArmyNo = null;
+  let currentPostingIdValue = null;
 
-  // Load personnel once
-  fetch(PERSONNEL_API)
-    .then(r => r.json())
-    .then(data => {
-      personnel = data;
-    })
-    .catch(err => console.error("Error loading personnel:", err));
+  // Load dropdowns
+  document.addEventListener("DOMContentLoaded", function () {
+    loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
+    loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
+    loadDropdown("RANK", rankSelect, "Select Rank");
+  });
 
-  // Detect typing
+  function loadDropdown(type, selectElement, defaultText) {
+    if (!selectElement) return;
+    fetch(`${DROPDOWN_API}/${type}`)
+      .then(res => res.json())
+      .then(data => {
+        selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+        data.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.name;
+          opt.textContent = item.name;
+          selectElement.appendChild(opt);
+        });
+      })
+      .catch(err => console.error(`Failed to load ${type}`, err));
+  }
+
+  function getOfficerImageUrl(officer) {
+    return officer?.officerImage ? `http://localhost:6060/${officer.officerImage}` : "/assets/default-avatar.png";
+  }
+
+  function fmt(d) {
+    if (!d) return "-";
+    return new Date(d).toLocaleDateString("en-GB");
+  }
+
+  // Army Number input
   officerInput.addEventListener("input", () => {
-    const armyNo = officerInput.value.trim().toLowerCase();
-
+    const armyNo = officerInput.value.trim();
     if (!armyNo) {
       officerDetails.style.display = "none";
+      currentArmyNo = null;
       return;
     }
 
-    const officer = personnel.find(p =>
-      p.armyNo.toLowerCase().includes(armyNo)
-    );
-
-    if (!officer) {
-      officerDetails.style.display = "none";
-      return;
-    }
-
+    currentArmyNo = armyNo;
     officerDetails.style.display = "flex";
     officerDetails.className = "officer-card";
-
     officerDetails.innerHTML = `
       <div class="officer-avatar">
-        <img
-          src="${getOfficerImageUrl(officer)}"
-          onerror="this.style.display='none'"
-          style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
-        />
+        <img src="/assets/default-avatar.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
       </div>
       <div class="officer-info">
-        <h4>${officer.rank} ${officer.fullName}</h4>
-        <p>Army No: ${officer.armyNo}</p>
-        <p>DOB: ${fmt(officer.dateOfBirth)}</p>
+        <h4>Army Number: ${armyNo}</h4>
+        <p>Will be validated at save time</p>
       </div>
     `;
   });
 
-  // Save button click handler - FIXED VERSION
-  document.getElementById("saveBtn").onclick = () => {
-    const armyNo = officerInput.value.trim().toLowerCase();
-    const officer = personnel.find(p => p.armyNo.toLowerCase() === armyNo);
-
-    if (!officer) {
-      alert("Valid Army Number required");
+  // ✅ Save button - ARMY NUMBER bhejo
+  saveBtn.onclick = async () => {
+    if (!currentArmyNo) {
+      alert("Please enter Army Number");
+      officerInput.focus();
       return;
     }
 
-    // Create request object with CORRECT field name "postingRequest"
-    const requestData = {
-      personnelId: officer.id,
-      postingRequest: [{
-        appointment: appointmentSelect.value,
-        postingType: postingTypeSelect.value,
-        movementDate: movementDate.value,
-        postedTo: postedTo.value,
-        postingOrderIssueDate: postingOrderIssueDate.value,
-        tosUpdatedDate: tosUpdatedDate.value,
-        rank: rankSelect.value
-      }]
-    };
-
-    console.log("Sending data:", requestData);
-
-    fetch(SAVE_API, {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestData)
-    })
-    .then(async r => {
-      const text = await r.text();
-      if (r.ok) {
-        alert("✅ " + text);
-        // Optional: Clear form after successful save
-        // movementDate.value = "";
-        // postedTo.value = "";
-        // postingOrderIssueDate.value = "";
-        // tosUpdatedDate.value = "";
-        // appointmentSelect.value = "";
-        // postingTypeSelect.value = "";
-        // rankSelect.value = "";
-      } else {
-        alert("❌ " + text);
-      }
-    })
-    .catch(err => {
-      console.error("Network error:", err);
-      alert("❌ Network error occurred");
-    });
-  };
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const DROPDOWN_API = "http://localhost:6060/api/dropdown";
-
-    const appointmentSelect = document.getElementById("appointmentSelect");
-    const postingTypeSelect = document.getElementById("postingTypeSelect");
-    const rankSelect = document.getElementById("rankSelect");
-
-    function loadDropdown(type, selectElement, defaultText) {
-      if (!selectElement) return;
-
-      fetch(`${DROPDOWN_API}/${type}`)
-        .then(res => res.json())
-        .then(data => {
-          selectElement.innerHTML = `<option value="">${defaultText}</option>`;
-          data.forEach(item => {
-            const opt = document.createElement("option");
-            opt.value = item.name;
-            opt.textContent = item.name;
-            selectElement.appendChild(opt);
-          });
-        })
-        .catch(err => console.error(`Failed to load ${type}`, err));
+    if (!postedTo.value.trim()) {
+      alert("Posted To field is required");
+      postedTo.focus();
+      return;
     }
 
-    loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
-    loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
-    loadDropdown("RANK", rankSelect, "Select Rank");
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+    const requestData = {
+      armyNo: currentArmyNo,
+      appointment: appointmentSelect.value,
+      postingType: postingTypeSelect.value,
+      movementDate: movementDate.value || null,
+      postedTo: postedTo.value.trim(),
+      postingOrderIssueDate: postingOrderIssueDate.value || null,
+      tosUpdatedDate: tosUpdatedDate.value || null,
+      rank: rankSelect.value || null
+    };
+
+    if (currentPostingIdValue) {
+      requestData.postingId = currentPostingIdValue;
+    }
+
+    try {
+      const response = await fetch(SAVE_API, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("✅ " + result.message);
+
+        if (result.data) {
+          currentPostingIdValue = result.data.postingId;
+          currentPostingId.value = result.data.postingId;
+
+          officerDetails.innerHTML = `
+            <div class="officer-avatar">
+              <img src="/assets/default-avatar.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+            </div>
+            <div class="officer-info">
+              <h4>Army Number: ${currentArmyNo}</h4>
+              <p>Personnel ID: ${result.data.personnelId}</p>
+              <p>Status: ${result.data.status}</p>
+              <p><span style="background:#52b788;color:white;padding:2px 8px;border-radius:4px;">✅ Active</span></p>
+            </div>
+          `;
+        }
+
+        if (tosUpdatedDate.value) {
+          clearForm();
+        }
+      } else {
+        alert("❌ " + result.message);
+        currentPostingIdValue = null;
+        currentPostingId.value = "";
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("❌ Network error occurred");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = 'Save Details';
+    }
+  };
+
+  // ✅ Delete/Cancel button - Sirf form clear karega, API call nahi karega
+  cancelBtn.onclick = () => {
+    if (confirm("Are you sure you want to clear the form? Unsaved changes will be lost.")) {
+      clearForm();
+      officerInput.value = "";
+      officerDetails.style.display = "none";
+      currentArmyNo = null;
+      currentPostingIdValue = null;
+      currentPostingId.value = "";
+    }
+  };
+
+  function clearForm() {
+    movementDate.value = "";
+    postedTo.value = "";
+    appointmentSelect.value = "";
+    postingOrderIssueDate.value = "";
+    postingTypeSelect.value = "";
+    tosUpdatedDate.value = "";
+    rankSelect.value = "";
+  }
+
+  // Enter key
+  officerInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveBtn.click();
+    }
   });
 </script>
 

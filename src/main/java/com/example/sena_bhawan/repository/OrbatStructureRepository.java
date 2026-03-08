@@ -4,6 +4,7 @@ import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -55,6 +56,19 @@ public interface OrbatStructureRepository extends JpaRepository<OrbatStructure, 
 
     @Query("select distinct o.divisionName from OrbatStructure o where o.divisionName is not null")
     List<String> findDistinctDivisionNames();
+
+
+    // Case-insensitive search by formation name
+    @Query("SELECT o FROM OrbatStructure o WHERE LOWER(o.name) = LOWER(:formationName)")
+    Optional<OrbatStructure> findByFormationNameCaseInsensitive(@Param("formationName") String formationName);
+
+    // Check if formation exists (case-insensitive)
+    @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END FROM OrbatStructure o WHERE LOWER(o.name) = LOWER(:formationName)")
+    boolean existsByFormationNameCaseInsensitive(@Param("formationName") String formationName);
+
+    // Search by partial name (for autocomplete)
+    @Query("SELECT o FROM OrbatStructure o WHERE LOWER(o.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    java.util.List<OrbatStructure> searchByFormationName(@Param("searchTerm") String searchTerm);
 
 
 }

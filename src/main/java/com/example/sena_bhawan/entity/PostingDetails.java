@@ -70,4 +70,8 @@ public class PostingDetails {
 
     @Column(name = "sos_date")
     private LocalDate sosDate;
+
+    @Column(name = "orbat_id")
+    private Long orbatId;
+
 }
