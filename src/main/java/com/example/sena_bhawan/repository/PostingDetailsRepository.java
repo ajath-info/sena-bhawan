@@ -2,6 +2,7 @@ package com.example.sena_bhawan.repository;
 
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.entity.PostingDetails;
+import com.example.sena_bhawan.projection.PostingDetailsProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostingDetailsRepository extends JpaRepository<PostingDetails, Long> {
-
+    List<PostingDetailsProjection> findByPersonnelIdInAndStatus(List<Long> personnelIds, String status);
     List<PostingDetails> findByPersonnelId(Long personnelId);
 
     Optional<Object> findTopByPersonnelIdOrderByFromDateDesc(Long id);

@@ -45,7 +45,10 @@ public class PersonnelListDTO {
     private String panelStatus; // ATTENDING / NOT_ATTENDING / null
 
     // Transform from entity with panel status map
-    public static PersonnelListDTO fromPersonnel(Personnel personnel, Map<Long, String> panelStatusMap) {
+    public static PersonnelListDTO fromPersonnel(Personnel personnel,
+	Map<Long, String> panelStatusMap,
+	Map<Long, String> unitMap,
+	Map<Long, String> commandMap)  {
         PersonnelListDTO dto = new PersonnelListDTO();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -69,6 +72,10 @@ public class PersonnelListDTO {
 
         // Set panel status from map
         dto.setPanelStatus(panelStatusMap.getOrDefault(personnel.getId(), "—"));
+
+        // Set unit and command from posting details
+        dto.setUnit(unitMap.getOrDefault(personnel.getId(), "—"));
+        dto.setCommand(commandMap.getOrDefault(personnel.getId(), "—"));
 
         // Handle nested data
         if (personnel.getQualifications() != null && !personnel.getQualifications().isEmpty()) {
@@ -105,6 +112,6 @@ public class PersonnelListDTO {
 
     // Overloaded method for backward compatibility
     public static PersonnelListDTO fromPersonnel(Personnel personnel) {
-        return fromPersonnel(personnel, new HashMap<>());
+        return fromPersonnel(personnel, new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 }

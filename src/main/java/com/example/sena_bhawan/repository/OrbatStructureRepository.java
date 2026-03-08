@@ -2,6 +2,7 @@ package com.example.sena_bhawan.repository;
 
 import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
+import com.example.sena_bhawan.projection.OrbatStructureProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface OrbatStructureRepository extends JpaRepository<OrbatStructure, Long> {
-
+    List<OrbatStructure> findByIdInAndFormationTypeIn(List<Long> orbatIds, List<String> formationTypes);
+    @Query("SELECT o.id as id, o.name as name, o.formationType as formationType FROM OrbatStructure o WHERE o.id IN :orbatIds AND o.formationType IN :formationTypes")
+    List<OrbatStructureProjection> findIdAndNameByIdInAndFormationTypeIn(@Param("orbatIds") List<Long> orbatIds, @Param("formationTypes") List<String> formationTypes);
     Optional<OrbatStructure> findById(Long id);
 
     List<OrbatStructure> findByFormationType(String formationType);

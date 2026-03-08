@@ -5,13 +5,10 @@ import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
+import com.example.sena_bhawan.projection.PostingDetailsProjection;
 import com.example.sena_bhawan.projection.RetirementYearProjection;
-import com.example.sena_bhawan.repository.CoursePanelRepository;
-import com.example.sena_bhawan.repository.PersonnelRepository;
-import com.example.sena_bhawan.repository.PostingDetailsRepository;
-import com.example.sena_bhawan.repository.UnitMasterRepository;
+import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Service;
@@ -56,6 +53,7 @@ public class PersonnelServiceImpl implements PersonnelService {
             "Lt Col", Arrays.asList("lt col", "lieutenant col", "lt colonel", "lieutenant colonel"),
             "Col", Arrays.asList("col", "colonel")
     );
+    private final OrbatStructureRepository orbatStructureRepository;
 
     @Override
     public RetirementForecastResponse getRetirementForecast() {
@@ -171,11 +169,12 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository) {
+    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository, OrbatStructureRepository orbatStructureRepository) {
         this.personnelRepository = personnelRepository;
         this.unitMasterRepository= unitMasterRepository;
         this.postingDetailsRepository=postingDetailsRepository;
         this.coursePanelRepository=coursePanelRepository;
+        this.orbatStructureRepository = orbatStructureRepository;
     }
 
     // ================= COMMON =================
@@ -1024,23 +1023,87 @@ public class PersonnelServiceImpl implements PersonnelService {
         // Create a map of personnelId -> panelStatus
         Map<Long, String> panelStatusMap = new HashMap<>();
 
-        if (!personnelIds.isEmpty()) {
-            List<CoursePanelNomination> nominations = coursePanelRepository.findByPersonnelIdIn(personnelIds);
+        // Create maps for unit and command by personnel ID
+        Map<Long, String> unitMap = new HashMap<>();
+        Map<Long, String> commandMap = new HashMap<>();
 
+        if (!personnelIds.isEmpty()) {
+            // Fetch course panel nominations
+            List<CoursePanelNomination> nominations = coursePanelRepository.findByPersonnelIdIn(personnelIds);
             panelStatusMap = nominations.stream()
                     .collect(Collectors.toMap(
                             CoursePanelNomination::getPersonnelId,
                             CoursePanelNomination::getAttendanceStatus,
-                            (existing, replacement) -> existing // In case of duplicates, keep the first
+                            (existing, replacement) -> existing
                     ));
+
+            // Fetch posting details for UNDER_POSTING status
+            List<PostingDetailsProjection> postingDetails = postingDetailsRepository
+                    .findByPersonnelIdInAndStatus(personnelIds, "UNDER_POSTING");
+
+            if (!postingDetails.isEmpty()) {
+                // Collect all orbat IDs
+                List<Long> orbatIds = postingDetails.stream()
+                        .map(PostingDetailsProjection::getOrbatId)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (!orbatIds.isEmpty()) {
+                    // Fetch orbat structures for Unit and Command formation types
+                    List<String> formationTypes = Arrays.asList("Unit", "Command");
+                    List<OrbatStructure> orbatStructures = orbatStructureRepository
+                            .findByIdInAndFormationTypeIn(orbatIds, formationTypes);
+
+                    // Create maps for orbat ID to name based on formation type
+                    Map<Long, String> unitNameMap = orbatStructures.stream()
+                            .filter(os -> "Unit".equals(os.getFormationType()))
+                            .collect(Collectors.toMap(
+                                    OrbatStructure::getId,
+                                    OrbatStructure::getName,
+                                    (existing, replacement) -> existing
+                            ));
+
+                    Map<Long, String> commandNameMap = orbatStructures.stream()
+                            .filter(os -> "Command".equals(os.getFormationType()))
+                            .collect(Collectors.toMap(
+                                    OrbatStructure::getId,
+                                    OrbatStructure::getName,
+                                    (existing, replacement) -> existing
+                            ));
+
+                    // Map posting details to personnel IDs
+                    for (PostingDetailsProjection pd : postingDetails) {
+                        Long personnelId = pd.getPersonnelId();
+                        Long orbatId = pd.getOrbatId();
+
+                        if (personnelId != null && orbatId != null) {
+                            // Check if it's a Unit
+                            if (unitNameMap.containsKey(orbatId)) {
+                                unitMap.put(personnelId, unitNameMap.get(orbatId));
+                            }
+                            // Check if it's a Command
+                            else if (commandNameMap.containsKey(orbatId)) {
+                                commandMap.put(personnelId, commandNameMap.get(orbatId));
+                            }
+                        }
+                    }
+                }
+            }
         }
+
         final Map<Long, String> finalPanelStatusMap = panelStatusMap;
+        final Map<Long, String> finalUnitMap = unitMap;
+        final Map<Long, String> finalCommandMap = commandMap;
+
         return personnelList.stream()
-                .map(personnel -> PersonnelListDTO.fromPersonnel(personnel, finalPanelStatusMap))
+                .map(personnel -> PersonnelListDTO.fromPersonnel(
+                        personnel,
+                        finalPanelStatusMap,
+                        finalUnitMap,
+                        finalCommandMap))
                 .collect(Collectors.toList());
-
     }
-
     private boolean hasField(Root<Personnel> root, String fieldName) {
         try {
             root.get(fieldName);
