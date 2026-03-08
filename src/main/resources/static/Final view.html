@@ -345,12 +345,18 @@
           padding: 30px;
         }
     </style>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 <div class="container">
-    <!-- Sidebar will be loaded here -->
-    <div id="sidebar"></div>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
+        </div>
+    </aside>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -466,7 +472,7 @@
         </div>
     </main>
 </div>
-
+<script src="sidebar.js"></script>
 <script>
     // Base URL for API calls
     const BASE_URL = "http://localhost:6060";
@@ -859,38 +865,6 @@
       document.getElementById("hardScaleGrid").innerHTML = defaultGrid;
     }
 
-    // Load sidebar and setup active menu
-    fetch("sidebar.html")
-      .then((res) => res.text())
-      .then((html) => {
-        document.getElementById("sidebar").innerHTML = html;
-
-        // Attach logout after sidebar loads
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) {
-          logoutBtn.addEventListener("click", function () {
-            sessionStorage.clear();
-            window.location.replace("/login.html");
-          });
-        }
-
-        // Set active menu based on current page
-        const currentPage = location.pathname.split("/").pop();
-        const menuLinks = document.querySelectorAll(".sidebar-nav a");
-
-        menuLinks.forEach((link) => {
-          const linkPath = link.getAttribute("href").split("/").pop();
-          if (currentPage === linkPath) {
-            link.classList.add("active");
-          }
-        });
-
-        // Initialize session timer if element exists
-        const timeElement = document.getElementById("time");
-        if (timeElement) {
-          // Session timer logic here if needed
-        }
-      });
 </script>
 </body>
 </html>

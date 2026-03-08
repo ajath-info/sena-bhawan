@@ -200,30 +200,19 @@
       color: #1b4332;
     }
   </style>
+  <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">🛡️</div>
-        <div class="logo-text">
-          <h1>ARMY HRMS</h1>
-          <p>भारतीय सेना</p>
-        </div>
-      </div>
+  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+  <aside class="sidebar" id="sidebarContainer">
+    <!-- Loading indicator (optional) -->
+    <div style="color: white; padding: 20px; text-align: center;">
+      Loading menu...
     </div>
-
-    <nav class="sidebar-nav">
-      <a href="/dashboard-new.html" class="nav-item">🏠 Dashboard</a>
-      <a href="/personnel-form.html" class="nav-item">👤 Personnel Data</a>
-      <a href="/coursepanel.html" class="nav-item">📋 Course Panel</a>
-      <a href="/unit-establishment.html" class="nav-item active">🛡️ Unit PE / WE</a>
-    </nav>
   </aside>
 
   <!-- MAIN -->
@@ -331,7 +320,7 @@
 
   </main>
 </div>
-
+<script src="sidebar.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     // Load Formation Types from dropdown master API

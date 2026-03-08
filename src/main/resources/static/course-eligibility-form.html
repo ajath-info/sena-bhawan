@@ -39,6 +39,7 @@
         .section-divider{margin:20px 0;border-top:2px solid #e5e7eb}
         .select2-container{width:100% !important;}
     </style>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
 <script src="auth.js"></script>
@@ -47,7 +48,13 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <div class="container">
-    <div id="sidebar"></div>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
+        </div>
+    </aside>
 
     <main class="main">
         <div class="header">
@@ -183,7 +190,7 @@
         </div>
     </main>
 </div>
-
+<script src="sidebar.js"></script>
 <script>
     // State management
     let selectedCourseId = null;

@@ -118,18 +118,32 @@
       border-radius:10px;
       border:1px solid var(--input-border);
       font-size:14px;
+      font-family:"Inter",sans-serif;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(82, 183, 136, 0.1);
     }
 
     .row{margin-bottom:14px}
 
     .btn{
-      padding:10px 14px;
+      padding:12px 14px;
       border-radius:10px;
       border:none;
       cursor:pointer;
       font-weight:700;
       background:var(--primary-dark);
       color:white;
+      width:100%;
+      font-size:16px;
+      transition: background 0.2s ease;
+    }
+
+    .btn:hover {
+      background: #2d6a4f;
     }
 
     .error{
@@ -137,6 +151,7 @@
       font-size:13px;
       color:#ef4444;
       display:none;
+      text-align:center;
     }
 
     @media (max-width:900px){
@@ -158,7 +173,7 @@
       </div>
     </div>
 
-    <div style="margin-top:auto;font-size:14px;">
+    <div style="margin-top:auto;font-size:14px; opacity:0.8;">
       Secure access to personnel dashboard
     </div>
   </aside>
@@ -171,7 +186,7 @@
     <form id="loginForm" onsubmit="return handleLogin(event)">
       <div class="row">
         <label>Username</label>
-        <input id="username" type="text" required />
+        <input id="username" type="text" required autocomplete="off" />
       </div>
 
       <div class="row">
@@ -191,6 +206,18 @@
   const usernameEl = document.getElementById('username');
   const passwordEl = document.getElementById('password');
 
+  // Check if user is already logged in
+  (function checkExistingSession() {
+    const token = sessionStorage.getItem('token');
+    const userId = sessionStorage.getItem('userId');
+
+    if (token && userId) {
+      // User might be already logged in, but we'll let them login again
+      // You can optionally redirect to dashboard
+      // window.location.href = "/session.html";
+    }
+  })();
+
   function handleLogin(e){
     e.preventDefault();
     errorEl.style.display = 'none';
@@ -198,39 +225,83 @@
     const username = usernameEl.value.trim();
     const password = passwordEl.value;
 
-    fetch('/api/login', {     // 🔥 FIX: your backend login URL is /api/login
+    if (!username || !password) {
+      errorEl.textContent = 'Please enter username and password';
+      errorEl.style.display = 'block';
+      return false;
+    }
+
+    // Show loading state
+    const submitBtn = document.querySelector('.btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Signing in...';
+    submitBtn.disabled = true;
+
+    fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     })
-    .then(res => res.json().then(data => ({ status: res.status, body: data })))
-    .then(({ status, body }) => {
-     console.log("STATUS:", status);
-    console.log("BODY:", body);
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+              console.log("STATUS:", status);
+              console.log("BODY:", body);
 
-        if(status === 200){
+              if(status === 200){
+                // 🔥 IMPORTANT: Clear ANY existing data before setting new
+                sessionStorage.clear();
 
-          // 🔥 SAVE TOKEN + USER DETAILS
-          sessionStorage.setItem("token", body.token);
-          sessionStorage.setItem("userId", body.userId);
-          sessionStorage.setItem("username", body.username);
-          sessionStorage.setItem("appointment", body.appointment);
+                // Clear any cached sidebar data for previous user
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                  const key = localStorage.key(i);
+                  if (key && key.startsWith('sidebar_')) {
+                    keysToRemove.push(key);
+                  }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
 
-          // redirect to dashboard
-          window.location.href = "/session.html";
-        }
-        else {
-          errorEl.textContent = body.error || 'Invalid credentials';
-          errorEl.style.display = 'block';
-        }
-    })
-    .catch(() => {
-      errorEl.textContent = 'Server error. Try again.';
-      errorEl.style.display = 'block';
-    });
+                // Save NEW token + user details
+                sessionStorage.setItem("token", body.token);
+                sessionStorage.setItem("userId", body.userId);
+                sessionStorage.setItem("username", body.username);
+                sessionStorage.setItem("appointment", body.appointment || 'User');
+
+                // Redirect to dashboard
+                window.location.href = "/session.html";
+              }
+              else {
+                errorEl.textContent = body.error || 'Invalid credentials';
+                errorEl.style.display = 'block';
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+              }
+            })
+            .catch((err) => {
+              console.error('Login error:', err);
+              errorEl.textContent = 'Server error. Try again.';
+              errorEl.style.display = 'block';
+              // Reset button
+              submitBtn.textContent = originalText;
+              submitBtn.disabled = false;
+            });
 
     return false;
   }
+
+  // Allow Enter key to submit
+  usernameEl.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      passwordEl.focus();
+    }
+  });
+
+  passwordEl.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  });
 
   usernameEl.focus();
 </script>

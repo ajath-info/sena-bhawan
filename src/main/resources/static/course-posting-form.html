@@ -445,15 +445,23 @@
 }
 
   </style>
+  <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 <script src="auth.js"></script>
 <script src="logout.js"></script>
+<script src="sidebar.js"></script>
 
 <div class="container">
 
-  <div id="sidebar"></div>
+  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+  <aside class="sidebar" id="sidebarContainer">
+    <!-- Loading indicator (optional) -->
+    <div style="color: white; padding: 20px; text-align: center;">
+      Loading menu...
+    </div>
+  </aside>
 
   <!-- MAIN -->
   <main class="main-content">

@@ -70,25 +70,17 @@
             pointer-events: none;
         }
     </style>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
 
 <div class="container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <div class="logo-icon">🛡️</div>
-                <div><strong>ARMY HRMS</strong><br><small style="color:#52b788">भारतीय सेना</small></div>
-            </div>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-title">Forms</div>
-            <a href="#" class="nav-item active">
-                <div class="nav-icon">📋</div>
-                <span>ORBAT Creation</span>
-            </a>
-        </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -193,7 +185,7 @@
         </div>
     </main>
 </div>
-
+<script src="sidebar.js"></script>
 <script>
     class ORBATCreator {
         constructor() {
