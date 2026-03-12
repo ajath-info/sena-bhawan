@@ -1268,7 +1268,7 @@
 
   async function loadCommandDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/command`);
+      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/command`);
       if (response.ok) {
         const commands = await response.json();
         const select = $('#commandFilter');
@@ -1285,7 +1285,7 @@
 
   async function loadCorpsDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/corps`);
+      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/corps`);
       if (response.ok) {
         const corpsList = await response.json();
         const select = $('#corpsFilter');
@@ -1302,7 +1302,7 @@
 
   async function loadDivisionDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/division`);
+      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/division`);
       if (response.ok) {
         const divisions = await response.json();
         const select = $('#divisionFilter');
@@ -1319,7 +1319,7 @@
 
   async function loadEstablishmentDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/establishment-type`);
+      const response = await fetch(`${API_BASE_URL}/establishment`);
       if (response.ok) {
         const types = await response.json();
         const select = $('#estFilter');

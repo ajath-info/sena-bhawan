@@ -111,12 +111,12 @@ public class OrbatStructureServiceImpl implements OrbatStructureService {
 
     @Override
     public List<String> getCommandDropdown() {
-        return repository.findDistinctCommandNames();
+        return repository.findAllCommandNames();
     }
 
     @Override
     public List<String> getCorpsDropdown() {
-        return repository.findDistinctCorpsNames();
+        return repository.findAllCorpsNames();
     }
 
     @Override

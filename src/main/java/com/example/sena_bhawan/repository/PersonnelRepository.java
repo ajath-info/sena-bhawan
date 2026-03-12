@@ -18,6 +18,9 @@ import java.util.Optional;
 @Repository
 public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
 
+    @Query("SELECT distinct medicalCategory FROM Personnel")
+    List<String> getMedicalCategory();
+
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")
     List<Object[]> getRankCounts();

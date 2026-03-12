@@ -947,6 +947,75 @@
         .btn-danger:active {
             background: #991b1b;
         }
+
+        /* Validation styles */
+        .form-input.error, .form-select.error {
+            border: 2px solid #ef4444 !important;
+            animation: shake 0.5s;
+        }
+
+        .validation-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+
+        .step.incomplete .step-number {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        /* Status toggle button styles */
+        .status-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-btn {
+            padding: 6px 12px;
+            border: 2px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 70px;
+        }
+
+        .status-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-btn.retain-btn.active {
+            border-color: #10b981;
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .status-btn.reserve-btn.active {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .status-btn:active {
+            transform: translateY(0);
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
     <!-- Add jsPDF and autoTable for PDF generation -->
@@ -1285,14 +1354,22 @@
                     </div>
                 </div>
 
-                <!-- STEP 5: Generate Letter -->
+                <!-- STEP 5: Generate Letter - UPDATED table structure without Letter column -->
                 <div class="section-card step-section" id="step-5">
                     <div class="section-title">
                         <span>🔍 Step 5: Generate Letter</span>
                         <span class="badge badge-info">Active</span>
                     </div>
 
-                    <!-- Officers Selection Table -->
+                    <!-- Add Download PDF Button -->
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+                        <button class="btn btn-success" onclick="generatePanelPDF()" style="display: flex; align-items: center; gap: 8px; padding: 12px 24px;">
+                            <span>📥</span>
+                            Download Panel PDF
+                        </button>
+                    </div>
+
+                    <!-- Officers Selection Table - WITHOUT Letter column -->
                     <div style="margin-top: 24px">
                         <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
                             <div class="table-scroll-wrapper">
@@ -1301,7 +1378,7 @@
                                     <tr>
                                         <th>Ser No</th>
                                         <th>Officer</th>
-                                        <th>Serial No</th> <!-- New column -->
+                                        <th>Serial No</th>
                                         <th>Rank</th>
                                         <th>Unit</th>
                                         <th>Command</th>
@@ -1312,7 +1389,7 @@
                                         <th>Email</th>
                                         <th>City</th>
                                         <th>State</th>
-                                        <th>Letter</th>
+                                        <!-- Letter column header removed -->
                                     </tr>
                                     </thead>
                                     <tbody id="step5TableBody"></tbody>
@@ -1671,6 +1748,76 @@ style.textContent = `
         20%, 40%, 60%, 80% { transform: translateX(2px); }
     }
 `;
+
+// ===============================
+// STEP NAVIGATION WITH VALIDATION
+// ===============================
+function validateCurrentStep() {
+    switch(currentStep) {
+        case 1:
+            // Validate Course Selection
+            const courseSelect = document.getElementById("courseSelect");
+            if (!courseSelect.value) {
+                showToast("Please select a course first", "error");
+                courseSelect.style.border = "2px solid #ef4444";
+                setTimeout(() => courseSelect.style.border = "", 2000);
+                return false;
+            }
+            return true;
+
+        case 2:
+            // Validate Panel Strength
+            const panelSize = document.getElementById("panelSize").value;
+            const courseStrength = document.getElementById("courseStrength").value;
+
+            if (!panelSize || panelSize <= 0) {
+                showToast("Please set panel size", "error");
+                document.getElementById("panelSize").style.border = "2px solid #ef4444";
+                setTimeout(() => document.getElementById("panelSize").style.border = "", 2000);
+                return false;
+            }
+
+            if (parseInt(panelSize) < parseInt(courseStrength)) {
+                showToast("Panel size cannot be less than course strength", "error");
+                return false;
+            }
+            return true;
+
+        case 3:
+            // Validate at least one officer selected
+            if (selectedSet.size === 0) {
+                showToast("Please select at least one officer", "error");
+                return false;
+            }
+            return true;
+
+        case 4:
+            // Validate Send to Approval
+            const roleSelect = document.getElementById("sendToRole");
+            if (!roleSelect.value) {
+                showToast("Please select a role to send for approval", "error");
+                roleSelect.style.border = "2px solid #ef4444";
+                setTimeout(() => roleSelect.style.border = "", 2000);
+                return false;
+            }
+
+            // Check if panel has been sent for approval
+            const approvalSent = sessionStorage.getItem("panelSentForApproval");
+            if (!approvalSent) {
+                showToast("Please send panel for approval first", "error");
+                return false;
+            }
+            return true;
+
+        case 5:
+            // No validation needed for step 5
+            return true;
+
+        default:
+            return true;
+    }
+}
+
 document.head.appendChild(style);
 
     // ===============================
@@ -1720,39 +1867,33 @@ document.head.appendChild(style);
 // MODIFIED STEP NAVIGATION - Check for duplicates before proceeding
 // ===============================
 nextNav.addEventListener('click', () => {
+    // First validate current step
+    if (!validateCurrentStep()) {
+        return;
+    }
+
     // Check for duplicate serial numbers when trying to go to next step
     if (currentStep === 4) {
-        // Check all serial inputs for duplicates
         const serialInputs = document.querySelectorAll('#finalApprovalTableBody input[type="number"]');
         const duplicateInputs = Array.from(serialInputs).filter(input => input.dataset.isDuplicate === 'true');
 
         if (duplicateInputs.length > 0) {
-            // Show warning message
             alert(`Please fix duplicate serial numbers (${duplicateInputs.length} duplicate(s) found) before proceeding.`);
 
-            // Highlight all duplicate inputs
             duplicateInputs.forEach(input => {
                 input.style.border = '2px solid #ef4444';
                 input.style.animation = 'shake 0.5s';
 
-                // Show tooltip for each duplicate
-                const container = input.parentElement;
-                const tooltip = container.querySelector('div[style*="background-color: #ef4444"]');
-                if (tooltip) {
-                    tooltip.style.display = 'block';
-                }
-
-                // Remove animation after it completes
                 setTimeout(() => {
                     input.style.animation = '';
                 }, 500);
             });
 
-            return; // Prevent navigation
+            return;
         }
     }
 
-    // If no duplicates or not on step 4, proceed with navigation
+    // If all validations pass, proceed
     if (currentStep < TOTAL_STEPS) {
         currentStep++;
         renderStep();
@@ -1768,7 +1909,22 @@ nextNav.addEventListener('click', () => {
 
     steps.forEach((step, index) => {
         step.addEventListener('click', () => {
-            currentStep = index + 1;
+            const targetStep = index + 1;
+
+            // Check if we can navigate to this step
+            if (targetStep < currentStep) {
+                // Allow going back without validation
+                currentStep = targetStep;
+                renderStep();
+                return;
+            }
+
+            // For forward navigation, validate current step first
+            if (!validateCurrentStep()) {
+                return;
+            }
+
+            currentStep = targetStep;
             renderStep();
         });
     });
@@ -1778,6 +1934,100 @@ nextNav.addEventListener('click', () => {
             handleStep3Save();
         }
     });
+
+    // ===============================
+    // PDF GENERATION FUNCTION
+    // ===============================
+    function generatePanelPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+
+        // Get selected officers for step 5
+        const selectedOfficers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
+
+        if (selectedOfficers.length === 0) {
+            showToast("No officers selected to generate PDF", "error");
+            return;
+        }
+
+        // Add title
+        doc.setFontSize(18);
+        doc.setTextColor(27, 67, 50); // #1b4332
+        doc.text("Course Panel - Officers List", 14, 15);
+
+        // Add course and date info
+        const courseSelect = document.getElementById("courseSelect");
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const courseName = selectedOption ? selectedOption.textContent.split('(')[0].trim() : 'N/A';
+
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Course: ${courseName}`, 14, 25);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 32);
+
+        // Prepare table data
+        const tableData = selectedOfficers.map((o, index) => {
+            const serialNumber = serialNumberMap.get(o.id || o.personnelId) || '';
+            return [
+                index + 1,                    // S.No.
+                o.armyNo || '-',               // Army No.
+                o.fullName || o.name || '-',   // Name
+                o.rank || '-',                  // Rank
+                o.unit || '-',                   // Unit
+                o.command || '-',                // Command
+                ''                                // Remarks (empty by default)
+            ];
+        });
+
+        // Add table
+        doc.autoTable({
+            startY: 40,
+            head: [['S.No.', 'Army No.', 'Name', 'Rank', 'Unit', 'Command', 'Remarks']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [27, 67, 50],
+                textColor: 255,
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: {
+                fillColor: [240, 240, 240]
+            },
+            styles: {
+                fontSize: 10,
+                cellPadding: 5
+            },
+            columnStyles: {
+                0: { cellWidth: 20 },  // S.No.
+                1: { cellWidth: 35 },  // Army No.
+                2: { cellWidth: 50 },  // Name
+                3: { cellWidth: 30 },  // Rank
+                4: { cellWidth: 45 },  // Unit
+                5: { cellWidth: 45 },  // Command
+                6: { cellWidth: 60 }   // Remarks
+            }
+        });
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text(
+                `Page ${i} of ${pageCount} | ARMY HRMS - Course Panel`,
+                doc.internal.pageSize.width / 2,
+                doc.internal.pageSize.height - 10,
+                { align: 'center' }
+            );
+        }
+
+        // Save PDF
+        const fileName = `Course_Panel_${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(fileName);
+
+        showToast("PDF generated successfully", "success");
+    }
 
     // ===============================
     // STEP 1: COURSE SELECTION
@@ -1820,6 +2070,9 @@ nextNav.addEventListener('click', () => {
 
             // Load course strength for step 2
             loadStep2PanelStrength(courseId);
+
+            // Reset approval flag when course changes
+            sessionStorage.removeItem("panelSentForApproval");
 
             // NEW: Fetch eligibility criteria and apply filters automatically
             if (courseId) {
@@ -2248,7 +2501,7 @@ nextNav.addEventListener('click', () => {
 
     async function loadCommandDropdown() {
         try {
-            const response = await fetch('http://localhost:6060/api/dropdown/command');
+            const response = await fetch('http://localhost:6060/api/orbat/dropdown/command');
             if (response.ok) {
                 const commands = await response.json();
                 const items = commands.map(cmd => ({ value: cmd, name: cmd }));
@@ -2261,7 +2514,7 @@ nextNav.addEventListener('click', () => {
 
     async function loadCorpsDropdown() {
         try {
-            const response = await fetch('http://localhost:6060/api/dropdown/corps');
+            const response = await fetch('http://localhost:6060/api/orbat/dropdown/corps');
             if (response.ok) {
                 const corpsList = await response.json();
                 const items = corpsList.map(corps => ({ value: corps, name: corps }));
@@ -2274,7 +2527,7 @@ nextNav.addEventListener('click', () => {
 
     async function loadDivisionDropdown() {
         try {
-            const response = await fetch('http://localhost:6060/api/dropdown/division');
+            const response = await fetch('http://localhost:6060/api/orbat/dropdown/division');
             if (response.ok) {
                 const divisions = await response.json();
                 const items = divisions.map(div => ({ value: div, name: div }));
@@ -2287,7 +2540,7 @@ nextNav.addEventListener('click', () => {
 
     async function loadEstablishmentDropdown() {
         try {
-            const response = await fetch('http://localhost:6060/api/master/filter/establishment-type');
+            const response = await fetch('http://localhost:6060/api/establishment');
             if (response.ok) {
                 const types = await response.json();
                 const items = types.map(type => ({ value: type, name: type }));
@@ -2740,6 +2993,9 @@ nextNav.addEventListener('click', () => {
             .catch(err => console.error("Officer load error", err));
     }
 
+    // ===============================
+    // OFFICER TABLE FUNCTIONS - WITH RETAIN/RESERVE TOGGLE
+    // ===============================
     function renderOfficerTable() {
         const tbody = document.getElementById("officerTableBody");
         if (!tbody) return;
@@ -2748,14 +3004,14 @@ nextNav.addEventListener('click', () => {
 
         if (!officers || officers.length === 0) {
             tbody.innerHTML = `
-        <tr>
-            <td colspan="18" style="text-align: center; padding: 40px;">
-                <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
-                <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No eligible officers found</div>
-                <div style="color: #6b7280;">Select a course to view eligible officers</div>
-            </td>
-        </tr>
-    `;
+            <tr>
+                <td colspan="18" style="text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No eligible officers found</div>
+                    <div style="color: #6b7280;">Select a course to view eligible officers</div>
+                </td>
+            </tr>
+        `;
             return;
         }
 
@@ -2763,63 +3019,154 @@ nextNav.addEventListener('click', () => {
             const personnelId = o.id || o.personnelId;
             const isSelected = selectedSet.has(personnelId);
             const isAttending = attendingSet.has(personnelId);
-            // Get panelStatus from the response, default to 'Reserve' if not present
-            const status = o.panelStatus || statusMap.get(personnelId) || 'Reserve';
+            // Get status from statusMap, default to 'Reserve'
+            const status = statusMap.get(personnelId) || 'Reserve';
 
             const row = document.createElement("tr");
 
             row.innerHTML = `
-        <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${personnelId}" class="officer-checkbox"></td>
-        <td>${index + 1}</td>
-        <td>
-            <div style="display:flex;align-items:center;gap:10px">
-                <div>
-                    <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
-                    <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
+            <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${personnelId}" class="officer-checkbox"></td>
+            <td>${index + 1}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div>
+                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td>${o.rank || "-"}</td>
-        <td>${o.unit || "-"}</td>
-        <td>${o.command || "-"}</td>
-        <td>${formatDate(o.dateOfCommission)}</td>
-        <td>${formatDate(o.dateOfSeniority)}</td>
-        <td>${formatDate(o.dateOfBirth)}</td>
-        <td>${o.religion || "-"}</td>
-        <td>${o.maritalStatus || "-"}</td>
-        <td>${o.medicalCategory || "-"}</td>
-        <td>${o.mobileNumber || o.mobile || "-"}</td>
-        <td>${o.emailAddress || o.email || "-"}</td>
-        <td>${o.city || "-"}</td>
-        <td>${o.state || "-"}</td>
-        <td>
-            <span class="badge ${status === 'Retain' ? 'badge-success' : status === 'Reserve' ? 'badge-warning' : 'badge-info'}">${status}</span>
-        </td>
-        <td>
-            <button class="btn btn-danger remove-officer-btn" data-personnelid="${personnelId}" data-name="${o.fullName || o.name}" style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                🗑️ Remove
-            </button>
-        </td>
-    `;
+            </td>
+            <td>${o.rank || "-"}</td>
+            <td>${o.unit || "-"}</td>
+            <td>${o.command || "-"}</td>
+            <td>${formatDate(o.dateOfCommission)}</td>
+            <td>${formatDate(o.dateOfSeniority)}</td>
+            <td>${formatDate(o.dateOfBirth)}</td>
+            <td>${o.religion || "-"}</td>
+            <td>${o.maritalStatus || "-"}</td>
+            <td>${o.medicalCategory || "-"}</td>
+            <td>${o.mobileNumber || o.mobile || "-"}</td>
+            <td>${o.emailAddress || o.email || "-"}</td>
+            <td>${o.city || "-"}</td>
+            <td>${o.state || "-"}</td>
+            <td>
+                <div class="status-toggle" style="display: flex; gap: 8px;">
+                    <button class="status-btn retain-btn ${status === 'Retain' ? 'active' : ''}"
+                            data-personnelid="${personnelId}"
+                            data-status="Retain"
+                            style="padding: 6px 12px;
+                                   border: 2px solid ${status === 'Retain' ? '#10b981' : '#d1d5db'};
+                                   background: ${status === 'Retain' ? '#d1fae5' : 'white'};
+                                   color: ${status === 'Retain' ? '#10b981' : '#6b7280'};
+                                   border-radius: 6px;
+                                   font-weight: 600;
+                                   font-size: 12px;
+                                   cursor: pointer;
+                                   transition: all 0.2s;">
+                        Retain
+                    </button>
+                    <button class="status-btn reserve-btn ${status === 'Reserve' ? 'active' : ''}"
+                            data-personnelid="${personnelId}"
+                            data-status="Reserve"
+                            style="padding: 6px 12px;
+                                   border: 2px solid ${status === 'Reserve' ? '#f59e0b' : '#d1d5db'};
+                                   background: ${status === 'Reserve' ? '#fef3c7' : 'white'};
+                                   color: ${status === 'Reserve' ? '#f59e0b' : '#6b7280'};
+                                   border-radius: 6px;
+                                   font-weight: 600;
+                                   font-size: 12px;
+                                   cursor: pointer;
+                                   transition: all 0.2s;">
+                        Reserve
+                    </button>
+                </div>
+            </td>
+            <td>
+                <button class="btn btn-danger remove-officer-btn" data-personnelid="${personnelId}" data-name="${o.fullName || o.name}" style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
+                    🗑️ Remove
+                </button>
+            </td>
+        `;
 
             tbody.appendChild(row);
 
+            // Add event listener for checkbox
             const checkbox = row.querySelector('.officer-checkbox');
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', function () {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (this.checked) {
                     selectedSet.add(personnelId);
+                    // Initialize status to 'Reserve' if not already set
+                    if (!statusMap.has(personnelId)) {
+                        statusMap.set(personnelId, 'Reserve');
+                    }
                 } else {
                     selectedSet.delete(personnelId);
                     statusMap.delete(personnelId);
                 }
                 document.getElementById('selectedCount').innerText = selectedSet.size;
                 updatePanelSummary();
+
+                // Update toggle button styles when checkbox changes
+                updateToggleStyles(personnelId);
+            });
+
+            // Add event listeners for status toggle buttons
+            const retainBtn = row.querySelector('.retain-btn');
+            const reserveBtn = row.querySelector('.reserve-btn');
+
+            retainBtn.addEventListener('click', function () {
+                const personnelId = parseInt(this.dataset.personnelid);
+                if (!selectedSet.has(personnelId)) {
+                    // Auto-select the officer if not already selected
+                    selectedSet.add(personnelId);
+                    const checkbox = row.querySelector('.officer-checkbox');
+                    if (checkbox) checkbox.checked = true;
+                    document.getElementById('selectedCount').innerText = selectedSet.size;
+                }
+
+                // Set status to Retain
+                statusMap.set(personnelId, 'Retain');
+
+                // Update button styles
+                this.style.border = '2px solid #10b981';
+                this.style.background = '#d1fae5';
+                this.style.color = '#10b981';
+
+                reserveBtn.style.border = '2px solid #d1d5db';
+                reserveBtn.style.background = 'white';
+                reserveBtn.style.color = '#6b7280';
+
+                updatePanelSummary();
+            });
+
+            reserveBtn.addEventListener('click', function () {
+                const personnelId = parseInt(this.dataset.personnelid);
+                if (!selectedSet.has(personnelId)) {
+                    // Auto-select the officer if not already selected
+                    selectedSet.add(personnelId);
+                    const checkbox = row.querySelector('.officer-checkbox');
+                    if (checkbox) checkbox.checked = true;
+                    document.getElementById('selectedCount').innerText = selectedSet.size;
+                }
+
+                // Set status to Reserve
+                statusMap.set(personnelId, 'Reserve');
+
+                // Update button styles
+                this.style.border = '2px solid #f59e0b';
+                this.style.background = '#fef3c7';
+                this.style.color = '#f59e0b';
+
+                retainBtn.style.border = '2px solid #d1d5db';
+                retainBtn.style.background = 'white';
+                retainBtn.style.color = '#6b7280';
+
+                updatePanelSummary();
             });
 
             // Add remove button event listener
             const removeBtn = row.querySelector('.remove-officer-btn');
-            removeBtn.addEventListener('click', function() {
+            removeBtn.addEventListener('click', function () {
                 const personnelId = parseInt(this.dataset.personnelid);
                 const officerName = this.dataset.name;
                 removeOfficer(personnelId, officerName);
@@ -2829,6 +3176,31 @@ nextNav.addEventListener('click', () => {
         document.getElementById('selectedCount').innerText = selectedSet.size;
     }
 
+    // Helper function to update toggle button styles based on status
+    function updateToggleStyles(personnelId) {
+        const row = document.querySelector(`.retain-btn[data-personnelid="${personnelId}"]`)?.closest('tr');
+        if (!row) return;
+
+        const retainBtn = row.querySelector('.retain-btn');
+        const reserveBtn = row.querySelector('.reserve-btn');
+        const currentStatus = statusMap.get(personnelId);
+
+        if (currentStatus === 'Retain') {
+            retainBtn.style.border = '2px solid #10b981';
+            retainBtn.style.background = '#d1fae5';
+            retainBtn.style.color = '#10b981';
+            reserveBtn.style.border = '2px solid #d1d5db';
+            reserveBtn.style.background = 'white';
+            reserveBtn.style.color = '#6b7280';
+        } else if (currentStatus === 'Reserve') {
+            reserveBtn.style.border = '2px solid #f59e0b';
+            reserveBtn.style.background = '#fef3c7';
+            reserveBtn.style.color = '#f59e0b';
+            retainBtn.style.border = '2px solid #d1d5db';
+            retainBtn.style.background = 'white';
+            retainBtn.style.color = '#6b7280';
+        }
+    }
 
     // ===============================
     // REMOVE OFFICER FUNCTION
@@ -2905,7 +3277,7 @@ nextNav.addEventListener('click', () => {
 
         const nominations = Array.from(selectedSet).map(personnelId => ({
             personnelId,
-            status: statusMap.get(personnelId) || "Reserve",
+            status: statusMap.get(personnelId) || "Reserve", // Include the status
             serialNumber: serialNumberMap.get(personnelId) || null // Include serial number if exists
         }));
 
@@ -3176,34 +3548,29 @@ nextNav.addEventListener('click', () => {
 
             const row = document.createElement("tr");
             row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <div>
-                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
-                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
+                <td>${index + 1}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div>
+                            <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                            <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
+                        </div>
                     </div>
-                </div>
-            </td>
-            <td>
-                <span style="font-weight:600; color:#1b4332;">${serialNumber || '—'}</span>
-            </td>
-            <td>${o.rank || "-"}</td>
-            <td>${o.unit || "-"}</td>
-            <td>${o.command || "-"}</td>
-            <td>${formatDate(o.dateOfCommission)}</td>
-            <td>${formatDate(o.dateOfSeniority)}</td>
-            <td>${formatDate(o.dateOfBirth)}</td>
-            <td>${o.mobileNumber || o.mobile || "-"}</td>
-            <td>${o.emailAddress || o.email || "-"}</td>
-            <td>${o.city || "-"}</td>
-            <td>${o.state || "-"}</td>
-            <td>
-                <button class="btn btn-primary" onclick="generateLetter(${personnelId})" style="padding: 6px 12px;">
-                    📄 Generate
-                </button>
-            </td>
-        `;
+                </td>
+                <td>
+                    <span style="font-weight:600; color:#1b4332;">${serialNumber || '—'}</span>
+                </td>
+                <td>${o.rank || "-"}</td>
+                <td>${o.unit || "-"}</td>
+                <td>${o.command || "-"}</td>
+                <td>${formatDate(o.dateOfCommission)}</td>
+                <td>${formatDate(o.dateOfSeniority)}</td>
+                <td>${formatDate(o.dateOfBirth)}</td>
+                <td>${o.mobileNumber || o.mobile || "-"}</td>
+                <td>${o.emailAddress || o.email || "-"}</td>
+                <td>${o.city || "-"}</td>
+                <td>${o.state || "-"}</td>
+            `;
             tbody.appendChild(row);
         });
     }
@@ -3211,16 +3578,12 @@ nextNav.addEventListener('click', () => {
     function renderEmptyStep5() {
         const tbody = document.getElementById("step5TableBody");
         tbody.innerHTML = `
-        <tr>
-            <td colspan="14" style="text-align:center;color:#6b7280;padding:20px;">
-                No officers selected. Please select officers in Step 3 first.
-            </td>
-        </tr>
-    `;
-    }
-
-    function generateLetter(personnelId) {
-        showToast('Letter generation feature coming soon!', 'info');
+            <tr>
+                <td colspan="13" style="text-align:center;color:#6b7280;padding:20px;">
+                    No officers selected. Please select officers in Step 3 first.
+                </td>
+            </tr>
+        `;
     }
 
     // ===============================
@@ -3290,7 +3653,7 @@ nextNav.addEventListener('click', () => {
     });
 
     // ===============================
-    // SEND FOR APPROVAL
+    // SEND FOR APPROVAL (UPDATED)
     // ===============================
     document.getElementById("sendToApproval")?.addEventListener("click", () => {
         const scheduleId = sessionStorage.getItem("scheduleId");
@@ -3314,6 +3677,12 @@ nextNav.addEventListener('click', () => {
             remark: remark.trim()
         };
 
+        // Show loading state
+        const sendBtn = document.getElementById("sendToApproval");
+        const originalText = sendBtn.textContent;
+        sendBtn.textContent = "Sending...";
+        sendBtn.disabled = true;
+
         fetch("http://localhost:6060/api/course-schedule-role-status", {
             method: "POST",
             headers: {
@@ -3326,11 +3695,24 @@ nextNav.addEventListener('click', () => {
                 return res.json();
             })
             .then(data => {
-                alert("Panel sent for approval successfully.");
+                // Set flag that panel has been sent for approval
+                sessionStorage.setItem("panelSentForApproval", "true");
+
+                // Show success message with option to go to next step
+                if (confirm("Panel sent for approval successfully! Would you like to proceed to Step 5?")) {
+                    currentStep = 5;
+                    renderStep();
+                }
+
+                showToast("Panel sent for approval successfully", "success");
             })
             .catch(err => {
                 console.error(err);
                 alert("Error while sending for approval.");
+            })
+            .finally(() => {
+                sendBtn.textContent = originalText;
+                sendBtn.disabled = false;
             });
     });
 

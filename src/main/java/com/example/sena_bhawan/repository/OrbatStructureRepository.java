@@ -13,6 +13,18 @@ import java.util.Optional;
 
 @Repository
 public interface OrbatStructureRepository extends JpaRepository<OrbatStructure, Long> {
+    @Query("SELECT DISTINCT o.name FROM OrbatStructure o WHERE LOWER(o.formationType) = 'unit'")
+    List<String> findAllUnitNames();
+
+    @Query("SELECT DISTINCT o.name FROM OrbatStructure o WHERE LOWER(o.formationType) = 'corps'")
+    List<String> findAllCorpsNames();
+
+    @Query("SELECT DISTINCT o.name FROM OrbatStructure o WHERE LOWER(o.formationType) = 'command'")
+    List<String> findAllCommandNames();
+
+    @Query("SELECT DISTINCT areaType FROM OrbatStructure")
+    List<String> getAllAreaType();
+
     List<OrbatStructure> findByIdInAndFormationTypeIn(List<Long> orbatIds, List<String> formationTypes);
     @Query("SELECT o.id as id, o.name as name, o.formationType as formationType FROM OrbatStructure o WHERE o.id IN :orbatIds AND o.formationType IN :formationTypes")
     List<OrbatStructureProjection> findIdAndNameByIdInAndFormationTypeIn(@Param("orbatIds") List<Long> orbatIds, @Param("formationTypes") List<String> formationTypes);

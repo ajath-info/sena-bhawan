@@ -6,10 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface FormationEstablishmentRepository extends JpaRepository<FormationEstablishment,Long> {
+    @Query("SELECT distinct establishmentType FROM FormationEstablishment")
+    List<String> listOfEstablishmentType();
+
     Optional<FormationEstablishment>
     findByOrbatIdAndEstablishmentType(
             Long orbatId,

@@ -16,6 +16,13 @@ public class EstablishmentController {
     @Autowired
     private EstablishmentService service;
 
+    @GetMapping
+    public ResponseEntity<?> getAllEstablishment() {
+        return ResponseEntity.ok(
+                service.getEstablishmentName()
+        );
+    }
+
     // 🔹 Get data when PE/WE selected
     @GetMapping("/{orbatId}/{type}")
     public ResponseEntity<?> getByOrbatAndType(

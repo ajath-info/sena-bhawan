@@ -13,6 +13,7 @@ import com.example.sena_bhawan.service.EstablishmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -24,6 +25,10 @@ public class EstablishmentImpl implements EstablishmentService {
 
     @Autowired
     private OrbatRepository orbatRepository;
+
+    public List<String> getEstablishmentName() {
+        return repository.listOfEstablishmentType();
+    }
 
     @Override
     public EstablishmentResponse getByOrbatAndType(

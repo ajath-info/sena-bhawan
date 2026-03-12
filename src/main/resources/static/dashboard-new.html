@@ -686,10 +686,10 @@
       <div class="section">
         <div class="section-title">Quick Actions</div>
         <div class="actions-grid">
-          <div class="action-card">➕ Add Personnel</div>
-          <div class="action-card">📍 New Posting</div>
-          <div class="action-card">🎓 Course Nomination</div>
-          <div class="action-card">📄 Generate Report</div>
+          <div class="action-card" onclick="window.location.href='/personnel-form.html'">➕ Add Personnel</div>
+          <div class="action-card" onclick="window.location.href='/course-posting-form.html'">📍 New Posting</div>
+          <div class="action-card" onclick="window.location.href='/coursepanel.html'">🎓 Course Nomination</div>
+          <div class="action-card" onclick="generatePDFReport()">📄 Generate Report</div>
         </div>
       </div>
 
@@ -697,6 +697,263 @@
   </main>
 
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+  async function generatePDFReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(27, 67, 50); // #1b4332
+    doc.text('ARMY HRMS - Comprehensive Report', 105, 15, { align: 'center' });
+
+    // Add date
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    const today = new Date();
+    doc.text(`Generated on: ${today.toLocaleDateString()} ${today.toLocaleTimeString()}`, 105, 22, { align: 'center' });
+
+    let yOffset = 30;
+
+    try {
+      // 1. Personnel Distribution by Rank
+      const distributionResponse = await fetch('http://localhost:6060/api/personnel/officer-strength');
+      const distributionData = await distributionResponse.json();
+
+      doc.setFontSize(14);
+      doc.setTextColor(27, 67, 50);
+      doc.text('1. Personnel Distribution by Rank', 14, yOffset);
+      yOffset += 6;
+
+      const distributionTableData = distributionData.labels.map((label, index) => [
+        label,
+        distributionData.data[index].toString()
+      ]);
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Rank', 'Number of Personnel']],
+        body: distributionTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // 2. Officer Strength by Rank (Detailed)
+      doc.setFontSize(14);
+      doc.text('2. Officer Strength by Rank (Detailed)', 14, yOffset);
+      yOffset += 6;
+
+      // We can reuse the same data but add percentages
+      const total = distributionData.data.reduce((a, b) => a + b, 0);
+      const strengthTableData = distributionData.labels.map((label, index) => {
+        const count = distributionData.data[index];
+        const percentage = ((count / total) * 100).toFixed(1);
+        return [label, count.toString(), `${percentage}%`];
+      });
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Rank', 'Count', 'Percentage']],
+        body: strengthTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // 3. Age Band Distribution
+      const ageResponse = await fetch('http://localhost:6060/api/personnel/age-distribution');
+      const ageData = await ageResponse.json();
+
+      doc.setFontSize(14);
+      doc.text('3. Age Band Distribution', 14, yOffset);
+      yOffset += 6;
+
+      const ageTableData = ageData.labels.map((label, index) => [
+        label,
+        ageData.data[index].toString()
+      ]);
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Age Band', 'Number of Officers']],
+        body: ageTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // Check if we need a new page
+      if (yOffset > 250) {
+        doc.addPage();
+        yOffset = 20;
+      }
+
+      // 4. Medical Category Distribution
+      const medicalResponse = await fetch('http://localhost:6060/api/personnel/medical-distribution');
+      const medicalData = await medicalResponse.json();
+
+      doc.setFontSize(14);
+      doc.text('4. Medical Category Distribution', 14, yOffset);
+      yOffset += 6;
+
+      const medicalTableData = medicalData.labels.map((label, index) => [
+        label,
+        medicalData.data[index].toString()
+      ]);
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Medical Category', 'Number of Personnel']],
+        body: medicalTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // 5. Retirement Forecast
+      const retirementResponse = await fetch('http://localhost:6060/api/personnel/retirement-forecast');
+      const retirementData = await retirementResponse.json();
+
+      doc.setFontSize(14);
+      doc.text('5. Retirement Forecast', 14, yOffset);
+      yOffset += 6;
+
+      const retirementTableData = retirementData.labels.map((label, index) => [
+        label,
+        retirementData.data[index].toString()
+      ]);
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Year', 'Number Retiring']],
+        body: retirementTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // Check if we need a new page
+      if (yOffset > 250) {
+        doc.addPage();
+        yOffset = 20;
+      }
+
+      // 6. Ongoing Courses – Officer Strength
+      const coursesResponse = await fetch('http://localhost:6060/api/course-panel/ongoing-strength');
+      const coursesData = await coursesResponse.json();
+
+      doc.setFontSize(14);
+      doc.text('6. Ongoing Courses – Officer Strength', 14, yOffset);
+      yOffset += 6;
+
+      const coursesTableData = coursesData.labels.map((label, index) => [
+        label,
+        coursesData.data[index].toString()
+      ]);
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Course', 'Officer Strength']],
+        body: coursesTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // 7. Officer Status Overview
+      const statusResponse = await fetch('http://localhost:6060/api/course-panel/officer-status');
+      const statusData = await statusResponse.json();
+
+      doc.setFontSize(14);
+      doc.text('7. Officer Status Overview', 14, yOffset);
+      yOffset += 6;
+
+      const statusTableData = statusData.labels.map((label, index) => {
+        // Format the status label nicely
+        const formattedLabel = label.replace(/_/g, ' ').toLowerCase()
+          .replace(/\b\w/g, l => l.toUpperCase());
+        return [formattedLabel, statusData.data[index].toString()];
+      });
+
+      doc.autoTable({
+        startY: yOffset,
+        head: [['Status', 'Number of Officers']],
+        body: statusTableData,
+        theme: 'grid',
+        headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+
+      // Add summary section
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(27, 67, 50);
+      doc.text('Executive Summary', 105, 20, { align: 'center' });
+
+      doc.setFontSize(11);
+      doc.setTextColor(60, 60, 60);
+
+      // Calculate some summary statistics
+      const totalPersonnel = distributionData.data.reduce((a, b) => a + b, 0);
+      const totalOfficers = distributionData.data[0] || 0; // Assuming first is Officers
+      const totalRetiring = retirementData.data.reduce((a, b) => a + b, 0);
+
+      const summaryText = [
+        `Total Personnel: ${totalPersonnel}`,
+        `Total Officers: ${totalOfficers}`,
+        `Total Personnel Retiring in Forecast Period: ${totalRetiring}`,
+        `Medical Categories Covered: ${medicalData.labels.length}`,
+        `Active Courses: ${coursesData.labels.length}`,
+        '',
+        'This report provides a comprehensive overview of the current personnel',
+        'status, including distribution by rank, age demographics, medical categorization,',
+        'retirement forecasts, and course participation metrics.',
+        '',
+        'All data is current as of the generation date and reflects the latest',
+        'updates from the ARMY HRMS database.'
+      ];
+
+      let summaryY = 40;
+      summaryText.forEach(line => {
+        if (line === '') {
+          summaryY += 3;
+        } else {
+          doc.text(line, 20, summaryY);
+          summaryY += 7;
+        }
+      });
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      doc.text('Error loading data for report generation. Please try again.', 14, 40);
+    }
+
+    // Save the PDF
+    doc.save(`ARMY_HRMS_Report_${today.toISOString().split('T')[0]}.pdf`);
+  }
+</script>
 
 <script>
   const rankData = {
