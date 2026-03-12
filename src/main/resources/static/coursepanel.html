@@ -949,6 +949,9 @@
         }
     </style>
     <link rel="stylesheet" href="sidebar.css">
+    <!-- Add jsPDF and autoTable for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -1113,12 +1116,15 @@
                     <!-- Filter Button -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div>
-                            <button class="btn btn-primary" onclick="openFilterPopup()" style="display: flex; align-items: center; gap: 8px;">
+                            <button class="btn btn-primary" onclick="openFilterPopup()"
+                                    style="display: flex; align-items: center; gap: 8px;">
                                 <span>🔍</span>
                                 Open Advanced Filters
                             </button>
                         </div>
-                        <div class="badge badge-info" id="activeFilterCount" style="font-size: 13px;">0 filters applied</div>
+                        <div class="badge badge-info" id="activeFilterCount" style="font-size: 13px;">0 filters
+                            applied
+                        </div>
                     </div>
 
                     <!-- Panel Summary -->
@@ -1202,7 +1208,7 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Review & Approve -->
+                <!-- STEP 4: Review & Approve - Modified Table Structure -->
                 <div class="section-card step-section" id="step-4">
                     <div class="section-title">
                         <span>🔍 Step 4: Review & Approve</span>
@@ -1218,6 +1224,9 @@
                                     <tr>
                                         <th>Ser No</th>
                                         <th>Officer</th>
+                                        <th>Serial No <span
+                                                style="color: #ef4444; font-size: 10px;">(Number only)</span></th>
+                                        <!-- New column -->
                                         <th>Rank</th>
                                         <th>Unit</th>
                                         <th>Command</th>
@@ -1276,7 +1285,7 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Generate Letter -->
+                <!-- STEP 5: Generate Letter -->
                 <div class="section-card step-section" id="step-5">
                     <div class="section-title">
                         <span>🔍 Step 5: Generate Letter</span>
@@ -1292,6 +1301,7 @@
                                     <tr>
                                         <th>Ser No</th>
                                         <th>Officer</th>
+                                        <th>Serial No</th> <!-- New column -->
                                         <th>Rank</th>
                                         <th>Unit</th>
                                         <th>Command</th>
@@ -1340,7 +1350,8 @@
 </div>
 
 <!-- Filter Popup Modal -->
-<div id="filterPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
+<div id="filterPopup"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;">
     <div style="position: relative; width: 95%; max-width: 1400px; margin: 30px auto; background: white; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
 
         <!-- Popup Header -->
@@ -1350,7 +1361,10 @@
             </h3>
             <div style="display: flex; gap: 12px; align-items: center;">
                 <span class="clear-filters" onclick="clearAllFilters()">Clear All</span>
-                <button onclick="closeFilterPopup()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280;">&times;</button>
+                <button onclick="closeFilterPopup()"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280;">
+                    &times;
+                </button>
             </div>
         </div>
 
@@ -1358,8 +1372,10 @@
         <div style="padding: 24px; max-height: calc(100vh - 250px); overflow-y: auto;">
             <!-- Quick Search -->
             <div style="margin-bottom: 24px;">
-                <label class="form-label" style="font-size: 14px; margin-bottom: 8px; display: block;">🔍 Quick Search</label>
-                <input type="text" class="form-input" id="globalSearch" placeholder="Search by name, army no..." style="width: 100%;">
+                <label class="form-label" style="font-size: 14px; margin-bottom: 8px; display: block;">🔍 Quick
+                    Search</label>
+                <input type="text" class="form-input" id="globalSearch" placeholder="Search by name, army no..."
+                       style="width: 100%;">
             </div>
 
             <div class="filter-grid">
@@ -1367,8 +1383,12 @@
                 <div class="form-group">
                     <label class="form-label">🏅 Rank</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="rankFilter">Select Ranks</div>
-                        <div class="dropdown-content" id="dropdown-rankFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="rankFilter">Select Ranks
+                        </div>
+                        <div class="dropdown-content" id="dropdown-rankFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1376,8 +1396,12 @@
                 <div class="form-group">
                     <label class="form-label">⚕️ Medical Category</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="medicalFilter">Select Medical Categories</div>
-                        <div class="dropdown-content" id="dropdown-medicalFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="medicalFilter">Select Medical Categories
+                        </div>
+                        <div class="dropdown-content" id="dropdown-medicalFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1385,8 +1409,12 @@
                 <div class="form-group">
                     <label class="form-label">📍 Command</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="commandFilter">Select Commands</div>
-                        <div class="dropdown-content" id="dropdown-commandFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="commandFilter">Select Commands
+                        </div>
+                        <div class="dropdown-content" id="dropdown-commandFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1394,8 +1422,12 @@
                 <div class="form-group">
                     <label class="form-label">🎯 Corps</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="corpsFilter">Select Corps</div>
-                        <div class="dropdown-content" id="dropdown-corpsFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="corpsFilter">Select Corps
+                        </div>
+                        <div class="dropdown-content" id="dropdown-corpsFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1403,8 +1435,12 @@
                 <div class="form-group">
                     <label class="form-label">🚩 Division</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="divisionFilter">Select Divisions</div>
-                        <div class="dropdown-content" id="dropdown-divisionFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="divisionFilter">Select Divisions
+                        </div>
+                        <div class="dropdown-content" id="dropdown-divisionFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1412,8 +1448,12 @@
                 <div class="form-group">
                     <label class="form-label">🏢 Type of Establishment</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="estFilter">Select Establishment Types</div>
-                        <div class="dropdown-content" id="dropdown-estFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="estFilter">Select Establishment Types
+                        </div>
+                        <div class="dropdown-content" id="dropdown-estFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1421,8 +1461,12 @@
                 <div class="form-group">
                     <label class="form-label">🗺️ Area Type</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="areaTypeFilter">Select Area Types</div>
-                        <div class="dropdown-content" id="dropdown-areaTypeFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="areaTypeFilter">Select Area Types
+                        </div>
+                        <div class="dropdown-content" id="dropdown-areaTypeFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1430,8 +1474,12 @@
                 <div class="form-group">
                     <label class="form-label">🎓 Civil Qualification</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="civilFilter">Select Qualifications</div>
-                        <div class="dropdown-content" id="dropdown-civilFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="civilFilter">Select Qualifications
+                        </div>
+                        <div class="dropdown-content" id="dropdown-civilFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1439,8 +1487,12 @@
                 <div class="form-group">
                     <label class="form-label">⚽ Sports</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="sportsFilter">Select Sports</div>
-                        <div class="dropdown-content" id="dropdown-sportsFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="sportsFilter">Select Sports
+                        </div>
+                        <div class="dropdown-content" id="dropdown-sportsFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1454,8 +1506,12 @@
                 <div class="form-group">
                     <label class="form-label">⏰ Posting Due (Months)</label>
                     <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="postingDueFilter">Select Months</div>
-                        <div class="dropdown-content" id="dropdown-postingDueFilter" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                        <div class="dropdown-btn"
+                             style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;"
+                             data-target="postingDueFilter">Select Months
+                        </div>
+                        <div class="dropdown-content" id="dropdown-postingDueFilter"
+                             style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
                     </div>
                 </div>
 
@@ -1468,7 +1524,8 @@
 
             <!-- Date Filters Section -->
             <div style="margin-top: 30px;">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">📅 Date Filters</h4>
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">
+                    📅 Date Filters</h4>
                 <div class="filter-grid">
                     <div class="form-group">
                         <label class="form-label">DOB (Greater Than)</label>
@@ -1519,7 +1576,8 @@
 
             <!-- Results Table inside Popup -->
             <div style="margin-top: 30px;">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">📋 Filter Results</h4>
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">
+                    📋 Filter Results</h4>
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
                     <div class="table-scroll-wrapper" style="max-height: 400px;">
                         <table class="data-table" id="filterResultsTable">
@@ -1580,6 +1638,10 @@
     let courseStrength = 0;
     let panelSize = 0;
     const BUFFER = 10;
+    let selectedOfficersForPanel = []; // Store selected officers data
+    let serialNumberMap = new Map(); // Store serial numbers for officers (personnelId -> serial number)
+    let step4Officers = []; // Store officers for step 4
+    let step5Officers = []; // Store officers for step 5
 
     // Add these filter state arrays here - GLOBAL SCOPE
     let rankSelected = [];
@@ -1599,6 +1661,17 @@
     const saveToDraft = document.getElementById('saveToDraft');
     const steps = document.querySelectorAll('.step');
     const sections = document.querySelectorAll('.step-section');
+
+    // Add shake animation keyframes
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+        20%, 40%, 60%, 80% { transform: translateX(2px); }
+    }
+`;
+document.head.appendChild(style);
 
     // ===============================
     // STEP NAVIGATION
@@ -1626,23 +1699,65 @@
         prevNav.classList.toggle('disabled', currentStep === 1);
         nextNav.classList.toggle('disabled', currentStep === TOTAL_STEPS);
 
+        // Load step data based on current step WITHOUT API CALLS
         if (currentStep === 4) {
-            loadStep4Panel();
+            // Get selected officers from the main officers array and selectedSet
+            step4Officers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
+            loadStep4Panel(step4Officers);
         }
+
         if (currentStep === 5) {
-            loadStep5Panel();
+            // Get same selected officers for step 5, preserving serial numbers
+            step5Officers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
+            loadStep5Panel(step5Officers);
         }
 
         prevNav.classList.toggle('active', currentStep > 1);
         nextNav.classList.toggle('active', currentStep < TOTAL_STEPS);
     }
 
-    nextNav.addEventListener('click', () => {
-        if (currentStep < TOTAL_STEPS) {
-            currentStep++;
-            renderStep();
+    // ===============================
+// MODIFIED STEP NAVIGATION - Check for duplicates before proceeding
+// ===============================
+nextNav.addEventListener('click', () => {
+    // Check for duplicate serial numbers when trying to go to next step
+    if (currentStep === 4) {
+        // Check all serial inputs for duplicates
+        const serialInputs = document.querySelectorAll('#finalApprovalTableBody input[type="number"]');
+        const duplicateInputs = Array.from(serialInputs).filter(input => input.dataset.isDuplicate === 'true');
+
+        if (duplicateInputs.length > 0) {
+            // Show warning message
+            alert(`Please fix duplicate serial numbers (${duplicateInputs.length} duplicate(s) found) before proceeding.`);
+
+            // Highlight all duplicate inputs
+            duplicateInputs.forEach(input => {
+                input.style.border = '2px solid #ef4444';
+                input.style.animation = 'shake 0.5s';
+
+                // Show tooltip for each duplicate
+                const container = input.parentElement;
+                const tooltip = container.querySelector('div[style*="background-color: #ef4444"]');
+                if (tooltip) {
+                    tooltip.style.display = 'block';
+                }
+
+                // Remove animation after it completes
+                setTimeout(() => {
+                    input.style.animation = '';
+                }, 500);
+            });
+
+            return; // Prevent navigation
         }
-    });
+    }
+
+    // If no duplicates or not on step 4, proceed with navigation
+    if (currentStep < TOTAL_STEPS) {
+        currentStep++;
+        renderStep();
+    }
+});
 
     prevNav.addEventListener('click', () => {
         if (currentStep > 1) {
@@ -2446,7 +2561,9 @@
         });
     }
 
-    // Add selected officers from popup to main panel
+    // ===============================
+    // MODIFIED ADD SELECTED OFFICERS - Reset serial numbers for new additions
+    // ===============================
     function addSelectedOfficers() {
         // Get all checked checkboxes from the filter results table that are NOT disabled
         const selectedFromPopup = Array.from(document.querySelectorAll('.result-checkbox:checked:not([disabled])'))
@@ -2491,8 +2608,11 @@
             const armyNosToRemove = new Set(uncheckedFromPopup.map(u => u.armyNo));
             officers = officers.filter(o => !armyNosToRemove.has(o.armyNo));
 
-            // Also remove from selectedSet
-            uncheckedFromPopup.forEach(u => selectedSet.delete(u.id));
+            // Also remove from selectedSet and serial number map
+            uncheckedFromPopup.forEach(u => {
+                selectedSet.delete(u.id);
+                serialNumberMap.delete(u.id);
+            });
         }
 
         // Add all selected IDs to the selectedSet (including existing ones)
@@ -2525,6 +2645,7 @@
 
         showToast(message, 'success');
     }
+
 
     // Update filter count badge
     function updateFilterCount() {
@@ -2730,6 +2851,9 @@
         // Remove from attendingSet if present
         attendingSet.delete(personnelId);
 
+        // Remove serial number
+        serialNumberMap.delete(personnelId);
+
         // Re-render the table
         renderOfficerTable();
 
@@ -2769,6 +2893,9 @@
             return;
         }
 
+        // Store selected officers for later steps
+        selectedOfficersForPanel = officers.filter(o => selectedSet.has(o.id || o.personnelId));
+
         if (selectedSet.size === 0) {
             console.log("No officers selected. Skipping save.");
             currentStep++;
@@ -2778,7 +2905,8 @@
 
         const nominations = Array.from(selectedSet).map(personnelId => ({
             personnelId,
-            status: statusMap.get(personnelId) || "Reserve"
+            status: statusMap.get(personnelId) || "Reserve",
+            serialNumber: serialNumberMap.get(personnelId) || null // Include serial number if exists
         }));
 
         const payload = {
@@ -2806,116 +2934,229 @@
     // ===============================
     // STEP 4 FUNCTIONS
     // ===============================
-    function loadStep4Panel() {
-        const scheduleId = sessionStorage.getItem("scheduleId");
-
-        if (!scheduleId) return;
-
-        fetch(`http://localhost:6060/api/course-panel/nomination/${scheduleId}`)
-            .then(res => res.json())
-            .then(panelData => {
-                const personnelIds = panelData.map(p => p.personnelId);
-
-                if (personnelIds.length === 0) {
-                    renderEmptyStep4();
-                    return;
-                }
-
-                fetch("http://localhost:6060/api/panel/officers")
-                    .then(res => res.json())
-                    .then(allOfficers => {
-                        const finalList = allOfficers.filter(o =>
-                            personnelIds.includes(o.personnelId)
-                        );
-                        renderStep4Table(finalList);
-                    });
-            })
-            .catch(err => console.error("Step-4 error", err));
-    }
-
-    function renderStep4Table(officers) {
-        const tbody = document.getElementById("finalApprovalTableBody");
-        if (!tbody) return;
-
-        tbody.innerHTML = "";
-
-        if (!Array.isArray(officers) || officers.length === 0) {
+    function loadStep4Panel(officersList) {
+        if (!officersList || officersList.length === 0) {
             renderEmptyStep4();
             return;
         }
-
-        officers.forEach((o, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
-                             style="width:36px;height:36px;border-radius:50%;object-fit:cover" />
-                        <div>
-                            <div style="font-weight:600">${o.fullName}</div>
-                            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>${o.rank || "-"}</td>
-                <td>${o.unit || "-"}</td>
-                <td>${o.command || "-"}</td>
-                <td>${formatDate(o.dateOfCommission)}</td>
-                <td>${formatDate(o.dateOfSeniority)}</td>
-                <td>${formatDate(o.dateOfBirth)}</td>
-                <td>${o.religion || "-"}</td>
-                <td>${o.maritalStatus || "-"}</td>
-                <td>${o.medicalCategory || "-"}</td>
-                <td>${o.mobileNumber || "-"}</td>
-                <td>${o.emailAddress || "-"}</td>
-                <td>${o.city || "-"}</td>
-                <td>${o.state || "-"}</td>
-            `;
-            tbody.appendChild(row);
-        });
+        renderStep4Table(officersList);
     }
+
+    // ===============================
+    // FIXED STEP 4 TABLE RENDERING - Proper duplicate checking
+    // ===============================
+    function renderStep4Table(officers) {
+    const tbody = document.getElementById("finalApprovalTableBody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(officers) || officers.length === 0) {
+        renderEmptyStep4();
+        return;
+    }
+
+    // Track used serial numbers to prevent duplicates
+    const usedSerialNumbers = new Map(); // Map serial -> personnelId
+
+    // First, collect all existing serial numbers from the map
+    serialNumberMap.forEach((value, personnelId) => {
+        if (value) {
+            usedSerialNumbers.set(value.toString(), personnelId);
+        }
+    });
+
+    officers.forEach((o, index) => {
+        const personnelId = o.id || o.personnelId;
+        let currentSerial = serialNumberMap.get(personnelId) || '';
+        let isDuplicate = false;
+
+        // Check if current serial is duplicate (exists and belongs to someone else)
+        if (currentSerial && usedSerialNumbers.has(currentSerial.toString()) &&
+            usedSerialNumbers.get(currentSerial.toString()) !== personnelId) {
+            isDuplicate = true;
+        }
+
+        const row = document.createElement("tr");
+
+        // Create container for serial input with tooltip
+        const serialContainer = document.createElement('div');
+        serialContainer.style.position = 'relative';
+        serialContainer.style.display = 'inline-block';
+
+        // Create serial number input
+        const serialInput = document.createElement('input');
+        serialInput.type = 'number';
+        serialInput.min = '1';
+        serialInput.step = '1';
+        serialInput.value = currentSerial;
+        serialInput.style.width = '80px';
+        serialInput.style.padding = '6px';
+        serialInput.style.border = isDuplicate ? '2px solid #ef4444' : '1px solid #d1d5db';
+        serialInput.style.borderRadius = '4px';
+        serialInput.style.fontSize = '13px';
+        serialInput.style.transition = 'border 0.2s';
+        serialInput.dataset.personnelId = personnelId;
+        serialInput.dataset.originalValue = currentSerial;
+
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.style.position = 'absolute';
+        tooltip.style.bottom = '100%';
+        tooltip.style.left = '50%';
+        tooltip.style.transform = 'translateX(-50%)';
+        tooltip.style.backgroundColor = '#ef4444';
+        tooltip.style.color = 'white';
+        tooltip.style.padding = '4px 8px';
+        tooltip.style.borderRadius = '4px';
+        tooltip.style.fontSize = '11px';
+        tooltip.style.whiteSpace = 'nowrap';
+        tooltip.style.marginBottom = '5px';
+        tooltip.style.zIndex = '10';
+        tooltip.style.display = isDuplicate ? 'block' : 'none';
+        tooltip.textContent = '⚠️ This serial number is already used';
+
+        // Add input event listener for real-time duplicate checking (visual only)
+        serialInput.addEventListener('input', function(e) {
+            const newValue = e.target.value.trim();
+            const currentPersonnelId = parseInt(this.dataset.personnelId);
+
+            // Check for duplicates (excluding current officer)
+            let isDuplicateValue = false;
+
+            if (newValue) {
+                // Check if this value exists in usedSerialNumbers AND belongs to a different officer
+                if (usedSerialNumbers.has(newValue)) {
+                    const existingPersonnelId = usedSerialNumbers.get(newValue);
+                    if (existingPersonnelId !== currentPersonnelId) {
+                        isDuplicateValue = true;
+                    }
+                }
+            }
+
+            // Update visual feedback
+            if (isDuplicateValue) {
+                this.style.border = '2px solid #ef4444';
+                tooltip.style.display = 'block';
+            } else {
+                this.style.border = newValue ? '2px solid #10b981' : '1px solid #d1d5db';
+                tooltip.style.display = 'none';
+            }
+
+            // Store the duplicate status on the input element
+            this.dataset.isDuplicate = isDuplicateValue ? 'true' : 'false';
+        });
+
+        // Add change event to update the map (only when value is valid)
+        serialInput.addEventListener('change', function(e) {
+            const newValue = e.target.value.trim();
+            const currentPersonnelId = parseInt(this.dataset.personnelId);
+            const oldValue = this.dataset.originalValue;
+
+            // Allow empty value
+            if (newValue === '') {
+                // Remove old value from usedSerialNumbers if it was this officer's
+                if (oldValue && usedSerialNumbers.get(oldValue) === currentPersonnelId) {
+                    usedSerialNumbers.delete(oldValue);
+                }
+
+                // Update the map
+                serialNumberMap.set(currentPersonnelId, null);
+                this.dataset.originalValue = '';
+                this.style.border = '1px solid #d1d5db';
+                tooltip.style.display = 'none';
+                this.dataset.isDuplicate = 'false';
+                return;
+            }
+
+            // Check for duplicates (excluding current officer)
+            if (usedSerialNumbers.has(newValue)) {
+                const existingPersonnelId = usedSerialNumbers.get(newValue);
+                if (existingPersonnelId !== currentPersonnelId) {
+                    // Duplicate - don't update the map, keep visual feedback
+                    this.style.border = '2px solid #ef4444';
+                    tooltip.style.display = 'block';
+                    this.dataset.isDuplicate = 'true';
+                    return;
+                }
+            }
+
+            // Valid value - update the maps
+            // Remove old value from usedSerialNumbers if it was this officer's
+            if (oldValue && usedSerialNumbers.get(oldValue) === currentPersonnelId) {
+                usedSerialNumbers.delete(oldValue);
+            }
+
+            // Add new value
+            usedSerialNumbers.set(newValue, currentPersonnelId);
+            serialNumberMap.set(currentPersonnelId, parseInt(newValue));
+
+            // Update visual feedback
+            this.style.border = '2px solid #10b981';
+            tooltip.style.display = 'none';
+            this.dataset.originalValue = newValue;
+            this.dataset.isDuplicate = 'false';
+        });
+
+        serialContainer.appendChild(serialInput);
+        serialContainer.appendChild(tooltip);
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div>
+                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
+                    </div>
+                </div>
+            </td>
+            <td></td> <!-- Placeholder for serial input -->
+            <td>${o.rank || "-"}</td>
+            <td>${o.unit || "-"}</td>
+            <td>${o.command || "-"}</td>
+            <td>${formatDate(o.dateOfCommission)}</td>
+            <td>${formatDate(o.dateOfSeniority)}</td>
+            <td>${formatDate(o.dateOfBirth)}</td>
+            <td>${o.religion || "-"}</td>
+            <td>${o.maritalStatus || "-"}</td>
+            <td>${o.medicalCategory || "-"}</td>
+            <td>${o.mobileNumber || o.mobile || "-"}</td>
+            <td>${o.emailAddress || o.email || "-"}</td>
+            <td>${o.city || "-"}</td>
+            <td>${o.state || "-"}</td>
+        `;
+
+        // Replace the placeholder with actual input container
+        const serialCell = row.cells[2];
+        serialCell.appendChild(serialContainer);
+        serialCell.style.position = 'relative';
+
+        tbody.appendChild(row);
+    });
+}
+
 
     function renderEmptyStep4() {
         const tbody = document.getElementById("finalApprovalTableBody");
         tbody.innerHTML = `
-            <tr>
-                <td colspan="15" style="text-align:center;color:#6b7280;padding:20px;">
-                    No officers nominated for this schedule
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td colspan="16" style="text-align:center;color:#6b7280;padding:20px;">
+                No officers selected. Please select officers in Step 3 first.
+            </td>
+        </tr>
+    `;
     }
 
     // ===============================
     // STEP 5 FUNCTIONS
     // ===============================
-    function loadStep5Panel() {
-        const scheduleId = sessionStorage.getItem("scheduleId");
-        if (!scheduleId) return;
-
-        fetch(`http://localhost:6060/api/course-panel/nomination/${scheduleId}`)
-            .then(res => res.json())
-            .then(panelData => {
-                const personnelIds = panelData
-                    .filter(p => p.status === "Retain")
-                    .map(p => p.personnelId);
-
-                if (personnelIds.length === 0) {
-                    renderEmptyStep5();
-                    return;
-                }
-
-                fetch("http://localhost:6060/api/panel/officers")
-                    .then(res => res.json())
-                    .then(allOfficers => {
-                        const finalList = allOfficers.filter(o =>
-                            personnelIds.includes(o.personnelId)
-                        );
-                        renderStep5Table(finalList);
-                    });
-            })
-            .catch(err => console.error("Step-5 error", err));
+    function loadStep5Panel(officersList) {
+        if (!officersList || officersList.length === 0) {
+            renderEmptyStep5();
+            return;
+        }
+        renderStep5Table(officersList);
     }
 
     function renderStep5Table(officers) {
@@ -2930,35 +3171,39 @@
         }
 
         officers.forEach((o, index) => {
+            const personnelId = o.id || o.personnelId;
+            const serialNumber = serialNumberMap.get(personnelId) || '';
+
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <img src="http://localhost:6060/${o.officerImage || 'uploads/default.png'}"
-                             style="width:36px;height:36px;border-radius:50%;object-fit:cover" />
-                        <div>
-                            <div style="font-weight:600">${o.fullName}</div>
-                            <div style="font-size:12px;color:#6b7280">${o.armyNo}</div>
-                        </div>
+            <td>${index + 1}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div>
+                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
                     </div>
-                </td>
-                <td>${o.rank || "-"}</td>
-                <td>${o.unit || "-"}</td>
-                <td>${o.command || "-"}</td>
-                <td>${formatDate(o.dateOfCommission)}</td>
-                <td>${formatDate(o.dateOfSeniority)}</td>
-                <td>${formatDate(o.dateOfBirth)}</td>
-                <td>${o.mobileNumber || "-"}</td>
-                <td>${o.emailAddress || "-"}</td>
-                <td>${o.city || "-"}</td>
-                <td>${o.state || "-"}</td>
-                <td>
-                    <button class="btn btn-primary" onclick="generateLetter(${o.personnelId})" style="padding: 6px 12px;">
-                        📄 Generate
-                    </button>
-                </td>
-            `;
+                </div>
+            </td>
+            <td>
+                <span style="font-weight:600; color:#1b4332;">${serialNumber || '—'}</span>
+            </td>
+            <td>${o.rank || "-"}</td>
+            <td>${o.unit || "-"}</td>
+            <td>${o.command || "-"}</td>
+            <td>${formatDate(o.dateOfCommission)}</td>
+            <td>${formatDate(o.dateOfSeniority)}</td>
+            <td>${formatDate(o.dateOfBirth)}</td>
+            <td>${o.mobileNumber || o.mobile || "-"}</td>
+            <td>${o.emailAddress || o.email || "-"}</td>
+            <td>${o.city || "-"}</td>
+            <td>${o.state || "-"}</td>
+            <td>
+                <button class="btn btn-primary" onclick="generateLetter(${personnelId})" style="padding: 6px 12px;">
+                    📄 Generate
+                </button>
+            </td>
+        `;
             tbody.appendChild(row);
         });
     }
@@ -2966,12 +3211,12 @@
     function renderEmptyStep5() {
         const tbody = document.getElementById("step5TableBody");
         tbody.innerHTML = `
-            <tr>
-                <td colspan="13" style="text-align:center;color:#6b7280;padding:20px;">
-                    No officers available for letter generation
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td colspan="14" style="text-align:center;color:#6b7280;padding:20px;">
+                No officers selected. Please select officers in Step 3 first.
+            </td>
+        </tr>
+    `;
     }
 
     function generateLetter(personnelId) {
@@ -3026,7 +3271,10 @@
     // SELECT / DESELECT ALL
     // ===============================
     document.getElementById("selectAllBtn")?.addEventListener("click", () => {
-        officers.forEach(o => selectedSet.add(o.personnelId));
+        officers.forEach(o => {
+            const personnelId = o.id || o.personnelId;
+            selectedSet.add(personnelId);
+        });
         document.getElementById("selectedCount").innerText = selectedSet.size;
         renderOfficerTable();
         updatePanelSummary();
@@ -3035,6 +3283,7 @@
     document.getElementById("deselectAllBtn")?.addEventListener("click", () => {
         selectedSet.clear();
         statusMap.clear();
+        serialNumberMap.clear(); // Clear all serial numbers
         document.getElementById("selectedCount").innerText = 0;
         renderOfficerTable();
         updatePanelSummary();
