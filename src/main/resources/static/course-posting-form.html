@@ -444,6 +444,42 @@
   }
 }
 
+    /* ================= UNIT SEARCH DROPDOWN ================= */
+.recommendation-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.recommendation-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.recommendation-item:hover {
+  background: #f3f4f6;
+}
+
+.recommendation-item .army-no {
+  font-weight: 600;
+  color: #1b4332;
+}
+
+.recommendation-loading {
+  padding: 10px 12px;
+  text-align: center;
+  color: #6b7280;
+}
+
   </style>
   <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -480,6 +516,7 @@
         <input type="text" id="officerInput" placeholder="Enter Army Number">
         <div id="officerDetails" style="display:none"></div>
         <input type="hidden" id="currentPostingId">
+        <input type="hidden" id="selectedOrbatId">
       </div>
 
       <div class="tabs">
@@ -556,10 +593,11 @@
 
 
 <script>
-  // ✅ APIs
+  // ✅ APIs - SIRF YEH LINE ADD KARO
   const DROPDOWN_API = "http://localhost:6060/api/dropdown";
   const SAVE_API = "http://localhost:6060/personnel-full-details/save";
   const DELETE_API = "http://localhost:6060/personnel-full-details";
+  const ORBAT_SEARCH_API = "http://localhost:6060/api/orbat/search";  // 🔥 NEW API
 
   // DOM Elements
   const movementDate = document.getElementById("movementDate");
@@ -575,11 +613,33 @@
   const saveBtn = document.getElementById("saveBtn");
   const cancelBtn = document.getElementById("cancelBtn");
 
+  // 🔥 NEW: Hidden field for ORBAT ID
+  const selectedOrbatId = document.getElementById("selectedOrbatId") || createHiddenField();
+
+  function createHiddenField() {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.id = "selectedOrbatId";
+    document.body.appendChild(input);
+    return input;
+  }
+
   // State
   let currentArmyNo = null;
   let currentPostingIdValue = null;
 
-  // Load dropdowns
+  // 🔥 NEW: Unit search variables
+  let unitSearchTimeout = null;
+  let unitAbortController = null;
+
+  // 🔥 NEW: Create unit recommendation dropdown
+  const unitRecommendationDropdown = document.createElement("div");
+  unitRecommendationDropdown.className = "recommendation-dropdown";
+  unitRecommendationDropdown.style.display = "none";
+  postedTo.parentNode.style.position = "relative";
+  postedTo.parentNode.appendChild(unitRecommendationDropdown);
+
+  // Load dropdowns (EXISTING - NO CHANGE)
   document.addEventListener("DOMContentLoaded", function () {
     loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
     loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
@@ -611,7 +671,88 @@
     return new Date(d).toLocaleDateString("en-GB");
   }
 
-  // Army Number input
+  // 🔥 NEW: UNIT SEARCH WITH DEBOUNCE
+  postedTo.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.trim();
+
+    // Clear selected ORBAT ID when user types
+    selectedOrbatId.value = "";
+
+    clearTimeout(unitSearchTimeout);
+
+    if (searchTerm.length < 3) {
+      unitRecommendationDropdown.style.display = "none";
+      return;
+    }
+
+    unitSearchTimeout = setTimeout(() => {
+      searchUnits(searchTerm);
+    }, 500);
+  });
+
+  async function searchUnits(term) {
+    if (unitAbortController) {
+      unitAbortController.abort();
+    }
+
+    unitAbortController = new AbortController();
+
+    try {
+      unitRecommendationDropdown.innerHTML = '<div class="recommendation-loading">Searching units...</div>';
+      unitRecommendationDropdown.style.display = "block";
+
+      const response = await fetch(`${ORBAT_SEARCH_API}?term=${encodeURIComponent(term)}`, {
+        signal: unitAbortController.signal
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data.length > 0) {
+        displayUnitRecommendations(result.data);
+      } else {
+        unitRecommendationDropdown.innerHTML = `
+          <div class="recommendation-loading" style="color: #ef4444;">
+            ⚠️ Unit "${term}" not found in database
+          </div>
+        `;
+      }
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.error("Unit search error:", error);
+      unitRecommendationDropdown.style.display = "none";
+    }
+  }
+
+  // 🔥 NEW: Display units with ID
+  function displayUnitRecommendations(units) {
+    let html = "";
+    units.forEach(unit => {
+      html += `
+        <div class="recommendation-item" onclick="selectUnit(${unit.id}, '${unit.name}')">
+          <div class="army-no">${unit.name}</div>
+        </div>
+      `;
+    });
+
+    unitRecommendationDropdown.innerHTML = html;
+  }
+
+  // 🔥 NEW: Select unit - sets both name and ID
+  window.selectUnit = function(orbatId, unitName) {
+    postedTo.value = unitName;
+    selectedOrbatId.value = orbatId;  // ID store ho rahi hai
+    unitRecommendationDropdown.style.display = "none";
+    console.log("Selected Unit ID:", orbatId, "Name:", unitName);
+  }
+
+  // 🔥 NEW: Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!postedTo.contains(e.target) && !unitRecommendationDropdown.contains(e.target)) {
+      unitRecommendationDropdown.style.display = "none";
+    }
+  });
+
+  // Army Number input (EXISTING - NO CHANGE)
   officerInput.addEventListener("input", () => {
     const armyNo = officerInput.value.trim();
     if (!armyNo) {
@@ -634,7 +775,7 @@
     `;
   });
 
-  // ✅ Save button - ARMY NUMBER bhejo
+  // ✅ Save button - SIRF ORBAT_ID ADD KI HAI
   saveBtn.onclick = async () => {
     if (!currentArmyNo) {
       alert("Please enter Army Number");
@@ -644,6 +785,13 @@
 
     if (!postedTo.value.trim()) {
       alert("Posted To field is required");
+      postedTo.focus();
+      return;
+    }
+
+    // 🔥 NEW: Check if unit was selected from dropdown
+    if (!selectedOrbatId.value) {
+      alert("Please select a unit from the recommendations");
       postedTo.focus();
       return;
     }
@@ -659,7 +807,8 @@
       postedTo: postedTo.value.trim(),
       postingOrderIssueDate: postingOrderIssueDate.value || null,
       tosUpdatedDate: tosUpdatedDate.value || null,
-      rank: rankSelect.value || null
+      rank: rankSelect.value || null,
+      orbatId: parseInt(selectedOrbatId.value)  // 🔥 NEW: ORBAT ID add ki
     };
 
     if (currentPostingIdValue) {
@@ -712,7 +861,7 @@
     }
   };
 
-  // ✅ Delete/Cancel button - Sirf form clear karega, API call nahi karega
+  // ✅ Cancel button - SIRF ORBAT_ID CLEAR KI
   cancelBtn.onclick = () => {
     if (confirm("Are you sure you want to clear the form? Unsaved changes will be lost.")) {
       clearForm();
@@ -721,6 +870,7 @@
       currentArmyNo = null;
       currentPostingIdValue = null;
       currentPostingId.value = "";
+      selectedOrbatId.value = "";  // 🔥 NEW: Clear ORBAT ID
     }
   };
 
@@ -732,9 +882,10 @@
     postingTypeSelect.value = "";
     tosUpdatedDate.value = "";
     rankSelect.value = "";
+    selectedOrbatId.value = "";  // 🔥 NEW: Clear ORBAT ID
   }
 
-  // Enter key
+  // Enter key (EXISTING - NO CHANGE)
   officerInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
