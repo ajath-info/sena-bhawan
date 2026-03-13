@@ -32,6 +32,10 @@ public class PersonnelListDTO {
     private String placeOfBirth;
     private String areaType;
     private String postingDueMonths;
+    private int totalCoursesDone;
+    private int coursesTrainingYr;
+    private int coursesInUnit;
+
 
     // New fields
     private String religion;
