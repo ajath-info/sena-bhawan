@@ -92,12 +92,10 @@
 
         <div class="content">
             <div class="form-grid" id="formGrid">
-                <!-- ARMY HQ Dropdown - /api/orbat/hq -->
+                <!-- ARMY HQ - Static value (1) -->
                 <div class="form-group full">
                     <label>Army HQ *</label>
-                    <select id="hqId">
-                        <option value="">Loading Army HQ...</option>
-                    </select>
+<!--                    <div class="static-value">Army HQ (Default)</div>-->
                 </div>
 
                 <!-- Formation Type - /api/dropdown/FORMATION_TYPE -->
@@ -190,6 +188,9 @@
     class ORBATCreator {
         constructor() {
             this.baseUrl = 'http://localhost:6060/api';
+            // Static HQ ID - 1 (default)
+            this.defaultHqId = 1;
+
             // Hierarchy mapping for different formation types
             this.hierarchyMap = {
                 'Command': [],  // No parent dependencies
@@ -203,10 +204,10 @@
         }
 
         async init() {
-            await this.loadHqDropdown();
+            // HQ dropdown removed - using static value
             await this.loadFormationTypes();
-            await this.loadAreaTypes(); // Load Area Types from /api/dropdown/AREA_TYPE
-            await this.loadUnitTypes(); // Load Unit Types from /api/dropdown/UNIT_TYPE
+            await this.loadAreaTypes();
+            await this.loadUnitTypes();
             this.setupEventListeners();
         }
 
@@ -259,30 +260,6 @@
                         select.value = '';
                     }
                 }
-            }
-        }
-
-        // Load Army HQ dropdown - /api/orbat/hq
-        async loadHqDropdown() {
-            const select = document.getElementById('hqId');
-
-            try {
-                const response = await fetch(`${this.baseUrl}/orbat/hq`);
-                if (!response.ok) throw new Error('Failed to load HQ data');
-
-                const data = await response.json();
-
-                let options = '<option value="">Select Army HQ</option>';
-                if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.id}">${item.name}</option>`
-                    ).join('');
-                }
-
-                select.innerHTML = options;
-            } catch (error) {
-                console.error('Error loading HQ:', error);
-                select.innerHTML = '<option value="">Error loading HQ</option>';
             }
         }
 
@@ -340,10 +317,7 @@
             select.innerHTML = '<option value="">Loading Corps...</option>';
 
             try {
-                const url = commandId
-                    ? `${this.baseUrl}/orbat/corps?commandId=${commandId}`
-                    : `${this.baseUrl}/orbat/corps`;
-
+                const url = `${this.baseUrl}/orbat/corps?commandId=${commandId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load corps');
 
@@ -369,10 +343,7 @@
             select.innerHTML = '<option value="">Loading Divisions...</option>';
 
             try {
-                const url = corpsId
-                    ? `${this.baseUrl}/orbat/divisions?corpsId=${corpsId}`
-                    : `${this.baseUrl}/orbat/divisions`;
-
+                const url = `${this.baseUrl}/orbat/divisions?corpsId=${corpsId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load divisions');
 
@@ -398,10 +369,7 @@
             select.innerHTML = '<option value="">Loading Brigades...</option>';
 
             try {
-                const url = divisionId
-                    ? `${this.baseUrl}/orbat/brigades?divisionId=${divisionId}`
-                    : `${this.baseUrl}/orbat/brigades`;
-
+                const url = `${this.baseUrl}/orbat/brigades?divisionId=${divisionId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load brigades');
 
@@ -552,8 +520,7 @@
         validateForm() {
             const submitBtn = document.getElementById('submitBtn');
 
-            // Check required fields
-            const hqId = document.getElementById('hqId').value;
+            // Check required fields (HQ is static, so always valid)
             const formationType = document.getElementById('formationType').value;
             const name = document.getElementById('name').value.trim();
             const location = document.getElementById('location').value.trim();
@@ -561,8 +528,8 @@
             const pin = document.getElementById('pin').value.trim();
             const areaType = document.getElementById('areaType').value;
 
-            // Basic validation
-            if (!hqId || !formationType || !name || !location || !susNo || !pin || !areaType) {
+            // Basic validation (hqId is static so not checked)
+            if (!formationType || !name || !location || !susNo || !pin || !areaType) {
                 submitBtn.disabled = true;
                 return;
             }
@@ -592,13 +559,13 @@
         async submitForm() {
             const formationType = document.getElementById('formationType').value;
 
-            // Get area type name (value is already the name since we set value="${item.name}")
+            // Get area type name
             const areaType = document.getElementById('areaType').value;
 
-            // Prepare payload according to FormationRequestDTO
+            // Prepare payload with static HQ ID (1)
             const payload = {
                 formationType: formationType,
-                hqId: parseInt(document.getElementById('hqId').value),
+                hqId: this.defaultHqId, // Static value 1
                 commandId: this.getHierarchyId('commandId'),
                 corpsId: this.getHierarchyId('corpsId'),
                 divisionId: this.getHierarchyId('divisionId'),
@@ -607,10 +574,10 @@
                 location: document.getElementById('location').value.trim(),
                 susNo: document.getElementById('susNo').value.trim(),
                 pinNo: document.getElementById('pin').value.trim(),
-                areaType: areaType  // Now this will be the name, not the ID
+                areaType: areaType
             };
 
-            // Add unit type if applicable (value is already the name)
+            // Add unit type if applicable
             if (formationType === 'Unit') {
                 payload.unitType = document.getElementById('unitType').value;
                 console.log('Unit Type being sent:', payload.unitType);
@@ -653,7 +620,7 @@
         }
 
         validatePayload(payload, formationType) {
-            // Validate based on formation type according to your service logic
+            // Validate based on formation type
             if (formationType === 'Command' && !payload.hqId) return false;
             if (formationType === 'Corps' && !payload.commandId) return false;
             if (formationType === 'Division' && !payload.corpsId) return false;

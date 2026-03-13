@@ -23,8 +23,6 @@ public class OrbatController {
 
     private final OrbatService service;
     private final OrbatStructureService orbatStructureService;
-    @Autowired
-    private FormationServiceImpl formationService;
 
     @GetMapping("/search")
     public ResponseEntity<?> searchUnits(@RequestParam String term) {
@@ -52,16 +50,9 @@ public class OrbatController {
 //        return ResponseEntity.ok(service.createFormation(request));
 //    }
 
-    @GetMapping("/formation-type/{formationType}")
-    public List<OrbatDropdownDTO> getByFormationType(@PathVariable String formationType) {
-        return orbatStructureService.getByFormationType(formationType);
-    }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createFormation(@RequestBody FormationRequestDTO dto) {
 
-        return ResponseEntity.ok(formationService.createFormation(dto));
-    }
+
 
     @GetMapping("/dropdown/{type}")
     public ResponseEntity<?> dropdown(

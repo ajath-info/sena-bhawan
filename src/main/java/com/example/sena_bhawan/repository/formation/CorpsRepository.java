@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CorpsRepository extends JpaRepository<Corps,Long> {
     List<Corps> findAll();
+    List<Corps> findByCommandId(Long commandId);
 }
