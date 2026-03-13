@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DropdownMasterRepository extends JpaRepository<DropdownMaster,Long> {
-    List<DropdownMaster> findByTypeAndStatus(String type, Integer status);
-    List<DropdownMaster> findByTypeIgnoreCaseAndStatus(String type, Integer status);
+    List<DropdownMaster> findByTypeIgnoreCaseAndStatusOrderByIdAsc(String type, Integer status);
     Optional<DropdownMaster> findByTypeAndName(String type, String name);
     Optional<DropdownMaster> findById(Long id);
 }

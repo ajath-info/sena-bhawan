@@ -47,24 +47,28 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
             throw new RuntimeException("Posted To field cannot be empty");
         }
 
-        // Get ORBAT ID from validation
-        Long validatedOrbatId = validateAndGetOrbatId(dto.getPostedTo());
-        dto.setOrbatId(validatedOrbatId);
+        if (dto.getOrbatId() == null) {
+            throw new RuntimeException("Invalid formation selection. Please select from recommendations.");
+        }
+
+        // Validate ORBAT ID and fetch formation
+        OrbatStructure orbat = orbatRepository.findById(dto.getOrbatId())
+                .orElseThrow(() -> new RuntimeException("Invalid ORBAT ID"));
 
         // Step 3: Check if TOS date is provided (new posting or update?)
         if (dto.getTosUpdatedDate() != null) {
             // TOS date provided - this is a new posting
-            return processNewPosting(dto, personnel);
+            return processNewPosting(dto, personnel, orbat);
         } else {
             // No TOS date - update existing current posting
-            return processUpdatePosting(dto, personnel);
+            return processUpdatePosting(dto, personnel, orbat);
         }
     }
 
     /**
      * Process a new posting (when TOS date is provided)
      */
-    private PostingDetails processNewPosting(PostingRequestDTO dto, Personnel personnel) {
+    private PostingDetails processNewPosting(PostingRequestDTO dto, Personnel personnel, OrbatStructure orbat) {
         log.info("Processing NEW posting for personnel ID: {}", personnel.getId());
 
         // Check if personnel already has a current posting
@@ -111,11 +115,9 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
         newPosting.setSosDate(null);
 
         // Get formation details from ORBAT using dto.getOrbatId()
-        orbatRepository.findById(dto.getOrbatId()).ifPresent(orbat -> {
-            newPosting.setFormationType(orbat.getFormationType());
-            newPosting.setLocation(orbat.getLocation());
-            newPosting.setCommand(orbat.getCommandName());
-        });
+        newPosting.setFormationType(orbat.getFormationType());
+        newPosting.setLocation(orbat.getLocation());
+        newPosting.setCommand(orbat.getCommandName());
 
         PostingDetails saved = postingRepository.save(newPosting);
         log.info("New posting created with ID: {}, Status: UNDER_POSTING", saved.getPostingId());
@@ -126,7 +128,7 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
     /**
      * Process update to existing posting (when no TOS date)
      */
-    private PostingDetails processUpdatePosting(PostingRequestDTO dto, Personnel personnel) {
+    private PostingDetails processUpdatePosting(PostingRequestDTO dto, Personnel personnel, OrbatStructure orbat) {
         log.info("Processing UPDATE to current posting for personnel ID: {}", personnel.getId());
 
         // Find current posting
@@ -145,11 +147,9 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
             currentPosting.setOrbatId(dto.getOrbatId());  // Use dto.getOrbatId()
 
             // Update formation details using dto.getOrbatId()
-            orbatRepository.findById(dto.getOrbatId()).ifPresent(orbat -> {
-                currentPosting.setFormationType(orbat.getFormationType());
-                currentPosting.setLocation(orbat.getLocation());
-                currentPosting.setCommand(orbat.getCommandName());
-            });
+            currentPosting.setFormationType(orbat.getFormationType());
+            currentPosting.setLocation(orbat.getLocation());
+            currentPosting.setCommand(orbat.getCommandName());
         }
 
         // Update other fields if provided

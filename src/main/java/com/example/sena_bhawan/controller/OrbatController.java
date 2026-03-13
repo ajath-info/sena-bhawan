@@ -1,9 +1,6 @@
 package com.example.sena_bhawan.controller;
 
-import com.example.sena_bhawan.dto.FormationRequestDTO;
-import com.example.sena_bhawan.dto.OrbatCreateRequest;
-import com.example.sena_bhawan.dto.OrbatDropdownDTO;
-import com.example.sena_bhawan.dto.OrbatSimpleDTO;
+import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.service.FormationService;
 import com.example.sena_bhawan.service.OrbatService;
@@ -15,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orbat")
@@ -26,6 +25,27 @@ public class OrbatController {
     private final OrbatStructureService orbatStructureService;
     @Autowired
     private FormationServiceImpl formationService;
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUnits(@RequestParam String term) {
+        try {
+            List<OrbatSearchDTO> units = orbatStructureService.searchUnits(term);
+
+            // Prepare response
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", units);
+            response.put("count", units.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Handle unexpected errors
+            return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", "An error occurred while searching")
+            );
+        }
+    }
 
 //    @PostMapping("/create")
 //    public ResponseEntity<?> create(@RequestBody OrbatCreateRequest request) {

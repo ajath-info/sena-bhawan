@@ -2,11 +2,15 @@ package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.dto.DropdownDTO;
 import com.example.sena_bhawan.dto.OrbatDropdownDTO;
+import com.example.sena_bhawan.dto.OrbatSearchDTO;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 
 import java.util.List;
 
 public interface OrbatStructureService {
+
+    List<OrbatSearchDTO> searchUnits(String term);
+    void validateSearchTerm(String term);
 
     List<OrbatDropdownDTO> getByFormationType(String formationType);
 
