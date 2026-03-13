@@ -38,6 +38,86 @@
         .btn-primary{background:#065f46;color:#fff;border:none}
         .section-divider{margin:20px 0;border-top:2px solid #e5e7eb}
         .select2-container{width:100% !important;}
+        /* Multi-select Dropdowns using custom dropdown style */
+.grid-2.mt {
+    position: relative;
+}
+
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-btn {
+    border: 1px solid #d1d5db;
+    padding: 10px 12px;
+    cursor: pointer;
+    background: #ffffff;
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    position: relative;
+    z-index: 5;
+}
+
+.dropdown-btn:hover {
+    background: #f9fafb;
+}
+
+.dropdown-btn:focus {
+    outline: none;
+    border-color: #065f46;
+    box-shadow: 0 0 0 2px rgba(6, 95, 70, 0.1);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+}
+
+.dropdown-content label {
+    display: block;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s ease;
+}
+
+.dropdown-content label:last-child {
+    border-bottom: none;
+}
+
+.dropdown-content label:hover {
+    background: #f3f4f6;
+}
+
+.dropdown-content input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* Ensure dropdowns have proper stacking context */
+.grid-2.mt:first-of-type {
+    position: relative;
+    z-index: 20;
+}
+
+.grid-2.mt:last-of-type {
+    position: relative;
+    z-index: 10;
+}
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -215,6 +295,7 @@
     // Initialize dropdown buttons
     document.querySelectorAll('.dropdown-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
             const targetKey = this.dataset.target;
             const content = document.getElementById(`dropdown-${targetKey}`);
@@ -235,25 +316,46 @@
         const container = document.getElementById(dropdownId);
         if (!container) return;
         container.innerHTML = '';
+
         items.forEach(item => {
             const label = document.createElement('label');
             label.style.display = 'block';
             label.style.padding = '8px';
             label.style.cursor = 'pointer';
-            label.innerHTML = `<input type="checkbox" value="${item.id}" ${selectedArrayRef.includes(item.id) ? 'checked' : ''}> ${item.name}`;
-            label.addEventListener('change', (e) => {
+            label.style.userSelect = 'none';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = item.id;
+            checkbox.checked = selectedArrayRef.includes(item.id);
+            checkbox.style.marginRight = '8px';
+
+            // Handle checkbox change
+            checkbox.addEventListener('change', function(e) {
                 e.stopPropagation();
-                const checkbox = label.querySelector('input');
-                const val = Number(checkbox.value);
-                if (checkbox.checked) {
-                    if (!selectedArrayRef.includes(val)) selectedArrayRef.push(val);
+                const val = Number(this.value);
+                if (this.checked) {
+                    if (!selectedArrayRef.includes(val)) {
+                        selectedArrayRef.push(val);
+                    }
                 } else {
                     const idx = selectedArrayRef.indexOf(val);
-                    if (idx > -1) selectedArrayRef.splice(idx, 1);
+                    if (idx > -1) {
+                        selectedArrayRef.splice(idx, 1);
+                    }
                 }
                 // Update button text
                 updateDropdownButtonText(dropdownId);
             });
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${item.name}`));
+
+            // Prevent dropdown from closing when clicking on label
+            label.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
             container.appendChild(label);
         });
     }
@@ -278,26 +380,6 @@
         btn.innerText = selectedArray.length === 0 ? 'Select Options' : `${selectedArray.length} selected`;
     }
 
-    // Mapping of dropdown types to their API endpoints and element IDs
-    const dropdownConfig = {
-        minCourseGrading: {
-            type: 'COURSE_GRADE',
-            elementId: 'minCourseGrading'
-        },
-        educationalQualifications: {
-            type: 'CIVIL_QUALIFICATION',
-            elementId: 'educationalQualifications'
-        },
-        medicalCategories: {
-            type: 'MEDICAL',
-            elementId: 'medicalCategories'
-        },
-        establishmentTypes: {
-            type: 'ESTABLISHMENT',
-            elementId: 'establishmentTypes'
-        }
-    };
-
     // Initialize all event listeners and data loading
     document.addEventListener('DOMContentLoaded', function() {
         loadCourses();
@@ -307,6 +389,33 @@
         loadAllDropdowns();
         initializePillListeners();
         initializeSelect2();
+
+        // Re-attach dropdown button listeners after content is loaded
+        setTimeout(function() {
+            document.querySelectorAll('.dropdown-btn').forEach(btn => {
+                // Remove existing listeners and add new ones
+                btn.replaceWith(btn.cloneNode(true));
+            });
+
+            // Re-attach click listeners
+            document.querySelectorAll('.dropdown-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetKey = this.dataset.target;
+                    const content = document.getElementById(`dropdown-${targetKey}`);
+                    if (!content) return;
+
+                    // Close all other dropdowns
+                    document.querySelectorAll('.dropdown-content').forEach(dd => {
+                        if (dd !== content) dd.style.display = 'none';
+                    });
+
+                    // Toggle current
+                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+        }, 500); // Small delay to ensure DOM is ready
     });
 
     function initializeSelect2() {
@@ -319,25 +428,133 @@
 
     // Load all dropdown data from the new API
     function loadAllDropdowns() {
+        console.log('Loading all dropdowns...');
+
+        // Load Course Grading
         fetch('http://localhost:6060/api/dropdown/COURSE_GRADE')
-            .then(r => r.json())
-            .then(data => populateDropdown('dropdown-grading', data, gradingSelected))
-            .catch(e => console.log('Using mock data for grading', e));
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load course grades');
+                return r.json();
+            })
+            .then(data => {
+                console.log('Course grades loaded:', data);
+                if (data && data.length > 0) {
+                    populateDropdown('dropdown-grading', data, gradingSelected);
+                } else {
+                    // Fallback mock data
+                    const mockData = [
+                        {id: 1, name: 'Grade A'},
+                        {id: 2, name: 'Grade B'},
+                        {id: 3, name: 'Grade C'},
+                        {id: 4, name: 'Grade D'}
+                    ];
+                    populateDropdown('dropdown-grading', mockData, gradingSelected);
+                }
+            })
+            .catch(e => {
+                console.error('Error loading grading:', e);
+                // Mock data for testing
+                const mockData = [
+                    {id: 1, name: 'Grade A'},
+                    {id: 2, name: 'Grade B'},
+                    {id: 3, name: 'Grade C'},
+                    {id: 4, name: 'Grade D'}
+                ];
+                populateDropdown('dropdown-grading', mockData, gradingSelected);
+            });
 
+        // Load Educational Qualifications
         fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATION')
-            .then(r => r.json())
-            .then(data => populateDropdown('dropdown-edu', data, eduSelected))
-            .catch(e => console.log('Using mock data for edu', e));
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load qualifications');
+                return r.json();
+            })
+            .then(data => {
+                console.log('Educational qualifications loaded:', data);
+                if (data && data.length > 0) {
+                    populateDropdown('dropdown-edu', data, eduSelected);
+                } else {
+                    const mockData = [
+                        {id: 1, name: 'Bachelor Degree'},
+                        {id: 2, name: 'Master Degree'},
+                        {id: 3, name: 'PhD'},
+                        {id: 4, name: 'Diploma'}
+                    ];
+                    populateDropdown('dropdown-edu', mockData, eduSelected);
+                }
+            })
+            .catch(e => {
+                console.error('Error loading edu:', e);
+                const mockData = [
+                    {id: 1, name: 'Bachelor Degree'},
+                    {id: 2, name: 'Master Degree'},
+                    {id: 3, name: 'PhD'},
+                    {id: 4, name: 'Diploma'}
+                ];
+                populateDropdown('dropdown-edu', mockData, eduSelected);
+            });
 
+        // Load Medical Categories
         fetch('http://localhost:6060/api/dropdown/MEDICAL')
-            .then(r => r.json())
-            .then(data => populateDropdown('dropdown-medical', data, medicalSelected))
-            .catch(e => console.log('Using mock data for medical', e));
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load medical categories');
+                return r.json();
+            })
+            .then(data => {
+                console.log('Medical categories loaded:', data);
+                if (data && data.length > 0) {
+                    populateDropdown('dropdown-medical', data, medicalSelected);
+                } else {
+                    const mockData = [
+                        {id: 1, name: 'Category A'},
+                        {id: 2, name: 'Category B'},
+                        {id: 3, name: 'Category C'},
+                        {id: 4, name: 'Category D'}
+                    ];
+                    populateDropdown('dropdown-medical', mockData, medicalSelected);
+                }
+            })
+            .catch(e => {
+                console.error('Error loading medical:', e);
+                const mockData = [
+                    {id: 1, name: 'Category A'},
+                    {id: 2, name: 'Category B'},
+                    {id: 3, name: 'Category C'},
+                    {id: 4, name: 'Category D'}
+                ];
+                populateDropdown('dropdown-medical', mockData, medicalSelected);
+            });
 
+        // Load Establishment Types
         fetch('http://localhost:6060/api/dropdown/ESTABLISHMENT')
-            .then(r => r.json())
-            .then(data => populateDropdown('dropdown-estab', data, estabSelected))
-            .catch(e => console.log('Using mock data for estab', e));
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load establishment types');
+                return r.json();
+            })
+            .then(data => {
+                console.log('Establishment types loaded:', data);
+                if (data && data.length > 0) {
+                    populateDropdown('dropdown-estab', data, estabSelected);
+                } else {
+                    const mockData = [
+                        {id: 1, name: 'Type 1'},
+                        {id: 2, name: 'Type 2'},
+                        {id: 3, name: 'Type 3'},
+                        {id: 4, name: 'Type 4'}
+                    ];
+                    populateDropdown('dropdown-estab', mockData, estabSelected);
+                }
+            })
+            .catch(e => {
+                console.error('Error loading estab:', e);
+                const mockData = [
+                    {id: 1, name: 'Type 1'},
+                    {id: 2, name: 'Type 2'},
+                    {id: 3, name: 'Type 3'},
+                    {id: 4, name: 'Type 4'}
+                ];
+                populateDropdown('dropdown-estab', mockData, estabSelected);
+            });
     }
 
     // Generic function to load dropdown data from /api/dropdown/{type}
@@ -417,9 +634,20 @@
     // Function to reset form
     function resetForm() {
         // reset custom dropdown selections
-        gradingSelected = []; eduSelected = []; medicalSelected = []; estabSelected = [];
-        document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.dropdown-btn').forEach(btn => btn.innerText = 'Select Options');
+        gradingSelected = [];
+        eduSelected = [];
+        medicalSelected = [];
+        estabSelected = [];
+
+        // Update dropdown buttons
+        document.querySelectorAll('.dropdown-btn').forEach(btn => {
+            btn.innerText = 'Select Options';
+        });
+
+        // Reset checkboxes in dropdowns
+        document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
 
         // Reset date fields
         document.getElementById('commissionFrom').value = '';
@@ -492,6 +720,7 @@
         eduSelected = data.educationalQualifications ? data.educationalQualifications.map(id => Number(id)) : [];
         medicalSelected = data.medicalCategories ? data.medicalCategories.map(id => Number(id)) : [];
         estabSelected = data.establishmentTypes ? data.establishmentTypes.map(id => Number(id)) : [];
+
         // Reload dropdowns to reflect selections
         loadAllDropdowns();
 
