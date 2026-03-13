@@ -19,14 +19,6 @@
           height:100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-          width:256px;
-          background:linear-gradient(180deg,#1b4332 0%,#081c15 100%);
-          color:white;
-          padding:20px;
-        }
-
         .nav-item {
           display:block;
           padding:10px 0;
@@ -103,30 +95,22 @@
           cursor:pointer;
         }
     </style>
+
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 
 <div class="container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-section">
-                <div class="logo-icon">🛡️</div>
-                <div class="logo-text">
-                    <h1>ARMY HRMS</h1>
-                    <p>भारतीय सेना</p>
-                </div>
-            </div>
+    <script src="sidebar.js"></script>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
         </div>
-
-        <nav class="sidebar-nav">
-            <a href="/dashboard-new.html" class="nav-item">🏠 Dashboard</a>
-            <a href="/personnel-form.html" class="nav-item">👤 Personnel Data</a>
-            <a href="/coursepanel.html" class="nav-item">📋 Course Panel</a>
-            <a href="/remarks.html" class="nav-item">📋 Course Remarks Update</a>
-        </nav>
     </aside>
+    <!-- SIDEBAR -->
 
     <!-- MAIN -->
     <main class="main-content">
@@ -297,7 +281,122 @@ const generalRemarks = document.getElementById("generalRemarks").value.trim();
     });
 }
 
+    // Load sidebar dynamically
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/session.html');
+            const html = await response.text();
+            document.getElementById('sidebarContainer').innerHTML = html;
 
+            // After loading sidebar, initialize its functionality
+            initializeSidebar();
+        } catch (error) {
+            console.error('Error loading sidebar:', error);
+        }
+    }
+
+    function initializeSidebar() {
+        // Copy the sidebar JS logic here
+        const userId = sessionStorage.getItem("userId");
+        const token = sessionStorage.getItem("token");
+
+        if (!userId) {
+            window.location.replace("/login.html");
+            return;
+        }
+
+        // Load dynamic menu items
+        fetch(`http://localhost:6060/api/users/${userId}/permissions`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => {
+                const container = document.querySelector("#sidebarContainer .sidebar-nav");
+                if (!container) return;
+
+                let html = "";
+                data.modules.forEach(module => {
+                    const allowed = module.permissions.filter(p => p.allowed === true);
+                    if (allowed.length === 0) return;
+
+                    html += `<div class="nav-section-title">${module.moduleName}</div>`;
+
+                    allowed.forEach(perm => {
+                        let page = perm.url ? perm.url : "#";
+                        let icon = autoEmoji(perm.label, module.moduleName);
+                        html += `
+                    <a href="${page}" class="nav-item">
+                        <div class="nav-icon">${icon}</div>
+                        <span>${perm.label}</span>
+                    </a>
+                `;
+                    });
+                });
+                container.innerHTML = html;
+                highlightActivePage();
+            })
+            .catch(error => console.error('Error loading permissions:', error));
+
+        // Setup logout
+        const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                sessionStorage.clear();
+                window.location.replace("/login.html");
+            });
+        }
+    }
+
+    // Copy the autoEmoji function from your sidebar
+    const keywordEmojis = [
+        { key: "dashboard", icon: "📊" },
+        { key: "stat", icon: "📈" },
+        { key: "report", icon: "📄" },
+        { key: "chart", icon: "📉" },
+        { key: "command", icon: "🧭" },
+        { key: "personnel", icon: "👤" },
+        { key: "officer", icon: "🎖️" },
+        { key: "unit", icon: "🏢" },
+        { key: "location", icon: "📍" },
+        { key: "course", icon: "📚" },
+        { key: "training", icon: "🏋️" },
+        { key: "schedule", icon: "🗓️" },
+        { key: "attendance", icon: "📝" },
+        { key: "posting", icon: "📌" },
+        { key: "transfer", icon: "🔁" },
+        { key: "master", icon: "⚙️" },
+        { key: "setting", icon: "⚙️" },
+        { key: "config", icon: "🧩" },
+        { key: "export", icon: "📤" },
+        { key: "delete", icon: "🗑️" },
+        { key: "edit", icon: "✏️" },
+        { key: "add", icon: "➕" },
+        { key: "create", icon: "✍️" },
+        { key: "view", icon: "👁️" },
+        { key: "history", icon: "📜" },
+        { key: "print", icon: "🖨️" }
+    ];
+
+    function autoEmoji(label, moduleName) {
+        const text = (label + " " + moduleName).toLowerCase();
+        for (const item of keywordEmojis) {
+            if (text.includes(item.key)) {
+                return item.icon;
+            }
+        }
+        return "📁";
+    }
+
+    function highlightActivePage() {
+        const current = location.pathname.split('/').pop().split('?')[0];
+        document.querySelectorAll("#sidebarContainer .nav-item").forEach(item => {
+            const page = item.getAttribute("href").split('/').pop();
+            if (current === page) item.classList.add("active");
+        });
+    }
+
+    // Load sidebar when page loads
+    document.addEventListener("DOMContentLoaded", loadSidebar);
 </script>
 
 

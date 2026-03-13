@@ -10,5 +10,6 @@ public interface MasterDropdownService {
     List<String> getCivilQualificationDropdown();
     List<String> getSportsDropdown();
     List<Integer> getPostingDueMonthsDropdown();
+    List<String> getUnitDropdown();
 }
 

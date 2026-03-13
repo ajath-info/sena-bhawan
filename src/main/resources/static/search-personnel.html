@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Search - ARMY HRMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            min-height: 72px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffb703;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #52b788;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 0;
+        }
+
+        .nav-section-title {
+            padding: 16px 20px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #52b788;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffb703;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d6a4f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .user-info .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-info .role {
+            font-size: 12px;
+            color: #52b788;
+        }
+
+        .logout-btn {
+            cursor: pointer;
+            color: #ffffff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 24px;
+        }
+
+        /* ================= SEARCH SECTION ================= */
+        .search-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .search-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 4px rgba(27, 67, 50, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-btn {
+            padding: 14px 32px;
+            background: #1b4332;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: #2d6a4f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            padding: 14px 24px;
+            background: white;
+            color: #6b7280;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .clear-btn:hover {
+            background: #f8fafc;
+            border-color: #9ca3af;
+        }
+
+        /* ================= RESULTS AREA ================= */
+        .results-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .results-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .results-count strong {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .total-count {
+            background: #1b4332;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .data-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #4b5563;
+            white-space: nowrap;
+            background: white;
+        }
+
+        .data-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-warning {
+            background: #fef9c3;
+            color: #b45309;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            background: white;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .icon-btn.view {
+            color: #15803d;
+            border-color: #15803d;
+            background: #f0fdf4;
+        }
+
+        .icon-btn.edit {
+            color: #2563eb;
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ================= PAGINATION ================= */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn.active {
+            background: #1b4332;
+            color: white;
+            border-color: #1b4332;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ================= LOADING ================= */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 12px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #1b4332;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px !important;
+        }
+
+        .no-results-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+        }
+
+        .no-results-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .no-results-text {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* ================= TOAST ================= */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid #15803d;
+        }
+
+        .toast.error {
+            border-left: 4px solid #dc2626;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #b45309;
+        }
+
+        .toast.info {
+            border-left: 4px solid #2563eb;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ================= MODAL STYLES ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 16px 16px 0 0;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #fee2e2;
+            border: none;
+            color: #dc2626;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fecaca;
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Officer Profile Section */
+        .officer-profile {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .officer-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #1b4332;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            border: 4px solid #ffb703;
+            flex-shrink: 0;
+        }
+
+        .officer-avatar-large img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .officer-info-summary {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .summary-value.badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            width: fit-content;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .detail-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .detail-card:hover {
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card.full-width {
+            grid-column: span 3;
+        }
+
+        .detail-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1b4332;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Qualifications Table */
+        .qualifications-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .qualifications-table th {
+            text-align: left;
+            padding: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .qualifications-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+<div class="container">
+    <script src="sidebar.js"></script>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h2>Quick Search</h2>
+                <p>Search officers by name, army number, or any keyword</p>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-title">
+                    <span>🔍</span> Quick Search
+                </div>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input
+                                type="text"
+                                class="search-input"
+                                id="quickSearch"
+                                placeholder="Search by name, army number, rank, unit... (Press Enter to search)"
+                                autofocus
+                        >
+                    </div>
+                    <button class="search-btn" onclick="performSearch()" id="searchBtn">
+                        <span>🔍</span>
+                        Search
+                    </button>
+                    <button class="clear-btn" onclick="clearSearch()" id="clearBtn">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Area -->
+            <div class="results-area">
+                <div class="results-header">
+                    <div class="results-count" id="resultsCount">
+                        Enter search term to find officers
+                    </div>
+                    <div class="total-count" id="totalCount">
+                        Total: 0
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Army No</th>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>DOB</th>
+                            <th>Commission</th>
+                            <th>Seniority</th>
+                            <th>Unit</th>
+                            <th>Command</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" class="no-results">
+                                <div class="no-results-content">
+                                    <div class="no-results-icon">🔍</div>
+                                    <div class="no-results-title">Start Searching</div>
+                                    <div class="no-results-text">Type something in the search box above to find officers</div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+    // API Base URL
+    const API_BASE_URL = 'http://localhost:6060/api';
+
+    // Global state
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let totalItems = 0;
+    let totalPages = 0;
+    let debounceTimer;
+    let isLoading = false;
+    let currentSearchTerm = '';
+
+    // Logout function
+    function logout() {
+        sessionStorage.clear();
+        window.location.replace("/login.html");
+        return false;
+    }
+
+    // Perform search
+    async function performSearch(page = 1) {
+        const searchTerm = document.getElementById('quickSearch').value.trim();
+
+        if (!searchTerm) {
+            showToast('Please enter a search term', 'warning');
+            return;
+        }
+
+        if (isLoading) return;
+
+        try {
+            isLoading = true;
+            currentPage = page;
+            currentSearchTerm = searchTerm;
+
+            // Update button states
+            document.getElementById('searchBtn').disabled = true;
+            document.getElementById('searchBtn').innerHTML = '<span>⏳</span> Searching...';
+
+            showLoading(true);
+
+            // Build filter request with only search parameter
+            const filterRequest = {
+                search: searchTerm
+            };
+
+            const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(filterRequest)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const allData = data.data || [];
+                totalItems = allData.length;
+                totalPages = Math.ceil(totalItems / itemsPerPage);
+
+                const start = (currentPage - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const paginatedData = allData.slice(start, end);
+
+                renderTable(paginatedData);
+                updateResultsCount();
+                renderPagination();
+            } else {
+                showToast('Error fetching results', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            showToast('Error loading officer records', 'error');
+        } finally {
+            isLoading = false;
+            document.getElementById('searchBtn').disabled = false;
+            document.getElementById('searchBtn').innerHTML = '<span>🔍</span> Search';
+            showLoading(false);
+        }
+    }
+
+    // Clear search
+    function clearSearch() {
+        document.getElementById('quickSearch').value = '';
+        currentSearchTerm = '';
+        currentPage = 1;
+
+        // Clear table
+        document.getElementById('tableBody').innerHTML = `
+      <tr>
+        <td colspan="9" class="no-results">
+          <div class="no-results-content">
+            <div class="no-results-icon">🔍</div>
+            <div class="no-results-title">Start Searching</div>
+            <div class="no-results-text">Type something in the search box above to find officers</div>
+          </div>
+        </td>
+      </tr>
+    `;
+
+        document.getElementById('resultsCount').innerHTML = 'Enter search term to find officers';
+        document.getElementById('totalCount').innerHTML = 'Total: 0';
+        document.getElementById('pagination').innerHTML = '';
+
+        // Focus on search input
+        document.getElementById('quickSearch').focus();
+    }
+
+    // Render table
+    function renderTable(officers) {
+        const tbody = document.getElementById('tableBody');
+
+        if (!officers || officers.length === 0) {
+            tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="no-results">
+            <div class="no-results-content">
+              <div class="no-results-icon">😕</div>
+              <div class="no-results-title">No officers found</div>
+              <div class="no-results-text">Try searching with different keywords</div>
+            </div>
+          </td>
+        </tr>
+      `;
+            return;
+        }
+
+        let html = '';
+        officers.forEach(o => {
+            const dob = o.dateOfBirth ? new Date(o.dateOfBirth).toLocaleDateString('en-GB') : '—';
+            const doc = o.dateOfCommission ? new Date(o.dateOfCommission).toLocaleDateString('en-GB') : '—';
+            const dos = o.dateOfSeniority ? new Date(o.dateOfSeniority).toLocaleDateString('en-GB') : '—';
+
+            html += `
+        <tr>
+          <td><strong>${o.armyNo || '—'}</strong></td>
+          <td><span class="badge badge-info">${o.rank || '—'}</span></td>
+          <td>${o.fullName || '—'}</td>
+          <td>${dob}</td>
+          <td>${doc}</td>
+          <td>${dos}</td>
+          <td>${o.unit || '—'}</td>
+          <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
+          <td>
+            <div class="action-icons">
+              <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">👁️</div>
+              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">✏️</div>
+            </div>
+          </td>
+        </tr>
+      `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Update results count
+    function updateResultsCount() {
+        const countElement = document.getElementById('resultsCount');
+        const totalElement = document.getElementById('totalCount');
+
+        if (totalItems > 0) {
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, totalItems);
+            countElement.innerHTML = `Showing <strong>${start}-${end}</strong> of <strong>${totalItems}</strong> officers matching "${currentSearchTerm}"`;
+            totalElement.innerHTML = `Total: ${totalItems}`;
+        } else {
+            countElement.innerHTML = `No officers found for "${currentSearchTerm}"`;
+            totalElement.innerHTML = 'Total: 0';
+        }
+    }
+
+    // Render pagination
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = `
+      <div class="pagination-info">
+        Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of
+        <strong>${totalItems}</strong> officers
+      </div>
+      <div class="pagination-controls">
+    `;
+
+        html += `
+      <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+        ← Previous
+      </button>
+    `;
+
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+            if (startPage > 2) {
+                html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+          ${i}
+        </button>
+      `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
+            }
+            html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        html += `
+      <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+        Next →
+      </button>
+    `;
+
+        html += '</div>';
+        pagination.innerHTML = html;
+    }
+
+    // Change page
+    function changePage(page) {
+        if (page < 1 || page > totalPages || isLoading) return;
+        currentPage = page;
+        performSearch(page);
+    }
+
+    // View officer details (popup)
+    async function viewOfficer(id) {
+        try {
+            showLoading(true);
+            const response = await fetch(`${API_BASE_URL}/personnel/${id}`);
+            if (response.ok) {
+                const officer = await response.json();
+                showOfficerModal(officer);
+            } else {
+                showToast('Officer not found', 'error');
+            }
+        } catch (error) {
+            console.error('Error fetching officer:', error);
+            showToast('Error loading officer details', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Edit officer
+    function editOfficer(id) {
+        window.location.href = `/personnel-edit.html?id=${id}`;
+    }
+
+    // Show officer modal (same as before)
+    function showOfficerModal(officer) {
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.id = 'officerModal';
+
+        const formatDate = (dateStr) => {
+            if (!dateStr) return '—';
+            return new Date(dateStr).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        };
+
+        const getInitials = (name) => {
+            if (!name) return 'O';
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        };
+
+        const qualificationsHtml = officer.qualifications && officer.qualifications.length > 0 ? `
+      <div class="detail-card full-width">
+        <div class="detail-card-title">
+          <span>🎓</span> Educational Qualifications
+        </div>
+        <table class="qualifications-table">
+          <thead>
+            <tr>
+              <th>Qualification</th>
+              <th>Institution</th>
+              <th>Year</th>
+              <th>Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${officer.qualifications.map(q => `
+              <tr>
+                <td><strong>${q.qualification || '—'}</strong></td>
+                <td>${q.institution || '—'}</td>
+                <td>${q.yearOfCompletion || '—'}</td>
+                <td>${q.gradePercentage || '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : '';
+
+        const additionalQualHtml = officer.additionalQualifications && officer.additionalQualifications.length > 0 ? `
+      <div class="detail-card full-width">
+        <div class="detail-card-title">
+          <span>📋</span> Additional Qualifications
+        </div>
+        <table class="qualifications-table">
+          <thead>
+            <tr>
+              <th>Qualification</th>
+              <th>Issuing Authority</th>
+              <th>Year</th>
+              <th>Valid Till</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${officer.additionalQualifications.map(aq => `
+              <tr>
+                <td><strong>${aq.qualification || '—'}</strong></td>
+                <td>${aq.issuingAuthority || '—'}</td>
+                <td>${aq.year || '—'}</td>
+                <td>${formatDate(aq.validity)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : '';
+
+        const familyHtml = officer.familyMembers && officer.familyMembers.length > 0 ? `
+      <div class="detail-card full-width">
+        <div class="detail-card-title">
+          <span>👨‍👩‍👧‍👦</span> Family Members
+        </div>
+        <table class="qualifications-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Relationship</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${officer.familyMembers.map(fm => `
+              <tr>
+                <td><strong>${fm.name || '—'}</strong></td>
+                <td>${fm.relationship || '—'}</td>
+                <td>${fm.contactNumber || '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : '';
+
+        const decorationsHtml = officer.decorations && officer.decorations.length > 0 ? `
+      <div class="detail-card full-width">
+        <div class="detail-card-title">
+          <span>🏅</span> Decorations & Awards
+        </div>
+        <table class="qualifications-table">
+          <thead>
+            <tr>
+              <th>Award</th>
+              <th>Date</th>
+              <th>Citation</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${officer.decorations.map(d => `
+              <tr>
+                <td><strong>${d.decorationName || '—'}</strong></td>
+                <td>${formatDate(d.awardDate)}</td>
+                <td>${d.citation || '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : '';
+
+        modalOverlay.innerHTML = `
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>
+            <span>👤</span>
+            Officer Details: ${officer.armyNo || ''}
+          </h2>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="officer-profile">
+            <div class="officer-avatar-large">
+              ${officer.officerImage ?
+            `<img src="http://localhost:6060/${officer.officerImage}" alt="${officer.fullName}" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%231b4332%22%2F%3E%3Ctext%20x%3D%2260%22%20y%3D%2270%22%20font-size%3D%2248%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-family%3D%22Inter%22%3E${getInitials(officer.fullName)}%3C%2Ftext%3E%3C%2Fsvg%3E'">`
+            : getInitials(officer.fullName)
+        }
+            </div>
+            <div class="officer-info-summary">
+              <div class="summary-item">
+                <span class="summary-label">Full Name</span>
+                <span class="summary-value">${officer.fullName || '—'}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Rank</span>
+                <span class="summary-value badge badge-info">${officer.rank || '—'}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Army No</span>
+                <span class="summary-value">${officer.armyNo || '—'}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Medical Category</span>
+                <span class="summary-value badge ${officer.medicalCategory === 'S1' ? 'badge-success' : 'badge-gray'}">${officer.medicalCategory || '—'}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Date of Birth</span>
+                <span class="summary-value">${formatDate(officer.dateOfBirth)}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Date of Commission</span>
+                <span class="summary-value">${formatDate(officer.dateOfCommission)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>📋</span> Personal Details
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Place of Birth:</span>
+                  <span class="detail-value">${officer.placeOfBirth || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Religion:</span>
+                  <span class="detail-value">${officer.religion || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Marital Status:</span>
+                  <span class="detail-value">${officer.maritalStatus || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">PAN Card:</span>
+                  <span class="detail-value">${officer.panCard || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Aadhaar:</span>
+                  <span class="detail-value">${officer.aadhaarNumber || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>📞</span> Contact Details
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Mobile:</span>
+                  <span class="detail-value">${officer.mobileNumber || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Alternate:</span>
+                  <span class="detail-value">${officer.alternateMobile || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Email:</span>
+                  <span class="detail-value">${officer.emailAddress || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">NSG Email:</span>
+                  <span class="detail-value">${officer.nsgEmail || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>🏠</span> Address
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Address:</span>
+                  <span class="detail-value">${officer.permanentAddress || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">City/District:</span>
+                  <span class="detail-value">${officer.city || '—'} / ${officer.district || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">State:</span>
+                  <span class="detail-value">${officer.state || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Pin Code:</span>
+                  <span class="detail-value">${officer.pinCode || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>⚕️</span> Medical Information
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Medical Category:</span>
+                  <span class="detail-value">${officer.medicalCategory || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Medical Date:</span>
+                  <span class="detail-value">${formatDate(officer.medicalDate)}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Injury Category:</span>
+                  <span class="detail-value">${officer.injuryCategory || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>📅</span> Service Details
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Commission Type:</span>
+                  <span class="detail-value">${officer.commissionType || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">IRS Transfer:</span>
+                  <span class="detail-value">${officer.irsTransfer || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">CDA Account:</span>
+                  <span class="detail-value">${officer.cdaAccountNo || '—'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">NRS:</span>
+                  <span class="detail-value">${officer.nrs || '—'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>⚽</span> Sports
+              </div>
+              <div class="detail-content">
+                ${officer.sports && officer.sports.length > 0 ?
+            officer.sports.map(sport => `
+                    <div class="detail-row">
+                      <span class="detail-value">${sport}</span>
+                    </div>
+                  `).join('') :
+            '<div class="detail-row"><span class="detail-value">—</span></div>'
+        }
+              </div>
+            </div>
+          </div>
+
+          ${qualificationsHtml}
+          ${additionalQualHtml}
+          ${familyHtml}
+          ${decorationsHtml}
+
+          <div class="details-grid" style="margin-top: 16px;">
+            <div class="detail-card">
+              <div class="detail-card-title">
+                <span>⏰</span> Record Information
+              </div>
+              <div class="detail-content">
+                <div class="detail-row">
+                  <span class="detail-label">Created:</span>
+                  <span class="detail-value">${formatDate(officer.createdAt)}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Last Updated:</span>
+                  <span class="detail-value">${formatDate(officer.updatedAt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+        document.body.appendChild(modalOverlay);
+
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('officerModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    function showLoading(show) {
+        // You can add a loading spinner if needed
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+      <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+      <span>${message}</span>
+    `;
+
+        document.getElementById('toastContainer').appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('quickSearch');
+
+        // Add enter key listener
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Auto-focus on search input
+        searchInput.focus();
+    });
+</script>
+</body>
+</html>

@@ -53,7 +53,7 @@ public interface PersonnelService {
 
     void updateOfficerImage(Long id, MultipartFile image);
 
-    List<Personnel> filterPersonnel(PersonnelFilterRequest filter);
+    List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
 
     OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId);
 

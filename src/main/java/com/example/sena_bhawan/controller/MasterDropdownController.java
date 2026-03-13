@@ -32,6 +32,12 @@ public class MasterDropdownController {
         return ResponseEntity.ok(service.getAreaTypeDropdown());
     }
 
+    @GetMapping("/unit")
+    public ResponseEntity<List<String>> getAreaUnitDropdown() {
+        return ResponseEntity.ok(service.getUnitDropdown());
+    }
+
+
     // ================= CIVIL QUALIFICATION =================
     @GetMapping("/civil-qualification")
     public ResponseEntity<List<String>> getCivilQualificationDropdown() {

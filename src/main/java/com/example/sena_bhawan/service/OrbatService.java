@@ -7,14 +7,14 @@ import java.util.List;
 
 public interface OrbatService {
 
-    OrbatStructure createFormation(OrbatCreateRequest request);
+//    OrbatStructure createFormation(OrbatCreateRequest request);
 
     Object getDropdown(String type, Long parentId);
 
     OrbatTreeResponse getOrbatTree();
 
-    List<String> getDistinctSosNumbers();
+    List<String> getDistinctSusNumbers();
 
-    List<OrbatStructure> getSosList();
+    List<OrbatStructure> getSusList();
 
 }

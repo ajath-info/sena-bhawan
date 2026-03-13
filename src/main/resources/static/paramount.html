@@ -206,14 +206,20 @@
           padding:10px;
         }
     </style>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 
 <div class="container">
-
-    <!-- SIDEBAR -->
-    <div id="sidebar"></div>
+    <script src="sidebar.js"></script>
+    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
+        </div>
+    </aside>
 
     <!-- MAIN CONTENT AREA -->
     <main class="main-content">
@@ -386,27 +392,6 @@
 </div>
 
 <script>
-    /* ===== LOAD SIDEBAR ===== */
-    fetch("sidebar.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("sidebar").innerHTML = html;
-
-        document.getElementById("logoutBtn")
-          ?.addEventListener("click", () => {
-            sessionStorage.clear();
-            window.location.replace("/login.html");
-          });
-
-        const currentPage = location.pathname.split('/').pop();
-        document.querySelectorAll('.sidebar-nav a')
-          .forEach(link => {
-            if (link.getAttribute('href').includes(currentPage)) {
-              link.classList.add('active');
-            }
-          });
-    });
-
     /* ===== LOAD PERSONNEL DROPDOWN ===== */
     async function loadPersonnelDropdown() {
       const res = await fetch("http://localhost:6060/api/personnel");

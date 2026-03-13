@@ -1,4 +1,3 @@
-<<<<<<<< HEAD:src/main/resources/static/sidebar.jsp
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -336,7 +335,7 @@
 
       <div class="nav-section-title">Administration</div>
 
-      <a href="/role-permmissoon.html" class="nav-item">
+      <a href="/role-permission.html" class="nav-item">
         <div class="nav-icon">🔐</div>
         <span>Role & Permissions</span>
       </a>
@@ -1385,4 +1384,3 @@
 </script>
 </body>
 </html>
->>>>>>>> dev-karan:target/classes/static/dashboard-new.html

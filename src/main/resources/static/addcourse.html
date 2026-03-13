@@ -204,73 +204,17 @@
       color: white;
     }
   </style>
+  <link rel="stylesheet" href="sidebar.css">
 </head>
 
 <body>
 <div class="container">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">🛡️</div>
-        <div class="logo-text">
-          <h1>ARMY HRMS</h1>
-          <p>भारतीय सेना</p>
-        </div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-title">Main Menu</div>
-
-      <a href="/dashboard-new.html" class="nav-item">🏠 Dashboard</a>
-      <a href="/dashboard-officers.html" class="nav-item">🏠 Dashboard Officers</a>
-      <a href="/dashboard-training.html" class="nav-item">🏠 Dashboard Training</a>
-      <a href="/filter.html" class="nav-item">🔍 Master Filter & Search</a>
-
-      <div class="nav-section-title">Administration</div>
-      <a href="/role-permmissoon.html" class="nav-item">🔐 Role & Permissions</a>
-
-      <div class="nav-section-title">Masters</div>
-      <a href="/course-master.html" class="nav-item active">📚 Course Master</a>
-      <a href="/grade-awards.html" class="nav-item">📝 Grade & Awards</a>
-      <a href="/course-schedule.html" class="nav-item">📅 Course Schedule</a>
-      <a href="/location-master.html" class="nav-item">📍 Location Master</a>
-      <a href="/rank-master.html" class="nav-item">🏅 Rank Master</a>
-      <a href="/unit-master.html" class="nav-item">🛡️ Unit Master</a>
-
-      <div class="nav-section-title">Forms</div>
-      <a href="/personnel-form.html" class="nav-item">👤 Personnel Data Form</a>
-      <a href="/coursepanel.html" class="nav-item">📋 Course Panel</a>
-
-      <a href="/orbat.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>Orbit Generation Form</span>
-      </a>
-
-      <a href="/add-new-user.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>New User Form</span>
-      </a>
-
-      <a href="/legal-disciplinary.html" class="nav-item">
-        <div class="nav-icon">📋</div>
-        <span>Legal And Disciplinary Form</span>
-      </a>
-
-      <a href="/course-posting-form.html" class="nav-item">📝 Course & Posting Form</a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="user-avatar">AD</div>
-        <div class="user-info">
-          <div class="name">Admin User</div>
-          <div class="role">HQ Command</div>
-        </div>
-        <div>🚪</div>
-      </div>
+  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+  <aside class="sidebar" id="sidebarContainer">
+    <!-- Loading indicator (optional) -->
+    <div style="color: white; padding: 20px; text-align: center;">
+      Loading menu...
     </div>
   </aside>
 
@@ -354,6 +298,6 @@
     });
   });
 </script>
-
+<script src="sidebar.js"></script>
 </body>
 </html>

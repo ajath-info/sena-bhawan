@@ -427,70 +427,16 @@
         color: #3b82f6;
       }
     </style>
+
+    <link rel="stylesheet" href="sidebar.css">
   </head>
   <body>
     <div class="container">
-      <aside class="sidebar">
-        <div class="sidebar-header">
-          <div class="logo-section">
-            <div class="logo-icon">🛡️</div>
-            <div class="logo-text">
-              <h1>ARMY HRMS</h1>
-              <p>भारतीय सेना</p>
-            </div>
-          </div>
-          <div class="menu-icon"><span></span><span></span><span></span></div>
-        </div>
-        <nav class="sidebar-nav">
-          <div class="nav-section-title">Main Menu</div>
-          <div class="nav-item active">
-            <div class="nav-icon">🏠</div>
-            <span>Dashboard</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📋</div>
-            <span>Course Planning</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📊</div>
-            <span>Strength Analysis</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📅</div>
-            <span>Annual Calendar</span>
-          </div>
-          <div class="nav-section-title">Operations</div>
-          <div class="nav-item">
-            <div class="nav-icon">🎓</div>
-            <span>Course Schedule</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">👥</div>
-            <span>Officer Database</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📍</div>
-            <span>Posting Planning</span>
-          </div>
-          <div class="nav-section-title">Reports</div>
-          <div class="nav-item">
-            <div class="nav-icon">📄</div>
-            <span>Planning Reports</span>
-          </div>
-          <div class="nav-item">
-            <div class="nav-icon">📈</div>
-            <span>Analytics</span>
-          </div>
-        </nav>
-        <div class="sidebar-footer">
-          <div class="user-profile">
-            <div class="user-avatar">CP</div>
-            <div class="user-info">
-              <div class="name">Col Prakash</div>
-              <div class="role">Planning Division</div>
-            </div>
-            <div>🚪</div>
-          </div>
+      <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+      <aside class="sidebar" id="sidebarContainer">
+        <!-- Loading indicator (optional) -->
+        <div style="color: white; padding: 20px; text-align: center;">
+          Loading menu...
         </div>
       </aside>
 
@@ -814,5 +760,7 @@
         </div>
       </main>
     </div>
+
+    <script src="sidebar.js"></script>
   </body>
 </html>

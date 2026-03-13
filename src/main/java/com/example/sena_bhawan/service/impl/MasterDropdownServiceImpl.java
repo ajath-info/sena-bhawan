@@ -10,17 +10,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MasterDropdownServiceImpl implements MasterDropdownService {
-
-    private final MedicalCategoryMasterRepository medicalRepo;
     private final EstablishmentTypeMasterRepository estRepo;
-    private final AreaTypeMasterRepository areaRepo;
-    private final CivilQualificationMasterRepository civilRepo;
-    private final SportsMasterRepository sportsRepo;
     private final PostingDueMonthsMasterRepository postingRepo;
+    private final PersonnelRepository personnelRepository;
+    private final OrbatStructureRepository orbatStructureRepository;
+    private final PersonnelAdditionalQualificationsRepository personnelAdditionalQualificationsRepository;
+    private final PersonnelSportsRepository personnelSportsRepository;
 
     @Override
     public List<String> getMedicalCategoryDropdown() {
-        return medicalRepo.findActiveMedicalCategories();
+        return personnelRepository.getMedicalCategory();
     }
 
     @Override
@@ -30,17 +29,22 @@ public class MasterDropdownServiceImpl implements MasterDropdownService {
 
     @Override
     public List<String> getAreaTypeDropdown() {
-        return areaRepo.findActiveAreaTypes();
+        return orbatStructureRepository.getAllAreaType();
+    }
+
+    @Override
+    public List<String> getUnitDropdown() {
+        return orbatStructureRepository.findAllUnitNames();
     }
 
     @Override
     public List<String> getCivilQualificationDropdown() {
-        return civilRepo.findActiveQualifications();
+        return personnelAdditionalQualificationsRepository.additionalQualificationList();
     }
 
     @Override
     public List<String> getSportsDropdown() {
-        return sportsRepo.findActiveSports();
+        return personnelSportsRepository.additionalQualificationList();
     }
 
     @Override

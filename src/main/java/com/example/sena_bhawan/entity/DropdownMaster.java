@@ -23,6 +23,9 @@ public class DropdownMaster {
     @Column(nullable = false)
     private String name;
 
+    @Column(length = 50)
+    private String code;
+
     @Column(nullable = false)
     private Integer status = 0;   // 0 = Active
 

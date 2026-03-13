@@ -50,6 +50,7 @@ public class CreatePersonnelRequest {
     public List<DecorationDTO> decorations;
     public List<QualificationDTO> qualifications;
     public List<AdditionalQualificationDTO> additionalQualifications;
+    public List<SportsDTO> sports;
     public List<FamilyDTO> family;
 
 
@@ -81,6 +82,12 @@ public class CreatePersonnelRequest {
         public String issuingAuthority;
         public Integer year;
         public LocalDate validity;
+    }
+
+    public static class SportsDTO {
+        public String sportName;
+        public String level;
+        public String remarks;
     }
 
     public static class FamilyDTO {

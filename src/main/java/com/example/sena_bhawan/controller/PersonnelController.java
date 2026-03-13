@@ -293,12 +293,7 @@ public class PersonnelController {
     public ResponseEntity<?> filterPersonnel(
             @RequestBody PersonnelFilterRequest filterRequest) {
 
-        List<Personnel> personnelList = personnelService.filterPersonnel(filterRequest);
-
-        // Transform to DTOs
-        List<PersonnelListDTO> responseList = personnelList.stream()
-                .map(PersonnelListDTO::fromPersonnel)
-                .collect(Collectors.toList());
+        List<PersonnelListDTO> responseList = personnelService.filterPersonnel(filterRequest);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");

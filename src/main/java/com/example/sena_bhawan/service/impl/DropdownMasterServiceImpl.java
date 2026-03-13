@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.service.impl;
 
 import com.example.sena_bhawan.dto.DropdownDTO;
+import com.example.sena_bhawan.entity.DropdownMaster;
 import com.example.sena_bhawan.repository.DropdownMasterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,9 @@ public class DropdownMasterServiceImpl implements MasterDropdownService{
     DropdownMasterRepository dropdownMasterRepository;
 
     public List<DropdownDTO> getByType(String type) {
-        return dropdownMasterRepository.findByTypeAndStatus(type, 0)
+        return dropdownMasterRepository.findByTypeIgnoreCaseAndStatusOrderByIdAsc(type, 1)
                 .stream()
                 .map(d -> new DropdownDTO(d.getId(), d.getName()))
-                .collect(Collectors.toList());
+                .toList();
     }
 }
