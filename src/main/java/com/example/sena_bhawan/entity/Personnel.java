@@ -35,6 +35,7 @@ public class Personnel {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String placeOfBirth;
+    private String caseType;
     private String officerImage;
 
     private String nrs;
@@ -98,6 +99,10 @@ public class Personnel {
     @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PersonnelFamily> familyMembers;
+
+    @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PersonnelMedicalDetails> medicalDetails;
 
     public Personnel(Long personnelId) {
     }

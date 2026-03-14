@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "personnel_sports")
 @Data
@@ -18,7 +20,9 @@ public class PersonnelSports {
 
     public String sportName;
     public String level;
-    public String remarks;
+    public String achievements;
+
+    private LocalDate createdAt;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")

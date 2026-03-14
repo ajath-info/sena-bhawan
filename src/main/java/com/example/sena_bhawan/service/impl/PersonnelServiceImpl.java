@@ -214,11 +214,13 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setDateOfSeniority(req.dateOfSeniority);
         p.setDateOfBirth(req.dateOfBirth);
         p.setPlaceOfBirth(req.placeOfBirth);
+        p.setCaseType(req.caseType);
+        p.setGender(req.gender);
 
+        // Image handling
         if (officerImage != null && !officerImage.isEmpty()) {
             String imagePath = saveOfficerImage(officerImage);
             p.setOfficerImage(imagePath);
-
         }
 
         // Service
@@ -242,29 +244,14 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setEmailAddress(req.emailAddress);
         p.setNsgEmail(req.nsgEmail);
 
-
-        // Medical
-//        p.setMedicalS(req.medicalS);
-//        p.setMedicalH(req.medicalH);
-//        p.setMedicalA(req.medicalA);
-//        p.setMedicalP(req.medicalP);
-//        p.setMedicalE(req.medicalE);
-
-        // Medical
+        // Medical basic info
         p.setMedicalCategory(req.medicalCategory);
-        p.setMedicalDate(req.medicalDate);
-        p.setDiagnosis(req.diagnosis);
-        p.setReviewDate(req.reviewDate);
-        p.setRestriction(req.restriction);
-        p.setInjuryCategory(req.injuryCategory);
-        p.setIrsTransfer(req.irsTransfer);
-
         p.setMedicalRemark(req.medicalRemark);
 
         p.setCreatedAt(LocalDateTime.now());
         p.setUpdatedAt(LocalDateTime.now());
 
-
+        // Handle Decorations
         if (req.decorations != null) {
             p.setDecorations(req.decorations.stream().map(d -> {
                 PersonnelDecorations deco = new PersonnelDecorations();
@@ -278,11 +265,12 @@ public class PersonnelServiceImpl implements PersonnelService {
             }).collect(Collectors.toList()));
         }
 
-        // Qualifications
+        // Handle Qualifications
         if (req.qualifications != null) {
             p.setQualifications(req.qualifications.stream().map(q -> {
                 PersonnelQualifications pq = new PersonnelQualifications();
                 pq.setQualification(q.qualification);
+                pq.setStream(q.stream);
                 pq.setInstitution(q.institution);
                 pq.setYearOfCompletion(q.yearOfCompletion);
                 pq.setGradePercentage(q.gradePercentage);
@@ -292,13 +280,17 @@ public class PersonnelServiceImpl implements PersonnelService {
             }).collect(Collectors.toList()));
         }
 
-        // Additional Qualifications
+        // Handle Additional Qualifications
         if (req.additionalQualifications != null) {
             p.setAdditionalQualifications(req.additionalQualifications.stream().map(a -> {
                 PersonnelAdditionalQualifications aq = new PersonnelAdditionalQualifications();
                 aq.setQualification(a.qualification);
                 aq.setIssuingAuthority(a.issuingAuthority);
                 aq.setYear(a.year);
+                aq.setAuthorityNo(a.authorityNo);
+                aq.setLocation(a.location);
+                aq.setPart2OrderNo(a.part2OrderNo);
+                aq.setOrderDate(a.orderDate);
                 aq.setValidity(a.validity);
                 aq.setPersonnel(p);
                 aq.setCreatedAt(LocalDate.now());
@@ -306,31 +298,50 @@ public class PersonnelServiceImpl implements PersonnelService {
             }).collect(Collectors.toList()));
         }
 
-        // Personnel Sports
-        p.setSports(
-                req.sports.stream().map(a -> {
-                    PersonnelSports ps = new PersonnelSports();
-                    ps.setSportName(a.sportName);
-                    ps.setLevel(a.level);
-                    ps.setRemarks(a.remarks);
-                    ps.setPersonnel(p);
-                    return ps;
-                }).collect(Collectors.toList())
-        );
+        // Handle Sports
+        if (req.sports != null) {
+            p.setSports(req.sports.stream().map(s -> {
+                PersonnelSports ps = new PersonnelSports();
+                ps.setSportName(s.sportName);
+                ps.setLevel(s.level);
+                ps.setAchievements(s.achievements);
+                ps.setPersonnel(p);
+                ps.setCreatedAt(LocalDate.now());
+                return ps;
+            }).collect(Collectors.toList()));
+        }
 
-        // Family
+        // Handle Family
         if (req.family != null) {
             p.setFamilyMembers(req.family.stream().map(f -> {
                 PersonnelFamily fam = new PersonnelFamily();
                 fam.setName(f.name);
                 fam.setRelationship(f.relationship);
                 fam.setContactNumber(f.contactNumber);
+                fam.setPart2OrderNo(f.part2OrderNo);
+                fam.setOrderDate(f.orderDate);
                 fam.setPersonnel(p);
                 fam.setCreatedAt(LocalDateTime.now());
                 return fam;
             }).collect(Collectors.toList()));
         }
 
+        // Handle Medical Details
+        if (req.medical != null && req.medical.medicalDetails != null) {
+            p.setMedicalDetails(req.medical.medicalDetails.stream().map(m -> {
+                PersonnelMedicalDetails md = new PersonnelMedicalDetails();
+                md.setMedicalCategory(m.category);
+                md.setMedicalValue(m.value);
+                md.setType(m.type);
+                md.setPeriod(m.period);
+                md.setRemark(m.remark);
+                md.setPersonnel(p);
+                md.setCreatedAt(LocalDateTime.now());
+                return md;
+            }).collect(Collectors.toList()));
+        }
+
+        // Save once - cascade will handle all children
         return personnelRepository.save(p).getId();
     }
 
@@ -759,14 +770,14 @@ public class PersonnelServiceImpl implements PersonnelService {
 
                 sport.setSportName(r.sportName);
                 sport.setLevel(r.level);
-                sport.setRemarks(r.remarks);
+                sport.setAchievements(r.remarks);
 
             } else {
                 // ADD NEW
                 PersonnelSports sport = new PersonnelSports();
                 sport.setSportName(r.sportName);
                 sport.setLevel(r.level);
-                sport.setRemarks(r.remarks);
+                sport.setAchievements(r.remarks);
 
                 sport.setPersonnel(personnel);
                 existing.add(sport);

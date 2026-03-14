@@ -21,6 +21,10 @@ public class PersonnelAdditionalQualifications {
 
     private String qualification;
     private String issuingAuthority;
+    private String authorityNo;
+    private String location;
+    private String part2OrderNo;
+    private LocalDate orderDate;
     private Integer year;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate validity;
