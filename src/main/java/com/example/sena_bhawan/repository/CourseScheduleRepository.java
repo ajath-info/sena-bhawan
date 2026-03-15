@@ -26,10 +26,10 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query("""
         SELECT cs FROM CourseSchedule cs
-        WHERE cs.course.srno = :courseId
+        WHERE cs.scheduleId = :scheduleId
         ORDER BY cs.startDate DESC
         """)
-    List<CourseSchedule> findByCourseId(@Param("courseId") Integer courseId);
+    CourseSchedule findByScheduleId(@Param("scheduleId") Integer scheduleId);
 
     // Count ongoing courses (current date between start_date and end_date)
     @Query("SELECT COUNT(c) FROM CourseSchedule c " +

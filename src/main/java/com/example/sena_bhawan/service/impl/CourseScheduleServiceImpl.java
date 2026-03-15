@@ -71,23 +71,20 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
 
     @Override
-    public Step2PanelStrengthDTO getPanelStrength(Integer courseId) {
+    public Step2PanelStrengthDTO getPanelStrength(Integer scheduleId) {
 
         // Step-1 validation
-        if (courseId == null) {
+        if (scheduleId == null) {
             throw new IllegalArgumentException("Course ID is required");
         }
 
         // Latest / active schedule fetch
-        List<CourseSchedule> schedules =
-                scheduleRepository.findByCourseId(courseId);
+        CourseSchedule schedule = scheduleRepository.findByScheduleId(scheduleId);
 
-        if (schedules.isEmpty()) {
+        if (schedule == null) {
             throw new RuntimeException(
-                    "No course schedule found for courseId: " + courseId);
+                    "No course schedule found for courseId: " + scheduleId);
         }
-
-        CourseSchedule schedule = schedules.get(0);
 
         // 🔴 course_strength STRING from DB
         String strengthStr = schedule.getCourseStrength();
@@ -111,7 +108,8 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
         // DTO response
         Step2PanelStrengthDTO dto = new Step2PanelStrengthDTO();
-        dto.setCourseId(courseId);
+        dto.setCourseId(schedule.getCourse().getSrno());
+        dto.setScheduleId(scheduleId);
         dto.setCourseStrength(strengthStr); // STRING
         dto.setBuffer(BUFFER_SIZE);
         dto.setPanelSize(panelSize);
@@ -157,8 +155,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
     @Override
     public List<CourseStep1DTO> getStep1Courses() {
 
-        List<CourseSchedule> schedules =
-                scheduleRepository.findCurrentAndUpcoming();
+        List<CourseSchedule> schedules = scheduleRepository.findCurrentAndUpcoming();
 
         return schedules.stream()
                 .map(cs -> new CourseStep1DTO(

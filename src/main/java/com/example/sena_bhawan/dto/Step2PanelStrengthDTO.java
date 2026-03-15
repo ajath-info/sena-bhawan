@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Step2PanelStrengthDTO {
-
+    private Integer scheduleId;
     private Integer courseId;
     private String courseStrength;   // STRING
     private Integer buffer;

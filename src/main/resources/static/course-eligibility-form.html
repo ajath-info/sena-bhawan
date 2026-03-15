@@ -202,7 +202,7 @@
 
             <!-- Units Selection -->
             <div class="card mt">
-                <div class="card-title">🏢 Select Units / Arms / Services</div>
+                <div class="card-title">🏢 Select Arms / Services</div>
                 <div class="rank-list" id="unitList">Loading units…</div>
             </div>
 
@@ -213,7 +213,6 @@
             </div>
 
             <!-- Multi-select Dropdowns using /api/dropdown/{type} -->
-            <!-- Multi-select Dropdowns using custom dropdown style -->
             <div class="grid-2 mt">
                 <div>
                     <label class="label">Minimum Course Grading</label>
@@ -638,6 +637,7 @@
         eduSelected = [];
         medicalSelected = [];
         estabSelected = [];
+        selectedRankIds = [];
 
         // Update dropdown buttons
         document.querySelectorAll('.dropdown-btn').forEach(btn => {
@@ -668,6 +668,9 @@
             cb.checked = false;
         });
         document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+        document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
             cb.checked = false;
         });
 
@@ -742,7 +745,7 @@
 
         // Ranks
         if (data.rankIds && data.rankIds.length > 0) {
-            selectedRankIds = data.rankIds;
+            selectedRankIds = data.rankIds.map(id => Number(id)); // Ensure numbers
             document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
                 cb.checked = selectedRankIds.includes(Number(cb.value));
             });
@@ -820,7 +823,7 @@
 
     // Load Ranks
     function loadRanks() {
-        fetch('http://localhost:6060/api/ranks/master')
+        fetch('http://localhost:6060/api/dropdown/RANK')
             .then(response => {
                 if (!response.ok) throw new Error('Failed to load ranks');
                 return response.json();
@@ -829,6 +832,11 @@
                 const rankList = document.getElementById('rankList');
                 rankList.innerHTML = '';
 
+                if (!ranks || ranks.length === 0) {
+                    rankList.innerHTML = '<div style="padding: 10px; color: #666;">No ranks available</div>';
+                    return;
+                }
+
                 ranks.forEach(rank => {
                     const label = document.createElement('label');
                     label.className = 'rank-item';
@@ -836,6 +844,8 @@
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.value = rank.id;
+                    checkbox.checked = selectedRankIds.includes(rank.id);
+
                     checkbox.addEventListener('change', function() {
                         if (this.checked) {
                             if (!selectedRankIds.includes(rank.id)) {
@@ -847,13 +857,16 @@
                     });
 
                     label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${rank.rank}`));
+                    label.appendChild(document.createTextNode(` ${rank.name}`)); // Changed from rank.rank to rank.name
                     rankList.appendChild(label);
                 });
             })
             .catch(error => {
                 console.error('Error loading ranks:', error);
-                document.getElementById('rankList').innerHTML = 'Failed to load ranks';
+                document.getElementById('rankList').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load ranks</div>';
+
+                // Optional: Add mock data for testing
+                addMockRanks();
             });
     }
 

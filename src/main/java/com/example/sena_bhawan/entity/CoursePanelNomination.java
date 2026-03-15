@@ -32,5 +32,5 @@ public class CoursePanelNomination {
     private Long personnelId;
 
     @Column(name = "attendance_status", nullable = false, length = 20)
-    private String attendanceStatus; // ATTENDING / NOT_ATTENDING
+    private String attendanceStatus; // Reserve / Retain
 }

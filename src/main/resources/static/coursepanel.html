@@ -1864,41 +1864,93 @@ document.head.appendChild(style);
     }
 
     // ===============================
-// MODIFIED STEP NAVIGATION - Check for duplicates before proceeding
-// ===============================
-nextNav.addEventListener('click', () => {
-    // First validate current step
-    if (!validateCurrentStep()) {
-        return;
-    }
-
-    // Check for duplicate serial numbers when trying to go to next step
-    if (currentStep === 4) {
-        const serialInputs = document.querySelectorAll('#finalApprovalTableBody input[type="number"]');
-        const duplicateInputs = Array.from(serialInputs).filter(input => input.dataset.isDuplicate === 'true');
-
-        if (duplicateInputs.length > 0) {
-            alert(`Please fix duplicate serial numbers (${duplicateInputs.length} duplicate(s) found) before proceeding.`);
-
-            duplicateInputs.forEach(input => {
-                input.style.border = '2px solid #ef4444';
-                input.style.animation = 'shake 0.5s';
-
-                setTimeout(() => {
-                    input.style.animation = '';
-                }, 500);
-            });
-
+    // MODIFIED STEP NAVIGATION - Check for duplicates before proceeding
+    // ===============================
+    nextNav.addEventListener('click', async () => {
+        // First validate current step
+        if (!validateCurrentStep()) {
             return;
         }
-    }
 
-    // If all validations pass, proceed
-    if (currentStep < TOTAL_STEPS) {
-        currentStep++;
-        renderStep();
-    }
-});
+        // Check for duplicate serial numbers when trying to go to next step
+        if (currentStep === 4) {
+            const serialInputs = document.querySelectorAll('#finalApprovalTableBody input[type="number"]');
+            const duplicateInputs = Array.from(serialInputs).filter(input => input.dataset.isDuplicate === 'true');
+
+            if (duplicateInputs.length > 0) {
+                alert(`Please fix duplicate serial numbers (${duplicateInputs.length} duplicate(s) found) before proceeding.`);
+
+                duplicateInputs.forEach(input => {
+                    input.style.border = '2px solid #ef4444';
+                    input.style.animation = 'shake 0.5s';
+
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                });
+
+                return;
+            }
+        }
+
+        // If on step 3, update all statuses before proceeding
+        if (currentStep === 3) {
+            const scheduleId = sessionStorage.getItem("scheduleId");
+
+            if (scheduleId && selectedSet.size > 0) {
+                // Show loading indicator
+                showLoading(true);
+
+                try {
+                    // Build status updates from statusMap
+                    const statusUpdates = [];
+                    statusMap.forEach((status, personnelId) => {
+                        statusUpdates.push({
+                            personnelId: personnelId,
+                            attendanceStatus: status
+                        });
+                    });
+
+                    const payload = {
+                        scheduleId: parseInt(scheduleId),
+                        statusUpdates: statusUpdates
+                    };
+
+                    console.log("Updating statuses:", payload);
+
+                    // Call the API to update statuses
+                    const response = await fetch('http://localhost:6060/api/course-panel/status', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log("Status update result:", result);
+                        showToast(`Updated ${result.updatedCount} officer statuses`, 'success');
+                    } else {
+                        const errorText = await response.text();
+                        console.error("Failed to update statuses:", errorText);
+                        showToast("Failed to update some statuses", 'error');
+                    }
+                } catch (error) {
+                    console.error("Error updating statuses:", error);
+                    showToast("Error updating officer statuses", 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        }
+
+        // If all validations pass, proceed
+        if (currentStep < TOTAL_STEPS) {
+            currentStep++;
+            renderStep();
+        }
+    });
 
     prevNav.addEventListener('click', () => {
         if (currentStep > 1) {
@@ -2057,7 +2109,7 @@ nextNav.addEventListener('click', () => {
         courseSelect.addEventListener("change", async function () {
             const selectedOption = this.options[this.selectedIndex];
             const scheduleId = this.value;
-            const courseId = selectedOption.dataset.courseId;
+            const courseId = selectedOption.dataset.courseId; // Get courseId from dataset
 
             if (!scheduleId) {
                 sessionStorage.clear();
@@ -2068,20 +2120,24 @@ nextNav.addEventListener('click', () => {
             document.getElementById("courseStartDate").value = selectedOption.dataset.startDate;
             document.getElementById("courseEndDate").value = selectedOption.dataset.endDate;
 
-            // Load course strength for step 2
-            loadStep2PanelStrength(courseId);
+            // Load course strength for step 2 using scheduleId
+            loadStep2PanelStrength(scheduleId);
 
             // Reset approval flag when course changes
             sessionStorage.removeItem("panelSentForApproval");
 
-            // NEW: Fetch eligibility criteria and apply filters automatically
+            // Fetch eligibility criteria using courseId (not scheduleId)
             if (courseId) {
                 try {
                     showLoading(true);
-                    // Call eligibility API
+                    // Call eligibility API with courseId
                     const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/course/${courseId}`);
-                    const eligibilityData = await eligibilityResponse.json();
 
+                    if (!eligibilityResponse.ok) {
+                        throw new Error(`Eligibility API failed with status: ${eligibilityResponse.status}`);
+                    }
+
+                    const eligibilityData = await eligibilityResponse.json();
                     console.log("Eligibility data:", eligibilityData);
 
                     // Transform eligibility data to filter request format
@@ -2122,12 +2178,13 @@ nextNav.addEventListener('click', () => {
                     }
                 } catch (error) {
                     console.error("Error fetching eligibility or filters:", error);
-                    showToast("Error loading eligible officers", 'error');
+                    showToast("Error loading eligible officers: " + error.message, 'error');
                 } finally {
                     showLoading(false);
                 }
             }
         });
+
     });
 
     // ===============================
@@ -2189,14 +2246,19 @@ nextNav.addEventListener('click', () => {
     // ===============================
     // STEP 2: PANEL STRENGTH
     // ===============================
-    function loadStep2PanelStrength(courseId) {
-        if (!courseId) {
-            console.warn("Course ID missing");
+    function loadStep2PanelStrength(scheduleId) {
+        if (!scheduleId) {
+            console.warn("Schedule ID missing");
             return;
         }
 
-        fetch(`http://localhost:6060/api/courseschedule/step2/${courseId}`)
-            .then(res => res.json())
+        fetch(`http://localhost:6060/api/courseschedule/step2/${scheduleId}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => {
                 courseStrength = parseInt(data.courseStrength);
                 panelSize = parseInt(data.panelSize);
@@ -2205,7 +2267,7 @@ nextNav.addEventListener('click', () => {
                 document.getElementById("panelSize").value = panelSize;
 
                 document.getElementById("logicText").innerText =
-                    `Panel size (${panelSize}) = Course strength (${courseStrength}) + Buffer (10).`;
+                    `Panel size (${panelSize}) = Course strength (${courseStrength}) + Buffer (${panelSize - courseStrength}).`;
 
                 sessionStorage.setItem("courseStrength", courseStrength);
                 sessionStorage.setItem("panelSize", panelSize);
@@ -2214,6 +2276,7 @@ nextNav.addEventListener('click', () => {
             .catch(err => {
                 console.error(err);
                 document.getElementById("logicText").innerText = "Unable to load course strength";
+                showToast("Unable to load course strength: " + err.message, 'error');
             });
     }
 
@@ -3277,8 +3340,8 @@ nextNav.addEventListener('click', () => {
 
         const nominations = Array.from(selectedSet).map(personnelId => ({
             personnelId,
-            status: statusMap.get(personnelId) || "Reserve", // Include the status
-            serialNumber: serialNumberMap.get(personnelId) || null // Include serial number if exists
+            status: statusMap.get(personnelId) || "Reserve", // Include the status from statusMap
+            serialNumber: serialNumberMap.get(personnelId) || null
         }));
 
         const payload = {

@@ -313,7 +313,7 @@ public class PersonnelServiceImpl implements PersonnelService {
                     PersonnelSports ps = new PersonnelSports();
                     ps.setSportName(s.sportName);
                     ps.setLevel(s.level);
-                    ps.setAchievements(s.achievements);
+                    ps.setRemarks(s.achievements);
                     ps.setPersonnel(p);
                     ps.setCreatedAt(LocalDate.now());
                     return ps;
@@ -801,14 +801,14 @@ public class PersonnelServiceImpl implements PersonnelService {
 
                 sport.setSportName(r.sportName);
                 sport.setLevel(r.level);
-                sport.setAchievements(r.remarks);
+                sport.setRemarks(r.remarks);
 
             } else {
                 // ADD NEW
                 PersonnelSports sport = new PersonnelSports();
                 sport.setSportName(r.sportName);
                 sport.setLevel(r.level);
-                sport.setAchievements(r.remarks);
+                sport.setRemarks(r.remarks);
 
                 sport.setPersonnel(personnel);
                 existing.add(sport);

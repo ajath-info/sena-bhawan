@@ -20,7 +20,7 @@ public class PersonnelSports {
 
     public String sportName;
     public String level;
-    public String achievements;
+    public String remarks;
 
     private LocalDate createdAt;
 
