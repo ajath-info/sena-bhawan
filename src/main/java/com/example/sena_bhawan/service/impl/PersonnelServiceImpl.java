@@ -11,6 +11,7 @@ import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -203,146 +204,176 @@ public class PersonnelServiceImpl implements PersonnelService {
     @Transactional
     public Long createPersonnel(CreatePersonnelRequest req, MultipartFile officerImage) {
 
-        Personnel p = new Personnel();
+        try {
+            Personnel p = new Personnel();
 
-        // Basic Info
-        p.setCommissionType(req.commissionType);
-        p.setArmyNo(req.armyNo);
-        p.setRank(req.rank);
-        p.setFullName(req.fullName);
-        p.setDateOfCommission(req.dateOfCommission);
-        p.setDateOfSeniority(req.dateOfSeniority);
-        p.setDateOfBirth(req.dateOfBirth);
-        p.setPlaceOfBirth(req.placeOfBirth);
-        p.setCaseType(req.caseType);
-        p.setGender(req.gender);
+            // Basic Info
+            p.setCommissionType(req.commissionType);
+            p.setArmyNo(req.armyNo);
+            p.setRank(req.rank);
+            p.setFirstName(req.firstName);
+            p.setLastName(req.lastName);
+            p.setFullName(req.fullName);
+            p.setDateOfCommission(req.dateOfCommission);
+            p.setDateOfSeniority(req.dateOfSeniority);
+            p.setDateOfBirth(req.dateOfBirth);
+            p.setPlaceOfBirth(req.placeOfBirth);
+            p.setCaseType(req.caseType);
+            p.setGender(req.gender);
 
-        // Image handling
-        if (officerImage != null && !officerImage.isEmpty()) {
-            String imagePath = saveOfficerImage(officerImage);
-            p.setOfficerImage(imagePath);
+            // Image handling
+            if (officerImage != null && !officerImage.isEmpty()) {
+                String imagePath = saveOfficerImage(officerImage);
+                p.setOfficerImage(imagePath);
+            }
+
+            // Service
+            p.setNrs(req.nrs);
+            p.setReligion(req.religion);
+            p.setAadhaarNumber(req.aadhaarNumber);
+            p.setPanCard(req.panCard);
+            p.setMaritalStatus(req.maritalStatus);
+            p.setCdaAccountNo(req.cdaAccountNo);
+
+            // Address
+            p.setPermanentAddress(req.permanentAddress);
+            p.setCity(req.city);
+            p.setDistrict(req.district);
+            p.setState(req.state);
+            p.setPinCode(req.pinCode);
+
+            // Contact
+            p.setMobileNumber(req.mobileNumber);
+            p.setAlternateMobile(req.alternateMobile);
+            p.setEmailAddress(req.emailAddress);
+            p.setNsgEmail(req.nsgEmail);
+
+            // Medical basic info
+            p.setMedicalCategory(req.medicalCategory);
+            p.setMedicalRemark(req.medicalRemark);
+
+            if (req.medical != null) {
+                String medicalCode = generateMedicalCode(req.medical);
+                p.setMedicalCode(medicalCode);
+            }
+
+            p.setCreatedAt(LocalDateTime.now());
+            p.setUpdatedAt(LocalDateTime.now());
+
+            // Handle Decorations
+            if (req.decorations != null) {
+                p.setDecorations(req.decorations.stream().map(d -> {
+                    PersonnelDecorations deco = new PersonnelDecorations();
+                    deco.setDecorationCategory(d.decorationCategory);
+                    deco.setDecorationName(d.decorationName);
+                    deco.setAwardDate(d.awardDate);
+                    deco.setCitation(d.citation);
+                    deco.setPersonnel(p);
+                    deco.setCreatedAt(LocalDateTime.now());
+                    return deco;
+                }).collect(Collectors.toList()));
+            }
+
+            // Handle Qualifications
+            if (req.qualifications != null) {
+                p.setQualifications(req.qualifications.stream().map(q -> {
+                    PersonnelQualifications pq = new PersonnelQualifications();
+                    pq.setQualification(q.qualification);
+                    pq.setStream(q.stream);
+                    pq.setInstitution(q.institution);
+                    pq.setYearOfCompletion(q.yearOfCompletion);
+                    pq.setGradePercentage(q.gradePercentage);
+                    pq.setPersonnel(p);
+                    pq.setCreatedAt(LocalDateTime.now());
+                    return pq;
+                }).collect(Collectors.toList()));
+            }
+
+            // Handle Additional Qualifications
+            if (req.additionalQualifications != null) {
+                p.setAdditionalQualifications(req.additionalQualifications.stream().map(a -> {
+                    PersonnelAdditionalQualifications aq = new PersonnelAdditionalQualifications();
+                    aq.setQualification(a.qualification);
+                    aq.setIssuingAuthority(a.issuingAuthority);
+                    aq.setYear(a.year);
+                    aq.setAuthorityNo(a.authorityNo);
+                    aq.setLocation(a.location);
+                    aq.setPart2OrderNo(a.part2OrderNo);
+                    aq.setOrderDate(a.orderDate);
+                    aq.setValidity(a.validity);
+                    aq.setPersonnel(p);
+                    aq.setCreatedAt(LocalDate.now());
+                    return aq;
+                }).collect(Collectors.toList()));
+            }
+
+            // Handle Sports
+            if (req.sports != null) {
+                p.setSports(req.sports.stream().map(s -> {
+                    PersonnelSports ps = new PersonnelSports();
+                    ps.setSportName(s.sportName);
+                    ps.setLevel(s.level);
+                    ps.setAchievements(s.achievements);
+                    ps.setPersonnel(p);
+                    ps.setCreatedAt(LocalDate.now());
+                    return ps;
+                }).collect(Collectors.toList()));
+            }
+
+            // Handle Family
+            if (req.family != null) {
+                p.setFamilyMembers(req.family.stream().map(f -> {
+                    PersonnelFamily fam = new PersonnelFamily();
+                    fam.setName(f.name);
+                    fam.setRelationship(f.relationship);
+                    fam.setContactNumber(f.contactNumber);
+                    fam.setPart2OrderNo(f.part2OrderNo);
+                    fam.setOrderDate(f.orderDate);
+                    fam.setPersonnel(p);
+                    fam.setCreatedAt(LocalDateTime.now());
+                    return fam;
+                }).collect(Collectors.toList()));
+            }
+
+            // Handle Medical Details
+            if (req.medical != null && req.medical.medicalDetails != null) {
+                p.setMedicalDetails(req.medical.medicalDetails.stream().map(m -> {
+                    PersonnelMedicalDetails md = new PersonnelMedicalDetails();
+                    md.setMedicalCategory(m.category);
+                    md.setMedicalValue(m.value);
+                    md.setType(m.type);
+                    md.setPeriod(m.period);
+                    md.setRemark(m.remark);
+                    md.setPersonnel(p);
+                    md.setCreatedAt(LocalDateTime.now());
+                    return md;
+                }).collect(Collectors.toList()));
+            }
+
+            // Save once - cascade will handle all children
+            return personnelRepository.save(p).getId();
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Duplicate data error");
+        } catch (Exception e) {
+            throw new RuntimeException("Something went wrong");
+        }
+    }
+
+    private String generateMedicalCode(CreatePersonnelRequest.MedicalDTO medical) {
+        if (medical == null || medical.medicalValues == null) {
+            return null;
         }
 
-        // Service
-        p.setNrs(req.nrs);
-        p.setReligion(req.religion);
-        p.setAadhaarNumber(req.aadhaarNumber);
-        p.setPanCard(req.panCard);
-        p.setMaritalStatus(req.maritalStatus);
-        p.setCdaAccountNo(req.cdaAccountNo);
+        StringBuilder code = new StringBuilder();
 
-        // Address
-        p.setPermanentAddress(req.permanentAddress);
-        p.setCity(req.city);
-        p.setDistrict(req.district);
-        p.setState(req.state);
-        p.setPinCode(req.pinCode);
+        // Always include all categories in order: S, H, A, P, E
+        code.append("S").append(medical.medicalValues.S != null ? medical.medicalValues.S : "1");
+        code.append("H").append(medical.medicalValues.H != null ? medical.medicalValues.H : "1");
+        code.append("A").append(medical.medicalValues.A != null ? medical.medicalValues.A : "1");
+        code.append("P").append(medical.medicalValues.P != null ? medical.medicalValues.P : "1");
+        code.append("E").append(medical.medicalValues.E != null ? medical.medicalValues.E : "1");
 
-        // Contact
-        p.setMobileNumber(req.mobileNumber);
-        p.setAlternateMobile(req.alternateMobile);
-        p.setEmailAddress(req.emailAddress);
-        p.setNsgEmail(req.nsgEmail);
-
-        // Medical basic info
-        p.setMedicalCategory(req.medicalCategory);
-        p.setMedicalRemark(req.medicalRemark);
-
-        p.setCreatedAt(LocalDateTime.now());
-        p.setUpdatedAt(LocalDateTime.now());
-
-        // Handle Decorations
-        if (req.decorations != null) {
-            p.setDecorations(req.decorations.stream().map(d -> {
-                PersonnelDecorations deco = new PersonnelDecorations();
-                deco.setDecorationCategory(d.decorationCategory);
-                deco.setDecorationName(d.decorationName);
-                deco.setAwardDate(d.awardDate);
-                deco.setCitation(d.citation);
-                deco.setPersonnel(p);
-                deco.setCreatedAt(LocalDateTime.now());
-                return deco;
-            }).collect(Collectors.toList()));
-        }
-
-        // Handle Qualifications
-        if (req.qualifications != null) {
-            p.setQualifications(req.qualifications.stream().map(q -> {
-                PersonnelQualifications pq = new PersonnelQualifications();
-                pq.setQualification(q.qualification);
-                pq.setStream(q.stream);
-                pq.setInstitution(q.institution);
-                pq.setYearOfCompletion(q.yearOfCompletion);
-                pq.setGradePercentage(q.gradePercentage);
-                pq.setPersonnel(p);
-                pq.setCreatedAt(LocalDateTime.now());
-                return pq;
-            }).collect(Collectors.toList()));
-        }
-
-        // Handle Additional Qualifications
-        if (req.additionalQualifications != null) {
-            p.setAdditionalQualifications(req.additionalQualifications.stream().map(a -> {
-                PersonnelAdditionalQualifications aq = new PersonnelAdditionalQualifications();
-                aq.setQualification(a.qualification);
-                aq.setIssuingAuthority(a.issuingAuthority);
-                aq.setYear(a.year);
-                aq.setAuthorityNo(a.authorityNo);
-                aq.setLocation(a.location);
-                aq.setPart2OrderNo(a.part2OrderNo);
-                aq.setOrderDate(a.orderDate);
-                aq.setValidity(a.validity);
-                aq.setPersonnel(p);
-                aq.setCreatedAt(LocalDate.now());
-                return aq;
-            }).collect(Collectors.toList()));
-        }
-
-        // Handle Sports
-        if (req.sports != null) {
-            p.setSports(req.sports.stream().map(s -> {
-                PersonnelSports ps = new PersonnelSports();
-                ps.setSportName(s.sportName);
-                ps.setLevel(s.level);
-                ps.setAchievements(s.achievements);
-                ps.setPersonnel(p);
-                ps.setCreatedAt(LocalDate.now());
-                return ps;
-            }).collect(Collectors.toList()));
-        }
-
-        // Handle Family
-        if (req.family != null) {
-            p.setFamilyMembers(req.family.stream().map(f -> {
-                PersonnelFamily fam = new PersonnelFamily();
-                fam.setName(f.name);
-                fam.setRelationship(f.relationship);
-                fam.setContactNumber(f.contactNumber);
-                fam.setPart2OrderNo(f.part2OrderNo);
-                fam.setOrderDate(f.orderDate);
-                fam.setPersonnel(p);
-                fam.setCreatedAt(LocalDateTime.now());
-                return fam;
-            }).collect(Collectors.toList()));
-        }
-
-        // Handle Medical Details
-        if (req.medical != null && req.medical.medicalDetails != null) {
-            p.setMedicalDetails(req.medical.medicalDetails.stream().map(m -> {
-                PersonnelMedicalDetails md = new PersonnelMedicalDetails();
-                md.setMedicalCategory(m.category);
-                md.setMedicalValue(m.value);
-                md.setType(m.type);
-                md.setPeriod(m.period);
-                md.setRemark(m.remark);
-                md.setPersonnel(p);
-                md.setCreatedAt(LocalDateTime.now());
-                return md;
-            }).collect(Collectors.toList()));
-        }
-
-        // Save once - cascade will handle all children
-        return personnelRepository.save(p).getId();
+        return code.toString();
     }
 
     // ================= SECTION-WISE UPDATES =================

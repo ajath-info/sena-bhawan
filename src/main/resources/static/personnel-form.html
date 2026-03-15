@@ -563,10 +563,158 @@
             border-color: #f87171;
             color: #7f1d1d;
         }
+        /* Required field indicator */
+        label.required:after {
+            content: " *";
+            color: #dc2626;
+            font-weight: bold;
+        }
 
+        /* Style for the asterisk in section titles if needed */
+        .section-title .required-badge {
+            color: #dc2626;
+            font-size: 12px;
+            margin-left: 4px;
+        }
     </style>
 
     <script>
+
+        async function loadCaseTypes() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/CASE_TYPE");
+                const caseTypes = await res.json();
+                const caseTypeSelect = document.getElementById("caseType");
+                if (caseTypeSelect) {
+                    caseTypeSelect.innerHTML = '<option value="">Select Case Type</option>';
+                    caseTypes.forEach(item => {
+                        caseTypeSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error("Failed loading case types:", err);
+            }
+        }
+
+        async function loadCivilQualifications() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS");
+                const qualifications = await res.json();
+                return qualifications; // Returns array of {id, name}
+            } catch (err) {
+                console.error("Failed loading civil qualifications:", err);
+                return [];
+            }
+        }
+
+        async function loadArmyCourses() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/ARMY_COURSES");
+                const courses = await res.json();
+                return courses; // Returns array of {id, name}
+            } catch (err) {
+                console.error("Failed loading army courses:", err);
+                return [];
+            }
+        }
+
+        function validateRequiredFields() {
+            const requiredFields = [
+                { id: 'commission', name: 'Types of Commission' },
+                { id: 'armyNo', name: 'Army No' },
+                { id: 'rank', name: 'Rank' },
+                { id: 'firstName', name: 'First Name' },
+                { id: 'lastName', name: 'Last Name' },
+                { id: 'dateOfCommission', name: 'Date of Commission' },
+                { id: 'dateOfSeniority', name: 'Date of Seniority' },
+                { id: 'dateOfBirth', name: 'Date of Birth' },
+                { id: 'gender', name: 'Gender' },
+                { id: 'placeOfBirth', name: 'Place of Birth' },
+                { id: 'nrs', name: 'NRS' },
+                { id: 'religion', name: 'Religion' },
+                { id: 'aadhaarNumber', name: 'Aadhaar Number' },
+                { id: 'panCard', name: 'PAN Card' },
+                { id: 'maritalStatus', name: 'Marital Status' },
+                { id: 'cdaAccountNo', name: 'CDA Account No' },
+                { id: 'permanentAddress', name: 'Permanent Address' },
+                { id: 'city', name: 'City' },
+                { id: 'district', name: 'District' },
+                { id: 'state', name: 'State' },
+                { id: 'pinCode', name: 'PIN Code' },
+                { id: 'mobileNumber', name: 'Mobile Number' },
+                { id: 'emailAddress', name: 'Email Address' },
+                { id: 'nsgEmail', name: 'NSG Email' },
+                { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' }
+            ];
+
+            // Validate image
+            const imageFile = document.getElementById("officerImageFile").files[0];
+            const imageError = document.getElementById("image-error");
+            if (!imageFile) {
+                if (imageError) imageError.style.display = "block";
+                alert("Officer Image is required");
+                document.getElementById("officerImageFile").focus();
+                return false;
+            } else {
+                if (imageError) imageError.style.display = "none";
+
+                // Validate file type
+                const fileType = imageFile.type;
+                if (!fileType.match('image.*')) {
+                    alert("Please select a valid image file (JPG/PNG)");
+                    return false;
+                }
+
+                // Validate file size (max 2MB)
+                const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                if (imageFile.size > maxSize) {
+                    alert("Image size should be less than 2MB");
+                    return false;
+                }
+            }
+
+            // Validate family members
+            const familyItems = document.querySelectorAll("#family-container .repeater-item");
+            if (familyItems.length > 0) {
+                for (let i = 0; i < familyItems.length; i++) {
+                    const item = familyItems[i];
+                    const nameInput = item.querySelector(".family-name");
+                    const relationshipSelect = item.querySelector(".family-relationship");
+                    const orderNoInput = item.querySelector(".family-order-no");
+
+                    if (nameInput && !nameInput.value.trim()) {
+                        alert(`Family Member #${i+1}: Name is required`);
+                        nameInput.focus();
+                        return false;
+                    }
+
+                    if (relationshipSelect && !relationshipSelect.value) {
+                        alert(`Family Member #${i+1}: Relationship is required`);
+                        relationshipSelect.focus();
+                        return false;
+                    }
+
+                    // Add validation for Part II Order No.
+                    if (orderNoInput && !orderNoInput.value.trim()) {
+                        alert(`Family Member #${i+1}: Part II Order No. is required`);
+                        orderNoInput.focus();
+                        return false;
+                    }
+                }
+            }
+
+            // Validate regular fields
+            for (let field of requiredFields) {
+                const element = document.getElementById(field.id);
+                if (element && !element.value.trim()) {
+                    alert(`${field.name} is required`);
+                    element.focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         // =======================================================
         // MEDICAL SECTION WITH DYNAMIC FIELDS
@@ -630,7 +778,7 @@
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
                         <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Type *</label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Type</label>
                             <div style="display: flex; gap: 16px;">
                                 <label style="display: flex; align-items: center; gap: 4px;">
                                     <input type="radio" name="medicalType-${letter}" value="TEMPORARY" onchange="updateMedicalType('${letter}', 'TEMPORARY')"> Temporary
@@ -641,7 +789,7 @@
                             </div>
                         </div>
                         <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Period (months) *</label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Period (months)</label>
                             <input type="number" min="1" max="24" placeholder="Max 24 months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;" onchange="updateMedicalPeriod('${letter}', this.value)">
                         </div>
                         <div>
@@ -774,6 +922,9 @@
                     });
                 }
 
+                // Load Case Types
+                await loadCaseTypes();
+
             } catch (err) {
                 console.error("Failed loading dropdowns:", err);
             }
@@ -846,7 +997,7 @@
                         </select>
                     </div>
                     <div>
-                        <label>Decoration Name *</label>
+                        <label>Decoration Name</label>
                         <select name="decorations[${index}][name]" id="decorationName-${index}">
                             <option value="">Select Award</option>
                         </select>
@@ -913,21 +1064,33 @@
         // =======================================================
         // CIVIL QUALIFICATIONS
         // =======================================================
-        function addCivilQualification(isFirst = false) {
+        async function addCivilQualification(isFirst = false) {
             const index = civilIndex++;
             const id = `civil-${index}`;
 
             const container = document.getElementById("civil-qualifications-container");
             if (!container) return;
 
+            // Load dropdown data
+            const qualifications = await loadCivilQualifications();
+
+            // Build dropdown options
+            let qualificationOptions = '<option value="">Select Qualification</option>';
+            qualifications.forEach(item => {
+                qualificationOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
             container.insertAdjacentHTML(
                 "beforeend",
                 `
                 <div class="grid repeater-item" id="${id}">
-                    <div><label>Qualification *</label><input type="text" placeholder="Enter qualification"></div>
-                    <div><label>Institution</label><input type="text" placeholder="Enter institution"></div>
-                    <div><label>Year</label><input type="text" placeholder="Enter year"></div>
-                    <div><label>Grade / Percentage</label><input type="text" placeholder="Enter grade/percentage"></div>
+                    <div>
+                        <label>Qualification</label>
+                        <select class="civil-qualification-select">${qualificationOptions}</select>
+                    </div>
+                    <div><label>Institution</label><input type="text" placeholder="Enter institution" class="civil-institution"></div>
+                    <div><label>Year</label><input type="text" placeholder="Enter year" class="civil-year"></div>
+                    <div><label>Grade / Percentage</label><input type="text" placeholder="Enter grade/percentage" class="civil-grade"></div>
                     ${!isFirst ? `
                         <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
                     ` : ""}
@@ -939,24 +1102,36 @@
         // =======================================================
         // ADDITIONAL QUALIFICATIONS
         // =======================================================
-        function addAdditionalQualification(isFirst = false) {
+        async function addAdditionalQualification(isFirst = false) {
             const index = additionalIndex++;
             const id = `additional-${index}`;
 
             const container = document.getElementById("additional-qualifications-container");
             if (!container) return;
 
+            // Load dropdown data
+            const armyCourses = await loadArmyCourses();
+
+            // Build dropdown options
+            let courseOptions = '<option value="">Select Qualification</option>';
+            armyCourses.forEach(item => {
+                courseOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
             container.insertAdjacentHTML(
                 "beforeend",
                 `
                 <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
-                    <div><label>Qualification *</label><input type="text" placeholder="Enter qualification"></div>
-                    <div><label>Authority</label><input type="text" placeholder="Enter authority"></div>
-                    <div><label>Year</label><input type="text" placeholder="Enter year"></div>
-                    <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no."></div>
-                    <div><label>Location</label><input type="text" placeholder="Enter location"></div>
-                    <div><label>Part 2 Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no."></div>
-                    <div><label>Order Date</label><input type="date"></div>
+                    <div>
+                        <label>Qualification</label>
+                        <select class="additional-qualification-select">${courseOptions}</select>
+                    </div>
+                    <div><label>Authority</label><input type="text" placeholder="Enter authority" class="additional-authority"></div>
+                    <div><label>Year</label><input type="text" placeholder="Enter year" class="additional-year"></div>
+                    <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no." class="additional-authority-no"></div>
+                    <div><label>Location</label><input type="text" placeholder="Enter location" class="additional-location"></div>
+                    <div><label>Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="additional-order-no"></div>
+                    <div><label>Order Date</label><input type="date" class="additional-order-date"></div>
                     ${!isFirst ? `
                         <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
                     ` : ""}
@@ -996,11 +1171,11 @@
                 <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
                     <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 16px;">
                         <div>
-                            <label>Sport Name *</label>
+                            <label>Sport Name</label>
                             <select>${sportsTypeOptions}</select>
                         </div>
                         <div>
-                            <label>Sports Level *</label>
+                            <label>Sports Level</label>
                             <select>${sportsLevelOptions}</select>
                         </div>
                     </div>
@@ -1045,13 +1220,16 @@
                 "beforeend",
                 `
                 <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
-                    <div><label>Name *</label><input type="text" placeholder="Enter name" class="family-name"></div>
                     <div>
-                        <label>Relationship *</label>
+                        <label class="required">Name</label>
+                        <input type="text" placeholder="Enter name" class="family-name">
+                    </div>
+                    <div>
+                        <label class="required">Relationship</label>
                         <select class="family-relationship">${relationshipOptions}</select>
                     </div>
                     <div><label>Contact Number (Optional)</label><input type="tel" placeholder="Enter contact number" class="family-contact"></div>
-                    <div><label>Part 2 Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="family-order-no"></div>
+                    <div><label class="required">Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="family-order-no"></div>
                     <div><label>Order Date</label><input type="date" class="family-order-date"></div>
                     ${!isFirst ? `
                         <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
@@ -1072,6 +1250,9 @@
         // SAVE PERSONNEL FUNCTION
         // =======================================================
         async function savePersonnel() {
+            if (!validateRequiredFields()) {
+                return;
+            }
             // Get form elements
             const commission = document.getElementById("commission");
             const armyNo = document.getElementById("armyNo");
@@ -1151,29 +1332,40 @@
 
             // Collect civil qualifications
             document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
-                const inputs = item.querySelectorAll("input");
-                if (inputs.length >= 4) {
+                const qualificationSelect = item.querySelector(".civil-qualification-select");
+                const institutionInput = item.querySelector(".civil-institution");
+                const yearInput = item.querySelector(".civil-year");
+                const gradeInput = item.querySelector(".civil-grade");
+
+                if (qualificationSelect && qualificationSelect.value) {
                     payload.qualifications.push({
-                        qualification: inputs[0].value,
-                        institution: inputs[1].value,
-                        yearOfCompletion: inputs[2].value,
-                        gradePercentage: inputs[3].value
+                        qualification: qualificationSelect.value,  // This will be the name from dropdown
+                        institution: institutionInput ? institutionInput.value : "",
+                        yearOfCompletion: yearInput ? yearInput.value : "",
+                        gradePercentage: gradeInput ? gradeInput.value : ""
                     });
                 }
             });
 
-            // Collect additional qualifications
+            // Collect additional qualifications (MIL)
             document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
-                const inputs = item.querySelectorAll("input");
-                if (inputs.length >= 7) {
+                const qualificationSelect = item.querySelector(".additional-qualification-select");
+                const authorityInput = item.querySelector(".additional-authority");
+                const yearInput = item.querySelector(".additional-year");
+                const authorityNoInput = item.querySelector(".additional-authority-no");
+                const locationInput = item.querySelector(".additional-location");
+                const orderNoInput = item.querySelector(".additional-order-no");
+                const orderDateInput = item.querySelector(".additional-order-date");
+
+                if (qualificationSelect && qualificationSelect.value) {
                     payload.additionalQualifications.push({
-                        qualification: inputs[0].value,
-                        issuingAuthority: inputs[1].value,
-                        year: inputs[2].value,
-                        authorityNo: inputs[3].value,
-                        location: inputs[4].value,
-                        part2OrderNo: inputs[5].value,
-                        orderDate: inputs[6].value
+                        qualification: qualificationSelect.value,  // This will be the name from dropdown
+                        issuingAuthority: authorityInput ? authorityInput.value : "",
+                        year: yearInput ? yearInput.value : "",
+                        authorityNo: authorityNoInput ? authorityNoInput.value : "",
+                        location: locationInput ? locationInput.value : "",
+                        part2OrderNo: orderNoInput ? orderNoInput.value : "",
+                        orderDate: orderDateInput ? orderDateInput.value : ""
                     });
                 }
             });
@@ -1229,12 +1421,15 @@
                     method: "POST",
                     body: formData
                 });
-
-                if (!res.ok) throw new Error("API Error");
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message);
+                    return;
+                }
                 alert("Personnel saved successfully.");
             } catch (err) {
                 console.error(err);
-                alert("Failed to save personnel.");
+                alert(err.message);
             }
         }
 
@@ -1265,8 +1460,8 @@
 
             // Load first rows for all repeaters
             await addDecoration(true);
-            addCivilQualification(true);
-            addAdditionalQualification(true);
+            await addCivilQualification(true);
+            await addAdditionalQualification(true);
             await addFamilyMember(true);
             await addSportsDetail(true);
             initMedicalSection();
@@ -1300,7 +1495,6 @@
     <main class="main-content">
         <div class="header">
             <h2>Add New Personnel</h2>
-            <p>Fill in all required fields to add personnel to the system</p>
         </div>
 
         <div class="content-area">
@@ -1311,11 +1505,17 @@
                     Complete officer profile with photograph and address details
                 </div>
 
-                <div class="upload-box">
-                    📷 Upload Officer Image<br>
+                <div class="upload-box" style="position: relative;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px;">
+                        <span>📷 Upload Officer Image</span>
+                        <span style="color: #dc2626; font-weight: bold;">*</span>
+                    </div>
                     JPG / PNG, Max 2MB
                     <br><br>
-                    <input type="file" id="officerImageFile" accept="image/*">
+                    <input type="file" id="officerImageFile" accept="image/*" required>
+                    <div id="image-error" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;">
+                        Please select an image
+                    </div>
                 </div>
 
 
@@ -1324,28 +1524,45 @@
                     <div class="section-title">🧾 Basic Information</div>
                     <div class="grid">
                         <div>
-                            <label>Types of Commission *</label>
+                            <label class="required">Types of Commission</label>
                             <select id="commission">
                                 <option value="">Select Commission Type</option>
                             </select>
                         </div>
-                        <div><label>Army No *</label><input id="armyNo"></div>
                         <div>
-                            <label>Rank *</label>
+                            <label class="required">Army No</label>
+                            <input id="armyNo">
+                        </div>
+                        <div>
+                            <label class="required">Rank</label>
                             <select id="rank">
                                 <option value="">Select Rank</option>
                             </select>
                         </div>
                         <div class="grid" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div><label>First Name *</label><input id="firstName"></div>
-                            <div><label>Last Name *</label><input id="lastName"></div>
+                            <div>
+                                <label class="required">First Name</label>
+                                <input id="firstName">
+                            </div>
+                            <div>
+                                <label>Last Name</label>
+                                <input id="lastName">
+                            </div>
                         </div>
-                        <div><label>Date of Commission *</label><input type="date" id="dateOfCommission"></div>
-                        <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority"></div>
-                        <div><label>Date of Birth *</label><input type="date" id="dateOfBirth"></div>
-                        <!-- GENDER FIELD - ADD THIS LINE -->
                         <div>
-                            <label>Gender *</label>
+                            <label class="required">Date of Commission</label>
+                            <input type="date" id="dateOfCommission">
+                        </div>
+                        <div>
+                            <label class="required">Date of Seniority</label>
+                            <input type="date" id="dateOfSeniority">
+                        </div>
+                        <div>
+                            <label class="required">Date of Birth</label>
+                            <input type="date" id="dateOfBirth">
+                        </div>
+                        <div>
+                            <label class="required">Gender</label>
                             <select id="gender">
                                 <option value="">Select Gender</option>
                                 <option value="M">Male</option>
@@ -1353,8 +1570,16 @@
                                 <option value="O">Other</option>
                             </select>
                         </div>
-                        <div><label>Place of Birth *</label><input id="placeOfBirth"></div>
-                        <div><label>Case Type *</label><input id="caseType"></div>
+                        <div>
+                            <label class="required">Place of Birth</label>
+                            <input id="placeOfBirth">
+                        </div>
+                        <div>
+                            <label>Case Type</label>
+                            <select id="caseType">
+                                <option value="">Select Case Type</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -1375,23 +1600,40 @@
                 <div class="section">
                     <div class="section-title">🎖️ Service Details</div>
                     <div class="grid">
-                        <div><label>NRS *</label><input id="nrs"></div>
-                        <div><label>Religion *</label><select id="religion">
-                            <option value="">Select Religion</option>
-                            <option value="Hindu">Hindu</option>
-                            <option value="Muslim">Muslim</option>
-                            <option value="Sikhs">Sikhs</option>
-                            <option value="Christian">Christian</option>
-                        </select></div>
-                        <div><label>Aadhaar Number *</label><input id="aadhaarNumber"></div>
-                        <div><label>PAN Card *</label><input id="panCard"></div>
-                        <div><label>Marital Status *</label><select id="maritalStatus">
-                            <option value="">Select Religion</option>
-                            <option value="Married">Married</option>
-                            <option value="Unmarried">Unmarried</option>
-                        </select></div>
-
-                        <div><label>CDA Account No *</label><input id="cdaAccountNo"></div>
+                        <div>
+                            <label class="required">NRS</label>
+                            <input id="nrs">
+                        </div>
+                        <div>
+                            <label class="required">Religion</label>
+                            <select id="religion">
+                                <option value="">Select Religion</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Muslim">Muslim</option>
+                                <option value="Sikhs">Sikhs</option>
+                                <option value="Christian">Christian</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">Aadhaar Number</label>
+                            <input id="aadhaarNumber">
+                        </div>
+                        <div>
+                            <label class="required">PAN Card</label>
+                            <input id="panCard">
+                        </div>
+                        <div>
+                            <label class="required">Marital Status</label>
+                            <select id="maritalStatus">
+                                <option value="">Select Marital Status</option>
+                                <option value="Married">Married</option>
+                                <option value="Unmarried">Unmarried</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">CDA Account No</label>
+                            <input id="cdaAccountNo">
+                        </div>
                     </div>
                 </div>
 
@@ -1402,16 +1644,28 @@
 
                     <div class="grid grid-1">
                         <div>
-                            <label>Permanent Address *</label>
+                            <label class="required">Permanent Address</label>
                             <textarea id="permanentAddress"></textarea>
                         </div>
                     </div>
 
                     <div class="grid">
-                        <div><label>City *</label><input id="city"></div>
-                        <div><label>State *</label><input id="district"></div>
-                        <div><label>District *</label><input id="state"></div>
-                        <div><label>PIN Code *</label><input id="pinCode"></div>
+                        <div>
+                            <label class="required">City</label>
+                            <input id="city">
+                        </div>
+                        <div>
+                            <label class="required">District</label>
+                            <input id="district">
+                        </div>
+                        <div>
+                            <label class="required">State</label>
+                            <input id="state">
+                        </div>
+                        <div>
+                            <label class="required">PIN Code</label>
+                            <input id="pinCode">
+                        </div>
                     </div>
                 </div>
 
@@ -1421,14 +1675,20 @@
                 <div class="section">
                     <div class="section-title">📞 Contact Details</div>
                     <div class="grid">
-                        <div><label>Mobile Number *</label><input id="mobileNumber"></div>
-                        <div><label>Alternate Mobile</label><input id="alternateMobile"></div>
+                        <div>
+                            <label class="required">Mobile Number</label>
+                            <input id="mobileNumber">
+                        </div>
+                        <div>
+                            <label>Alternate Mobile</label>
+                            <input id="alternateMobile">
+                        </div>
                         <div class="grid-1">
-                            <label>Email Address *</label>
+                            <label class="required">Email Address</label>
                             <input type="email" id="emailAddress">
                         </div>
                         <div class="grid-1">
-                            <label>NSG Email *</label>
+                            <label class="required">NSG Email</label>
                             <input type="email" id="nsgEmail">
                         </div>
                     </div>
@@ -1476,9 +1736,9 @@
                         <span>🩺 Medical Category</span>
                     </div>
 
-                    <!-- SHAPE MEDICAL CATEGORY DROPDOWN - ADD THIS -->
+                    <!-- SHAPE MEDICAL CATEGORY DROPDOWN -->
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">SHAPE Medical Category *</label>
+                        <label class="required" style="display: block; margin-bottom: 8px; font-weight: 600;">SHAPE Medical Category</label>
                         <select id="shapeMedicalCategory" style="width: 100%; max-width: 300px; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
                             <option value="">Select SHAPE Category</option>
                             <option value="SHAPE-I">SHAPE-I</option>

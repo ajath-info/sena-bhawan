@@ -53,6 +53,7 @@ public class CreatePersonnelRequest {
 
     public String medicalCategory;
     public String medicalRemark;
+    public String medicalCode;
 
     // CHILD LISTS
     public List<DecorationDTO> decorations;
