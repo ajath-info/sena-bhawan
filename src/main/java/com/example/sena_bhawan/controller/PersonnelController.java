@@ -4,7 +4,10 @@ import com.example.sena_bhawan.dto.*;
 
 import com.example.sena_bhawan.entity.CourseMaster;
 import com.example.sena_bhawan.entity.Personnel;
+import com.example.sena_bhawan.entity.PostingDetails;
 import com.example.sena_bhawan.service.PersonnelService;
+import com.example.sena_bhawan.service.PostingDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -19,14 +23,69 @@ import java.util.stream.Collectors;
 public class PersonnelController {
 
     private final PersonnelService personnelService;
+    private final PostingDetailsService postingService;
 
-    public PersonnelController(PersonnelService personnelService) {
+
+    public PersonnelController(PersonnelService personnelService, PostingDetailsService postingService) {
         this.personnelService = personnelService;
+        this.postingService = postingService;
     }
 
     @GetMapping
     public List<Personnel> getAll() {
         return personnelService.getallPersonnels();
+    }
+
+    @GetMapping("/{personnelId}/posting-history")
+    public ResponseEntity<?> getPostingHistory(@PathVariable Long personnelId) {
+        try {
+            List<PostingHistoryDTO> history = postingService.getPostingHistory(personnelId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", history);
+            response.put("count", history.size());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", e.getMessage())
+            );
+        }
+    }
+
+    @GetMapping("/{personnelId}/current-posting")
+    public ResponseEntity<?> getCurrentPosting(@PathVariable Long personnelId) {
+
+        PostingResponseDTO dto = postingService.getCurrentPostingDetails(personnelId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", dto);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPersonnels(@RequestParam String term) {
+        try {
+            List<PersonnelDTO> units = personnelService.searchPersonnels(term);
+
+            // Prepare response
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", units);
+            response.put("count", units.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Handle unexpected errors
+            return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", "An error occurred while searching")
+            );
+        }
     }
 
     @GetMapping("/{id}")

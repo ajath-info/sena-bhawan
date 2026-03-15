@@ -11,12 +11,14 @@ public class PostingResponseDTO {
     private String armyNo;
     private String personnelName;
     private String rank;
+    private String unitName;
 
     // UNDER POSTING
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate movementDate;
     private String postedTo;
     private String appointment;
+    private String typeOfPosting;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate postingOrderIssueDate;
 

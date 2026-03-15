@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface BrigadeRepository extends JpaRepository<Brigade,Long> {
     List<Brigade> findAll();
+    List<Brigade> findByDivisionId(Long divisionId);
 }

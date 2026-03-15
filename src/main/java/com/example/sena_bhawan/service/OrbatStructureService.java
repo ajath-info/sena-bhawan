@@ -34,4 +34,9 @@ public interface OrbatStructureService {
 
     List<String> getDivisionDropdown();
 
+    // Add these new methods for filtered dropdowns
+    List<DropdownDTO> getCorpsByCommandId(Long commandId);
+    List<DropdownDTO> getDivisionsByCorpsId(Long corpsId);
+    List<DropdownDTO> getBrigadesByDivisionId(Long divisionId);
+
 }

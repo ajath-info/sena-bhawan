@@ -17,7 +17,7 @@ public interface OrbatRepository extends JpaRepository<OrbatStructure, Long> {
     @Query("""
     SELECT DISTINCT o
     FROM OrbatStructure o
-    WHERE LOWER(o.name) LIKE LOWER(CONCAT('%', :term, '%'))
+    WHERE LOWER(o.name) LIKE LOWER(CONCAT(:term, '%'))
     ORDER BY o.name
     """)
     List<OrbatStructure> findDistinctByNameStartingWith(@Param("term") String term, Pageable pageable);

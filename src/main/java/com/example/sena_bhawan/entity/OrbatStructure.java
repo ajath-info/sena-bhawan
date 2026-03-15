@@ -48,7 +48,7 @@ public class OrbatStructure {
     private Long hqId;
     @Column(name = "location")
     private String location;
-    @Column(name = "sus_no")
+    @Column(name = "sus_no",unique = true)
     private String susNo;
     @Column(name = "pin")
     private String pin;

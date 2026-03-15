@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.service.impl;
 
+import com.example.sena_bhawan.dto.PostingHistoryDTO;
 import com.example.sena_bhawan.dto.PostingRequestDTO;
 import com.example.sena_bhawan.dto.PostingResponseDTO;
 import com.example.sena_bhawan.entity.OrbatStructure;
@@ -13,8 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,24 +30,40 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
     private final PersonnelRepository personnelRepository;
     private final OrbatStructureRepository orbatRepository;
 
+    // ==================== STATUS CONSTANTS ====================
+    public static final String UNDER_POSTING = "UNDER_POSTING";
+    public static final String POSTED = "POSTED";
+    public static final String PREVIOUS_POSTING = "PREVIOUS_POSTING";
+
     @Override
     public List<PostingDetails> getByPersonnel(Long personnelId) {
         return postingRepository.findByPersonnelId(personnelId);
     }
 
+    // ==================== MAIN UPSERT METHOD ====================
     @Override
     @Transactional
     public PostingDetails upsertPosting(PostingRequestDTO dto) {
 
-        // CHANGE: Find by armyNo instead of ID
+        // Step 1: Find Personnel by Army Number
         Personnel personnel = personnelRepository.findByArmyNo(dto.getArmyNo())
                 .orElseThrow(() -> new RuntimeException(
                         "Personnel not found with Army No: " + dto.getArmyNo()));
-        // Rest of your code remains EXACTLY same
-        log.info("Processing posting for Army No: {}, Name: {}",
-                personnel.getArmyNo(), personnel.getFullName());
 
-        // Step 2: Validate and get ORBAT ID for postedTo formation
+        log.info("Processing posting for Army No: {}, Personnel ID: {}",
+                personnel.getArmyNo(), personnel.getId());
+
+        dto.setPersonnelId(personnel.getId());
+
+        // Update rank in personnel table if changed
+        if (dto.getRank() != null && !dto.getRank().equals(personnel.getRank())) {
+            personnel.setRank(dto.getRank());
+            personnelRepository.save(personnel);
+            log.info("Updated rank in personnel table: {} → {}",
+                    personnel.getArmyNo(), dto.getRank());
+        }
+
+        // Step 2: Validate ORBAT
         if (dto.getPostedTo() == null || dto.getPostedTo().trim().isEmpty()) {
             throw new RuntimeException("Posted To field cannot be empty");
         }
@@ -51,156 +72,205 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
             throw new RuntimeException("Invalid formation selection. Please select from recommendations.");
         }
 
-        // Validate ORBAT ID and fetch formation
         OrbatStructure orbat = orbatRepository.findById(dto.getOrbatId())
                 .orElseThrow(() -> new RuntimeException("Invalid ORBAT ID"));
 
-        // Step 3: Check if TOS date is provided (new posting or update?)
+        // Step 3: Get current active posting
+        Optional<PostingDetails> currentActiveOpt = getCurrentActivePosting(personnel.getId());
+
+        // Step 4: Decision Logic based on TOS date
         if (dto.getTosUpdatedDate() != null) {
-            // TOS date provided - this is a new posting
-            return processNewPosting(dto, personnel, orbat);
+            return processJoiningPosting(dto, personnel, orbat, currentActiveOpt);
         } else {
-            // No TOS date - update existing current posting
-            return processUpdatePosting(dto, personnel, orbat);
+            return processUnderPosting(dto, personnel, orbat, currentActiveOpt);
         }
     }
 
-    /**
-     * Process a new posting (when TOS date is provided)
-     */
-    private PostingDetails processNewPosting(PostingRequestDTO dto, Personnel personnel, OrbatStructure orbat) {
-        log.info("Processing NEW posting for personnel ID: {}", personnel.getId());
+    // ==================== PROCESS JOINING (WITH TOS) ====================
+    private PostingDetails processJoiningPosting(PostingRequestDTO dto, Personnel personnel,
+                                                 OrbatStructure orbat, Optional<PostingDetails> currentActiveOpt) {
+        log.info("Processing JOINING (TOS provided) for personnel ID: {}", personnel.getId());
 
-        // Check if personnel already has a current posting
-        postingRepository.findCurrentPosting(personnel.getId()).ifPresent(currentPosting -> {
-            log.info("Completing current posting ID: {}", currentPosting.getPostingId());
+        if (currentActiveOpt.isPresent()) {
+            PostingDetails current = currentActiveOpt.get();
+            log.info("Current active posting found with status: {}, ID: {}",
+                    current.getStatus(), current.getPostingId());
 
-            // Complete the current posting
-            currentPosting.setStatus("POSTED");
-            currentPosting.setToDate(dto.getTosUpdatedDate());
-            currentPosting.setSosDate(dto.getTosUpdatedDate());
+            if (UNDER_POSTING.equals(current.getStatus())) {
+                // UNDER_POSTING → POSTED
+                log.info("Completing UNDER_POSTING ID: {} → POSTED", current.getPostingId());
 
-            // Calculate duration
-            if (currentPosting.getFromDate() != null) {
-                Period period = Period.between(currentPosting.getFromDate(), dto.getTosUpdatedDate());
-                String duration = String.format("%d years %d months", period.getYears(), period.getMonths());
-                currentPosting.setDuration(duration);
+                current.setStatus(POSTED);
+                current.setTosUpdatedDate(dto.getTosUpdatedDate());
+                current.setToDate(dto.getTosUpdatedDate());
+                current.setUnitName(current.getPostedTo());
+
+                // ✅ Current posting ki duration abhi "Present" rahegi
+                current.setDuration("Present");
+
+                if (dto.getRank() != null) {
+                    current.setRank(dto.getRank());
+                }
+
+                return postingRepository.save(current);
+
+            } else if (POSTED.equals(current.getStatus())) {
+                log.info("Current status is POSTED. Creating new POSTED record");
+
+                // ✅ FIXED: Calculate duration for previous posting using its tosUpdatedDate
+                // and the new TOS date
+                if (current.getTosUpdatedDate() != null && dto.getTosUpdatedDate() != null) {
+                    String duration = calculateDuration(current.getTosUpdatedDate(), dto.getTosUpdatedDate());
+                    current.setDuration(duration);
+                    log.info("Duration calculated for previous posting ID {}: from {} to {} = {}",
+                            current.getPostingId(), current.getTosUpdatedDate(), dto.getTosUpdatedDate(), duration);
+                }
+
+                current.setStatus(PREVIOUS_POSTING);
+                postingRepository.save(current);
+
+                PostingDetails newPosting = createNewPosting(dto, personnel, orbat);
+                newPosting.setStatus(POSTED);
+                newPosting.setTosUpdatedDate(dto.getTosUpdatedDate());
+                newPosting.setToDate(dto.getTosUpdatedDate());
+                newPosting.setDuration("Present"); // New posting ki duration "Present"
+                newPosting.setUnitName(dto.getPostedTo());
+
+                return postingRepository.save(newPosting);
             }
+        }
 
-            postingRepository.save(currentPosting);
-        });
+        log.info("No current posting. Creating first POSTED record");
 
-        // Create new posting record
-        PostingDetails newPosting = new PostingDetails();
-        newPosting.setPersonnelId(personnel.getId());
-
-        // UNDER POSTING fields
-        newPosting.setMovementDate(dto.getMovementDate());
-        newPosting.setPostedTo(dto.getPostedTo());
-        newPosting.setOrbatId(dto.getOrbatId());  // Use dto.getOrbatId()
-        newPosting.setAppointment(dto.getAppointment());
-        newPosting.setPostingOrderIssueDate(dto.getPostingOrderIssueDate());
-
-        // POSTING IN fields
+        PostingDetails newPosting = createNewPosting(dto, personnel, orbat);
+        newPosting.setStatus(POSTED);
         newPosting.setTosUpdatedDate(dto.getTosUpdatedDate());
-        newPosting.setRank(dto.getRank());
+        newPosting.setToDate(dto.getTosUpdatedDate());
+        newPosting.setDuration("Present"); // First posting ki duration "Present"
+        newPosting.setUnitName(dto.getPostedTo());
 
-        // Set from_date = TOS date
-        newPosting.setFromDate(dto.getTosUpdatedDate());
-
-        // New posting is current
-        newPosting.setStatus("UNDER_POSTING");
-        newPosting.setDuration("Present");
-        newPosting.setToDate(null);
-        newPosting.setSosDate(null);
-
-        // Get formation details from ORBAT using dto.getOrbatId()
-        newPosting.setFormationType(orbat.getFormationType());
-        newPosting.setLocation(orbat.getLocation());
-        newPosting.setCommand(orbat.getCommandName());
-
-        PostingDetails saved = postingRepository.save(newPosting);
-        log.info("New posting created with ID: {}, Status: UNDER_POSTING", saved.getPostingId());
-
-        return saved;
+        return postingRepository.save(newPosting);
     }
 
-    /**
-     * Process update to existing posting (when no TOS date)
-     */
-    private PostingDetails processUpdatePosting(PostingRequestDTO dto, Personnel personnel, OrbatStructure orbat) {
-        log.info("Processing UPDATE to current posting for personnel ID: {}", personnel.getId());
+    // ==================== PROCESS UNDER POSTING (NO TOS) ====================
+    private PostingDetails processUnderPosting(PostingRequestDTO dto, Personnel personnel,
+                                               OrbatStructure orbat, Optional<PostingDetails> currentActiveOpt) {
+        log.info("Processing UNDER_POSTING (no TOS) for personnel ID: {}", personnel.getId());
 
-        // Find current posting
-        PostingDetails currentPosting = postingRepository.findCurrentPosting(personnel.getId())
-                .orElseThrow(() -> new RuntimeException(
-                        "No current posting found for personnel ID: " + personnel.getId() +
-                                ". Please create a new posting first."));
+        if (currentActiveOpt.isPresent()) {
+            PostingDetails current = currentActiveOpt.get();
+            log.info("Current active posting found with status: {}, ID: {}",
+                    current.getStatus(), current.getPostingId());
 
-        log.info("Updating current posting ID: {}", currentPosting.getPostingId());
+            if (UNDER_POSTING.equals(current.getStatus())) {
+                log.info("Updating existing UNDER_POSTING ID: {}", current.getPostingId());
+                updatePostingFields(current, dto, orbat);
+                return postingRepository.save(current);
 
-        // Check if unit is changing
-        boolean unitChanged = !currentPosting.getPostedTo().equalsIgnoreCase(dto.getPostedTo());
-        if (unitChanged) {
-            log.info("Unit changing from {} to {}", currentPosting.getPostedTo(), dto.getPostedTo());
-            currentPosting.setPostedTo(dto.getPostedTo());
-            currentPosting.setOrbatId(dto.getOrbatId());  // Use dto.getOrbatId()
+            } else if (POSTED.equals(current.getStatus())) {
+                log.info("Creating new UNDER_POSTING for transfer");
 
-            // Update formation details using dto.getOrbatId()
-            currentPosting.setFormationType(orbat.getFormationType());
-            currentPosting.setLocation(orbat.getLocation());
-            currentPosting.setCommand(orbat.getCommandName());
+                // ✅ Note: Jab naya UNDER_POSTING create ho raha hai, tab previous POSTED ki duration
+                // calculate nahi karenge - ye tab hoga jab iska end date aayega (next TOS)
+                log.info("Previous posting ID {} has tosUpdatedDate: {} - duration will be calculated later",
+                        current.getPostingId(), current.getTosUpdatedDate());
+
+                current.setStatus(PREVIOUS_POSTING);
+                postingRepository.save(current);
+
+                PostingDetails newPosting = createNewPosting(dto, personnel, orbat);
+                newPosting.setStatus(UNDER_POSTING);
+                newPosting.setDuration("Present");
+
+                return postingRepository.save(newPosting);
+            }
         }
 
-        // Update other fields if provided
+        log.info("No current posting. Creating first UNDER_POSTING record");
+
+        PostingDetails newPosting = createNewPosting(dto, personnel, orbat);
+        newPosting.setStatus(UNDER_POSTING);
+        newPosting.setDuration("Present");
+
+        return postingRepository.save(newPosting);
+    }
+
+    // ==================== CREATE NEW POSTING ====================
+    private PostingDetails createNewPosting(PostingRequestDTO dto, Personnel personnel, OrbatStructure orbat) {
+        PostingDetails posting = new PostingDetails();
+
+        posting.setPersonnelId(personnel.getId());
+
+        posting.setMovementDate(dto.getMovementDate());
+        posting.setPostedTo(dto.getPostedTo());
+        posting.setOrbatId(dto.getOrbatId());
+        posting.setAppointment(dto.getAppointment());
+        posting.setPostingOrderIssueDate(dto.getPostingOrderIssueDate());
+        posting.setTypeOfPosting(dto.getTypeOfPosting());
+
+        posting.setRank(dto.getRank());
+        posting.setTosUpdatedDate(dto.getTosUpdatedDate());
+
+        posting.setFormationType(orbat.getFormationType());
+        posting.setLocation(orbat.getLocation());
+        posting.setCommand(orbat.getCommandName());
+
+        posting.setToDate(null);
+        posting.setSosDate(null);
+        posting.setFromDate(null);
+
+        return posting;
+    }
+
+    // ==================== UPDATE FIELDS ====================
+    private void updatePostingFields(PostingDetails posting, PostingRequestDTO dto, OrbatStructure orbat) {
         if (dto.getMovementDate() != null) {
-            currentPosting.setMovementDate(dto.getMovementDate());
-            if (currentPosting.getFromDate() == null) {
-                currentPosting.setFromDate(dto.getMovementDate());
-            }
+            posting.setMovementDate(dto.getMovementDate());
+        }
+
+        if (dto.getPostedTo() != null && !dto.getPostedTo().equals(posting.getPostedTo())) {
+            posting.setPostedTo(dto.getPostedTo());
+            posting.setOrbatId(dto.getOrbatId());
+            posting.setFormationType(orbat.getFormationType());
+            posting.setLocation(orbat.getLocation());
+            posting.setCommand(orbat.getCommandName());
         }
 
         if (dto.getAppointment() != null) {
-            currentPosting.setAppointment(dto.getAppointment());
+            posting.setAppointment(dto.getAppointment());
         }
 
         if (dto.getPostingOrderIssueDate() != null) {
-            currentPosting.setPostingOrderIssueDate(dto.getPostingOrderIssueDate());
+            posting.setPostingOrderIssueDate(dto.getPostingOrderIssueDate());
+        }
+
+        if (dto.getTypeOfPosting() != null) {
+            posting.setTypeOfPosting(dto.getTypeOfPosting());
         }
 
         if (dto.getRank() != null) {
-            currentPosting.setRank(dto.getRank());
+            posting.setRank(dto.getRank());
         }
-
-        PostingDetails saved = postingRepository.save(currentPosting);
-        log.info("Current posting updated successfully");
-
-        return saved;
     }
+
+    // ==================== EXISTING METHODS ====================
 
     @Override
     public Long validateAndGetOrbatId(String formationName) {
-        //Case-insensitive search in ORBAT table
         OrbatStructure orbat = orbatRepository.findByFormationNameCaseInsensitive(formationName.trim())
-                .orElseThrow(() -> new RuntimeException(
-                        "Formation '" + formationName + "' not found in ORBAT master. " +
-                                "Please check the formation name or add it to ORBAT first."));
-
-        log.info("Formation validated: {} (ID: {}, Type: {})",
-                orbat.getName(), orbat.getId(), orbat.getFormationType());
-
+                .orElseThrow(() -> new RuntimeException("Formation not found"));
         return orbat.getId();
     }
 
     @Override
     public PostingDetails getCurrentPosting(Long personnelId) {
-        return postingRepository.findCurrentPosting(personnelId)
-                .orElseThrow(() -> new RuntimeException("No current posting found for personnel ID: " + personnelId));
+        return getCurrentActivePosting(personnelId)
+                .orElseThrow(() -> new RuntimeException("No current posting found"));
     }
 
     @Override
     public List<PostingDetails> getPersonnelPostings(Long personnelId) {
-        return postingRepository.findByPersonnelIdOrderByFromDateDesc(personnelId);
+        return postingRepository.findByPersonnelIdOrderByTosUpdatedDateDesc(personnelId);
     }
 
     @Override
@@ -214,16 +284,17 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
         summary.setPersonnelName(personnel.getFullName());
         summary.setRank(personnel.getRank());
 
-        // Get current posting
-        postingRepository.findCurrentPosting(personnelId).ifPresent(current -> {
+        getCurrentActivePosting(personnelId).ifPresent(current -> {
             summary.setPostingId(current.getPostingId());
             summary.setMovementDate(current.getMovementDate());
             summary.setPostedTo(current.getPostedTo());
             summary.setAppointment(current.getAppointment());
             summary.setPostingOrderIssueDate(current.getPostingOrderIssueDate());
-            summary.setFromDate(current.getFromDate());
+            summary.setTypeOfPosting(current.getTypeOfPosting());
+            summary.setTosUpdatedDate(current.getTosUpdatedDate());
             summary.setStatus(current.getStatus());
             summary.setOrbatId(current.getOrbatId());
+            summary.setUnitName(current.getUnitName());
         });
 
         return summary;
@@ -233,26 +304,131 @@ public class PostingDetailsServiceImpl implements PostingDetailsService {
     @Transactional
     public void deletePosting(Long postingId) {
         PostingDetails posting = postingRepository.findById(postingId)
-                .orElseThrow(() -> new RuntimeException("Posting not found with ID: " + postingId));
+                .orElseThrow(() -> new RuntimeException("Posting not found"));
 
-        if ("UNDER_POSTING".equals(posting.getStatus())) {
-            throw new RuntimeException("Cannot delete current posting. Please complete it first by providing TOS date.");
+        if (UNDER_POSTING.equals(posting.getStatus())) {
+            throw new RuntimeException("Cannot delete current posting");
         }
 
         postingRepository.delete(posting);
-        log.info("Deleted posting ID: {}", postingId);
     }
 
-    // Additional method to get by army number
     public List<PostingDetails> getPersonnelPostingsByArmyNo(String armyNo) {
         Personnel personnel = personnelRepository.findByArmyNo(armyNo)
-                .orElseThrow(() -> new RuntimeException("Personnel not found with Army No: " + armyNo));
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
         return getPersonnelPostings(personnel.getId());
     }
 
     public PostingDetails getCurrentPostingByArmyNo(String armyNo) {
         Personnel personnel = personnelRepository.findByArmyNo(armyNo)
-                .orElseThrow(() -> new RuntimeException("Personnel not found with Army No: " + armyNo));
+                .orElseThrow(() -> new RuntimeException("Personnel not found"));
         return getCurrentPosting(personnel.getId());
+    }
+
+    @Override
+    public Optional<PostingDetails> getCurrentActivePosting(Long personnelId) {
+
+        log.debug("Getting current active posting for personnel ID: {}", personnelId);
+
+        // Priority 1: UNDER_POSTING
+        Optional<PostingDetails> underPosting = postingRepository.findCurrentUnderPosting(personnelId);
+        if (underPosting.isPresent()) {
+            log.debug("Found UNDER_POSTING with ID: {}", underPosting.get().getPostingId());
+            return underPosting;
+        }
+
+        // Priority 2: Latest POSTED
+        Optional<PostingDetails> latestPosted = postingRepository.findLatestPosted(personnelId);
+        if (latestPosted.isPresent()) {
+            log.debug("Found latest POSTED with ID: {}", latestPosted.get().getPostingId());
+            return latestPosted;
+        }
+
+        log.debug("No active posting found for personnel ID: {}", personnelId);
+        return Optional.empty();
+    }
+
+    /**
+     * Get current posting details as DTO for frontend
+     */
+    @Override
+    public PostingResponseDTO getCurrentPostingDetails(Long personnelId) {
+        Optional<PostingDetails> currentOpt = getCurrentActivePosting(personnelId);
+
+        if (currentOpt.isEmpty()) {
+            return null;
+        }
+
+        PostingDetails current = currentOpt.get();
+        PostingResponseDTO dto = new PostingResponseDTO();
+
+        dto.setPostingId(current.getPostingId());
+        dto.setPersonnelId(current.getPersonnelId());
+        dto.setMovementDate(current.getMovementDate());
+        dto.setPostedTo(current.getPostedTo());
+        dto.setAppointment(current.getAppointment());
+        dto.setPostingOrderIssueDate(current.getPostingOrderIssueDate());
+        dto.setTypeOfPosting(current.getTypeOfPosting());
+        dto.setTosUpdatedDate(current.getTosUpdatedDate());
+        dto.setRank(current.getRank());
+        dto.setStatus(current.getStatus());
+        dto.setOrbatId(current.getOrbatId());
+        dto.setUnitName(current.getUnitName());
+        dto.setFormationType(current.getFormationType());
+        dto.setLocation(current.getLocation());
+
+        personnelRepository.findById(current.getPersonnelId()).ifPresent(personnel -> {
+            dto.setArmyNo(personnel.getArmyNo());
+            dto.setPersonnelName(personnel.getFullName());
+        });
+
+        return dto;
+    }
+
+    @Override
+    public List<PostingHistoryDTO> getPostingHistory(Long personnelId) {
+        List<PostingDetails> historyList = postingRepository.findPostingHistory(personnelId);
+
+        return historyList.stream()
+                .map(this::convertToHistoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PostingHistoryDTO convertToHistoryDTO(PostingDetails posting) {
+        PostingHistoryDTO dto = new PostingHistoryDTO();
+        dto.setPostingId(posting.getPostingId());
+        dto.setUnitName(posting.getPostedTo());
+        dto.setAppointment(posting.getAppointment());
+        dto.setTypeOfPosting(posting.getTypeOfPosting());
+        dto.setRank(posting.getRank());
+        dto.setDuration(posting.getDuration() != null ? posting.getDuration() : "-");
+        dto.setStatus(posting.getStatus());
+        return dto;
+    }
+
+    // ==================== DURATION CALCULATION ====================
+    private String calculateDuration(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null || toDate == null) {
+            return "-";
+        }
+
+        Period period = Period.between(fromDate, toDate);
+        int years = period.getYears();
+        int months = period.getMonths();
+        int days = period.getDays();
+
+        StringBuilder duration = new StringBuilder();
+        if (years > 0) {
+            duration.append(years).append(" yr ");
+        }
+        if (months > 0) {
+            duration.append(months).append(" m ");
+        }
+        if (days > 0) {
+            duration.append(days).append(" d");
+        }
+
+        String result = duration.toString().trim();
+        return result.isEmpty() ? "< 1 d" : result;
     }
 }

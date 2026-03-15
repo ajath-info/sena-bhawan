@@ -1,19 +1,16 @@
 package com.example.sena_bhawan.controller;
 
-import com.example.sena_bhawan.dto.CourseDetailsRequestDTO;
 import com.example.sena_bhawan.dto.PersonnelFullDetailsDTO;
 import com.example.sena_bhawan.dto.PostingDetailsDTO;
 import com.example.sena_bhawan.dto.PostingRequestDTO;
-import com.example.sena_bhawan.service.CourseDetailsService;
 import com.example.sena_bhawan.service.PostingDetailsService;
 import com.example.sena_bhawan.entity.PostingDetails;
-import com.example.sena_bhawan.entity.CourseDetails;
+
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -27,7 +24,6 @@ import java.util.Map;
 public class PersonnelFullDetailsController {
 
     private final PostingDetailsService postingService;
-    private final CourseDetailsService courseService;
 
     @PostMapping("/save")
     public ResponseEntity<?> savePosting(@RequestBody PostingRequestDTO dto) {
