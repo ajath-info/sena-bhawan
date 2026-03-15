@@ -11,6 +11,9 @@ import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,12 +31,47 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PersonnelServiceImpl implements PersonnelService {
 
     private final UnitMasterRepository unitMasterRepository;
     private final PostingDetailsRepository postingDetailsRepository;
     private final PersonnelRepository personnelRepository;
     private final CoursePanelRepository coursePanelRepository;
+
+
+    @Override
+    public List<PersonnelDTO> searchPersonnels(String term) {
+        // Step 1: Validate search term
+        validateSearchTerm(term);
+
+        log.info("Searching Personnel with term: {}", term);
+
+        // Step 2: Search in database
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Personnel> personnels = personnelRepository.findDistinctByArmyNoStartingWith(term, pageable);
+
+        // Step 3: Convert to DTO (only id and name)
+        return personnels.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    public void validateSearchTerm(String term) {
+        if (term == null || term.trim().length() < 4) {
+            throw new RuntimeException("Minimum 4 characters required for search");
+        }
+    }
+
+    private PersonnelDTO convertToDTO(Personnel personnel) {
+        PersonnelDTO dto = new PersonnelDTO();
+        dto.setId(personnel.getId());
+        dto.setArmyNo(personnel.getArmyNo());
+        dto.setFullName(personnel.getFullName());
+        dto.setRank(personnel.getRank());
+        return dto;
+    }
 
     // STATIC labels in EXACT order as frontend
     private final List<String> STATIC_RANK_LABELS = Arrays.asList(

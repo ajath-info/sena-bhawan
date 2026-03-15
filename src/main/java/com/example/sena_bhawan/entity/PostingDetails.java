@@ -74,4 +74,7 @@ public class PostingDetails {
     @Column(name = "orbat_id")
     private Long orbatId;
 
+    @Column(name = "posting_type")
+    private String typeOfPosting;
+
 }

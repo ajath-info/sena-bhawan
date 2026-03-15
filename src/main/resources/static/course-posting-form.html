@@ -491,9 +491,8 @@
 
 <div class="container">
 
-  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+  <!-- SIDEBAR CONTAINER - populated by sidebar.js -->
   <aside class="sidebar" id="sidebarContainer">
-    <!-- Loading indicator (optional) -->
     <div style="color: white; padding: 20px; text-align: center;">
       Loading menu...
     </div>
@@ -509,14 +508,20 @@
 
     <div class="content-area">
 
-      <!-- Officer Selection -->
+      <!-- Officer Selection with Search -->
       <div class="card">
         <div class="section-title">Officer Selection</div>
         <label>Enter Army Number *</label>
-        <input type="text" id="officerInput" placeholder="Enter Army Number">
+        <div style="position: relative;">
+          <input type="text" id="officerInput" placeholder="Enter Army Number (min 4 characters)" autocomplete="off">
+          <div id="officerRecommendationDropdown" class="recommendation-dropdown" style="display: none;"></div>
+        </div>
         <div id="officerDetails" style="display:none"></div>
+        <input type="hidden" id="selectedPersonnelId">
         <input type="hidden" id="currentPostingId">
         <input type="hidden" id="selectedOrbatId">
+        <!-- 🔥 NEW: Hidden field for personnel rank -->
+        <input type="hidden" id="personnelRank">
       </div>
 
       <div class="tabs">
@@ -528,6 +533,10 @@
         <div class="section-title">Under Posting</div>
 
         <div class="form-grid three-col">
+          <div>
+            <label>Posting Order Issue Date</label>
+            <input type="date" id="postingOrderIssueDate">
+          </div>
 
           <div>
             <label>Movement Date (Mov Dt)</label>
@@ -536,7 +545,10 @@
 
           <div>
             <label>Posted To (Unit / Formation)</label>
-            <input type="text" id="postedTo" placeholder="e.g. 12 INF BN">
+            <div style="position: relative;">
+              <input type="text" id="postedTo" placeholder="e.g. 12 INF BN" autocomplete="off">
+              <div id="unitRecommendationDropdown" class="recommendation-dropdown" style="display: none;"></div>
+            </div>
           </div>
 
           <div>
@@ -547,17 +559,11 @@
           </div>
 
           <div>
-            <label>Posting Order Issue Date</label>
-            <input type="date" id="postingOrderIssueDate">
-          </div>
-
-          <div>
             <label>Type of Posting</label>
             <select id="postingTypeSelect">
               <option value="">Select Type</option>
             </select>
           </div>
-
         </div>
       </div>
 
@@ -566,7 +572,6 @@
         <div class="section-title">Posting In</div>
 
         <div class="form-grid two-col">
-
           <div>
             <label>TOS Update Date</label>
             <input type="date" id="tosUpdatedDate">
@@ -574,11 +579,53 @@
 
           <div>
             <label>Rank (If On Promotion)</label>
-            <select id="rankSelect">
+            <select id="rankSelect" style="opacity:1; background-color:white;">
               <option value="">Select Rank</option>
             </select>
           </div>
+        </div>
+      </div>
 
+      <!-- Current Status Display -->
+      <div id="currentStatusCard" class="card" style="display: none; background: #f0f9ff; border-left: 4px solid #1b4332;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-weight: 600;">Current Status:</span>
+            <span id="currentStatusText" style="background: #1b4332; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;"></span>
+          </div>
+          <div>
+            <span style="font-weight: 600;">Current Unit:</span>
+            <span id="currentUnitText"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posting History Section -->
+      <div class="card" id="historySection" style="display: none; margin-top: 20px;">
+        <div class="section-title">Posting History</div>
+
+        <div style="overflow-x: auto;">
+          <table id="postingHistoryTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+            <tr>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">S.No.</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Unit Name</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Appointment</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Type of Posting</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Rank</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Duration</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">Status</th>
+            </tr>
+            </thead>
+            <tbody id="historyTableBody">
+            <!-- History rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Show message if no history -->
+        <div id="noHistoryMessage" style="text-align: center; padding: 30px; color: #6b7280; display: none;">
+          <p>No posting history available</p>
         </div>
       </div>
 
@@ -591,15 +638,16 @@
   </main>
 </div>
 
-
 <script>
-  // ✅ APIs - SIRF YEH LINE ADD KARO
-  const DROPDOWN_API = "http://localhost:6060/api/dropdown";
-  const SAVE_API = "http://localhost:6060/personnel-full-details/save";
-  const DELETE_API = "http://localhost:6060/personnel-full-details";
-  const ORBAT_SEARCH_API = "http://localhost:6060/api/orbat/search";  // 🔥 NEW API
+  // ==================== CONFIGURATION ====================
+  const BASE_URL = "http://localhost:6060";
+  const DROPDOWN_API = `${BASE_URL}/api/dropdown`;
+  const PERSONNEL_SEARCH_API = `${BASE_URL}/api/personnel/search`;
+  const PERSONNEL_API = `${BASE_URL}/api/personnel`;
+  const SAVE_API = `${BASE_URL}/personnel-full-details/save`;
+  const ORBAT_SEARCH_API = `${BASE_URL}/api/orbat/search`;
 
-  // DOM Elements
+  // ==================== DOM ELEMENTS ====================
   const movementDate = document.getElementById("movementDate");
   const postedTo = document.getElementById("postedTo");
   const postingOrderIssueDate = document.getElementById("postingOrderIssueDate");
@@ -610,42 +658,42 @@
   const officerDetails = document.getElementById("officerDetails");
   const officerInput = document.getElementById("officerInput");
   const currentPostingId = document.getElementById("currentPostingId");
+  const selectedPersonnelId = document.getElementById("selectedPersonnelId");
+  const selectedOrbatId = document.getElementById("selectedOrbatId");
+  const personnelRank = document.getElementById("personnelRank");
   const saveBtn = document.getElementById("saveBtn");
   const cancelBtn = document.getElementById("cancelBtn");
+  const currentStatusCard = document.getElementById("currentStatusCard");
+  const currentStatusText = document.getElementById("currentStatusText");
+  const currentUnitText = document.getElementById("currentUnitText");
 
-  // 🔥 NEW: Hidden field for ORBAT ID
-  const selectedOrbatId = document.getElementById("selectedOrbatId") || createHiddenField();
+  // ==================== DROPDOWNS ====================
+  const officerRecommendationDropdown = document.getElementById("officerRecommendationDropdown");
+  const unitRecommendationDropdown = document.getElementById("unitRecommendationDropdown");
 
-  function createHiddenField() {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.id = "selectedOrbatId";
-    document.body.appendChild(input);
-    return input;
-  }
-
-  // State
+  // ==================== STATE ====================
   let currentArmyNo = null;
   let currentPostingIdValue = null;
+  let currentPersonnelId = null;
 
-  // 🔥 NEW: Unit search variables
+  // Search timeouts
+  let officerSearchTimeout = null;
   let unitSearchTimeout = null;
+  let officerAbortController = null;
   let unitAbortController = null;
 
-  // 🔥 NEW: Create unit recommendation dropdown
-  const unitRecommendationDropdown = document.createElement("div");
-  unitRecommendationDropdown.className = "recommendation-dropdown";
-  unitRecommendationDropdown.style.display = "none";
-  postedTo.parentNode.style.position = "relative";
-  postedTo.parentNode.appendChild(unitRecommendationDropdown);
-
-  // Load dropdowns (EXISTING - NO CHANGE)
+  // ==================== INITIAL LOAD ====================
   document.addEventListener("DOMContentLoaded", function () {
     loadDropdown("APPOINTMENT", appointmentSelect, "Select Appointment");
     loadDropdown("POSTING_TYPE", postingTypeSelect, "Select Type");
     loadDropdown("RANK", rankSelect, "Select Rank");
+
+    clearForm();
+    officerDetails.style.display = "none";
+    currentStatusCard.style.display = "none";
   });
 
+  // ==================== HELPER FUNCTIONS ====================
   function loadDropdown(type, selectElement, defaultText) {
     if (!selectElement) return;
     fetch(`${DROPDOWN_API}/${type}`)
@@ -658,26 +706,207 @@
           opt.textContent = item.name;
           selectElement.appendChild(opt);
         });
+
+        if (type === "POSTING_TYPE" && !data.find(d => d.name === "ON_PROMOTION")) {
+          const opt = document.createElement("option");
+          opt.value = "ON_PROMOTION";
+          opt.textContent = "On Promotion";
+          selectElement.appendChild(opt);
+        }
       })
       .catch(err => console.error(`Failed to load ${type}`, err));
   }
 
   function getOfficerImageUrl(officer) {
-    return officer?.officerImage ? `http://localhost:6060/${officer.officerImage}` : "/assets/default-avatar.png";
+    return officer?.officerImage ? `${BASE_URL}/${officer.officerImage}` : "/assets/default-avatar.png";
   }
 
-  function fmt(d) {
-    if (!d) return "-";
-    return new Date(d).toLocaleDateString("en-GB");
+  function formatDateForInput(dateStr) {
+    if (!dateStr) return "";
+    if (typeof dateStr === 'string' && dateStr.includes('-')) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0];
+    }
+    return "";
   }
 
-  // 🔥 NEW: UNIT SEARCH WITH DEBOUNCE
+  // ==================== OFFICER SEARCH ====================
+  officerInput.addEventListener("input", (e) => {
+    const searchTerm = e.target.value.trim();
+    selectedPersonnelId.value = "";
+    currentArmyNo = searchTerm || null;
+
+    clearTimeout(officerSearchTimeout);
+
+    if (searchTerm.length < 4) {
+      officerRecommendationDropdown.style.display = "none";
+      officerDetails.style.display = "none";
+      clearForm();
+      currentStatusCard.style.display = "none";
+      return;
+    }
+
+    officerSearchTimeout = setTimeout(() => {
+      searchPersonnel(searchTerm);
+    }, 500);
+  });
+
+  async function searchPersonnel(term) {
+    if (officerAbortController) officerAbortController.abort();
+    officerAbortController = new AbortController();
+
+    try {
+      officerRecommendationDropdown.innerHTML = '<div class="recommendation-loading">Searching personnel...</div>';
+      officerRecommendationDropdown.style.display = "block";
+
+      const response = await fetch(`${PERSONNEL_SEARCH_API}?term=${encodeURIComponent(term)}`, {
+        signal: officerAbortController.signal
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data.length > 0) {
+        displayPersonnelRecommendations(result.data);
+      } else {
+        officerRecommendationDropdown.innerHTML = `
+          <div class="recommendation-loading" style="color: #ef4444;">
+            ⚠️ No personnel found with Army No: "${term}"
+          </div>
+        `;
+      }
+    } catch (error) {
+      if (error.name === "AbortError") return;
+      console.error("Personnel search error:", error);
+      officerRecommendationDropdown.style.display = "none";
+    }
+  }
+
+  function displayPersonnelRecommendations(personnelList) {
+    let html = "";
+    personnelList.forEach(person => {
+      html += `
+        <div class="recommendation-item" onclick="selectPersonnel(${person.id}, '${person.armyNo}', '${person.fullName}', '${person.rank || ''}')">
+          <div class="army-no">${person.armyNo}</div>
+          <div style="font-size: 12px; color: #4b5563;">${person.fullName} ${person.rank ? '- ' + person.rank : ''}</div>
+        </div>
+      `;
+    });
+    officerRecommendationDropdown.innerHTML = html;
+  }
+
+  // ==================== SELECT PERSONNEL ====================
+  window.selectPersonnel = function(personnelId, armyNo, fullName, rank) {
+    officerInput.value = armyNo;
+    selectedPersonnelId.value = personnelId;
+    currentArmyNo = armyNo;
+    currentPersonnelId = personnelId;
+
+    // Store personnel rank
+    personnelRank.value = rank || '';
+
+    officerRecommendationDropdown.style.display = "none";
+
+    officerDetails.style.display = "flex";
+    officerDetails.className = "officer-card";
+    officerDetails.innerHTML = `
+      <div class="officer-avatar">
+        <img src="/assets/default-avatar.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+      </div>
+      <div class="officer-info">
+        <h4>${armyNo} - ${fullName}</h4>
+        <p>${rank || 'No Rank'}</p>
+      </div>
+    `;
+
+    loadOfficerDetails(personnelId);
+    loadCurrentPosting(personnelId);
+    loadPostingHistory(personnelId);
+  }
+
+  // ==================== LOAD OFFICER DETAILS ====================
+  async function loadOfficerDetails(personnelId) {
+    try {
+      const response = await fetch(`${PERSONNEL_API}/${personnelId}`);
+      if (!response.ok) throw new Error('Personnel not found');
+      const personnel = await response.json();
+
+      officerDetails.style.display = "flex";
+      officerDetails.className = "officer-card";
+      officerDetails.innerHTML = `
+        <div class="officer-avatar">
+          <img src="${getOfficerImageUrl(personnel)}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+        </div>
+        <div class="officer-info">
+          <h4>${personnel.armyNo} - ${personnel.fullName}</h4>
+          <p>${personnel.rank || 'No Rank'}</p>
+        </div>
+      `;
+    } catch (error) {
+      console.error("Error loading officer details:", error);
+    }
+  }
+
+  // ==================== LOAD CURRENT POSTING ====================
+  async function loadCurrentPosting(personnelId) {
+    try {
+      const response = await fetch(`${PERSONNEL_API}/${personnelId}/current-posting`);
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const posting = result.data;
+
+        currentStatusCard.style.display = "block";
+        currentStatusText.textContent = posting.status || 'UNDER_POSTING';
+        currentUnitText.textContent = posting.postedTo || 'Not assigned';
+
+        if (posting.status === 'POSTED') {
+          currentStatusText.style.background = '#059669';
+        } else if (posting.status === 'UNDER_POSTING') {
+          currentStatusText.style.background = '#d97706';
+        }
+
+        if (posting.status === 'UNDER_POSTING') {
+          movementDate.value = formatDateForInput(posting.movementDate);
+          postingOrderIssueDate.value = formatDateForInput(posting.postingOrderIssueDate);
+          tosUpdatedDate.value = formatDateForInput(posting.tosUpdatedDate);
+          postedTo.value = posting.postedTo || '';
+          appointmentSelect.value = posting.appointment || '';
+          postingTypeSelect.value = posting.typeOfPosting || '';
+
+          // SIMPLIFIED RANK LOGIC: Always use posting rank if available, otherwise personnel rank
+          if (posting.rank) {
+            rankSelect.value = posting.rank;
+          } else {
+            rankSelect.value = personnelRank.value;
+          }
+
+          if (posting.orbatId) selectedOrbatId.value = posting.orbatId;
+          if (posting.postingId) {
+            currentPostingId.value = posting.postingId;
+            currentPostingIdValue = posting.postingId;
+          }
+        } else {
+          clearForm();
+        }
+      } else {
+        currentStatusCard.style.display = "none";
+        clearForm();
+      }
+    } catch (error) {
+      console.error("Error loading current posting:", error);
+    }
+  }
+
+  // ==================== UNIT SEARCH ====================
   postedTo.addEventListener("input", (e) => {
     const searchTerm = e.target.value.trim();
-
-    // Clear selected ORBAT ID when user types
     selectedOrbatId.value = "";
-
     clearTimeout(unitSearchTimeout);
 
     if (searchTerm.length < 3) {
@@ -691,10 +920,7 @@
   });
 
   async function searchUnits(term) {
-    if (unitAbortController) {
-      unitAbortController.abort();
-    }
-
+    if (unitAbortController) unitAbortController.abort();
     unitAbortController = new AbortController();
 
     try {
@@ -723,7 +949,6 @@
     }
   }
 
-  // 🔥 NEW: Display units with ID
   function displayUnitRecommendations(units) {
     let html = "";
     units.forEach(unit => {
@@ -733,52 +958,74 @@
         </div>
       `;
     });
-
     unitRecommendationDropdown.innerHTML = html;
   }
 
-  // 🔥 NEW: Select unit - sets both name and ID
   window.selectUnit = function(orbatId, unitName) {
     postedTo.value = unitName;
-    selectedOrbatId.value = orbatId;  // ID store ho rahi hai
+    selectedOrbatId.value = orbatId;
     unitRecommendationDropdown.style.display = "none";
-    console.log("Selected Unit ID:", orbatId, "Name:", unitName);
   }
 
-  // 🔥 NEW: Close dropdown when clicking outside
+  // ==================== CLICK OUTSIDE ====================
   document.addEventListener("click", (e) => {
+    if (!officerInput.contains(e.target) && !officerRecommendationDropdown.contains(e.target)) {
+      officerRecommendationDropdown.style.display = "none";
+    }
     if (!postedTo.contains(e.target) && !unitRecommendationDropdown.contains(e.target)) {
       unitRecommendationDropdown.style.display = "none";
     }
   });
 
-  // Army Number input (EXISTING - NO CHANGE)
-  officerInput.addEventListener("input", () => {
-    const armyNo = officerInput.value.trim();
-    if (!armyNo) {
-      officerDetails.style.display = "none";
-      currentArmyNo = null;
-      return;
+  // ==================== LOAD POSTING HISTORY ====================
+  async function loadPostingHistory(personnelId) {
+    try {
+      const response = await fetch(`${PERSONNEL_API}/${personnelId}/posting-history`);
+      const result = await response.json();
+
+      const historySection = document.getElementById("historySection");
+      const tableBody = document.getElementById("historyTableBody");
+      const noHistoryMessage = document.getElementById("noHistoryMessage");
+
+      if (result.success && result.data && result.data.length > 0) {
+        historySection.style.display = "block";
+        noHistoryMessage.style.display = "none";
+        tableBody.innerHTML = "";
+
+        result.data.forEach((item, index) => {
+          const row = document.createElement("tr");
+          const statusColor = '#6b7280';
+          const statusText = 'PREVIOUS';
+
+          row.innerHTML = `
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.unitName || '-'}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.appointment || '-'}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.typeOfPosting || '-'}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.rank || '-'}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.duration || '-'}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+              <span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                ${statusText}
+              </span>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } else {
+        historySection.style.display = "block";
+        tableBody.innerHTML = "";
+        noHistoryMessage.style.display = "block";
+      }
+    } catch (error) {
+      console.error("Error loading posting history:", error);
     }
+  }
 
-    currentArmyNo = armyNo;
-    officerDetails.style.display = "flex";
-    officerDetails.className = "officer-card";
-    officerDetails.innerHTML = `
-      <div class="officer-avatar">
-        <img src="/assets/default-avatar.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
-      </div>
-      <div class="officer-info">
-        <h4>Army Number: ${armyNo}</h4>
-        <p>Will be validated at save time</p>
-      </div>
-    `;
-  });
-
-  // ✅ Save button - SIRF ORBAT_ID ADD KI HAI
+  // ==================== SAVE BUTTON ====================
   saveBtn.onclick = async () => {
-    if (!currentArmyNo) {
-      alert("Please enter Army Number");
+    if (!selectedPersonnelId.value) {
+      alert("Please select a valid officer");
       officerInput.focus();
       return;
     }
@@ -789,26 +1036,26 @@
       return;
     }
 
-    // 🔥 NEW: Check if unit was selected from dropdown
     if (!selectedOrbatId.value) {
-      alert("Please select a unit from the recommendations");
+      alert("Please select a unit from recommendations");
       postedTo.focus();
       return;
     }
 
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner"></span> Saving...';
+    saveBtn.innerHTML = 'Saving...';
 
     const requestData = {
       armyNo: currentArmyNo,
-      appointment: appointmentSelect.value,
-      postingType: postingTypeSelect.value,
+      personnelId: parseInt(selectedPersonnelId.value),
+      appointment: appointmentSelect.value || null,
+      typeOfPosting: postingTypeSelect.value || null,
       movementDate: movementDate.value || null,
       postedTo: postedTo.value.trim(),
       postingOrderIssueDate: postingOrderIssueDate.value || null,
       tosUpdatedDate: tosUpdatedDate.value || null,
       rank: rankSelect.value || null,
-      orbatId: parseInt(selectedOrbatId.value)  // 🔥 NEW: ORBAT ID add ki
+      orbatId: parseInt(selectedOrbatId.value)
     };
 
     if (currentPostingIdValue) {
@@ -826,31 +1073,14 @@
 
       if (result.success) {
         alert("✅ " + result.message);
-
         if (result.data) {
           currentPostingIdValue = result.data.postingId;
           currentPostingId.value = result.data.postingId;
-
-          officerDetails.innerHTML = `
-            <div class="officer-avatar">
-              <img src="/assets/default-avatar.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" />
-            </div>
-            <div class="officer-info">
-              <h4>Army Number: ${currentArmyNo}</h4>
-              <p>Personnel ID: ${result.data.personnelId}</p>
-              <p>Status: ${result.data.status}</p>
-              <p><span style="background:#52b788;color:white;padding:2px 8px;border-radius:4px;">✅ Active</span></p>
-            </div>
-          `;
-        }
-
-        if (tosUpdatedDate.value) {
-          clearForm();
+          loadCurrentPosting(currentPersonnelId);
+          loadPostingHistory(currentPersonnelId);
         }
       } else {
         alert("❌ " + result.message);
-        currentPostingIdValue = null;
-        currentPostingId.value = "";
       }
     } catch (error) {
       console.error("Network error:", error);
@@ -861,16 +1091,20 @@
     }
   };
 
-  // ✅ Cancel button - SIRF ORBAT_ID CLEAR KI
+  // ==================== CANCEL BUTTON ====================
   cancelBtn.onclick = () => {
-    if (confirm("Are you sure you want to clear the form? Unsaved changes will be lost.")) {
+    if (confirm("Clear form? Unsaved changes will be lost.")) {
       clearForm();
       officerInput.value = "";
+      selectedPersonnelId.value = "";
       officerDetails.style.display = "none";
+      currentStatusCard.style.display = "none";
       currentArmyNo = null;
+      currentPersonnelId = null;
       currentPostingIdValue = null;
       currentPostingId.value = "";
-      selectedOrbatId.value = "";  // 🔥 NEW: Clear ORBAT ID
+      selectedOrbatId.value = "";
+      personnelRank.value = "";
     }
   };
 
@@ -882,12 +1116,11 @@
     postingTypeSelect.value = "";
     tosUpdatedDate.value = "";
     rankSelect.value = "";
-    selectedOrbatId.value = "";  // 🔥 NEW: Clear ORBAT ID
+    selectedOrbatId.value = "";
   }
 
-  // Enter key (EXISTING - NO CHANGE)
   officerInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && selectedPersonnelId.value) {
       e.preventDefault();
       saveBtn.click();
     }

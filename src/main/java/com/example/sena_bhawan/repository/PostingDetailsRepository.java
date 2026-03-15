@@ -17,6 +17,21 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
     List<PostingDetailsProjection> findByPersonnelIdInAndStatus(List<Long> personnelIds, String status);
     List<PostingDetails> findByPersonnelId(Long personnelId);
 
+    // ✅ Order by tosUpdatedDate instead of fromDate
+    List<PostingDetails> findByPersonnelIdOrderByTosUpdatedDateDesc(Long personnelId);
+
+    // Find current UNDER_POSTING
+    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'UNDER_POSTING'")
+    Optional<PostingDetails> findCurrentUnderPosting(@Param("personnelId") Long personnelId);
+
+    // Find latest POSTED (using tosUpdatedDate)
+    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'POSTED' ORDER BY p.tosUpdatedDate DESC")
+    Optional<PostingDetails> findLatestPosted(@Param("personnelId") Long personnelId);
+
+
+    // Find all previous postings for history
+    List<PostingDetails> findByPersonnelIdAndStatusOrderByTosUpdatedDateDesc(Long personnelId, String status);
+
     Optional<Object> findTopByPersonnelIdOrderByFromDateDesc(Long id);
 
     @Query("""
@@ -68,7 +83,7 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
     Optional<PostingDetails> findCurrentPosting(@Param("personnelId") Long personnelId);
 
     // Find all historical postings (status = POSTED)
-    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'POSTED' ORDER BY p.toDate DESC")
+    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status IN ('PREVIOUS_POSTING') ORDER BY p.tosUpdatedDate DESC NULLS LAST")
     List<PostingDetails> findPostingHistory(@Param("personnelId") Long personnelId);
 
     // Check if personnel has any posting

@@ -1,14 +1,18 @@
 package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.dto.PostingDetailsDTO;
+import com.example.sena_bhawan.dto.PostingHistoryDTO;
 import com.example.sena_bhawan.dto.PostingRequestDTO;
 import com.example.sena_bhawan.dto.PostingResponseDTO;
 import com.example.sena_bhawan.entity.PostingDetails;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostingDetailsService {
-
+    Optional<PostingDetails> getCurrentActivePosting(Long personnelId);
+    PostingResponseDTO getCurrentPostingDetails(Long personnelId);
+    List<PostingHistoryDTO> getPostingHistory(Long personnelId);
     List<PostingDetails> getByPersonnel(Long personnelId);
 
 
