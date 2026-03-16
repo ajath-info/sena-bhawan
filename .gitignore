@@ -32,3 +32,4 @@ target/*
 ./.idea/*
 ./.idea/
 ./.idea/workspace.xml
+/bin/

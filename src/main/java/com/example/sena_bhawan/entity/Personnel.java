@@ -27,6 +27,10 @@ public class Personnel {
 
     private String armyNo;
     private String rank;
+    @Column(name = "first_name")
+    private String firstName;
+    @Column(name = "last_name")
+    private String lastName;
     private String fullName;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfCommission;
@@ -35,6 +39,7 @@ public class Personnel {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String placeOfBirth;
+    private String caseType;
     private String officerImage;
 
     private String nrs;
@@ -73,6 +78,8 @@ public class Personnel {
     private String irsTransfer;
     @Column(name = "medical_remark")
     private String medicalRemark;
+    @Column(name = "medical_code", length = 20)
+    private String medicalCode;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -98,6 +105,10 @@ public class Personnel {
     @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PersonnelFamily> familyMembers;
+
+    @OneToMany(mappedBy = "personnel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PersonnelMedicalDetails> medicalDetails;
 
     public Personnel(Long personnelId) {
     }

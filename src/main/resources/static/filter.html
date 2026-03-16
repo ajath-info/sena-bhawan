@@ -1138,17 +1138,11 @@
                   <th>Unit</th>
                   <th>Command</th>
                   <th>Corps</th>
-                  <th>Division</th>
-                  <th>Est Type</th>
                   <th>Medical</th>
-                  <th>TOS From</th>
-                  <th>TOS To</th>
                   <th>Course</th>
                   <th>Civil Qual</th>
                   <th>Sports</th>
                   <th>POB</th>
-                  <th>Area Type</th>
-                  <th>Posting Due</th>
                   <th>Actions</th>
                 </tr>
                 </thead>
@@ -1480,7 +1474,7 @@
     if (!officers || officers.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="21" style="text-align: center; padding: 40px;">
+          <td colspan="15" style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
             <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
             <div style="color: #6b7280;">Try adjusting your filters</div>
@@ -1513,17 +1507,11 @@
           <td>${o.unit || '—'}</td>
           <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
           <td>${o.corps || '—'}</td>
-          <td>${o.division || '—'}</td>
-          <td>${o.establishmentType || '—'}</td>
           <td><span class="badge ${o.medicalCategory === 'SHAPE-1' ? 'badge-success' : 'badge-gray'}">${o.medicalCategory || '—'}</span></td>
-          <td>${o.tosStart || '—'}</td>
-          <td>${o.tosEnd || '—'}</td>
           <td>${courseName}</td>
           <td>${civilQual}</td>
           <td>${sports}</td>
           <td>${o.placeOfBirth || '—'}</td>
-          <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
-          <td>${o.postingDueMonths || '—'} M</td>
           <td>
             <div class="action-icons">
               <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>

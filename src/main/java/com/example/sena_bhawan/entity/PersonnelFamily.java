@@ -21,6 +21,8 @@ public class PersonnelFamily {
     private String name;
     private String relationship;
     private String contactNumber;
+    private String part2OrderNo;
+    private LocalDate orderDate;
 
     private LocalDateTime createdAt;
 

@@ -5,6 +5,9 @@ import com.example.sena_bhawan.dto.OrbatDropdownDTO;
 import com.example.sena_bhawan.dto.OrbatSearchDTO;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 import com.example.sena_bhawan.entity.OrbatStructure;
+import com.example.sena_bhawan.entity.formation.Brigade;
+import com.example.sena_bhawan.entity.formation.Corps;
+import com.example.sena_bhawan.entity.formation.Division;
 import com.example.sena_bhawan.repository.OrbatRepository;
 import com.example.sena_bhawan.repository.OrbatStructureRepository;
 
@@ -127,6 +130,7 @@ public class OrbatStructureServiceImpl implements OrbatStructureService {
         }).toList();
     }
 
+    @Override
     public List<OrbatDropdownDTO> getByFormationType(String formationType) {
         List<OrbatStructure> orbatList = orbatRepository.findByFormationType(formationType);
 
@@ -139,6 +143,77 @@ public class OrbatStructureServiceImpl implements OrbatStructureService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DropdownDTO> getCorpsByCommandId(Long commandId) {
+
+        if (commandId == null) {
+            throw new IllegalArgumentException("Command is required to fetch Corps");
+        }
+
+        List<Corps> corpsList = corpsRepository.findByCommandId(commandId);
+
+        // Agar koi corps nahi mila to empty list return karo
+        if (corpsList.isEmpty()) {
+            return List.of();
+        }
+
+        return corpsList.stream()
+                .map(corps -> {
+                    DropdownDTO dto = new DropdownDTO();
+                    dto.setId(corps.getCorpsId());
+                    dto.setName(corps.getCorpsName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DropdownDTO> getDivisionsByCorpsId(Long corpsId) {
+        // Agar corpsId null hai to exception throw karo
+        if (corpsId == null) {
+            throw new IllegalArgumentException("Corps is required to fetch Divisions");
+        }
+
+        List<Division> divisionList = divisionRepository.findByCorpsId(corpsId);
+
+        // Agar koi division nahi mila to empty list return karo
+        if (divisionList.isEmpty()) {
+            return List.of();
+        }
+
+        return divisionList.stream()
+                .map(division -> {
+                    DropdownDTO dto = new DropdownDTO();
+                    dto.setId(division.getDivisionId());
+                    dto.setName(division.getDivisionName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DropdownDTO> getBrigadesByDivisionId(Long divisionId) {
+        // Agar divisionId null hai to exception throw karo
+        if (divisionId == null) {
+            throw new IllegalArgumentException("Division is required to fetch Brigades");
+        }
+
+        List<Brigade> brigadeList = brigadeRepository.findByDivisionId(divisionId);
+
+        // Agar koi brigade nahi mila to empty list return karo
+        if (brigadeList.isEmpty()) {
+            return List.of();
+        }
+
+        return brigadeList.stream()
+                .map(brigade -> {
+                    DropdownDTO dto = new DropdownDTO();
+                    dto.setId(brigade.getBrigadeId());
+                    dto.setName(brigade.getBrigadeName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<OrbatSimpleDTO> getCorpsByCommand(String commandName) {

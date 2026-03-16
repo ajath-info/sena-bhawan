@@ -20,12 +20,10 @@ import java.util.stream.Collectors;
 public class CourseEligibilityService {
 
     private final CourseMasterRepository courseRepository;
-    private final RankMasterRepository rankRepository;
     private final UnitMasterRepository unitRepository;
     private final DropdownMasterRepository dropdownRepository;
 
     private final CourseEligibilityRepo eligibilityRepository;
-    private final CourseRankMappingRepository rankMappingRepository;
     private final CourseUnitMappingRepository unitMappingRepository;
     private final CourseDropdownMappingRepository dropdownMappingRepository;
 
@@ -42,37 +40,38 @@ public class CourseEligibilityService {
         // Save or update Course Eligibility Master (only course-specific fields)
         CourseEligibilityMaster eligibility = saveOrUpdateEligibilityMaster(course, dto);
 
-        // Save Rank Mappings
-        saveRankMappings(course, dto.getRankIds());
+        // Collect ALL dropdown mappings in a single list
+        List<CourseDropdownMapping> allDropdownMappings = new ArrayList<>();
 
-        // Save Unit Mappings
-        saveUnitMappings(course, dto.getUnitIds());
+        // Add mappings from each category
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getRankIds(), "RANK"));
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getPostingTypeIds(), "POST_TYPES"));
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getMinCourseGrading(), "COURSE_GRADE"));
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getEducationalQualifications(), "CIVIL_QUALIFICATION"));
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getMedicalCategories(), "MEDICAL"));
+        allDropdownMappings.addAll(saveDropdownMappings(course, dto.getEstablishmentTypes(), "ESTABLISHMENT"));
 
-        // Save all dropdown mappings using the single repository
-        saveDropdownMappings(course, dto.getPostingTypeIds(), "POST_TYPES");
-        saveDropdownMappings(course, dto.getMinCourseGrading(), "COURSE_GRADE");
-        saveDropdownMappings(course, dto.getEducationalQualifications(), "CIVIL_QUALIFICATION");
-        saveDropdownMappings(course, dto.getMedicalCategories(), "MEDICAL");
-        saveDropdownMappings(course, dto.getEstablishmentTypes(), "ESTABLISHMENT");
-
-        // For remarks (if they come from dropdown_master with type "REMARKS")
+        // Handle remarks
         if (dto.getRemarks() != null && !dto.getRemarks().isEmpty()) {
-            // You need to get the dropdown IDs for these remark values
             List<Long> remarkIds = getRemarkDropdownIds(dto.getRemarks());
-            saveDropdownMappings(course, remarkIds, "REMARKS");
+            allDropdownMappings.addAll(saveDropdownMappings(course, remarkIds, "REMARKS"));
         }
+
+        // Save ALL dropdown mappings in a single batch
+        if (!allDropdownMappings.isEmpty()) {
+            dropdownMappingRepository.saveAll(allDropdownMappings);
+        }
+
+        // Save Unit Mappings (if units are not in dropdown_master)
+        saveUnitMappings(course, dto.getUnitIds());
 
         return eligibility;
     }
 
     private void deleteExistingMappings(Integer courseId) {
-
         // Delete from all mapping tables
-        rankMappingRepository.deleteByCourseId(courseId);
         unitMappingRepository.deleteByCourseId(courseId);
         dropdownMappingRepository.deleteByCourseId(courseId); // This deletes all dropdown mappings
-
-        // Note: We don't delete from course_eligibility_master - we update it
     }
 
     private CourseEligibilityMaster saveOrUpdateEligibilityMaster(CourseMaster course, CourseEligibilityDTO dto) {
@@ -100,25 +99,6 @@ public class CourseEligibilityService {
         return eligibilityRepository.save(eligibility);
     }
 
-    private void saveRankMappings(CourseMaster course, List<Long> rankIds) {
-        if (rankIds != null && !rankIds.isEmpty()) {
-            List<CourseRankMapping> mappings = rankIds.stream()
-                    .map(rankId -> {
-                        RankMaster rank = rankRepository.findById(rankId)
-                                .orElseThrow(() -> new EntityNotFoundException("Rank not found with ID: " + rankId));
-
-                        CourseRankMapping mapping = new CourseRankMapping();
-                        mapping.setCourse(course);
-                        mapping.setRank(rank);
-                        return mapping;
-                    })
-                    .collect(Collectors.toList());
-
-            rankMappingRepository.saveAll(mappings);
-            log.debug("Saved {} rank mappings for course ID: {}", mappings.size(), course.getSrno());
-        }
-    }
-
     private void saveUnitMappings(CourseMaster course, List<Long> unitIds) {
         if (unitIds != null && !unitIds.isEmpty()) {
             List<CourseUnitMapping> mappings = unitIds.stream()
@@ -138,10 +118,10 @@ public class CourseEligibilityService {
         }
     }
 
-    private void saveDropdownMappings(CourseMaster course, List<Long> dropdownIds, String dropdownType) {
-        if (dropdownIds != null && !dropdownIds.isEmpty()) {
-            List<CourseDropdownMapping> mappings = new ArrayList<>();
+    private List<CourseDropdownMapping> saveDropdownMappings(CourseMaster course, List<Long> dropdownIds, String dropdownType) {
+        List<CourseDropdownMapping> mappings = new ArrayList<>();
 
+        if (dropdownIds != null && !dropdownIds.isEmpty()) {
             for (Long dropdownId : dropdownIds) {
                 DropdownMaster dropdown = dropdownRepository.findById(dropdownId)
                         .orElseThrow(() -> new EntityNotFoundException(
@@ -152,15 +132,13 @@ public class CourseEligibilityService {
                 mapping.setDropdown(dropdown);
                 mappings.add(mapping);
             }
-
-            dropdownMappingRepository.saveAll(mappings);
-
+            log.debug("Created {} mappings for type: {}", mappings.size(), dropdownType);
         }
+
+        return mappings;
     }
 
     private List<Long> getRemarkDropdownIds(List<String> remarks) {
-        // This method fetches dropdown IDs for the given remark values
-        // You need to implement this based on how remarks are stored in dropdown_master
         List<Long> remarkIds = new ArrayList<>();
         for (String remark : remarks) {
             dropdownRepository.findByTypeAndName("REMARKS", remark)
@@ -172,8 +150,8 @@ public class CourseEligibilityService {
 
 
     // Add this method to CourseEligibilityService
+// Add this method to CourseEligibilityService
     public CourseEligibilityDTO getEligibilityByCourseId(Integer courseId) {
-        log.info("Fetching eligibility for course ID: {}", courseId);
 
         CourseMaster course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found with ID: " + courseId));
@@ -196,8 +174,8 @@ public class CourseEligibilityService {
 
         dto.setAdditionalRemarks(eligibility.getAdditionalRemarks());
 
-        // Get rank IDs from mapping table
-        List<Long> rankIds = rankMappingRepository.findRankIdsByCourseId(courseId);
+        // Get rank IDs from dropdown mapping table (not rankMappingRepository)
+        List<Long> rankIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "RANK");
         dto.setRankIds(rankIds);
 
         // Get unit IDs from mapping table
@@ -238,50 +216,3 @@ public class CourseEligibilityService {
         return dto;
     }
 }
-//
-//    // Method to retrieve eligibility data
-//    public CourseEligibilityDTO getEligibilityByCourseId(Integer courseId) {
-//        CourseMaster course = courseRepository.findById(courseId)
-//                .orElseThrow(() -> new EntityNotFoundException("Course not found with ID: " + courseId));
-//
-//        CourseEligibilityMaster eligibility = eligibilityRepository.findByCourse(course);
-//
-//        CourseEligibilityDTO dto = new CourseEligibilityDTO();
-//        dto.setCourseId(courseId);
-//
-//        // Set date filters
-//        dto.setCommissionDateFrom(eligibility.getCommissionDateFrom());
-//        dto.setCommissionDateTo(eligibility.getCommissionDateTo());
-//        dto.setSeniorityDateFrom(eligibility.getSeniorityDateFrom());
-//        dto.setSeniorityDateTo(eligibility.getSeniorityDateTo());
-//        dto.setDobFrom(eligibility.getDobFrom());
-//        dto.setDobTo(eligibility.getDobTo());
-//
-//        dto.setAdditionalRemarks(eligibility.getAdditionalRemarks());
-//
-//        // Get rank IDs
-//        dto.setRankIds(rankMappingRepository.findRankIdsByCourseId(courseId));
-//
-//        // Get unit IDs
-//        dto.setUnitIds(unitMappingRepository.findUnitIdsByCourseId(courseId));
-//
-//        // Get all dropdown mappings by type
-//        dto.setPostingTypeIds(dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "POST_TYPES"));
-//        dto.setMinCourseGrading(dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "COURSE_GRADE"));
-//        dto.setEducationalQualifications(dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "CIVIL_QUALIFICATION"));
-//        dto.setMedicalCategories(dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "MEDICAL"));
-//        dto.setEstablishmentTypes(dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "ESTABLISHMENT"));
-//
-//        // Get remarks (if stored in dropdown_master)
-//        List<Long> remarkIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "REMARKS");
-//        if (!remarkIds.isEmpty()) {
-//            List<String> remarks = remarkIds.stream()
-//                    .map(id -> dropdownRepository.findById(id).map(DropdownMaster::getName).orElse(null))
-//                    .filter(name -> name != null)
-//                    .collect(Collectors.toList());
-//            dto.setRemarks(remarks);
-//        }
-//
-//        return dto;
-//    }
-//}

@@ -1,0 +1,76 @@
+
+CREATE TABLE IF NOT EXISTS public.personnel
+(
+    id bigint NOT NULL DEFAULT nextval('personnel_id_seq'::regclass),
+    army_no character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    rank character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    full_name character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    date_of_commission date NOT NULL,
+    date_of_seniority date,
+    date_of_birth date NOT NULL,
+    place_of_birth character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    officer_image character varying(255) COLLATE pg_catalog."default",
+    nrs character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    religion character varying(50) COLLATE pg_catalog."default",
+    aadhaar_number character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    pan_card character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    marital_status character varying(20) COLLATE pg_catalog."default",
+    cda_account_no character varying(50) COLLATE pg_catalog."default",
+    permanent_address text COLLATE pg_catalog."default" NOT NULL,
+    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    district character varying(100) COLLATE pg_catalog."default",
+    state character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    pin_code character varying(10) COLLATE pg_catalog."default" NOT NULL,
+    mobile_number character varying(15) COLLATE pg_catalog."default" NOT NULL,
+    alternate_mobile character varying(15) COLLATE pg_catalog."default",
+    email_address character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    medical_category character varying(20) COLLATE pg_catalog."default",
+    commission_type character varying(255) COLLATE pg_catalog."default",
+    nsg_mail character varying(255) COLLATE pg_catalog."default",
+    irs_transfer character varying(255) COLLATE pg_catalog."default",
+    med_date date,
+    med_category character varying(255) COLLATE pg_catalog."default",
+    diagnosis character varying(255) COLLATE pg_catalog."default",
+    review_date date,
+    restriction character varying(255) COLLATE pg_catalog."default",
+    med_s integer DEFAULT 1,
+    med_h integer DEFAULT 1,
+    med_a integer DEFAULT 1,
+    med_p integer DEFAULT 1,
+    med_e integer DEFAULT 1,
+    medical_remark text COLLATE pg_catalog."default",
+    gender character(1) COLLATE pg_catalog."default" DEFAULT 'M'::bpchar,
+    case_type character varying(50) COLLATE pg_catalog."default",
+    first_name character varying(100) COLLATE pg_catalog."default",
+    last_name character varying(100) COLLATE pg_catalog."default",
+    medical_code character varying(20) COLLATE pg_catalog."default",
+    CONSTRAINT personnel_pkey PRIMARY KEY (id),
+    CONSTRAINT personnel_aadhaar_number_key UNIQUE (aadhaar_number),
+    CONSTRAINT personnel_army_no_key UNIQUE (army_no),
+    CONSTRAINT personnel_cda_account_no_key UNIQUE (cda_account_no),
+    CONSTRAINT personnel_email_address_key UNIQUE (email_address),
+    CONSTRAINT personnel_nrs_key UNIQUE (nrs),
+    CONSTRAINT personnel_pan_card_key UNIQUE (pan_card)
+)
+
+Army No
+Rank
+Name
+DOB	Commission
+Seniority
+Unit
+Command	Corps
+Division
+Est Type
+Medical
+TOS From
+TOS To
+Course
+Civil Qual
+Sports
+POB
+Area Type
+Posting Due
+Actions

@@ -45,4 +45,7 @@ public class CourseSchedule {
     @Column(name = "remarks")
     private String remarks;
 
+    @Column(name = "panel_size")
+    private String panelSize;
+
 }

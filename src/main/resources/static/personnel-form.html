@@ -516,7 +516,964 @@
             color: #ffffff;
         }
 
+        /* Medical section styles */
+        .medical-detail-item {
+            animation: fadeInSlide 0.25s ease forwards;
+        }
+
+        .medical-detail-item.removing {
+            animation: fadeOutSlide 0.2s ease forwards;
+        }
+
+        .medical-select {
+            cursor: pointer;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .medical-select:hover {
+            border-color: #9ca3af;
+        }
+
+        .medical-select:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.12);
+        }
+
+        .medical-select option {
+            padding: 8px;
+        }
+
+        /* Radio button styles */
+        input[type="radio"] {
+            width: auto;
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        /* Remove button for medical details */
+        #medical-details-container .btn-secondary {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        #medical-details-container .btn-secondary:hover {
+            background: #fecaca;
+            border-color: #f87171;
+            color: #7f1d1d;
+        }
+        /* Required field indicator */
+        label.required:after {
+            content: " *";
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* Style for the asterisk in section titles if needed */
+        .section-title .required-badge {
+            color: #dc2626;
+            font-size: 12px;
+            margin-left: 4px;
+        }
     </style>
+
+    <script>
+
+        async function loadCaseTypes() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/CASE_TYPE");
+                const caseTypes = await res.json();
+                const caseTypeSelect = document.getElementById("caseType");
+                if (caseTypeSelect) {
+                    caseTypeSelect.innerHTML = '<option value="">Select Case Type</option>';
+                    caseTypes.forEach(item => {
+                        caseTypeSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error("Failed loading case types:", err);
+            }
+        }
+
+        async function loadCivilQualifications() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS");
+                const qualifications = await res.json();
+                return qualifications; // Returns array of {id, name}
+            } catch (err) {
+                console.error("Failed loading civil qualifications:", err);
+                return [];
+            }
+        }
+
+        async function loadArmyCourses() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/ARMY_COURSES");
+                const courses = await res.json();
+                return courses; // Returns array of {id, name}
+            } catch (err) {
+                console.error("Failed loading army courses:", err);
+                return [];
+            }
+        }
+
+        function validateRequiredFields() {
+            const requiredFields = [
+                { id: 'commission', name: 'Types of Commission' },
+                { id: 'armyNo', name: 'Army No' },
+                { id: 'rank', name: 'Rank' },
+                { id: 'firstName', name: 'First Name' },
+                { id: 'lastName', name: 'Last Name' },
+                { id: 'dateOfCommission', name: 'Date of Commission' },
+                { id: 'dateOfSeniority', name: 'Date of Seniority' },
+                { id: 'dateOfBirth', name: 'Date of Birth' },
+                { id: 'gender', name: 'Gender' },
+                { id: 'placeOfBirth', name: 'Place of Birth' },
+                { id: 'nrs', name: 'NRS' },
+                { id: 'religion', name: 'Religion' },
+                { id: 'aadhaarNumber', name: 'Aadhaar Number' },
+                { id: 'panCard', name: 'PAN Card' },
+                { id: 'maritalStatus', name: 'Marital Status' },
+                { id: 'cdaAccountNo', name: 'CDA Account No' },
+                { id: 'permanentAddress', name: 'Permanent Address' },
+                { id: 'city', name: 'City' },
+                { id: 'district', name: 'District' },
+                { id: 'state', name: 'State' },
+                { id: 'pinCode', name: 'PIN Code' },
+                { id: 'mobileNumber', name: 'Mobile Number' },
+                { id: 'emailAddress', name: 'Email Address' },
+                { id: 'nsgEmail', name: 'NSG Email' },
+                { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' }
+            ];
+
+            // Validate image
+            const imageFile = document.getElementById("officerImageFile").files[0];
+            const imageError = document.getElementById("image-error");
+            if (!imageFile) {
+                if (imageError) imageError.style.display = "block";
+                alert("Officer Image is required");
+                document.getElementById("officerImageFile").focus();
+                return false;
+            } else {
+                if (imageError) imageError.style.display = "none";
+
+                // Validate file type
+                const fileType = imageFile.type;
+                if (!fileType.match('image.*')) {
+                    alert("Please select a valid image file (JPG/PNG)");
+                    return false;
+                }
+
+                // Validate file size (max 2MB)
+                const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                if (imageFile.size > maxSize) {
+                    alert("Image size should be less than 2MB");
+                    return false;
+                }
+            }
+
+            // Validate family members
+            const familyItems = document.querySelectorAll("#family-container .repeater-item");
+            if (familyItems.length > 0) {
+                for (let i = 0; i < familyItems.length; i++) {
+                    const item = familyItems[i];
+                    const nameInput = item.querySelector(".family-name");
+                    const relationshipSelect = item.querySelector(".family-relationship");
+                    const orderNoInput = item.querySelector(".family-order-no");
+
+                    if (nameInput && !nameInput.value.trim()) {
+                        alert(`Family Member #${i+1}: Name is required`);
+                        nameInput.focus();
+                        return false;
+                    }
+
+                    if (relationshipSelect && !relationshipSelect.value) {
+                        alert(`Family Member #${i+1}: Relationship is required`);
+                        relationshipSelect.focus();
+                        return false;
+                    }
+
+                    // Add validation for Part II Order No.
+                    if (orderNoInput && !orderNoInput.value.trim()) {
+                        alert(`Family Member #${i+1}: Part II Order No. is required`);
+                        orderNoInput.focus();
+                        return false;
+                    }
+                }
+            }
+
+            // Validate regular fields
+            for (let field of requiredFields) {
+                const element = document.getElementById(field.id);
+                if (element && !element.value.trim()) {
+                    alert(`${field.name} is required`);
+                    element.focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // =======================================================
+        // MEDICAL SECTION WITH DYNAMIC FIELDS
+        // =======================================================
+
+        // Store medical data
+        let medicalData = {
+            S: { value: '1', type: '', period: '', remark: '' },
+            H: { value: '1', type: '', period: '', remark: '' },
+            A: { value: '1', type: '', period: '', remark: '' },
+            P: { value: '1', type: '', period: '', remark: '' },
+            E: { value: '1', type: '', period: '', remark: '' }
+        };
+
+        // Initialize medical section
+        function initMedicalSection() {
+            const selects = document.querySelectorAll('.medical-select');
+
+            selects.forEach(select => {
+                const letter = select.dataset.letter;
+
+                // Set initial value to 1
+                select.value = '1';
+
+                // Add change event listener
+                select.addEventListener('change', function() {
+                    const value = this.value;
+                    medicalData[letter].value = value;
+
+                    if (value !== '1') {
+                        showMedicalDetails(letter, value);
+                    } else {
+                        hideMedicalDetails(letter);
+                        // Reset additional fields for this letter
+                        medicalData[letter].type = '';
+                        medicalData[letter].period = '';
+                        medicalData[letter].remark = '';
+                    }
+                });
+            });
+        }
+
+        // Show medical details for a specific letter
+        function showMedicalDetails(letter, value) {
+            const container = document.getElementById('medical-details-container');
+
+            // Check if details for this letter already exist
+            let existingDetail = document.getElementById(`medical-detail-${letter}`);
+
+            if (!existingDetail) {
+                // Create new detail section
+                const detailDiv = document.createElement('div');
+                detailDiv.id = `medical-detail-${letter}`;
+                detailDiv.className = 'medical-detail-item';
+                detailDiv.style.cssText = 'border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #f9fafb;';
+
+                detailDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Medical Category ${letter} - Value ${value}</h4>
+                        <button type="button" class="btn btn-secondary" style="margin-left: auto; padding: 4px 12px; height: 32px;" onclick="removeMedicalDetail('${letter}')">Remove</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Type</label>
+                            <div style="display: flex; gap: 16px;">
+                                <label style="display: flex; align-items: center; gap: 4px;">
+                                    <input type="radio" name="medicalType-${letter}" value="TEMPORARY" onchange="updateMedicalType('${letter}', 'TEMPORARY')"> Temporary
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 4px;">
+                                    <input type="radio" name="medicalType-${letter}" value="PERMANENT" onchange="updateMedicalType('${letter}', 'PERMANENT')"> Permanent
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Period (months)</label>
+                            <input type="number" min="1" max="24" placeholder="Max 24 months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;" onchange="updateMedicalPeriod('${letter}', this.value)">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Remark</label>
+                            <input type="text" placeholder="Enter remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;" onchange="updateMedicalRemark('${letter}', this.value)">
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(detailDiv);
+            } else {
+                // Update the value display in existing detail
+                const header = existingDetail.querySelector('h4');
+                if (header) {
+                    header.innerHTML = `Medical Category ${letter} - Value ${value}`;
+                }
+            }
+        }
+
+        // Hide medical details for a specific letter
+        function hideMedicalDetails(letter) {
+            const existingDetail = document.getElementById(`medical-detail-${letter}`);
+            if (existingDetail) {
+                existingDetail.remove();
+            }
+        }
+
+        // Remove medical detail (called by remove button)
+        function removeMedicalDetail(letter) {
+            // Reset the select value to 1
+            const select = document.getElementById(`medical${letter}`);
+            if (select) {
+                select.value = '1';
+                medicalData[letter].value = '1';
+            }
+
+            // Reset medical data for this letter
+            medicalData[letter].type = '';
+            medicalData[letter].period = '';
+            medicalData[letter].remark = '';
+
+            // Remove the detail div
+            hideMedicalDetails(letter);
+        }
+
+        // Update medical type
+        function updateMedicalType(letter, type) {
+            medicalData[letter].type = type;
+        }
+
+        // Update medical period
+        function updateMedicalPeriod(letter, period) {
+            // Ensure period is not more than 24
+            if (parseInt(period) > 24) {
+                period = '24';
+                const input = event.target;
+                if (input) input.value = '24';
+            }
+            medicalData[letter].period = period;
+        }
+
+        // Update medical remark
+        function updateMedicalRemark(letter, remark) {
+            medicalData[letter].remark = remark;
+        }
+
+        // Get medical payload
+        function getMedicalPayload() {
+            const payload = {
+                medicalValues: {
+                    S: medicalData.S.value,
+                    H: medicalData.H.value,
+                    A: medicalData.A.value,
+                    P: medicalData.P.value,
+                    E: medicalData.E.value
+                },
+                medicalDetails: []
+            };
+
+            // Add details for values > 1
+            Object.keys(medicalData).forEach(letter => {
+                if (medicalData[letter].value !== '1') {
+                    payload.medicalDetails.push({
+                        category: letter,
+                        value: medicalData[letter].value,
+                        type: medicalData[letter].type,
+                        period: medicalData[letter].period,
+                        remark: medicalData[letter].remark
+                    });
+                }
+            });
+
+            return payload;
+        }
+
+        // =======================================================
+        // GLOBAL VARIABLES - Define all indices at the top
+        // =======================================================
+        let decorationIndex = 0;
+        let civilIndex = 0;
+        let additionalIndex = 0;
+        let familyIndex = 0;
+        let sportsIndex = 0;  // Add this
+        let selectedMedicals = {};
+
+        // =======================================================
+        // DROPDOWN LOADING FUNCTIONS
+        // =======================================================
+        async function loadDropdowns() {
+            try {
+                // Load Commission Types
+                const commissionRes = await fetch("http://localhost:6060/api/dropdown/COMMISSION_TYPE");
+                const commissionTypes = await commissionRes.json();
+                const commissionSelect = document.getElementById("commission");
+                if (commissionSelect) {
+                    commissionSelect.innerHTML = '<option value="">Select Commission Type</option>';
+                    commissionTypes.forEach(item => {
+                        commissionSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    });
+                }
+
+                // Load Ranks
+                const rankRes = await fetch("http://localhost:6060/api/dropdown/RANK");
+                const ranks = await rankRes.json();
+                const rankSelect = document.getElementById("rank");
+                if (rankSelect) {
+                    rankSelect.innerHTML = '<option value="">Select Rank</option>';
+                    ranks.forEach(item => {
+                        rankSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    });
+                }
+
+                // Load Case Types
+                await loadCaseTypes();
+
+            } catch (err) {
+                console.error("Failed loading dropdowns:", err);
+            }
+        }
+
+        async function loadRelationshipTypes() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/RELATIONSHIP_TYPE");
+                const relationships = await res.json();
+                return relationships.map(item => item.name);
+            } catch (err) {
+                console.error("Failed loading relationships:", err);
+                return [];
+            }
+        }
+
+        async function loadSportsTypes() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/SPORTS");
+                const sportsTypes = await res.json();
+                return sportsTypes;
+            } catch (err) {
+                console.error("Failed loading sports types:", err);
+                return [];
+            }
+        }
+
+        async function loadSportsLevels() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/SPORTS_LEVEL");
+                const sportsLevels = await res.json();
+                return sportsLevels;
+            } catch (err) {
+                console.error("Failed loading sports levels:", err);
+                return [];
+            }
+        }
+
+        // =======================================================
+        // REMOVE BLOCK WITH ANIMATION
+        // =======================================================
+        function removeBlock(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add("removing");
+                setTimeout(() => el.remove(), 200);
+            }
+        }
+
+        // =======================================================
+        // DECORATION SECTION
+        // =======================================================
+        async function addDecoration(isFirst = false) {
+            const index = decorationIndex++;
+            const id = `decoration-${index}`;
+
+            const container = document.getElementById("decorations-container");
+            if (!container) return;
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="grid repeater-item" id="${id}">
+                    <div>
+                        <label>Decoration Category</label>
+                        <select name="decorations[${index}][category]"
+                                id="decorationCategory-${index}"
+                                onchange="loadAwardsForCategory(this.value, ${index})">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Decoration Name</label>
+                        <select name="decorations[${index}][name]" id="decorationName-${index}">
+                            <option value="">Select Award</option>
+                        </select>
+                    </div>
+                    ${!isFirst ? `
+                        <button type="button" class="btn btn-secondary"
+                                onclick="removeBlock('${id}')">
+                            Remove
+                        </button>
+                    ` : ""}
+                </div>
+                `
+            );
+
+            await loadDecorationCategories(index);
+        }
+
+        async function loadDecorationCategories(index) {
+            try {
+                const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
+                const categories = await res.json();
+
+                const dropdown = document.getElementById(`decorationCategory-${index}`);
+                if (dropdown) {
+                    dropdown.innerHTML = '<option value="">Select Category</option>';
+                    categories.forEach(cat => {
+                        dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error("Failed loading categories:", err);
+            }
+        }
+
+        async function loadAwardsForCategory(category, index) {
+            const awardDropdown = document.getElementById(`decorationName-${index}`);
+            if (!awardDropdown) return;
+
+            if (!category) {
+                awardDropdown.innerHTML = '<option value="">Select Award</option>';
+                return;
+            }
+
+            awardDropdown.innerHTML = '<option value="">Loading...</option>';
+
+            try {
+                const res = await fetch(
+                    `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
+                );
+                const awards = await res.json();
+
+                awardDropdown.innerHTML = '<option value="">Select Award</option>';
+                awards.forEach(a => {
+                    awardDropdown.innerHTML += `
+                        <option value="${a.name}">${a.name} (${a.suffix})</option>
+                    `;
+                });
+            } catch (err) {
+                console.error("Failed loading awards:", err);
+                awardDropdown.innerHTML = '<option>Error Loading</option>';
+            }
+        }
+
+        // =======================================================
+        // CIVIL QUALIFICATIONS
+        // =======================================================
+        async function addCivilQualification(isFirst = false) {
+            const index = civilIndex++;
+            const id = `civil-${index}`;
+
+            const container = document.getElementById("civil-qualifications-container");
+            if (!container) return;
+
+            // Load dropdown data
+            const qualifications = await loadCivilQualifications();
+
+            // Build dropdown options
+            let qualificationOptions = '<option value="">Select Qualification</option>';
+            qualifications.forEach(item => {
+                qualificationOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="grid repeater-item" id="${id}">
+                    <div>
+                        <label>Qualification</label>
+                        <select class="civil-qualification-select">${qualificationOptions}</select>
+                    </div>
+                    <div><label>Institution</label><input type="text" placeholder="Enter institution" class="civil-institution"></div>
+                    <div><label>Year</label><input type="text" placeholder="Enter year" class="civil-year"></div>
+                    <div><label>Grade / Percentage</label><input type="text" placeholder="Enter grade/percentage" class="civil-grade"></div>
+                    ${!isFirst ? `
+                        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+                    ` : ""}
+                </div>
+                `
+            );
+        }
+
+        // =======================================================
+        // ADDITIONAL QUALIFICATIONS
+        // =======================================================
+        async function addAdditionalQualification(isFirst = false) {
+            const index = additionalIndex++;
+            const id = `additional-${index}`;
+
+            const container = document.getElementById("additional-qualifications-container");
+            if (!container) return;
+
+            // Load dropdown data
+            const armyCourses = await loadArmyCourses();
+
+            // Build dropdown options
+            let courseOptions = '<option value="">Select Qualification</option>';
+            armyCourses.forEach(item => {
+                courseOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
+                    <div>
+                        <label>Qualification</label>
+                        <select class="additional-qualification-select">${courseOptions}</select>
+                    </div>
+                    <div><label>Authority</label><input type="text" placeholder="Enter authority" class="additional-authority"></div>
+                    <div><label>Year</label><input type="text" placeholder="Enter year" class="additional-year"></div>
+                    <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no." class="additional-authority-no"></div>
+                    <div><label>Location</label><input type="text" placeholder="Enter location" class="additional-location"></div>
+                    <div><label>Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="additional-order-no"></div>
+                    <div><label>Order Date</label><input type="date" class="additional-order-date"></div>
+                    ${!isFirst ? `
+                        <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
+                    ` : ""}
+                </div>
+                `
+            );
+        }
+
+        // =======================================================
+        // SPORTS DETAILS
+        // =======================================================
+        async function addSportsDetail(isFirst = false) {
+            const index = sportsIndex++;
+            const id = `sports-${index}`;
+
+            const container = document.getElementById("sports-container");
+            if (!container) return;
+
+            // Load dropdown data
+            const sportsTypes = await loadSportsTypes();
+            const sportsLevels = await loadSportsLevels();
+
+            // Build dropdown options
+            let sportsTypeOptions = '<option value="">Select Sport Name</option>';
+            sportsTypes.forEach(item => {
+                sportsTypeOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
+            let sportsLevelOptions = '<option value="">Select Sports Level</option>';
+            sportsLevels.forEach(item => {
+                sportsLevelOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
+                    <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 16px;">
+                        <div>
+                            <label>Sport Name</label>
+                            <select>${sportsTypeOptions}</select>
+                        </div>
+                        <div>
+                            <label>Sports Level</label>
+                            <select>${sportsLevelOptions}</select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label>Achievements / Remarks</label>
+                        <textarea
+                            placeholder="Enter achievements or remarks"
+                            rows="3"
+                            style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; resize: vertical;"
+                        ></textarea>
+                    </div>
+
+                    ${!isFirst ? `
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
+                        </div>
+                    ` : ""}
+                </div>
+                `
+            );
+        }
+
+        // =======================================================
+        // FAMILY DETAILS
+        // =======================================================
+        async function addFamilyMember(isFirst = false) {
+            const index = familyIndex++;
+            const id = `family-${index}`;
+
+            const container = document.getElementById("family-container");
+            if (!container) return;
+
+            const relationships = await loadRelationshipTypes();
+
+            let relationshipOptions = '<option value="">Select Relationship</option>';
+            relationships.forEach(rel => {
+                relationshipOptions += `<option value="${rel}">${rel}</option>`;
+            });
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
+                    <div>
+                        <label class="required">Name</label>
+                        <input type="text" placeholder="Enter name" class="family-name">
+                    </div>
+                    <div>
+                        <label class="required">Relationship</label>
+                        <select class="family-relationship">${relationshipOptions}</select>
+                    </div>
+                    <div><label>Contact Number (Optional)</label><input type="tel" placeholder="Enter contact number" class="family-contact"></div>
+                    <div><label class="required">Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="family-order-no"></div>
+                    <div><label>Order Date</label><input type="date" class="family-order-date"></div>
+                    ${!isFirst ? `
+                        <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
+                    ` : ""}
+                </div>
+                `
+            );
+        }
+
+        // =======================================================
+        // MEDICAL SELECTION
+        // =======================================================
+        function getMedicalCategoryString() {
+            return document.getElementById("shapeMedicalCategory") ? document.getElementById("shapeMedicalCategory").value : "";
+        }
+
+        // =======================================================
+        // SAVE PERSONNEL FUNCTION
+        // =======================================================
+        async function savePersonnel() {
+            if (!validateRequiredFields()) {
+                return;
+            }
+            // Get form elements
+            const commission = document.getElementById("commission");
+            const armyNo = document.getElementById("armyNo");
+            const rank = document.getElementById("rank");
+            const firstName = document.getElementById("firstName");
+            const lastName = document.getElementById("lastName");
+            const caseType = document.getElementById("caseType");
+            const dateOfCommission = document.getElementById("dateOfCommission");
+            const dateOfSeniority = document.getElementById("dateOfSeniority");
+            const dateOfBirth = document.getElementById("dateOfBirth");
+            const placeOfBirth = document.getElementById("placeOfBirth");
+            const nrs = document.getElementById("nrs");
+            const religion = document.getElementById("religion");
+            const aadhaarNumber = document.getElementById("aadhaarNumber");
+            const panCard = document.getElementById("panCard");
+            const maritalStatus = document.getElementById("maritalStatus");
+            const cdaAccountNo = document.getElementById("cdaAccountNo");
+            const permanentAddress = document.getElementById("permanentAddress");
+            const city = document.getElementById("city");
+            const district = document.getElementById("district");
+            const state = document.getElementById("state");
+            const pinCode = document.getElementById("pinCode");
+            const mobileNumber = document.getElementById("mobileNumber");
+            const alternateMobile = document.getElementById("alternateMobile");
+            const emailAddress = document.getElementById("emailAddress");
+            const nsgEmail = document.getElementById("nsgEmail");
+
+            // Build payload
+            const payload = {
+                commission: commission ? commission.value : "",
+                armyNo: armyNo ? armyNo.value : "",
+                rank: rank ? rank.value : "",
+                firstName: firstName ? firstName.value : "",
+                lastName: lastName ? lastName.value : "",
+                fullName: (firstName ? firstName.value : "") + " " + (lastName ? lastName.value : ""),
+                gender: document.getElementById("gender") ? document.getElementById("gender").value : "",
+                caseType: caseType ? caseType.value : "",
+                dateOfCommission: dateOfCommission ? dateOfCommission.value : "",
+                dateOfSeniority: dateOfSeniority ? dateOfSeniority.value : "",
+                dateOfBirth: dateOfBirth ? dateOfBirth.value : "",
+                placeOfBirth: placeOfBirth ? placeOfBirth.value : "",
+                nrs: nrs ? nrs.value : "",
+                religion: religion ? religion.value : "",
+                aadhaarNumber: aadhaarNumber ? aadhaarNumber.value : "",
+                panCard: panCard ? panCard.value : "",
+                maritalStatus: maritalStatus ? maritalStatus.value : "",
+                cdaAccountNo: cdaAccountNo ? cdaAccountNo.value : "",
+                permanentAddress: permanentAddress ? permanentAddress.value : "",
+                city: city ? city.value : "",
+                district: district ? district.value : "",
+                state: state ? state.value : "",
+                pinCode: pinCode ? pinCode.value : "",
+                mobileNumber: mobileNumber ? mobileNumber.value : "",
+                alternateMobile: alternateMobile ? alternateMobile.value : "",
+                emailAddress: emailAddress ? emailAddress.value : "",
+                nsgEmmail: nsgEmail ? nsgEmail.value : "",
+                medicalCategory: getMedicalCategoryString(),
+                decorations: [],
+                qualifications: [],
+                additionalQualifications: [],
+                family: [],
+                sports: [],
+                medical: getMedicalPayload()
+            };
+
+            // Collect decorations
+            document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
+                const categorySelect = item.querySelector('select[name*="[category]"]');
+                const nameSelect = item.querySelector('select[name*="[name]"]');
+                if (categorySelect && nameSelect) {
+                    payload.decorations.push({
+                        decorationCategory: categorySelect.value,
+                        decorationName: nameSelect.value
+                    });
+                }
+            });
+
+            // Collect civil qualifications
+            document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
+                const qualificationSelect = item.querySelector(".civil-qualification-select");
+                const institutionInput = item.querySelector(".civil-institution");
+                const yearInput = item.querySelector(".civil-year");
+                const gradeInput = item.querySelector(".civil-grade");
+
+                if (qualificationSelect && qualificationSelect.value) {
+                    payload.qualifications.push({
+                        qualification: qualificationSelect.value,  // This will be the name from dropdown
+                        institution: institutionInput ? institutionInput.value : "",
+                        yearOfCompletion: yearInput ? yearInput.value : "",
+                        gradePercentage: gradeInput ? gradeInput.value : ""
+                    });
+                }
+            });
+
+            // Collect additional qualifications (MIL)
+            document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
+                const qualificationSelect = item.querySelector(".additional-qualification-select");
+                const authorityInput = item.querySelector(".additional-authority");
+                const yearInput = item.querySelector(".additional-year");
+                const authorityNoInput = item.querySelector(".additional-authority-no");
+                const locationInput = item.querySelector(".additional-location");
+                const orderNoInput = item.querySelector(".additional-order-no");
+                const orderDateInput = item.querySelector(".additional-order-date");
+
+                if (qualificationSelect && qualificationSelect.value) {
+                    payload.additionalQualifications.push({
+                        qualification: qualificationSelect.value,  // This will be the name from dropdown
+                        issuingAuthority: authorityInput ? authorityInput.value : "",
+                        year: yearInput ? yearInput.value : "",
+                        authorityNo: authorityNoInput ? authorityNoInput.value : "",
+                        location: locationInput ? locationInput.value : "",
+                        part2OrderNo: orderNoInput ? orderNoInput.value : "",
+                        orderDate: orderDateInput ? orderDateInput.value : ""
+                    });
+                }
+            });
+
+            // Collect family details
+            document.querySelectorAll("#family-container .repeater-item").forEach(item => {
+                const nameInput = item.querySelector(".family-name");
+                const relationshipSelect = item.querySelector(".family-relationship");
+                const contactInput = item.querySelector(".family-contact");
+                const orderNoInput = item.querySelector(".family-order-no");
+                const orderDateInput = item.querySelector(".family-order-date");
+
+                if (nameInput && nameInput.value) {
+                    payload.family.push({
+                        name: nameInput.value,
+                        relationship: relationshipSelect ? relationshipSelect.value : "",
+                        contactNumber: contactInput ? contactInput.value : "",  // Optional field
+                        part2OrderNo: orderNoInput ? orderNoInput.value : "",
+                        orderDate: orderDateInput ? orderDateInput.value : ""
+                    });
+                }
+            });
+
+            // Collect sports details
+            document.querySelectorAll("#sports-container .repeater-item").forEach(item => {
+                const selects = item.querySelectorAll("select");
+                const textareas = item.querySelectorAll("textarea");
+                if (selects.length >= 2) {
+                    if (selects[0].value) {
+                        payload.sports.push({
+                            sportName: selects[0].value,
+                            sportsLevel: selects[1].value,
+                            achievements: textareas[0] ? textareas[0].value : ""
+                        });
+                    }
+                }
+            });
+
+            // Create FormData and send
+            const formData = new FormData();
+            formData.append(
+                "data",
+                new Blob([JSON.stringify(payload)], { type: "application/json" })
+            );
+
+            const imageFile = document.getElementById("officerImageFile").files[0];
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+
+            try {
+                const res = await fetch("http://localhost:6060/api/personnel/add", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message);
+                    return;
+                }
+                alert("Personnel saved successfully.");
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            }
+        }
+
+        // =======================================================
+        // INITIALIZATION - Run when DOM is fully loaded
+        // =======================================================
+        document.addEventListener("DOMContentLoaded", async () => {
+            console.log("DOM fully loaded, initializing form...");
+
+            // Medical category click handling
+            document.querySelectorAll(".medical-box").forEach(box => {
+                box.addEventListener("click", () => {
+                    const letter = box.dataset.letter;
+                    const value = box.dataset.value;
+
+                    if (box.classList.contains("selected")) {
+                        box.classList.remove("selected");
+                        delete selectedMedicals[letter];
+                    } else {
+                        box.classList.add("selected");
+                        selectedMedicals[letter] = value;
+                    }
+                });
+            });
+
+            // Load dropdowns
+            await loadDropdowns();
+
+            // Load first rows for all repeaters
+            await addDecoration(true);
+            await addCivilQualification(true);
+            await addAdditionalQualification(true);
+            await addFamilyMember(true);
+            await addSportsDetail(true);
+            initMedicalSection();
+
+            // Attach save button event listener
+            const saveBtn = document.getElementById("savePersonnelBtn");
+            if (saveBtn) {
+                saveBtn.addEventListener("click", savePersonnel);
+            }
+        });
+    </script>
+
     <link rel="stylesheet" href="sidebar.css">
 </head>
 
@@ -538,7 +1495,6 @@
     <main class="main-content">
         <div class="header">
             <h2>Add New Personnel</h2>
-            <p>Fill in all required fields to add personnel to the system</p>
         </div>
 
         <div class="content-area">
@@ -549,11 +1505,17 @@
                     Complete officer profile with photograph and address details
                 </div>
 
-                <div class="upload-box">
-                    📷 Upload Officer Image<br>
+                <div class="upload-box" style="position: relative;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px;">
+                        <span>📷 Upload Officer Image</span>
+                        <span style="color: #dc2626; font-weight: bold;">*</span>
+                    </div>
                     JPG / PNG, Max 2MB
                     <br><br>
-                    <input type="file" id="officerImageFile" accept="image/*">
+                    <input type="file" id="officerImageFile" accept="image/*" required>
+                    <div id="image-error" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;">
+                        Please select an image
+                    </div>
                 </div>
 
 
@@ -561,17 +1523,63 @@
                 <div class="section">
                     <div class="section-title">🧾 Basic Information</div>
                     <div class="grid">
-                        <div><label>Types of Commisiion *</label><input id="commission"></div>
-                        <div><label>Army No *</label><input id="armyNo"></div>
-                        <div><label>Rank *</label><input id="rank"></div>
-                        <div><label>Full Name *</label><input id="fullName"></div>
-                        <div><label>Date of Commission *</label><input type="date" id="dateOfCommission"></div>
-
-                        <!-- ✅ ADDED -->
-                        <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority"></div>
-
-                        <div><label>Date of Birth *</label><input type="date" id="dateOfBirth"></div>
-                        <div><label>Place of Birth *</label><input id="placeOfBirth"></div>
+                        <div>
+                            <label class="required">Types of Commission</label>
+                            <select id="commission">
+                                <option value="">Select Commission Type</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">Army No</label>
+                            <input id="armyNo">
+                        </div>
+                        <div>
+                            <label class="required">Rank</label>
+                            <select id="rank">
+                                <option value="">Select Rank</option>
+                            </select>
+                        </div>
+                        <div class="grid" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label class="required">First Name</label>
+                                <input id="firstName">
+                            </div>
+                            <div>
+                                <label>Last Name</label>
+                                <input id="lastName">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="required">Date of Commission</label>
+                            <input type="date" id="dateOfCommission">
+                        </div>
+                        <div>
+                            <label class="required">Date of Seniority</label>
+                            <input type="date" id="dateOfSeniority">
+                        </div>
+                        <div>
+                            <label class="required">Date of Birth</label>
+                            <input type="date" id="dateOfBirth">
+                        </div>
+                        <div>
+                            <label class="required">Gender</label>
+                            <select id="gender">
+                                <option value="">Select Gender</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="O">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">Place of Birth</label>
+                            <input id="placeOfBirth">
+                        </div>
+                        <div>
+                            <label>Case Type</label>
+                            <select id="caseType">
+                                <option value="">Select Case Type</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -592,23 +1600,40 @@
                 <div class="section">
                     <div class="section-title">🎖️ Service Details</div>
                     <div class="grid">
-                        <div><label>NRS *</label><input id="nrs"></div>
-                        <div><label>Religion *</label><select id="religion">
-                            <option value="">Select Religion</option>
-                            <option value="Hindu">Hindu</option>
-                            <option value="Muslim">Muslim</option>
-                            <option value="Sikhs">Sikhs</option>
-                            <option value="Christian">Christian</option>
-                        </select></div>
-                        <div><label>Aadhaar Number *</label><input id="aadhaarNumber"></div>
-                        <div><label>PAN Card *</label><input id="panCard"></div>
-                        <div><label>Marital Status *</label><select id="maritalStatus">
-                            <option value="">Select Religion</option>
-                            <option value="Married">Married</option>
-                            <option value="Unmarried">Unmarried</option>
-                        </select></div>
-
-                        <div><label>CDA Account No *</label><input id="cdaAccountNo"></div>
+                        <div>
+                            <label class="required">NRS</label>
+                            <input id="nrs">
+                        </div>
+                        <div>
+                            <label class="required">Religion</label>
+                            <select id="religion">
+                                <option value="">Select Religion</option>
+                                <option value="Hindu">Hindu</option>
+                                <option value="Muslim">Muslim</option>
+                                <option value="Sikhs">Sikhs</option>
+                                <option value="Christian">Christian</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">Aadhaar Number</label>
+                            <input id="aadhaarNumber">
+                        </div>
+                        <div>
+                            <label class="required">PAN Card</label>
+                            <input id="panCard">
+                        </div>
+                        <div>
+                            <label class="required">Marital Status</label>
+                            <select id="maritalStatus">
+                                <option value="">Select Marital Status</option>
+                                <option value="Married">Married</option>
+                                <option value="Unmarried">Unmarried</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="required">CDA Account No</label>
+                            <input id="cdaAccountNo">
+                        </div>
                     </div>
                 </div>
 
@@ -619,16 +1644,28 @@
 
                     <div class="grid grid-1">
                         <div>
-                            <label>Permanent Address *</label>
+                            <label class="required">Permanent Address</label>
                             <textarea id="permanentAddress"></textarea>
                         </div>
                     </div>
 
                     <div class="grid">
-                        <div><label>City *</label><input id="city"></div>
-                        <div><label>State *</label><input id="district"></div>
-                        <div><label>District *</label><input id="state"></div>
-                        <div><label>PIN Code *</label><input id="pinCode"></div>
+                        <div>
+                            <label class="required">City</label>
+                            <input id="city">
+                        </div>
+                        <div>
+                            <label class="required">District</label>
+                            <input id="district">
+                        </div>
+                        <div>
+                            <label class="required">State</label>
+                            <input id="state">
+                        </div>
+                        <div>
+                            <label class="required">PIN Code</label>
+                            <input id="pinCode">
+                        </div>
                     </div>
                 </div>
 
@@ -638,14 +1675,20 @@
                 <div class="section">
                     <div class="section-title">📞 Contact Details</div>
                     <div class="grid">
-                        <div><label>Mobile Number *</label><input id="mobileNumber"></div>
-                        <div><label>Alternate Mobile</label><input id="alternateMobile"></div>
+                        <div>
+                            <label class="required">Mobile Number</label>
+                            <input id="mobileNumber">
+                        </div>
+                        <div>
+                            <label>Alternate Mobile</label>
+                            <input id="alternateMobile">
+                        </div>
                         <div class="grid-1">
-                            <label>Email Address *</label>
+                            <label class="required">Email Address</label>
                             <input type="email" id="emailAddress">
                         </div>
                         <div class="grid-1">
-                            <label>NSG Email *</label>
+                            <label class="required">NSG Email</label>
                             <input type="email" id="nsgEmail">
                         </div>
                     </div>
@@ -663,7 +1706,7 @@
                         + Add Civil Qualification
                     </button>
 
-                    <h4 style="margin-top:16px;">Additional Qualifications</h4>
+                    <h4 style="margin-top:16px;">MIL Qualifications</h4>
                     <div id="additional-qualifications-container"></div>
                     <button type="button"
                             class="btn btn-secondary"
@@ -688,79 +1731,98 @@
 
 
                 <!-- MEDICAL CATEGORY -->
-                <!--        <div class="medical-category">-->
-                <!--          <div class="medical-item">-->
-                <!--            <span>S*</span>-->
-                <!--            <div class="medical-box" data-group="S">1</div>-->
-                <!--          </div>-->
+                <div id="section-medical" class="section">
+                    <div class="section-title">
+                        <span>🩺 Medical Category</span>
+                    </div>
 
-                <!--          <div class="medical-item">-->
-                <!--            <span>H*</span>-->
-                <!--            <div class="medical-box" data-group="H">2</div>-->
-                <!--          </div>-->
+                    <!-- SHAPE MEDICAL CATEGORY DROPDOWN -->
+                    <div style="margin-bottom: 20px;">
+                        <label class="required" style="display: block; margin-bottom: 8px; font-weight: 600;">SHAPE Medical Category</label>
+                        <select id="shapeMedicalCategory" style="width: 100%; max-width: 300px; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                            <option value="">Select SHAPE Category</option>
+                            <option value="SHAPE-I">SHAPE-I</option>
+                            <option value="SHAPE-II">SHAPE-II</option>
+                            <option value="SHAPE-III">SHAPE-III</option>
+                            <option value="SHAPE-IV">SHAPE-IV</option>
+                            <option value="SHAPE-V">SHAPE-V</option>
+                        </select>
+                    </div>
 
-                <!--          <div class="medical-item">-->
-                <!--            <span>A*</span>-->
-                <!--            <div class="medical-box" data-group="A">3</div>-->
-                <!--          </div>-->
-
-                <!--          <div class="medical-item">-->
-                <!--            <span>P*</span>-->
-                <!--            <div class="medical-box" data-group="P">4</div>-->
-                <!--          </div>-->
-
-                <!--          <div class="medical-item">-->
-                <!--            <span>E*</span>-->
-                <!--            <div class="medical-box" data-group="E">5</div>-->
-                <!--          </div>-->
-                <!--        </div>-->
-
-                <!-- MEDICAL CATEGORY -->
-                <div class="section">
-                    <div class="section-title">🩺 Medical Category</div>
-
-
-                    <div class="medical-category">
-                        <div class="medical-item">
-                            <span>S</span>
-                            <div class="medical-box" data-letter="S" data-value="1">1</div>
+                    <!-- Main Medical Category Dropdowns -->
+                    <div class="medical-category" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <div class="medical-item" style="min-width: 80px;">
+                            <label style="display: block; text-align: center; font-weight: bold;">S</label>
+                            <select class="medical-select" data-letter="S" id="medicalS" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
-
-                        <div class="medical-item">
-                            <span>H</span>
-                            <div class="medical-box" data-letter="H" data-value="2">2</div>
+                        <div class="medical-item" style="min-width: 80px;">
+                            <label style="display: block; text-align: center; font-weight: bold;">H</label>
+                            <select class="medical-select" data-letter="H" id="medicalH" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
-
-                        <div class="medical-item">
-                            <span>A</span>
-                            <div class="medical-box" data-letter="A" data-value="3">3</div>
+                        <div class="medical-item" style="min-width: 80px;">
+                            <label style="display: block; text-align: center; font-weight: bold;">A</label>
+                            <select class="medical-select" data-letter="A" id="medicalA" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
-
-                        <div class="medical-item">
-                            <span>P</span>
-                            <div class="medical-box" data-letter="P" data-value="4">4</div>
+                        <div class="medical-item" style="min-width: 80px;">
+                            <label style="display: block; text-align: center; font-weight: bold;">P</label>
+                            <select class="medical-select" data-letter="P" id="medicalP" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
-
-                        <div class="medical-item">
-                            <span>E</span>
-                            <div class="medical-box" data-letter="E" data-value="5">5</div>
+                        <div class="medical-item" style="min-width: 80px;">
+                            <label style="display: block; text-align: center; font-weight: bold;">E</label>
+                            <select class="medical-select" data-letter="E" id="medicalE" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-1" style="margin-top:16px;">
-                        <div>
-                            <label>Medical Remarks</label>
-                            <textarea
-                                    id="medicalRemark"
-                                    placeholder="Enter any medical observations, limitations, or remarks..."
-                                    rows="3">
-              </textarea>
-                        </div>
+                    <!-- Container for additional medical details (appears when value > 1 is selected) -->
+                    <div id="medical-details-container" style="margin-top: 20px;">
+                        <!-- Dynamic content will be inserted here -->
                     </div>
 
                 </div>
 
 
+                <!-- SPORTS DETAILS -->
+                <div class="section">
+                    <div class="section-title">🏆 Sports Details (Optional)</div>
+
+                    <div id="sports-container"></div>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="addSportsDetail()">
+                        + Add Sports Detail
+                    </button>
+                </div>
 
                 <!-- ACTIONS -->
                 <div class="actions">
@@ -776,352 +1838,6 @@
     </main>
 
 </div>
-<script>
-
-    /* =======================================================
-       REMOVE BLOCK WITH ANIMATION
-    ======================================================= */
-    function removeBlock(id) {
-        const el = document.getElementById(id);
-        el.classList.add("removing");
-        setTimeout(() => el.remove(), 200);
-    }
-
-
-    /* =======================================================
-       DECORATION SECTION (FIXED WITH DROPDOWNS)
-    ======================================================= */
-    let decorationIndex = 0;
-
-    async function addDecoration(isFirst = false) {
-        const index = decorationIndex++;
-        const id = `decoration-${index}`;
-
-        document.getElementById("decorations-container").insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}">
-
-        <div>
-          <label>Decoration Category *</label>
-          <select name="decorations[${index}][category]"
-                  id="decorationCategory-${index}"
-                  onchange="loadAwardsForCategory(this.value, ${index})">
-            <option value="">Loading...</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Decoration Name *</label>
-          <select name="decorations[${index}][name]" id="decorationName-${index}">
-            <option value="">Select Award</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Award Date *</label>
-          <input type="date" name="decorations[${index}][date]">
-        </div>
-
-        <div class="grid-1">
-          <label>Citation / Remarks</label>
-          <textarea name="decorations[${index}][remarks]"></textarea>
-        </div>
-
-        ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary"
-                  onclick="removeBlock('${id}')">
-            Remove
-          </button>
-        `}
-      </div>
-      `
-        );
-
-        loadDecorationCategories(index);
-    }
-
-
-    /* LOAD CATEGORIES */
-    async function loadDecorationCategories(index) {
-        try {
-            const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
-            const categories = await res.json();
-
-            const dropdown = document.getElementById(`decorationCategory-${index}`);
-            dropdown.innerHTML = `<option value="">Select Category</option>`;
-
-            categories.forEach(cat => {
-                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
-
-        } catch (err) {
-            console.error("Failed loading categories:", err);
-        }
-    }
-
-
-    /* LOAD AWARDS WHEN CATEGORY SELECTED */
-    async function loadAwardsForCategory(category, index) {
-        const awardDropdown = document.getElementById(`decorationName-${index}`);
-
-        if (!category) {
-            awardDropdown.innerHTML = `<option value="">Select Award</option>`;
-            return;
-        }
-
-        awardDropdown.innerHTML = `<option value="">Loading...</option>`;
-
-        try {
-            const res = await fetch(
-                `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
-            );
-            const awards = await res.json();
-
-            awardDropdown.innerHTML = `<option value="">Select Award</option>`;
-
-            awards.forEach(a => {
-                awardDropdown.innerHTML += `
-          <option value="${a.name}">${a.name} (${a.suffix})</option>
-        `;
-            });
-
-        } catch (err) {
-            console.error("Failed loading awards:", err);
-            awardDropdown.innerHTML = `<option>Error Loading</option>`;
-        }
-    }
-
-
-    /* COLLECT DECORATIONS PAYLOAD */
-    function collectDecorationsIntoPayload(payload) {
-        payload.decorations = [];
-
-        document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
-            payload.decorations.push({
-                decorationCategory: item.querySelector('select[name*="[category]"]').value,
-                decorationName: item.querySelector('select[name*="[name]"]').value,
-                awardDate: item.querySelector('input[type="date"]').value,
-                citation: item.querySelector("textarea").value
-            });
-        });
-    }
-
-
-    /* =======================================================
-       CIVIL, ADDITIONAL, FAMILY
-    ======================================================= */
-    let civilIndex = 0, additionalIndex = 0, familyIndex = 0;
-
-    function addCivilQualification(isFirst = false) {
-        const index = civilIndex++;
-        const id = `civil-${index}`;
-
-        document.getElementById("civil-qualifications-container").insertAdjacentHTML(
-            "beforeend",
-            `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Qualification *</label><input></div>
-          <div><label>Institution</label><input></div>
-          <div><label>Year</label><input></div>
-          <div><label>Grade / Percentage</label><input></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
-      `
-        );
-    }
-
-    function addAdditionalQualification(isFirst = false) {
-        const index = additionalIndex++;
-        const id = `additional-${index}`;
-
-        document.getElementById("additional-qualifications-container").insertAdjacentHTML(
-            "beforeend",
-            `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Qualification *</label><input></div>
-          <div><label>Authority</label><input></div>
-          <div><label>Year</label><input></div>
-          <div><label>Validity</label><input type="date"></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
-      `
-        );
-    }
-
-    function addFamilyMember(isFirst = false) {
-        const index = familyIndex++;
-        const id = `family-${index}`;
-
-        document.getElementById("family-container").insertAdjacentHTML(
-            "beforeend",
-            `
-        <div class="grid repeater-item" id="${id}">
-          <div><label>Name *</label><input></div>
-          <div><label>Relationship *</label><input></div>
-
-          ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-          `}
-        </div>
-      `
-        );
-    }
-
-
-    /* =======================================================
-       MEDICAL SELECTION
-    ======================================================= */
-    let selectedMedicals = {};
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-        // Medical category click handling
-        document.querySelectorAll(".medical-box").forEach(box => {
-            box.addEventListener("click", () => {
-                const letter = box.dataset.letter;
-                const value = box.dataset.value;
-
-                if (box.classList.contains("selected")) {
-                    box.classList.remove("selected");
-                    delete selectedMedicals[letter];
-                } else {
-                    box.classList.add("selected");
-                    selectedMedicals[letter] = value;
-                }
-            });
-        });
-
-        // Load first rows
-        addDecoration(true);
-        addCivilQualification(true);
-        addAdditionalQualification(true);
-        addFamilyMember(true);
-
-    });
-
-
-    function getMedicalCategoryString() {
-        return Object.keys(selectedMedicals)
-            .sort()
-            .map(l => l + selectedMedicals[l])
-            .join("");
-    }
-
-
-    /* =======================================================
-       SAVE PERSONNEL
-    ======================================================= */
-    document.getElementById("savePersonnelBtn").addEventListener("click", async () => {
-
-        // ---------- BUILD PAYLOAD ----------
-        const payload = {
-            commission: commission.value,
-            armyNo: armyNo.value,
-            rank: rank.value,
-            fullName: fullName.value,
-            dateOfCommission: dateOfCommission.value,
-            dateOfSeniority: dateOfSeniority.value,
-            dateOfBirth: dateOfBirth.value,
-            placeOfBirth: placeOfBirth.value,
-            nrs: nrs.value,
-            religion: religion.value,
-            aadhaarNumber: aadhaarNumber.value,
-            panCard: panCard.value,
-            maritalStatus: maritalStatus.value,
-            cdaAccountNo: cdaAccountNo.value,
-            permanentAddress: permanentAddress.value,
-            city: city.value,
-            district: district.value,
-            state: state.value,
-            pinCode: pinCode.value,
-            mobileNumber: mobileNumber.value,
-            alternateMobile: alternateMobile.value,
-            emailAddress: emailAddress.value,
-            nsgEmmail: nsgEmail.value,
-            medicalCategory: getMedicalCategoryString(),
-            medicalRemark: document.getElementById("medicalRemark").value,
-
-            decorations: [],
-            qualifications: [],
-            additionalQualifications: [],
-            family: []
-        };
-
-        // ---------- COLLECT CHILD DATA ----------
-        collectDecorationsIntoPayload(payload);
-
-        document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
-            const inputs = item.querySelectorAll("input");
-            payload.qualifications.push({
-                qualification: inputs[0].value,
-                institution: inputs[1].value,
-                yearOfCompletion: inputs[2].value,
-                gradePercentage: inputs[3].value
-            });
-        });
-
-        document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
-            const inputs = item.querySelectorAll("input");
-            payload.additionalQualifications.push({
-                qualification: inputs[0].value,
-                issuingAuthority: inputs[1].value,
-                year: inputs[2].value,
-                validity: inputs[3].value
-            });
-        });
-
-        document.querySelectorAll("#family-container .repeater-item").forEach(item => {
-            const inputs = item.querySelectorAll("input");
-            payload.family.push({
-                name: inputs[0].value,
-                relationship: inputs[1].value,
-                contactNumber: ""
-            });
-        });
-
-        // ---------- MULTIPART FORM ----------
-        const formData = new FormData();
-
-        formData.append(
-            "data",
-            new Blob([JSON.stringify(payload)], { type: "application/json" })
-        );
-
-        const imageFile = document.getElementById("officerImageFile").files[0];
-        if (imageFile) {
-            formData.append("image", imageFile);
-        }
-
-        // ---------- API CALL ----------
-        try {
-            const res = await fetch("http://localhost:6060/api/personnel/add", {
-                method: "POST",
-                body: formData
-            });
-
-            if (!res.ok) throw new Error("API Error");
-
-            alert("Personnel saved successfully.");
-
-        } catch (err) {
-            console.error(err);
-            alert("Failed to save personnel.");
-        }
-
-    });
-
-
-
-
-
-</script>
 
 </body>
 </html>

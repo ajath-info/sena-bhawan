@@ -1,9 +1,11 @@
 package com.example.sena_bhawan.repository;
 
+import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import com.example.sena_bhawan.projection.RetirementYearProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +19,14 @@ import java.util.Optional;
 
 @Repository
 public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
+
+    @Query("""
+    SELECT DISTINCT p
+    FROM Personnel p
+    WHERE LOWER(p.armyNo) LIKE LOWER(CONCAT(:term, '%'))
+    ORDER BY p.armyNo
+    """)
+    List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term, Pageable pageable);
 
     @Query("SELECT distinct medicalCategory FROM Personnel")
     List<String> getMedicalCategory();

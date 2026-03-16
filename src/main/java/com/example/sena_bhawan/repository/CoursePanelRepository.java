@@ -7,9 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CoursePanelRepository
         extends JpaRepository<CoursePanelNomination, Long> {
+
+    // Find nomination by scheduleId and personnelId
+    Optional<CoursePanelNomination> findByScheduleIdAndPersonnelId(Long scheduleId, Long personnelId);
+
+    // Check if exists
+    boolean existsByScheduleIdAndPersonnelId(Long scheduleId, Long personnelId);
 
     // Find all nominations for given personnel IDs
     List<CoursePanelNomination> findByPersonnelIdIn(List<Long> personnelIds);
