@@ -5,5 +5,5 @@ import com.example.sena_bhawan.dto.DropdownDTO;
 import java.util.List;
 
 public interface MasterDropdownService {
-    public List<DropdownDTO> getByType(String type);
+    public List<DropdownDTO> getByType(String type, Integer code);
 }

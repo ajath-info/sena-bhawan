@@ -576,25 +576,570 @@
             font-size: 12px;
             margin-left: 4px;
         }
+        /* Validation styles */
+        input.error, select.error, textarea.error {
+            border-color: #dc2626;
+            background-color: #fff5f5;
+        }
+
+        input.error:focus, select.error:focus, textarea.error:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .field-hint {
+            color: #6b7280;
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Success state */
+        input.valid {
+            border-color: #10b981;
+        }
+
+        /* Add these styles to your existing CSS */
+        .dropdown-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 4px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item.highlighted {
+            background-color: #f3f4f6;
+        }
+
+        .dropdown-item.selected {
+            background-color: #e8f0fe;
+            color: #1b4332;
+            font-weight: 500;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item .item-code {
+            font-size: 11px;
+            color: #6b7280;
+            margin-left: 8px;
+        }
+
+        .no-results {
+            padding: 12px;
+            color: #6b7280;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Dropdown styles */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-content input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-bottom: 1px solid #d1d5db;
+            font-size: 14px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-content input:focus {
+            outline: none;
+            border-bottom-color: #1b4332;
+        }
+
+        .dropdown-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.15s ease;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .dropdown-item.selected {
+            background-color: #e8f0fe;
+            color: #1b4332;
+            font-weight: 500;
+        }
+
+        /* Animation for dropdown */
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-content.show {
+            display: block;
+            animation: dropdownFade 0.2s ease;
+        }
     </style>
 
     <script>
 
+        // Store all case types for filtering
+        let allCaseTypes = [];
+        let allStations = [];
+        let allAirports = [];
+        let currentStationPage = 1;
+        let currentAirportPage = 1;
+        const ITEMS_PER_PAGE = 6000;
+
+        // Load stations from JSON file
+        async function loadStations() {
+            try {
+                const response = await fetch('/all_india_junctions.json');
+                const data = await response.json();
+                allStations = data.stations || [];
+
+                // Initial population (first page)
+                displayStations(allStations.slice(0, ITEMS_PER_PAGE));
+
+                console.log(`Loaded ${allStations.length} stations`);
+            } catch (err) {
+                console.error("Failed loading stations:", err);
+                document.getElementById("nrsItemsContainer").innerHTML =
+                    '<div style="padding: 12px; color: #dc2626; text-align: center;">Failed to load stations</div>';
+            }
+        }
+
+        // Load airports from JSON file
+        async function loadAirports() {
+            try {
+                const response = await fetch('/all_india_airport.json');
+                const data = await response.json();
+                allAirports = data.airports || [];
+
+                // Initial population (first page)
+                displayAirports(allAirports.slice(0, ITEMS_PER_PAGE));
+
+                console.log(`Loaded ${allAirports.length} airports`);
+            } catch (err) {
+                console.error("Failed loading airports:", err);
+                document.getElementById("airportItemsContainer").innerHTML =
+                    '<div style="padding: 12px; color: #dc2626; text-align: center;">Failed to load airports</div>';
+            }
+        }
+
+        // Display stations with pagination
+        function displayStations(stationsToShow, hasMore = false) {
+            const container = document.getElementById("nrsItemsContainer");
+            if (!container) return;
+
+            if (stationsToShow.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; color: #6b7280; text-align: center;">No stations found</div>';
+                return;
+            }
+
+            let html = '';
+            stationsToShow.forEach((station, index) => {
+                const displayText = `${station.stnName} (${station.stnCode}) - ${station.stnCity}`;
+                html += `
+            <div class="dropdown-item" onclick="selectStation('${station.stnCode}', '${displayText.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500;">${station.stnName}</span>
+                    <span style="font-size: 11px; color: #6b7280;">${station.stnCode}</span>
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">${station.stnCity}</div>
+            </div>
+        `;
+            });
+
+            // Add "Load More" button if there are more items
+            if (hasMore) {
+                html += `
+            <div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <button onclick="loadMoreStations()" style="background: none; border: 1px solid #1b4332; color: #1b4332; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    Load More (${currentStationPage * ITEMS_PER_PAGE} of ${allStations.length})
+                </button>
+            </div>
+        `;
+            }
+
+            container.innerHTML = html;
+
+            // Add hover effect
+            container.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f3f4f6';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        }
+
+        // Display airports with pagination
+        function displayAirports(airportsToShow, hasMore = false) {
+            const container = document.getElementById("airportItemsContainer");
+            if (!container) return;
+
+            if (airportsToShow.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; color: #6b7280; text-align: center;">No airports found</div>';
+                return;
+            }
+
+            let html = '';
+            airportsToShow.forEach((airport, index) => {
+                const displayText = `${airport.airport_name} (${airport.IATA_code}) - ${airport.city_name}`;
+                html += `
+            <div class="dropdown-item" onclick="selectAirport('${airport.IATA_code}', '${displayText.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500;">${airport.airport_name}</span>
+                    <span style="font-size: 11px; color: #6b7280;">${airport.IATA_code}</span>
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">${airport.city_name}</div>
+            </div>
+        `;
+            });
+
+            // Add "Load More" button if there are more items
+            if (hasMore) {
+                html += `
+            <div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <button onclick="loadMoreAirports()" style="background: none; border: 1px solid #1b4332; color: #1b4332; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    Load More (${currentAirportPage * ITEMS_PER_PAGE} of ${allAirports.length})
+                </button>
+            </div>
+        `;
+            }
+
+            container.innerHTML = html;
+
+            // Add hover effect
+            container.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f3f4f6';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        }
+
+        // Filter stations based on search input
+        function filterStations() {
+            const input = document.getElementById("nrsSearchInput");
+            const filter = input.value.toUpperCase();
+
+            if (filter.length === 0) {
+                // Reset to first page when search is cleared
+                currentStationPage = 1;
+                displayStations(allStations.slice(0, ITEMS_PER_PAGE), allStations.length > ITEMS_PER_PAGE);
+                return;
+            }
+
+            const filtered = allStations.filter(station =>
+                station.stnName.toUpperCase().includes(filter) ||
+                station.stnCode.toUpperCase().includes(filter) ||
+                station.stnCity.toUpperCase().includes(filter)
+            );
+
+            // Show only first 12 filtered results
+            displayStations(filtered.slice(0, ITEMS_PER_PAGE), filtered.length > ITEMS_PER_PAGE);
+        }
+
+        // Filter airports based on search input
+        function filterAirports() {
+            const input = document.getElementById("airportSearchInput");
+            const filter = input.value.toUpperCase();
+
+            if (filter.length === 0) {
+                // Reset to first page when search is cleared
+                currentAirportPage = 1;
+                displayAirports(allAirports.slice(0, ITEMS_PER_PAGE), allAirports.length > ITEMS_PER_PAGE);
+                return;
+            }
+
+            const filtered = allAirports.filter(airport =>
+                airport.airport_name.toUpperCase().includes(filter) ||
+                airport.IATA_code.toUpperCase().includes(filter) ||
+                airport.city_name.toUpperCase().includes(filter)
+            );
+
+            // Show only first 12 filtered results
+            displayAirports(filtered.slice(0, ITEMS_PER_PAGE), filtered.length > ITEMS_PER_PAGE);
+        }
+
+        // Load more stations
+        function loadMoreStations() {
+            currentStationPage++;
+            const start = (currentStationPage - 1) * ITEMS_PER_PAGE;
+            const end = currentStationPage * ITEMS_PER_PAGE;
+            const moreStations = allStations.slice(start, end);
+
+            const container = document.getElementById("nrsItemsContainer");
+            let html = container.innerHTML;
+
+            moreStations.forEach(station => {
+                const displayText = `${station.stnName} (${station.stnCode}) - ${station.stnCity}`;
+                html += `
+            <div class="dropdown-item" onclick="selectStation('${station.stnCode}', '${displayText.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500;">${station.stnName}</span>
+                    <span style="font-size: 11px; color: #6b7280;">${station.stnCode}</span>
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">${station.stnCity}</div>
+            </div>
+        `;
+            });
+
+            // Update load more button if there are more items
+            if (end < allStations.length) {
+                html = html.replace(/<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">[\s\S]*?<\/div>/,
+                    `<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <button onclick="loadMoreStations()" style="background: none; border: 1px solid #1b4332; color: #1b4332; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    Load More (${end} of ${allStations.length})
+                </button>
+            </div>`);
+            } else {
+                html = html.replace(/<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">[\s\S]*?<\/div>/, '');
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Load more airports
+        function loadMoreAirports() {
+            currentAirportPage++;
+            const start = (currentAirportPage - 1) * ITEMS_PER_PAGE;
+            const end = currentAirportPage * ITEMS_PER_PAGE;
+            const moreAirports = allAirports.slice(start, end);
+
+            const container = document.getElementById("airportItemsContainer");
+            let html = container.innerHTML;
+
+            moreAirports.forEach(airport => {
+                const displayText = `${airport.airport_name} (${airport.IATA_code}) - ${airport.city_name}`;
+                html += `
+            <div class="dropdown-item" onclick="selectAirport('${airport.IATA_code}', '${displayText.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500;">${airport.airport_name}</span>
+                    <span style="font-size: 11px; color: #6b7280;">${airport.IATA_code}</span>
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">${airport.city_name}</div>
+            </div>
+        `;
+            });
+
+            // Update load more button if there are more items
+            if (end < allAirports.length) {
+                html = html.replace(/<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">[\s\S]*?<\/div>/,
+                    `<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <button onclick="loadMoreAirports()" style="background: none; border: 1px solid #1b4332; color: #1b4332; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    Load More (${end} of ${allAirports.length})
+                </button>
+            </div>`);
+            } else {
+                html = html.replace(/<div style="padding: 12px; text-align: center; border-top: 1px solid #e5e7eb;">[\s\S]*?<\/div>/, '');
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Toggle dropdown
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const isVisible = dropdown.style.display === 'block';
+
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                d.style.display = 'none';
+            });
+
+            // Toggle current dropdown
+            dropdown.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                // Focus the search input when dropdown opens
+                setTimeout(() => {
+                    const searchInput = dropdownId === 'nrsDropdown' ?
+                        document.getElementById("nrsSearchInput") :
+                        document.getElementById("airportSearchInput");
+                    if (searchInput) searchInput.focus();
+                }, 100);
+            }
+        }
+
+        // Select station
+        function selectStation(code, displayText) {
+            document.getElementById("selectedNrsDisplay").textContent = displayText;
+            document.getElementById("nrs").value = code;
+            document.getElementById("nrsDropdown").style.display = 'none';
+            document.getElementById("nrsSearchInput").value = '';
+
+            // Reset to first page
+            currentStationPage = 1;
+            displayStations(allStations.slice(0, ITEMS_PER_PAGE), allStations.length > ITEMS_PER_PAGE);
+        }
+
+        // Select airport
+        function selectAirport(code, displayText) {
+            document.getElementById("selectedAirportDisplay").textContent = displayText;
+            document.getElementById("nearestAirport").value = code;
+            document.getElementById("airportDropdown").style.display = 'none';
+            document.getElementById("airportSearchInput").value = '';
+
+            // Reset to first page
+            currentAirportPage = 1;
+            displayAirports(allAirports.slice(0, ITEMS_PER_PAGE), allAirports.length > ITEMS_PER_PAGE);
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const nrsDropdown = document.getElementById("nrsDropdown");
+            const airportDropdown = document.getElementById("airportDropdown");
+            const nrsTrigger = event.target.closest('[onclick="toggleDropdown(\'nrsDropdown\')"]');
+            const airportTrigger = event.target.closest('[onclick="toggleDropdown(\'airportDropdown\')"]');
+
+            if (!nrsTrigger && nrsDropdown && !nrsDropdown.contains(event.target)) {
+                nrsDropdown.style.display = 'none';
+            }
+
+            if (!airportTrigger && airportDropdown && !airportDropdown.contains(event.target)) {
+                airportDropdown.style.display = 'none';
+            }
+        });
+
         async function loadCaseTypes() {
             try {
-                const res = await fetch("http://localhost:6060/api/dropdown/CASE_TYPE");
-                const caseTypes = await res.json();
+                // Add code=1 parameter to get codes
+                const res = await fetch("http://localhost:6060/api/dropdown/CASE_TYPE?code=1");
+                allCaseTypes = await res.json(); // Store all case types for filtering
+
+                // Populate hidden select (for form submission)
                 const caseTypeSelect = document.getElementById("caseType");
                 if (caseTypeSelect) {
                     caseTypeSelect.innerHTML = '<option value="">Select Case Type</option>';
-                    caseTypes.forEach(item => {
-                        caseTypeSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                    allCaseTypes.forEach(item => {
+                        caseTypeSelect.innerHTML += `<option value="${item.code}">${item.name}</option>`;
                     });
                 }
+
+                // Populate dropdown items
+                populateCaseTypeItems(allCaseTypes);
+
             } catch (err) {
                 console.error("Failed loading case types:", err);
+                allCaseTypes = [];
             }
         }
+
+        function populateCaseTypeItems(items) {
+            const container = document.getElementById("caseTypeItemsContainer");
+            if (!container) return;
+
+            if (items.length === 0) {
+                container.innerHTML = '<div style="padding: 12px; color: #6b7280; text-align: center;">No case types found</div>';
+                return;
+            }
+
+            let html = '';
+            items.forEach((item, index) => {
+                html += `
+            <div class="dropdown-item" onclick="selectCaseType('${item.code}', '${item.name.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${item.name}</span>
+                    ${item.code ? `<span style="font-size: 11px; color: #6b7280;">${item.code}</span>` : ''}
+                </div>
+            </div>
+        `;
+            });
+
+            container.innerHTML = html;
+
+            // Add hover effect
+            container.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f3f4f6';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        }
+
+        function selectCaseType(code, name) {
+            // Update display
+            document.getElementById("selectedCaseTypeDisplay").textContent = name;
+
+            // Update hidden select
+            document.getElementById("caseType").value = code;
+
+            // Close dropdown
+            document.getElementById("caseTypeDropdown").style.display = 'none';
+
+            // Clear search input for next time
+            document.getElementById("caseTypeSearchInput").value = '';
+
+            // Trigger change event
+            const event = new Event('change', { bubbles: true });
+            document.getElementById("caseType").dispatchEvent(event);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById("caseTypeDropdown");
+            const trigger = event.target.closest('[onclick="toggleCaseTypeDropdown()"]');
+
+            if (!trigger && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
 
         async function loadCivilQualifications() {
             try {
@@ -618,7 +1163,13 @@
             }
         }
 
+        // =======================================================
+        // MODIFIED VALIDATE REQUIRED FIELDS FUNCTION
+        // =======================================================
         function validateRequiredFields() {
+            // Clear all previous errors first
+            clearAllErrors();
+
             const requiredFields = [
                 { id: 'commission', name: 'Types of Commission' },
                 { id: 'armyNo', name: 'Army No' },
@@ -647,6 +1198,8 @@
                 { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' }
             ];
 
+            let isValid = true;
+
             // Validate image
             const imageFile = document.getElementById("officerImageFile").files[0];
             const imageError = document.getElementById("image-error");
@@ -654,7 +1207,7 @@
                 if (imageError) imageError.style.display = "block";
                 alert("Officer Image is required");
                 document.getElementById("officerImageFile").focus();
-                return false;
+                isValid = false;
             } else {
                 if (imageError) imageError.style.display = "none";
 
@@ -662,14 +1215,14 @@
                 const fileType = imageFile.type;
                 if (!fileType.match('image.*')) {
                     alert("Please select a valid image file (JPG/PNG)");
-                    return false;
+                    isValid = false;
                 }
 
                 // Validate file size (max 2MB)
-                const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                const maxSize = 2 * 1024 * 1024;
                 if (imageFile.size > maxSize) {
                     alert("Image size should be less than 2MB");
-                    return false;
+                    isValid = false;
                 }
             }
 
@@ -685,20 +1238,22 @@
                     if (nameInput && !nameInput.value.trim()) {
                         alert(`Family Member #${i+1}: Name is required`);
                         nameInput.focus();
-                        return false;
+                        isValid = false;
+                        break;
                     }
 
                     if (relationshipSelect && !relationshipSelect.value) {
                         alert(`Family Member #${i+1}: Relationship is required`);
                         relationshipSelect.focus();
-                        return false;
+                        isValid = false;
+                        break;
                     }
 
-                    // Add validation for Part II Order No.
                     if (orderNoInput && !orderNoInput.value.trim()) {
                         alert(`Family Member #${i+1}: Part II Order No. is required`);
                         orderNoInput.focus();
-                        return false;
+                        isValid = false;
+                        break;
                     }
                 }
             }
@@ -707,13 +1262,39 @@
             for (let field of requiredFields) {
                 const element = document.getElementById(field.id);
                 if (element && !element.value.trim()) {
-                    alert(`${field.name} is required`);
-                    element.focus();
-                    return false;
+                    showFieldError(element, `${field.name} is required`, `${field.id}-required-error`);
+                    isValid = false;
                 }
             }
 
-            return true;
+            // Validate Army Number format
+            if (!validateArmyNumber()) {
+                isValid = false;
+            }
+
+            // Validate date relationships
+            if (!validateDates()) {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function clearAllErrors() {
+            // Remove all error messages
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            document.querySelectorAll('.field-hint').forEach(el => el.remove());
+
+            // Remove error classes from all inputs
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.classList.remove('error', 'valid');
+            });
+
+            // Hide image error
+            const imageError = document.getElementById("image-error");
+            if (imageError) {
+                imageError.style.display = "none";
+            }
         }
 
         // =======================================================
@@ -987,29 +1568,29 @@
             container.insertAdjacentHTML(
                 "beforeend",
                 `
-                <div class="grid repeater-item" id="${id}">
-                    <div>
-                        <label>Decoration Category</label>
-                        <select name="decorations[${index}][category]"
-                                id="decorationCategory-${index}"
-                                onchange="loadAwardsForCategory(this.value, ${index})">
-                            <option value="">Loading...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Decoration Name</label>
-                        <select name="decorations[${index}][name]" id="decorationName-${index}">
-                            <option value="">Select Award</option>
-                        </select>
-                    </div>
-                    ${!isFirst ? `
-                        <button type="button" class="btn btn-secondary"
-                                onclick="removeBlock('${id}')">
-                            Remove
-                        </button>
-                    ` : ""}
-                </div>
-                `
+        <div class="grid repeater-item" id="${id}">
+            <div>
+                <label>Decoration Category</label>
+                <select name="decorations[${index}][category]"
+                        id="decorationCategory-${index}"
+                        onchange="loadAwardsForCategory(this.value, ${index})">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+            <div>
+                <label>Decoration Name</label>
+                <select name="decorations[${index}][name]" id="decorationName-${index}">
+                    <option value="">Select Award</option>
+                </select>
+            </div>
+            ${!isFirst ? `
+                <button type="button" class="btn btn-secondary"
+                        onclick="removeBlock('${id}')">
+                    Remove
+                </button>
+            ` : ""}
+        </div>
+        `
             );
 
             await loadDecorationCategories(index);
@@ -1017,14 +1598,16 @@
 
         async function loadDecorationCategories(index) {
             try {
-                const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
+                // Add code=1 parameter to get the code field
+                const res = await fetch("http://localhost:6060/api/dropdown/DECORATION_CATEGORY?code=1");
                 const categories = await res.json();
 
                 const dropdown = document.getElementById(`decorationCategory-${index}`);
                 if (dropdown) {
                     dropdown.innerHTML = '<option value="">Select Category</option>';
                     categories.forEach(cat => {
-                        dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+                        // cat will now have {id, name, code}
+                        dropdown.innerHTML += `<option value="${cat.code}">${cat.name}</option>`;
                     });
                 }
             } catch (err) {
@@ -1032,11 +1615,45 @@
             }
         }
 
-        async function loadAwardsForCategory(category, index) {
+        function toggleCaseTypeDropdown() {
+            const dropdown = document.getElementById("caseTypeDropdown");
+            const isVisible = dropdown.style.display === 'block';
+
+            // Close all other dropdowns first
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if (d.id !== 'caseTypeDropdown') {
+                    d.style.display = 'none';
+                }
+            });
+
+            // Toggle current dropdown
+            dropdown.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                // Focus the search input when dropdown opens
+                setTimeout(() => {
+                    document.getElementById("caseTypeSearchInput").focus();
+                }, 100);
+            }
+        }
+
+        function filterCaseTypes() {
+            const input = document.getElementById("caseTypeSearchInput");
+            const filter = input.value.toUpperCase();
+
+            const filteredItems = allCaseTypes.filter(item =>
+                item.name.toUpperCase().includes(filter) ||
+                (item.code && item.code.toUpperCase().includes(filter))
+            );
+
+            populateCaseTypeItems(filteredItems);
+        }
+
+        async function loadAwardsForCategory(categoryCode, index) {
             const awardDropdown = document.getElementById(`decorationName-${index}`);
             if (!awardDropdown) return;
 
-            if (!category) {
+            if (!categoryCode) {
                 awardDropdown.innerHTML = '<option value="">Select Award</option>';
                 return;
             }
@@ -1044,16 +1661,16 @@
             awardDropdown.innerHTML = '<option value="">Loading...</option>';
 
             try {
-                const res = await fetch(
-                    `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
-                );
+                // Use the category code to fetch awards
+                const res = await fetch(`http://localhost:6060/api/dropdown/${categoryCode}?code=1`);
                 const awards = await res.json();
 
                 awardDropdown.innerHTML = '<option value="">Select Award</option>';
                 awards.forEach(a => {
+                    // a will have {id, name, code}
                     awardDropdown.innerHTML += `
-                        <option value="${a.name}">${a.name} (${a.suffix})</option>
-                    `;
+                <option value="${a.code}">${a.name}</option>
+            `;
                 });
             } catch (err) {
                 console.error("Failed loading awards:", err);
@@ -1265,6 +1882,7 @@
             const dateOfBirth = document.getElementById("dateOfBirth");
             const placeOfBirth = document.getElementById("placeOfBirth");
             const nrs = document.getElementById("nrs");
+            const nearestAirport = document.getElementById("nearestAirport");
             const religion = document.getElementById("religion");
             const aadhaarNumber = document.getElementById("aadhaarNumber");
             const panCard = document.getElementById("panCard");
@@ -1294,7 +1912,6 @@
                 dateOfSeniority: dateOfSeniority ? dateOfSeniority.value : "",
                 dateOfBirth: dateOfBirth ? dateOfBirth.value : "",
                 placeOfBirth: placeOfBirth ? placeOfBirth.value : "",
-                nrs: nrs ? nrs.value : "",
                 religion: religion ? religion.value : "",
                 aadhaarNumber: aadhaarNumber ? aadhaarNumber.value : "",
                 panCard: panCard ? panCard.value : "",
@@ -1317,6 +1934,20 @@
                 sports: [],
                 medical: getMedicalPayload()
             };
+            payload.nrs = nrs ? nrs.value : "";
+            payload.nearestAirport = nearestAirport ? nearestAirport.value : "";
+
+            // For decorations collection
+            document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
+                const categorySelect = item.querySelector('select[name*="[category]"]');
+                const nameSelect = item.querySelector('select[name*="[name]"]');
+                if (categorySelect && nameSelect) {
+                    payload.decorations.push({
+                        decorationCategory: categorySelect.value, // This is now the category code
+                        decorationName: nameSelect.value // This is now the award code
+                    });
+                }
+            });
 
             // Collect decorations
             document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
@@ -1436,6 +2067,7 @@
         // =======================================================
         // INITIALIZATION - Run when DOM is fully loaded
         // =======================================================
+        // Update the initialization to include case type search
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("DOM fully loaded, initializing form...");
 
@@ -1457,6 +2089,11 @@
 
             // Load dropdowns
             await loadDropdowns();
+            await loadCaseTypes();
+
+            // Load stations and airports
+            await loadStations();
+            await loadAirports();
 
             // Load first rows for all repeaters
             await addDecoration(true);
@@ -1466,12 +2103,241 @@
             await addSportsDetail(true);
             initMedicalSection();
 
+            // Add real-time validation
+            addRealTimeValidation();
+
             // Attach save button event listener
             const saveBtn = document.getElementById("savePersonnelBtn");
             if (saveBtn) {
                 saveBtn.addEventListener("click", savePersonnel);
             }
         });
+
+        // =======================================================
+        // ADD REAL-TIME VALIDATION
+        // =======================================================
+        function addRealTimeValidation() {
+            // Army No real-time formatting
+            const armyNoInput = document.getElementById("armyNo");
+            if (armyNoInput) {
+                armyNoInput.addEventListener("input", function(e) {
+                    // Store cursor position
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const oldLength = this.value.length;
+
+                    formatArmyNumber();
+
+                    // Adjust cursor position if needed
+                    const newLength = this.value.length;
+                    if (newLength > oldLength) {
+                        this.setSelectionRange(start + (newLength - oldLength), end + (newLength - oldLength));
+                    }
+                });
+
+                armyNoInput.addEventListener("blur", function() {
+                    validateArmyNumber();
+                });
+            }
+
+            // Date validations on change
+            const dateFields = ["dateOfCommission", "dateOfSeniority", "dateOfBirth"];
+            dateFields.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener("change", function() {
+                        validateDates();
+                    });
+                }
+            });
+        }
+
+
+        // =======================================================
+        // ARMY NO FORMAT VALIDATION
+        // =======================================================
+        function formatArmyNumber() {
+            const armyNoInput = document.getElementById("armyNo");
+            if (!armyNoInput) return;
+
+            let value = armyNoInput.value;
+
+            // Remove any existing hyphens and convert to uppercase
+            value = value.replace(/-/g, '').toUpperCase();
+
+            // Check if it starts with IC or SC
+            if (value.length >= 2) {
+                const prefix = value.substring(0, 2);
+                if (prefix !== 'IC' && prefix !== 'SC') {
+                    // Auto-correct: if it starts with I or S, try to fix
+                    if (value.startsWith('I')) {
+                        value = 'IC' + value.substring(1);
+                    } else if (value.startsWith('S')) {
+                        value = 'SC' + value.substring(1);
+                    }
+                }
+            }
+
+            // Format: IC/SC + hyphen + 5 digits + 1 letter
+            let formatted = '';
+
+            if (value.length >= 2) {
+                const prefix = value.substring(0, 2);
+                if (prefix === 'IC' || prefix === 'SC') {
+                    formatted = prefix + '-';
+
+                    // Extract digits and letter
+                    let remaining = value.substring(2);
+                    let digits = remaining.replace(/[^0-9]/g, '').substring(0, 5);
+                    let letters = remaining.replace(/[^A-Z]/g, '');
+
+                    if (digits.length > 0) {
+                        formatted += digits;
+
+                        // Add hyphen after digits if we have a letter
+                        if (letters.length > 0) {
+                            formatted += letters.substring(0, 1);
+                        }
+                    }
+
+                    armyNoInput.value = formatted;
+                } else {
+                    armyNoInput.value = value;
+                }
+            } else {
+                armyNoInput.value = value;
+            }
+        }
+
+        function validateArmyNumber() {
+            const armyNoInput = document.getElementById("armyNo");
+            if (!armyNoInput) return true;
+
+            const value = armyNoInput.value;
+            const errorId = "armyNo-error";
+            let existingError = document.getElementById(errorId);
+
+            // Remove any existing error
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Pattern: IC-12345A or SC-12345A
+            const pattern = /^(IC|SC)-[0-9]{5}[A-Z]$/;
+
+            if (!value) {
+                showFieldError(armyNoInput, "Army No is required", errorId);
+                return false;
+            } else if (!pattern.test(value)) {
+                showFieldError(armyNoInput, "Army No must be in format: IC-12345A or SC-12345A (5 digits + 1 capital letter)", errorId);
+                return false;
+            }
+
+            // Add success styling
+            armyNoInput.classList.add("valid");
+            armyNoInput.classList.remove("error");
+            return true;
+        }
+
+        function showFieldError(element, message, errorId) {
+            element.classList.add("error");
+            element.classList.remove("valid");
+
+            const error = document.createElement("span");
+            error.id = errorId;
+            error.className = "error-message";
+            error.textContent = message;
+            element.parentNode.appendChild(error);
+        }
+
+        // =======================================================
+        // DATE VALIDATIONS
+        // =======================================================
+        function validateDates() {
+            const dateOfCommission = document.getElementById("dateOfCommission");
+            const dateOfSeniority = document.getElementById("dateOfSeniority");
+            const dateOfBirth = document.getElementById("dateOfBirth");
+
+            let isValid = true;
+
+            // Clear previous date errors
+            clearDateErrors();
+
+            // Validate Date of Commission < Date of Seniority
+            if (dateOfCommission.value && dateOfSeniority.value) {
+                const commission = new Date(dateOfCommission.value);
+                const seniority = new Date(dateOfSeniority.value);
+
+                if (commission >= seniority) {
+                    showFieldError(dateOfCommission, "Date of Commission must be less than Date of Seniority", "commission-error");
+                    showFieldError(dateOfSeniority, "Date of Seniority must be greater than Date of Commission", "seniority-error");
+                    isValid = false;
+                }
+            }
+
+            // Validate Age at Commission > 18 years
+            if (dateOfBirth.value && dateOfCommission.value) {
+                const birth = new Date(dateOfBirth.value);
+                const commission = new Date(dateOfCommission.value);
+
+                const ageAtCommission = commission.getFullYear() - birth.getFullYear();
+                const monthDiff = commission.getMonth() - birth.getMonth();
+                const dayDiff = commission.getDate() - birth.getDate();
+
+                // Adjust age if birthday hasn't occurred yet in the commission year
+                const exactAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ?
+                    ageAtCommission - 1 : ageAtCommission;
+
+                if (exactAge < 18) {
+                    showFieldError(dateOfBirth, `Age at Commission must be at least 18 years (current: ${exactAge} years)`, "birth-error");
+                    showFieldError(dateOfCommission, `Commission age must be at least 18 years (current: ${exactAge} years)`, "commission-age-error");
+                    isValid = false;
+                }
+
+                // Add hint about calculated age
+                addAgeHint(birth, commission, exactAge);
+            }
+
+            return isValid;
+        }
+
+        function clearDateErrors() {
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => error.remove());
+
+            // Remove error classes from date inputs
+            ["dateOfCommission", "dateOfSeniority", "dateOfBirth"].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.remove("error", "valid");
+                }
+            });
+        }
+
+        function addAgeHint(birthDate, commissionDate, age) {
+            const birthField = document.getElementById("dateOfBirth");
+            if (!birthField) return;
+
+            const hintId = "age-hint";
+            let existingHint = document.getElementById(hintId);
+
+            if (existingHint) {
+                existingHint.remove();
+            }
+
+            const hint = document.createElement("span");
+            hint.id = hintId;
+            hint.className = "field-hint";
+            hint.textContent = `Age at Commission: ${age} years`;
+
+            if (age < 18) {
+                hint.style.color = "#dc2626";
+            } else {
+                hint.style.color = "#10b981";
+            }
+
+            birthField.parentNode.appendChild(hint);
+        }
     </script>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -1532,6 +2398,7 @@
                         <div>
                             <label class="required">Army No</label>
                             <input id="armyNo">
+                            <span class="field-hint">Format: IC-12345A or SC-12345A</span>
                         </div>
                         <div>
                             <label class="required">Rank</label>
@@ -1567,6 +2434,7 @@
                                 <option value="">Select Gender</option>
                                 <option value="M">Male</option>
                                 <option value="F">Female</option>
+                                <option value="T">Transgender</option>
                                 <option value="O">Other</option>
                             </select>
                         </div>
@@ -1575,10 +2443,30 @@
                             <input id="placeOfBirth">
                         </div>
                         <div>
-                            <label>Case Type</label>
-                            <select id="caseType">
-                                <option value="">Select Case Type</option>
-                            </select>
+                            <label class="required">Case Type</label>
+                            <div style="position: relative;">
+                                <!-- Button to trigger dropdown -->
+                                <div onclick="toggleCaseTypeDropdown()" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                    <span id="selectedCaseTypeDisplay">Select Case Type</span>
+                                    <span style="font-size: 12px;">▼</span>
+                                </div>
+
+                                <!-- Hidden select for form submission -->
+                                <select id="caseType" style="display: none;"></select>
+
+                                <!-- Dropdown with search input -->
+                                <div id="caseTypeDropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 300px; overflow-y: auto; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 4px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                                    <input type="text"
+                                           placeholder="Search case type..."
+                                           id="caseTypeSearchInput"
+                                           onkeyup="filterCaseTypes()"
+                                           onclick="event.stopPropagation()"
+                                           style="width: 100%; padding: 10px 12px; border: none; border-bottom: 1px solid #d1d5db; border-radius: 8px 8px 0 0; outline: none; font-size: 14px;">
+                                    <div id="caseTypeItemsContainer" style="max-height: 250px; overflow-y: auto;">
+                                        <!-- Items will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1601,9 +2489,61 @@
                     <div class="section-title">🎖️ Service Details</div>
                     <div class="grid">
                         <div>
-                            <label class="required">NRS</label>
-                            <input id="nrs">
+                            <label class="required">NRS (Nearest Railway Station)</label>
+                            <div style="position: relative;">
+                                <!-- Button to trigger dropdown -->
+                                <div onclick="toggleDropdown('nrsDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                    <span id="selectedNrsDisplay">Select Railway Station</span>
+                                    <span style="font-size: 12px;">▼</span>
+                                </div>
+
+                                <!-- Hidden input for form submission -->
+                                <input type="hidden" id="nrs" name="nrs">
+
+                                <!-- Dropdown with search input -->
+                                <div id="nrsDropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 350px; overflow-y: auto; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 4px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                                    <input type="text"
+                                           placeholder="Search by station name or code..."
+                                           id="nrsSearchInput"
+                                           onkeyup="filterStations()"
+                                           onclick="event.stopPropagation()"
+                                           style="width: 100%; padding: 12px; border: none; border-bottom: 1px solid #d1d5db; border-radius: 8px 8px 0 0; outline: none; font-size: 14px; box-sizing: border-box;">
+                                    <div id="nrsItemsContainer" style="max-height: 300px; overflow-y: auto;">
+                                        <!-- Items will be populated here -->
+                                        <div style="padding: 12px; color: #6b7280; text-align: center;">Loading stations...</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <div>
+                            <label class="required">Nearest Airport</label>
+                            <div style="position: relative;">
+                                <!-- Button to trigger dropdown -->
+                                <div onclick="toggleDropdown('airportDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                    <span id="selectedAirportDisplay">Select Airport</span>
+                                    <span style="font-size: 12px;">▼</span>
+                                </div>
+
+                                <!-- Hidden input for form submission -->
+                                <input type="hidden" id="nearestAirport" name="nearestAirport">
+
+                                <!-- Dropdown with search input -->
+                                <div id="airportDropdown" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 350px; overflow-y: auto; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 4px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                                    <input type="text"
+                                           placeholder="Search by airport name or code..."
+                                           id="airportSearchInput"
+                                           onkeyup="filterAirports()"
+                                           onclick="event.stopPropagation()"
+                                           style="width: 100%; padding: 12px; border: none; border-bottom: 1px solid #d1d5db; border-radius: 8px 8px 0 0; outline: none; font-size: 14px; box-sizing: border-box;">
+                                    <div id="airportItemsContainer" style="max-height: 300px; overflow-y: auto;">
+                                        <!-- Items will be populated here -->
+                                        <div style="padding: 12px; color: #6b7280; text-align: center;">Loading airports...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div>
                             <label class="required">Religion</label>
                             <select id="religion">
