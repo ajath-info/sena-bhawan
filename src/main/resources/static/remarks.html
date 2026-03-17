@@ -9,90 +9,161 @@
 
     <style>
         body {
-          font-family: "Inter", sans-serif;
-          background:#f1f3f5;
-          margin:0;
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            margin: 0;
         }
 
         .container {
-          display:flex;
-          height:100vh;
+            display: flex;
+            height: 100vh;
         }
 
         .nav-item {
-          display:block;
-          padding:10px 0;
-          color:white;
-          text-decoration:none;
+            display: block;
+            padding: 10px 0;
+            color: white;
+            text-decoration: none;
         }
 
         .nav-item.active {
-          font-weight:700;
+            font-weight: 700;
         }
 
         /* Main */
         .main-content {
-          flex:1;
-          display:flex;
-          flex-direction:column;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
-          background:white;
-          padding:20px;
-          border-bottom:1px solid #ddd;
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
         }
 
         .content-area {
-          flex:1;
-          overflow-y:auto;
-          padding:24px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
         }
 
         /* Card */
         .form-card {
-          max-width:900px;
-          margin:auto;
-          background:white;
-          padding:25px;
-          border-radius:10px;
-          box-shadow:0 10px 25px rgba(0,0,0,0.08);
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
         .section {
-          border:1px solid #ddd;
-          border-radius:8px;
-          padding:15px;
-          margin-bottom:20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
 
         .section-title {
-          font-weight:600;
-          margin-bottom:12px;
-          border-bottom:1px solid #ccc;
-          padding-bottom:5px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
         }
 
         textarea {
-          width:100%;
-          padding:8px;
-          border-radius:5px;
-          border:1px solid #ccc;
-          min-height:70px;
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            min-height: 70px;
+            font-family: "Inter", sans-serif;
+            box-sizing: border-box;
         }
 
         .radio-group {
-          display:flex;
-          gap:20px;
+            display: flex;
+            gap: 20px;
         }
 
         .btn-primary {
-          background:#1b4332;
-          color:white;
-          border:none;
-          padding:10px 20px;
-          border-radius:6px;
-          cursor:pointer;
+            background: #1b4332;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: "Inter", sans-serif;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #2d6a4f;
+        }
+
+        /* Search styles - exactly like working page */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #personnelSearch {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: "Inter", sans-serif;
+            box-sizing: border-box;
+        }
+
+        .recommendation-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .recommendation-item:hover {
+            background: #f3f4f6;
+        }
+
+        .recommendation-item .army-no {
+            font-weight: 600;
+            color: #1b4332;
+        }
+
+        .recommendation-loading {
+            padding: 10px 12px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        #selectedPersonnelInfo {
+            margin-top: 10px;
+            padding: 8px;
+            background: #e8f0fe;
+            border-radius: 5px;
+            display: none;
+            border-left: 3px solid #1b4332;
+        }
+
+        select, input[type="text"] {
+            font-family: "Inter", sans-serif;
         }
     </style>
 
@@ -103,33 +174,35 @@
 
 <div class="container">
     <script src="sidebar.js"></script>
-    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
     <aside class="sidebar" id="sidebarContainer">
-        <!-- Loading indicator (optional) -->
         <div style="color: white; padding: 20px; text-align: center;">
             Loading menu...
         </div>
     </aside>
-    <!-- SIDEBAR -->
 
     <!-- MAIN -->
     <main class="main-content">
-
         <div class="content-area">
-
             <div class="form-card">
-
                 <div class="header">
                     <h2>Course Remarks Update</h2>
                     <p>Update remarks before and after course detailment</p>
                 </div>
 
-                <!-- SELECT PERSONNEL -->
+                <!-- SELECT PERSONNEL - Like working page -->
                 <div class="section">
                     <div class="section-title">Select Personnel</div>
-                    <select id="personnelSelect">
-                        <option>Select Personnel</option>
-                    </select>
+                    <div style="position: relative;">
+                        <input
+                                type="text"
+                                id="personnelSearch"
+                                placeholder="Search by Army Number (min 4 characters)..."
+                                autocomplete="off"
+                        >
+                        <div id="searchResults" class="recommendation-dropdown" style="display: none;"></div>
+                    </div>
+                    <div id="selectedPersonnelInfo"></div>
+                    <input type="hidden" id="selectedPersonnelId">
                 </div>
 
                 <!-- BEFORE DETAILMENT -->
@@ -151,17 +224,16 @@
                     </div>
                 </div>
 
-
                 <!-- AFTER DETAILMENT -->
                 <div class="section">
                     <div class="section-title">After Detailment</div>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="after" value="TakenOff" >
+                            <input type="radio" name="after" value="TakenOff">
                             Taken Off
                         </label>
                         <label>
-                            <input type="radio" name="after" value="Continuing" >
+                            <input type="radio" name="after" value="Continuing">
                             Continuing
                         </label>
                     </div>
@@ -170,7 +242,6 @@
                         <textarea id="afterReason" placeholder="Reason for taken off"></textarea>
                     </div>
                 </div>
-
 
                 <!-- GENERAL REMARK -->
                 <div class="section">
@@ -181,114 +252,226 @@
                 <div style="text-align:right;">
                     <button class="btn-primary" onclick="saveRemarks()">Update Remarks</button>
                 </div>
-
             </div>
-
         </div>
     </main>
 </div>
 
-
 <script>
+    // ==================== CONFIGURATION - Like working page ====================
+    const BASE_URL = "http://localhost:6060";
+    const SEARCH_API = `${BASE_URL}/api/personnel/search`;
+    const REMARKS_API = `${BASE_URL}/api/remarks/save`;
 
-    const PERSONNEL_API = "http://localhost:6060/api/personnel";
-    const personnelSelect = document.getElementById("personnelSelect");
+    // ==================== DOM ELEMENTS ====================
+    const searchInput = document.getElementById('personnelSearch');
+    const searchResults = document.getElementById('searchResults');
+    const selectedPersonnelInfo = document.getElementById('selectedPersonnelInfo');
+    const selectedPersonnelId = document.getElementById('selectedPersonnelId');
 
-    let personnelList = [];
+    // ==================== STATE ====================
+    let selectedPersonnel = null;
+    let searchTimeout = null;
+    let abortController = null;
 
-    /* Load personnel */
-    fetch(PERSONNEL_API)
-      .then(res => res.json())
-      .then(data => {
-          personnelList = data;
-
-          data.forEach(p => {
-              const option = document.createElement("option");
-              option.value = p.id; // personnel ID
-              option.textContent = `${p.fullName} (${p.armyNo})`;
-              personnelSelect.appendChild(option);
-          });
-      })
-      .catch(err => {
-          console.error("Failed to load personnel", err);
-      });
-
-    /* When personnel selected */
-    personnelSelect.addEventListener("change", function () {
-        const selectedId = this.value;
-        if (!selectedId) return;
-
-        const selectedPerson = personnelList.find(p => p.id == selectedId);
-        console.log("Selected Personnel:", selectedPerson);
+    // ==================== INITIAL LOAD ====================
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('✅ DOM loaded');
+        loadSidebar();
     });
 
-    const REMARKS_API = "http://localhost:6060/api/remarks/save";
+    // ==================== SEARCH FUNCTION - Exactly like working page ====================
+    searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.trim();
+        selectedPersonnelId.value = "";
+        selectedPersonnel = null;
 
+        clearTimeout(searchTimeout);
 
-/* save data  */
+        if (searchTerm.length < 4) {
+            searchResults.style.display = "none";
+            selectedPersonnelInfo.style.display = "none";
+            return;
+        }
 
-function saveRemarks() {
+        searchTimeout = setTimeout(() => {
+            searchPersonnel(searchTerm);
+        }, 500);
+    });
 
-    const personnelId = document.getElementById("personnelSelect").value;
+    async function searchPersonnel(term) {
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
 
-    if (!personnelId || personnelId === "" || personnelId === null ) {
-        alert("Please select personnel");
-        return;
+        try {
+            searchResults.innerHTML = '<div class="recommendation-loading">Searching personnel...</div>';
+            searchResults.style.display = "block";
+
+            console.log('🔍 Searching for:', term);
+            const response = await fetch(`${SEARCH_API}?term=${encodeURIComponent(term)}`, {
+                signal: abortController.signal
+            });
+
+            const result = await response.json();
+            console.log('📦 Response:', result);
+
+            if (result.success && result.data && result.data.length > 0) {
+                displaySearchResults(result.data);
+            } else {
+                searchResults.innerHTML = `
+                    <div class="recommendation-loading" style="color: #ef4444;">
+                        ⚠️ No personnel found with Army No: "${term}"
+                    </div>
+                `;
+            }
+        } catch (error) {
+            if (error.name === "AbortError") return;
+            console.error("Search error:", error);
+            searchResults.style.display = "none";
+        }
     }
-    const beforeRadio = document.querySelector('input[name="before"]:checked');
-if (beforeRadio === null) {
-    alert("Please select Before Detailment");
-    return;
-}
 
-const afterRadio = document.querySelector('input[name="after"]:checked');
-if (afterRadio === null) {
-    alert("Please select After Detailment");
-    return;
-}
+    function displaySearchResults(personnelList) {
+        let html = "";
+        personnelList.forEach(person => {
+            html += `
+                <div class="recommendation-item" onclick="selectPersonnel(${person.id}, '${person.armyNo}', '${person.fullName}', '${person.rank || ''}')">
+                    <div class="army-no">${person.armyNo}</div>
+                    <div style="font-size: 12px; color: #4b5563;">${person.fullName} ${person.rank ? '- ' + person.rank : ''}</div>
+                </div>
+            `;
+        });
+        searchResults.innerHTML = html;
+    }
 
+    // ==================== SELECT PERSONNEL ====================
+    window.selectPersonnel = function(personnelId, armyNo, fullName, rank) {
+        console.log('✅ Selected:', {personnelId, armyNo, fullName, rank});
 
-    /* GENERAL REMARKS */
-const generalRemarks = document.getElementById("generalRemarks").value.trim();
+        searchInput.value = `${fullName} (${armyNo})`;
+        selectedPersonnelId.value = personnelId;
 
-    const payload = {
-        personnelId: Number(personnelId),
-        beforeDetailment: beforeRadio.value,
-        afterDetailment: afterRadio.value,
-        generalRemarks: generalRemarks
+        selectedPersonnel = {
+            id: personnelId,
+            armyNo: armyNo,
+            fullName: fullName,
+            rank: rank
+        };
+
+        searchResults.style.display = "none";
+
+        selectedPersonnelInfo.style.display = "block";
+        selectedPersonnelInfo.innerHTML = `
+            <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
+        `;
     };
 
-    console.log("Sending:", payload);
-
-    fetch(REMARKS_API, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Save failed");
-        return res.json();
-    })
-    .then(data => {
-        alert("Remarks updated successfully ✅");
-        console.log("Saved:", data);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Error saving remarks ❌");
+    // ==================== CLICK OUTSIDE ====================
+    document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = "none";
+        }
     });
-}
 
-    // Load sidebar dynamically
+    // ==================== SAVE REMARKS ====================
+    window.saveRemarks = function() {
+        if (!selectedPersonnel) {
+            alert("Please select personnel");
+            return;
+        }
+
+        const beforeRadio = document.querySelector('input[name="before"]:checked');
+        if (!beforeRadio) {
+            alert("Please select Before Detailment");
+            return;
+        }
+
+        const afterRadio = document.querySelector('input[name="after"]:checked');
+        if (!afterRadio) {
+            alert("Please select After Detailment");
+            return;
+        }
+
+        let beforeReason = '';
+        if (beforeRadio.value === 'NotDetail') {
+            beforeReason = document.getElementById('beforeReason').value.trim();
+        }
+
+        let afterReason = '';
+        if (afterRadio.value === 'TakenOff') {
+            afterReason = document.getElementById('afterReason').value.trim();
+        }
+
+        const generalRemarks = document.getElementById("generalRemarks").value.trim();
+
+        const payload = {
+            personnelId: selectedPersonnel.id,
+            beforeDetailment: beforeRadio.value,
+            afterDetailment: afterRadio.value,
+            beforeReason: beforeReason,
+            afterReason: afterReason,
+            generalRemarks: generalRemarks
+        };
+
+        console.log("📤 Sending:", payload);
+
+        fetch(REMARKS_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("Remarks updated successfully ✅");
+            console.log("✅ Saved:", data);
+            clearForm();
+        })
+        .catch(error => {
+            console.error("❌ Error:", error);
+            alert("Error saving remarks ❌");
+        });
+    };
+
+    // ==================== CLEAR FORM ====================
+    function clearForm() {
+        searchInput.value = '';
+        selectedPersonnel = null;
+        selectedPersonnelId.value = '';
+        selectedPersonnelInfo.style.display = 'none';
+        searchResults.style.display = 'none';
+
+        document.querySelectorAll('input[name="before"]').forEach(r => r.checked = false);
+        document.querySelectorAll('input[name="after"]').forEach(r => r.checked = false);
+
+        document.getElementById('generalRemarks').value = '';
+        document.getElementById('beforeReason').value = '';
+        document.getElementById('afterReason').value = '';
+
+        document.getElementById('notDetailReason').style.display = 'none';
+        document.getElementById('takenOffReason').style.display = 'none';
+    }
+
+    // ==================== RADIO BUTTON LOGIC ====================
+    document.querySelectorAll('input[name="before"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('notDetailReason').style.display =
+                this.value === 'NotDetail' ? 'block' : 'none';
+        });
+    });
+
+    document.querySelectorAll('input[name="after"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('takenOffReason').style.display =
+                this.value === 'TakenOff' ? 'block' : 'none';
+        });
+    });
+
+    // ==================== SIDEBAR FUNCTIONS ====================
     async function loadSidebar() {
         try {
             const response = await fetch('/session.html');
             const html = await response.text();
             document.getElementById('sidebarContainer').innerHTML = html;
-
-            // After loading sidebar, initialize its functionality
             initializeSidebar();
         } catch (error) {
             console.error('Error loading sidebar:', error);
@@ -296,7 +479,6 @@ const generalRemarks = document.getElementById("generalRemarks").value.trim();
     }
 
     function initializeSidebar() {
-        // Copy the sidebar JS logic here
         const userId = sessionStorage.getItem("userId");
         const token = sessionStorage.getItem("token");
 
@@ -305,39 +487,37 @@ const generalRemarks = document.getElementById("generalRemarks").value.trim();
             return;
         }
 
-        // Load dynamic menu items
         fetch(`http://localhost:6060/api/users/${userId}/permissions`, {
             headers: { "Authorization": `Bearer ${token}` }
         })
-            .then(res => res.json())
-            .then(data => {
-                const container = document.querySelector("#sidebarContainer .sidebar-nav");
-                if (!container) return;
+        .then(res => res.json())
+        .then(data => {
+            const container = document.querySelector("#sidebarContainer .sidebar-nav");
+            if (!container) return;
 
-                let html = "";
-                data.modules.forEach(module => {
-                    const allowed = module.permissions.filter(p => p.allowed === true);
-                    if (allowed.length === 0) return;
+            let html = "";
+            data.modules.forEach(module => {
+                const allowed = module.permissions.filter(p => p.allowed === true);
+                if (allowed.length === 0) return;
 
-                    html += `<div class="nav-section-title">${module.moduleName}</div>`;
+                html += `<div class="nav-section-title">${module.moduleName}</div>`;
 
-                    allowed.forEach(perm => {
-                        let page = perm.url ? perm.url : "#";
-                        let icon = autoEmoji(perm.label, module.moduleName);
-                        html += `
-                    <a href="${page}" class="nav-item">
-                        <div class="nav-icon">${icon}</div>
-                        <span>${perm.label}</span>
-                    </a>
-                `;
-                    });
+                allowed.forEach(perm => {
+                    let page = perm.url ? perm.url : "#";
+                    let icon = autoEmoji(perm.label, module.moduleName);
+                    html += `
+                        <a href="${page}" class="nav-item">
+                            <div class="nav-icon">${icon}</div>
+                            <span>${perm.label}</span>
+                        </a>
+                    `;
                 });
-                container.innerHTML = html;
-                highlightActivePage();
-            })
-            .catch(error => console.error('Error loading permissions:', error));
+            });
+            container.innerHTML = html;
+            highlightActivePage();
+        })
+        .catch(error => console.error('Error loading permissions:', error));
 
-        // Setup logout
         const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
         if (logoutBtn) {
             logoutBtn.addEventListener("click", () => {
@@ -347,42 +527,11 @@ const generalRemarks = document.getElementById("generalRemarks").value.trim();
         }
     }
 
-    // Copy the autoEmoji function from your sidebar
-    const keywordEmojis = [
-        { key: "dashboard", icon: "📊" },
-        { key: "stat", icon: "📈" },
-        { key: "report", icon: "📄" },
-        { key: "chart", icon: "📉" },
-        { key: "command", icon: "🧭" },
-        { key: "personnel", icon: "👤" },
-        { key: "officer", icon: "🎖️" },
-        { key: "unit", icon: "🏢" },
-        { key: "location", icon: "📍" },
-        { key: "course", icon: "📚" },
-        { key: "training", icon: "🏋️" },
-        { key: "schedule", icon: "🗓️" },
-        { key: "attendance", icon: "📝" },
-        { key: "posting", icon: "📌" },
-        { key: "transfer", icon: "🔁" },
-        { key: "master", icon: "⚙️" },
-        { key: "setting", icon: "⚙️" },
-        { key: "config", icon: "🧩" },
-        { key: "export", icon: "📤" },
-        { key: "delete", icon: "🗑️" },
-        { key: "edit", icon: "✏️" },
-        { key: "add", icon: "➕" },
-        { key: "create", icon: "✍️" },
-        { key: "view", icon: "👁️" },
-        { key: "history", icon: "📜" },
-        { key: "print", icon: "🖨️" }
-    ];
 
     function autoEmoji(label, moduleName) {
         const text = (label + " " + moduleName).toLowerCase();
         for (const item of keywordEmojis) {
-            if (text.includes(item.key)) {
-                return item.icon;
-            }
+            if (text.includes(item.key)) return item.icon;
         }
         return "📁";
     }
@@ -394,11 +543,7 @@ const generalRemarks = document.getElementById("generalRemarks").value.trim();
             if (current === page) item.classList.add("active");
         });
     }
-
-    // Load sidebar when page loads
-    document.addEventListener("DOMContentLoaded", loadSidebar);
 </script>
-
 
 </body>
 </html>

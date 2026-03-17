@@ -707,12 +707,6 @@
           selectElement.appendChild(opt);
         });
 
-        if (type === "POSTING_TYPE" && !data.find(d => d.name === "ON_PROMOTION")) {
-          const opt = document.createElement("option");
-          opt.value = "ON_PROMOTION";
-          opt.textContent = "On Promotion";
-          selectElement.appendChild(opt);
-        }
       })
       .catch(err => console.error(`Failed to load ${type}`, err));
   }
