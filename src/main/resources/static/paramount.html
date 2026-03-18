@@ -27,14 +27,6 @@
           overflow: hidden;
         }
 
-        /* SIDEBAR HOLDER */
-        #sidebar {
-          width: 256px;
-          flex-shrink: 0;
-          overflow-y: auto;
-          background: #081c15;
-        }
-
         /* MAIN CONTENT */
         .main-content {
           flex: 1;
@@ -69,8 +61,7 @@
           padding: 24px;
         }
 
-        /* ================= PARAMOUNT CARD STYLES ================= */
-
+        /* ================= SEARCH STYLES (from Course Remarks) ================= */
         .selector-area {
           max-width: 900px;
           margin: auto;
@@ -84,15 +75,73 @@
         .selector-area label {
           font-weight: 600;
           font-size: 15px;
+          display: block;
+          margin-bottom: 8px;
         }
 
-        .selector-area select {
-          width: 100%;
-          padding: 10px;
-          margin-top: 8px;
-          border: 1px solid #cbd5e1;
-          border-radius: 8px;
-          font-size: 15px;
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        #personnelSearch {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-family: "Inter", sans-serif;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        #personnelSearch:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.1);
+        }
+
+        .recommendation-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .recommendation-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .recommendation-item:hover {
+            background: #f3f4f6;
+        }
+
+        .recommendation-item .army-no {
+            font-weight: 600;
+            color: #1b4332;
+        }
+
+        .recommendation-loading {
+            padding: 10px 12px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        #selectedPersonnelInfo {
+            margin-top: 10px;
+            padding: 8px;
+            background: #e8f0fe;
+            border-radius: 5px;
+            display: none;
+            border-left: 3px solid #1b4332;
         }
 
         .download-btn {
@@ -105,7 +154,7 @@
           font-size:14px;
           margin-bottom:20px;
           display:none;
-          margin-left: 930px;
+          float: right;
         }
 
         .page {
@@ -116,6 +165,7 @@
           padding: 32px 36px;
           box-shadow: 0 10px 25px rgba(0,0,0,0.08);
           display:none;
+          clear: both;
         }
 
         .header-card {
@@ -215,7 +265,6 @@
     <script src="sidebar.js"></script>
     <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
     <aside class="sidebar" id="sidebarContainer">
-        <!-- Loading indicator (optional) -->
         <div style="color: white; padding: 20px; text-align: center;">
             Loading menu...
         </div>
@@ -235,12 +284,20 @@
         <!-- BODY CONTENT -->
         <div class="content-area">
 
-            <!-- DROPDOWN -->
+            <!-- SEARCH INPUT (replaces dropdown) -->
             <div class="selector-area">
                 <label>Select Officer</label>
-                <select id="personnelSelect">
-                    <option value="">-- Select Officer --</option>
-                </select>
+                <div class="search-container">
+                    <input
+                            type="text"
+                            id="personnelSearch"
+                            placeholder="Search by Army Number (min 4 characters)..."
+                            autocomplete="off"
+                    >
+                    <div id="searchResults" class="recommendation-dropdown" style="display: none;"></div>
+                </div>
+                <div id="selectedPersonnelInfo"></div>
+                <input type="hidden" id="selectedPersonnelId">
             </div>
 
             <button class="download-btn" id="pdfBtn" onclick="downloadPDF()">Download PDF</button>
@@ -392,190 +449,314 @@
 </div>
 
 <script>
-    /* ===== LOAD PERSONNEL DROPDOWN ===== */
-    async function loadPersonnelDropdown() {
-      const res = await fetch("http://localhost:6060/api/personnel");
-      const list = await res.json();
+    // ==================== CONFIGURATION (from Course Remarks) ====================
+    const BASE_URL = "http://localhost:6060";
+    const SEARCH_API = `${BASE_URL}/api/personnel/search`;
 
-      const select = document.getElementById("personnelSelect");
+    // ==================== DOM ELEMENTS ====================
+    const searchInput = document.getElementById('personnelSearch');
+    const searchResults = document.getElementById('searchResults');
+    const selectedPersonnelInfo = document.getElementById('selectedPersonnelInfo');
+    const selectedPersonnelId = document.getElementById('selectedPersonnelId');
 
-      list.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.textContent = `${p.armyNo} – ${p.fullName}`;
-        select.appendChild(opt);
-      });
+    // ==================== STATE ====================
+    let selectedPersonnel = null;
+    let searchTimeout = null;
+    let abortController = null;
+
+    // ==================== SEARCH FUNCTION (exactly like Course Remarks) ====================
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.trim();
+            selectedPersonnelId.value = "";
+            selectedPersonnel = null;
+
+            clearTimeout(searchTimeout);
+
+            if (searchTerm.length < 4) {
+                searchResults.style.display = "none";
+                selectedPersonnelInfo.style.display = "none";
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                searchPersonnel(searchTerm);
+            }, 500);
+        });
     }
 
-    document.getElementById("personnelSelect").addEventListener("change", function () {
-      const id = this.value;
-      if (id) loadAllData(id);
+    async function searchPersonnel(term) {
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+
+        try {
+            searchResults.innerHTML = '<div class="recommendation-loading">Searching personnel...</div>';
+            searchResults.style.display = "block";
+
+            console.log('🔍 Searching for:', term);
+            const response = await fetch(`${SEARCH_API}?term=${encodeURIComponent(term)}`, {
+                signal: abortController.signal
+            });
+
+            const result = await response.json();
+            console.log('📦 Response:', result);
+
+            if (result.success && result.data && result.data.length > 0) {
+                displaySearchResults(result.data);
+            } else {
+                searchResults.innerHTML = `
+                    <div class="recommendation-loading" style="color: #ef4444;">
+                        ⚠️ No personnel found with Army No: "${term}"
+                    </div>
+                `;
+            }
+        } catch (error) {
+            if (error.name === "AbortError") return;
+            console.error("Search error:", error);
+            searchResults.style.display = "none";
+        }
+    }
+
+    function displaySearchResults(personnelList) {
+        let html = "";
+        personnelList.forEach(person => {
+            html += `
+                <div class="recommendation-item" onclick="selectPersonnel(${person.id}, '${person.armyNo}', '${person.fullName}', '${person.rank || ''}')">
+                    <div class="army-no">${person.armyNo}</div>
+                    <div style="font-size: 12px; color: #4b5563;">${person.fullName} ${person.rank ? '- ' + person.rank : ''}</div>
+                </div>
+            `;
+        });
+        searchResults.innerHTML = html;
+    }
+
+    // ==================== SELECT PERSONNEL ====================
+    window.selectPersonnel = function(personnelId, armyNo, fullName, rank) {
+        console.log('✅ Selected:', {personnelId, armyNo, fullName, rank});
+
+        searchInput.value = `${fullName} (${armyNo})`;
+        selectedPersonnelId.value = personnelId;
+
+        selectedPersonnel = {
+            id: personnelId,
+            armyNo: armyNo,
+            fullName: fullName,
+            rank: rank
+        };
+
+        searchResults.style.display = "none";
+
+        selectedPersonnelInfo.style.display = "block";
+        selectedPersonnelInfo.innerHTML = `
+            <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
+        `;
+
+        // Load all data for selected personnel
+        loadAllData(personnelId);
+    };
+
+    // ==================== CLICK OUTSIDE ====================
+    document.addEventListener("click", (e) => {
+        if (searchInput && !searchInput.contains(e.target) && searchResults && !searchResults.contains(e.target)) {
+            searchResults.style.display = "none";
+        }
     });
 
     /* ===== LOAD ALL 3 APIs ===== */
     async function loadAllData(id) {
+        try {
+            const p1 = await fetch(`http://localhost:6060/api/personnel/${id}`);
+            const personnel = await p1.json();
 
-      const p1 = await fetch(`http://localhost:6060/api/personnel/${id}`);
-      const personnel = await p1.json();
+            const p2 = await fetch(`http://localhost:6060/personnel-full-details/${id}`);
+            const fullDetails = await p2.json();
 
-      const p2 = await fetch(`http://localhost:6060/personnel-full-details/${id}`);
-      const fullDetails = await p2.json();
+            const p3 = await fetch(`http://localhost:6060/api/personnelinformation/${id}`);
+            const info = await p3.json();
 
-      const p3 = await fetch(`http://localhost:6060/api/personnelinformation/${id}`);
-      const info = await p3.json();
-
-      fillCard(personnel, fullDetails, info);
+            fillCard(personnel, fullDetails, info);
+        } catch (error) {
+            console.error('Error loading data:', error);
+            alert('Error loading personnel data');
+        }
     }
 
     /* ===== FILL THE PARAMOUNT CARD ===== */
     function fillCard(p, fd, info) {
 
-      document.getElementById("pdfContent").style.display = "block";
-      document.getElementById("pdfBtn").style.display = "inline-block";
+        document.getElementById("pdfContent").style.display = "block";
+        document.getElementById("pdfBtn").style.display = "inline-block";
 
-      document.getElementById("name").innerText = p.fullName;
-      document.getElementById("rankArmyMobile").innerHTML =
-        `${p.rank} | ${p.armyNo}<br>Mobile: ${p.mobileNumber}`;
+        document.getElementById("name").innerText = p.fullName;
+        document.getElementById("rankArmyMobile").innerHTML =
+            `${p.rank} | ${p.armyNo}<br>Mobile: ${p.mobileNumber || 'N/A'}`;
 
-      document.getElementById("photo").src =
-        p.officerImage ? p.officerImage : "https://via.placeholder.com/150";
+        document.getElementById("photo").src =
+            p.officerImage ? `http://localhost:6060/${p.officerImage}` : "https://via.placeholder.com/150";
 
-      document.getElementById("dob").innerText = p.dateOfBirth;
-      document.getElementById("doc").innerText = p.dateOfCommission;
-      document.getElementById("dos").innerText = p.dateOfSeniority;
-      document.getElementById("pan").innerText = p.panCard;
-      document.getElementById("aadhaar").innerText = p.aadhaarNumber;
-      document.getElementById("medCat").innerText = p.medicalCategory ?? "N/A";
+        document.getElementById("dob").innerText = p.dateOfBirth || 'N/A';
+        document.getElementById("doc").innerText = p.dateOfCommission || 'N/A';
+        document.getElementById("dos").innerText = p.dateOfSeniority || 'N/A';
+        document.getElementById("pan").innerText = p.panCard || 'N/A';
+        document.getElementById("aadhaar").innerText = p.aadhaarNumber || 'N/A';
+        document.getElementById("medCat").innerText = p.medicalCategory || 'N/A';
 
-      const disc = info.find(i => i.caseType?.toLowerCase() === "disciplinary");
-      document.getElementById("disciplineCase").innerText = disc ? disc.caseType : "N/A";
+        const disc = Array.isArray(info) ? info.find(i => i.caseType?.toLowerCase() === "disciplinary") : null;
+        document.getElementById("disciplineCase").innerText = disc ? disc.caseType : "N/A";
 
-      const postingBody = document.querySelector("#postingTable tbody");
-      postingBody.innerHTML = "";
-      fd.postingDetails.forEach(post => {
-        postingBody.innerHTML += `
-          <tr>
-            <td>${post.unitName}</td>
-            <td>${post.command}</td>
-            <td>N/A</td>
-            <td>${post.fromDate}</td>
-            <td>${post.appointment}</td>
-            <td>${post.duration}</td>
-          </tr>`;
-      });
+        // Posting History
+        const postingBody = document.querySelector("#postingTable tbody");
+        postingBody.innerHTML = "";
+        if (fd.postingDetails && fd.postingDetails.length > 0) {
+            fd.postingDetails.forEach(post => {
+                postingBody.innerHTML += `
+                    <tr>
+                        <td>${post.unitName || 'N/A'}</td>
+                        <td>${post.command || 'N/A'}</td>
+                        <td>N/A</td>
+                        <td>${post.fromDate || 'N/A'}</td>
+                        <td>${post.appointment || 'N/A'}</td>
+                        <td>${post.duration || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const courseBody = document.querySelector("#courseTable tbody");
-      courseBody.innerHTML = "";
-      fd.courseDetails.forEach(c => {
-        courseBody.innerHTML += `
-          <tr>
-            <td>${c.courseName}</td>
-            <td>${c.grading}</td>
-            <td>${c.fromDate}</td>
-            <td>${c.toDate}</td>
-          </tr>`;
-      });
+        // Courses
+        const courseBody = document.querySelector("#courseTable tbody");
+        courseBody.innerHTML = "";
+        if (fd.courseDetails && fd.courseDetails.length > 0) {
+            fd.courseDetails.forEach(c => {
+                courseBody.innerHTML += `
+                    <tr>
+                        <td>${c.courseName || 'N/A'}</td>
+                        <td>${c.grading || 'N/A'}</td>
+                        <td>${c.fromDate || 'N/A'}</td>
+                        <td>${c.toDate || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const decorBody = document.querySelector("#decorTable tbody");
-      decorBody.innerHTML = "";
-      p.decorations.forEach(d => {
-        decorBody.innerHTML += `
-          <tr>
-            <td>${d.decorationName}</td>
-            <td>${d.awardDate}</td>
-            <td>${d.citation}</td>
-          </tr>`;
-      });
+        // Decorations
+        const decorBody = document.querySelector("#decorTable tbody");
+        decorBody.innerHTML = "";
+        if (p.decorations && p.decorations.length > 0) {
+            p.decorations.forEach(d => {
+                decorBody.innerHTML += `
+                    <tr>
+                        <td>${d.decorationName || 'N/A'}</td>
+                        <td>${d.awardDate || 'N/A'}</td>
+                        <td>${d.citation || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const qualBody = document.querySelector("#qualTable tbody");
-      qualBody.innerHTML = "";
-      p.qualifications.forEach(q => {
-        qualBody.innerHTML += `
-          <tr>
-            <td>${q.qualification}</td>
-            <td>${q.institution}</td>
-            <td>${q.yearOfCompletion}</td>
-            <td>${q.gradePercentage}</td>
-          </tr>`;
-      });
+        // Qualifications
+        const qualBody = document.querySelector("#qualTable tbody");
+        qualBody.innerHTML = "";
+        if (p.qualifications && p.qualifications.length > 0) {
+            p.qualifications.forEach(q => {
+                qualBody.innerHTML += `
+                    <tr>
+                        <td>${q.qualification || 'N/A'}</td>
+                        <td>${q.institution || 'N/A'}</td>
+                        <td>${q.yearOfCompletion || 'N/A'}</td>
+                        <td>${q.gradePercentage || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const addQ = document.querySelector("#addQualTable tbody");
-      addQ.innerHTML = "";
-      p.additionalQualifications.forEach(a => {
-        addQ.innerHTML += `
-          <tr>
-            <td>${a.qualification}</td>
-            <td>${a.issuingAuthority}</td>
-            <td>${a.year}</td>
-            <td>${a.validity}</td>
-          </tr>`;
-      });
+        // Additional Qualifications
+        const addQ = document.querySelector("#addQualTable tbody");
+        addQ.innerHTML = "";
+        if (p.additionalQualifications && p.additionalQualifications.length > 0) {
+            p.additionalQualifications.forEach(a => {
+                addQ.innerHTML += `
+                    <tr>
+                        <td>${a.qualification || 'N/A'}</td>
+                        <td>${a.issuingAuthority || 'N/A'}</td>
+                        <td>${a.year || 'N/A'}</td>
+                        <td>${a.validity || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const famBody = document.querySelector("#familyTable tbody");
-      famBody.innerHTML = "";
-      p.familyMembers.forEach(f => {
-        famBody.innerHTML += `
-          <tr>
-            <td>${f.name}</td>
-            <td>${f.relationship}</td>
-            <td>${f.contactNumber}</td>
-          </tr>`;
-      });
+        // Family
+        const famBody = document.querySelector("#familyTable tbody");
+        famBody.innerHTML = "";
+        if (p.familyMembers && p.familyMembers.length > 0) {
+            p.familyMembers.forEach(f => {
+                famBody.innerHTML += `
+                    <tr>
+                        <td>${f.name || 'N/A'}</td>
+                        <td>${f.relationship || 'N/A'}</td>
+                        <td>${f.contactNumber || 'N/A'}</td>
+                    </tr>`;
+            });
+        }
 
-      const firstQual = p.qualifications[0];
-      document.getElementById("institute").innerText = firstQual ? firstQual.institution : "N/A";
-      document.getElementById("degree").innerText = firstQual ? firstQual.qualification : "N/A";
-      document.getElementById("courseQual").innerText = firstQual ? firstQual.qualification : "N/A";
+        const firstQual = p.qualifications && p.qualifications[0];
+        document.getElementById("institute").innerText = firstQual ? firstQual.institution : "N/A";
+        document.getElementById("degree").innerText = firstQual ? firstQual.qualification : "N/A";
+        document.getElementById("courseQual").innerText = firstQual ? firstQual.qualification : "N/A";
 
-      document.getElementById("homeStation").innerText = p.city;
+        document.getElementById("homeStation").innerText = p.city || 'N/A';
     }
 
     /* ===== PDF EXPORT ===== */
-<!--    function downloadPDF() {-->
-<!--      const element = document.getElementById("pdfContent");-->
-<!--      const opt = {-->
-<!--        margin: 0.4,-->
-<!--        filename: "Paramount_Card.pdf",-->
-<!--        image: { type: "jpeg", quality: 1 },-->
-<!--        html2canvas: { scale: 2 },-->
-<!--        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }-->
-<!--      };-->
-<!--      html2pdf().from(element).set(opt).save();-->
-<!--    }-->
-
-<!--    loadPersonnelDropdown();-->
-
     function downloadPDF() {
-  const element = document.getElementById("pdfContent");
-  const opt = {
-    margin: 0.4,
-    filename: "Paramount_Card.pdf",
-    image: { type: "jpeg", quality: 1 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-  };
-  html2pdf().from(element).set(opt).save();
-}
+        const element = document.getElementById("pdfContent");
+        const opt = {
+            margin: 0.4,
+            filename: "Paramount_Card.pdf",
+            image: { type: "jpeg", quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+        };
+        html2pdf().from(element).set(opt).save();
+    }
 
-/* ===============================
-   AUTO DOWNLOAD WHEN ID EXISTS
-================================ */
+    /* ===== AUTO DOWNLOAD FROM URL PARAM ===== */
+    const params = new URLSearchParams(window.location.search);
+    const autoId = params.get("id");
 
-const params = new URLSearchParams(window.location.search);
-const autoId = params.get("id");
+    if (autoId) {
+        // Set the input to loading state
+        if (searchInput) searchInput.value = "Loading...";
+        loadAllData(autoId);
 
-if (autoId) {
-  loadAllData(autoId);
+        setTimeout(() => {
+            downloadPDF();
+        }, 1200);
+    }
 
-  setTimeout(() => {
-    downloadPDF();
-  }, 1200);
-} else {
-  loadPersonnelDropdown();
-}
+    // ==================== SIDEBAR LOADER ====================
+    async function loadSidebar() {
+        try {
+            if (typeof window.loadSidebar === 'function') {
+                window.loadSidebar();
+            } else {
+                const response = await fetch('/session.html');
+                const html = await response.text();
+                document.getElementById('sidebarContainer').innerHTML = html;
 
+                const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
+                if (logoutBtn) {
+                    logoutBtn.addEventListener("click", () => {
+                        sessionStorage.clear();
+                        window.location.replace("/login.html");
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading sidebar:', error);
+        }
+    }
 
-
+    // Load sidebar when page loads
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('✅ DOM loaded');
+        loadSidebar();
+    });
 </script>
 
 </body>

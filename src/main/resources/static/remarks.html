@@ -103,12 +103,7 @@
             background: #2d6a4f;
         }
 
-        /* Search styles - exactly like working page */
-        .search-container {
-            position: relative;
-            width: 100%;
-        }
-
+        /* Search styles */
         #personnelSearch {
             width: 100%;
             padding: 8px;
@@ -162,8 +157,9 @@
             border-left: 3px solid #1b4332;
         }
 
-        select, input[type="text"] {
-            font-family: "Inter", sans-serif;
+        .search-container {
+            position: relative;
+            width: 100%;
         }
     </style>
 
@@ -189,10 +185,10 @@
                     <p>Update remarks before and after course detailment</p>
                 </div>
 
-                <!-- SELECT PERSONNEL - Like working page -->
+                <!-- SELECT PERSONNEL -->
                 <div class="section">
                     <div class="section-title">Select Personnel</div>
-                    <div style="position: relative;">
+                    <div class="search-container">
                         <input
                                 type="text"
                                 id="personnelSearch"
@@ -258,7 +254,7 @@
 </div>
 
 <script>
-    // ==================== CONFIGURATION - Like working page ====================
+    // ==================== CONFIGURATION ====================
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_API = `${BASE_URL}/api/remarks/save`;
@@ -274,30 +270,26 @@
     let searchTimeout = null;
     let abortController = null;
 
-    // ==================== INITIAL LOAD ====================
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log('✅ DOM loaded');
-        loadSidebar();
-    });
+    // ==================== SEARCH FUNCTION ====================
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.trim();
+            selectedPersonnelId.value = "";
+            selectedPersonnel = null;
 
-    // ==================== SEARCH FUNCTION - Exactly like working page ====================
-    searchInput.addEventListener("input", (e) => {
-        const searchTerm = e.target.value.trim();
-        selectedPersonnelId.value = "";
-        selectedPersonnel = null;
+            clearTimeout(searchTimeout);
 
-        clearTimeout(searchTimeout);
+            if (searchTerm.length < 4) {
+                searchResults.style.display = "none";
+                selectedPersonnelInfo.style.display = "none";
+                return;
+            }
 
-        if (searchTerm.length < 4) {
-            searchResults.style.display = "none";
-            selectedPersonnelInfo.style.display = "none";
-            return;
-        }
-
-        searchTimeout = setTimeout(() => {
-            searchPersonnel(searchTerm);
-        }, 500);
-    });
+            searchTimeout = setTimeout(() => {
+                searchPersonnel(searchTerm);
+            }, 500);
+        });
+    }
 
     async function searchPersonnel(term) {
         if (abortController) abortController.abort();
@@ -368,7 +360,7 @@
 
     // ==================== CLICK OUTSIDE ====================
     document.addEventListener("click", (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        if (searchInput && !searchInput.contains(e.target) && searchResults && !searchResults.contains(e.target)) {
             searchResults.style.display = "none";
         }
     });
@@ -434,115 +426,83 @@
 
     // ==================== CLEAR FORM ====================
     function clearForm() {
-        searchInput.value = '';
+        if (searchInput) searchInput.value = '';
         selectedPersonnel = null;
-        selectedPersonnelId.value = '';
-        selectedPersonnelInfo.style.display = 'none';
-        searchResults.style.display = 'none';
+        if (selectedPersonnelId) selectedPersonnelId.value = '';
+        if (selectedPersonnelInfo) selectedPersonnelInfo.style.display = 'none';
+        if (searchResults) searchResults.style.display = 'none';
 
         document.querySelectorAll('input[name="before"]').forEach(r => r.checked = false);
         document.querySelectorAll('input[name="after"]').forEach(r => r.checked = false);
 
-        document.getElementById('generalRemarks').value = '';
-        document.getElementById('beforeReason').value = '';
-        document.getElementById('afterReason').value = '';
+        const generalRemarks = document.getElementById('generalRemarks');
+        if (generalRemarks) generalRemarks.value = '';
 
-        document.getElementById('notDetailReason').style.display = 'none';
-        document.getElementById('takenOffReason').style.display = 'none';
+        const beforeReason = document.getElementById('beforeReason');
+        if (beforeReason) beforeReason.value = '';
+
+        const afterReason = document.getElementById('afterReason');
+        if (afterReason) afterReason.value = '';
+
+        const notDetailReason = document.getElementById('notDetailReason');
+        if (notDetailReason) notDetailReason.style.display = 'none';
+
+        const takenOffReason = document.getElementById('takenOffReason');
+        if (takenOffReason) takenOffReason.style.display = 'none';
     }
 
     // ==================== RADIO BUTTON LOGIC ====================
     document.querySelectorAll('input[name="before"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            document.getElementById('notDetailReason').style.display =
-                this.value === 'NotDetail' ? 'block' : 'none';
+            const notDetailReason = document.getElementById('notDetailReason');
+            if (notDetailReason) {
+                notDetailReason.style.display = this.value === 'NotDetail' ? 'block' : 'none';
+            }
         });
     });
 
     document.querySelectorAll('input[name="after"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            document.getElementById('takenOffReason').style.display =
-                this.value === 'TakenOff' ? 'block' : 'none';
+            const takenOffReason = document.getElementById('takenOffReason');
+            if (takenOffReason) {
+                takenOffReason.style.display = this.value === 'TakenOff' ? 'block' : 'none';
+            }
         });
     });
 
-    // ==================== SIDEBAR FUNCTIONS ====================
+    // ==================== FIXED: SIDEBAR LOADER ====================
     async function loadSidebar() {
         try {
-            const response = await fetch('/session.html');
-            const html = await response.text();
-            document.getElementById('sidebarContainer').innerHTML = html;
-            initializeSidebar();
+            // sidebar.js ka loadSidebar function call karo
+            if (typeof window.loadSidebar === 'function') {
+                window.loadSidebar(); // ✅ YEH SAHI HAI
+            } else {
+                console.warn('loadSidebar function not found in sidebar.js');
+
+                // Fallback: sirf session.html load karo
+                const response = await fetch('/session.html');
+                const html = await response.text();
+                document.getElementById('sidebarContainer').innerHTML = html;
+
+                // Logout button setup
+                const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
+                if (logoutBtn) {
+                    logoutBtn.addEventListener("click", () => {
+                        sessionStorage.clear();
+                        window.location.replace("/login.html");
+                    });
+                }
+            }
         } catch (error) {
             console.error('Error loading sidebar:', error);
         }
     }
 
-    function initializeSidebar() {
-        const userId = sessionStorage.getItem("userId");
-        const token = sessionStorage.getItem("token");
-
-        if (!userId) {
-            window.location.replace("/login.html");
-            return;
-        }
-
-        fetch(`http://localhost:6060/api/users/${userId}/permissions`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const container = document.querySelector("#sidebarContainer .sidebar-nav");
-            if (!container) return;
-
-            let html = "";
-            data.modules.forEach(module => {
-                const allowed = module.permissions.filter(p => p.allowed === true);
-                if (allowed.length === 0) return;
-
-                html += `<div class="nav-section-title">${module.moduleName}</div>`;
-
-                allowed.forEach(perm => {
-                    let page = perm.url ? perm.url : "#";
-                    let icon = autoEmoji(perm.label, module.moduleName);
-                    html += `
-                        <a href="${page}" class="nav-item">
-                            <div class="nav-icon">${icon}</div>
-                            <span>${perm.label}</span>
-                        </a>
-                    `;
-                });
-            });
-            container.innerHTML = html;
-            highlightActivePage();
-        })
-        .catch(error => console.error('Error loading permissions:', error));
-
-        const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                sessionStorage.clear();
-                window.location.replace("/login.html");
-            });
-        }
-    }
-
-
-    function autoEmoji(label, moduleName) {
-        const text = (label + " " + moduleName).toLowerCase();
-        for (const item of keywordEmojis) {
-            if (text.includes(item.key)) return item.icon;
-        }
-        return "📁";
-    }
-
-    function highlightActivePage() {
-        const current = location.pathname.split('/').pop().split('?')[0];
-        document.querySelectorAll("#sidebarContainer .nav-item").forEach(item => {
-            const page = item.getAttribute("href").split('/').pop();
-            if (current === page) item.classList.add("active");
-        });
-    }
+    // Load sidebar when page loads
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('✅ DOM loaded');
+        loadSidebar();
+    });
 </script>
 
 </body>
