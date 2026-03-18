@@ -727,6 +727,42 @@
             display: block;
             animation: dropdownFade 0.2s ease;
         }
+        /* Image preview styles */
+        .upload-box {
+            transition: border-color 0.3s ease;
+        }
+
+        #imagePreviewContainer {
+            animation: fadeIn 0.3s ease;
+        }
+
+        #imagePreview {
+            transition: transform 0.2s ease;
+        }
+
+        #imagePreview:hover {
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style for the remove button */
+        #imagePreviewContainer button {
+            transition: background-color 0.2s ease;
+        }
+
+        #imagePreviewContainer button:hover {
+            background-color: #b91c1c !important;
+        }
     </style>
 
     <script>
@@ -738,6 +774,483 @@
         let currentStationPage = 1;
         let currentAirportPage = 1;
         const ITEMS_PER_PAGE = 6000;
+
+
+        // Helper function to add field hint
+        function addFieldHint(element, message, hintId, color = "#6b7280") {
+            const hint = document.createElement("span");
+            hint.id = hintId;
+            hint.className = "field-hint";
+            hint.innerHTML = message;
+            hint.style.color = color;
+            element.parentNode.appendChild(hint);
+        }
+
+        // Update the showFieldError function to handle HTML
+        function showFieldError(element, message, errorId) {
+            element.classList.add("error");
+            element.classList.remove("valid");
+
+            const error = document.createElement("span");
+            error.id = errorId;
+            error.className = "error-message";
+            error.innerHTML = message; // Using innerHTML to support line breaks
+            element.parentNode.appendChild(error);
+        }
+
+        function addRealTimeValidation() {
+            // Army No real-time formatting
+            const armyNoInput = document.getElementById("armyNo");
+            if (armyNoInput) {
+                armyNoInput.addEventListener("input", function(e) {
+                    // Store cursor position
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const oldLength = this.value.length;
+
+                    formatArmyNumber();
+
+                    // Adjust cursor position if needed
+                    const newLength = this.value.length;
+                    if (newLength > oldLength) {
+                        this.setSelectionRange(start + (newLength - oldLength), end + (newLength - oldLength));
+                    }
+                });
+
+                armyNoInput.addEventListener("blur", function() {
+                    validateArmyNumber();
+                });
+            }
+
+            // Aadhaar Number formatting
+            const aadhaarInput = document.getElementById("aadhaarNumber");
+            if (aadhaarInput) {
+                aadhaarInput.addEventListener("input", function() {
+                    formatAadhaarNumber(this);
+                });
+                aadhaarInput.addEventListener("blur", function() {
+                    validateAadhaar(this);
+                });
+            }
+
+            // PAN Card formatting
+            const panInput = document.getElementById("panCard");
+            if (panInput) {
+                panInput.addEventListener("input", function() {
+                    formatPanCard(this);
+                });
+                panInput.addEventListener("blur", function() {
+                    validatePanCard(this);
+                });
+            }
+
+            // CDA Account formatting
+            const cdaInput = document.getElementById("cdaAccountNo");
+            if (cdaInput) {
+                cdaInput.addEventListener("input", function() {
+                    formatCDAAccount(this);
+                });
+                cdaInput.addEventListener("blur", function() {
+                    validateCDAAccount(this);
+                });
+            }
+
+            // Date validations on change
+            const dateFields = ["dateOfCommission", "dateOfSeniority", "dateOfBirth"];
+            dateFields.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener("change", function() {
+                        validateDates();
+                    });
+                }
+            });
+        }
+
+        // ---------------------------------------------
+
+        // =======================================================
+        // AADHAAR NUMBER VALIDATION AND FORMATTING
+        // =======================================================
+        function formatAadhaarNumber(input) {
+            // Get cursor position
+            const cursorPos = input.selectionStart;
+            const oldLength = input.value.length;
+
+            // Remove any non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Limit to 12 digits
+            if (value.length > 12) {
+                value = value.slice(0, 12);
+            }
+
+            // Format as XXXX XXXX XXXX
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+
+            input.value = formatted;
+
+            // Adjust cursor position
+            const newLength = input.value.length;
+            const spacesAdded = (formatted.match(/ /g) || []).length - (input.value.substring(0, cursorPos).match(/ /g) || []).length;
+
+            if (newLength > oldLength) {
+                // Character was added
+                input.setSelectionRange(cursorPos + 1 + spacesAdded, cursorPos + 1 + spacesAdded);
+            } else if (newLength < oldLength) {
+                // Character was deleted
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+
+            validateAadhaar(input);
+        }
+
+        function validateAadhaar(input) {
+            const rawValue = input.value;
+            const value = rawValue.replace(/\s/g, ''); // Remove spaces for validation
+            const errorId = "aadhaar-error";
+            let existingError = document.getElementById(errorId);
+
+            // Remove any existing error
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Remove any existing hint
+            const existingHint = document.getElementById("aadhaar-hint");
+            if (existingHint) {
+                existingHint.remove();
+            }
+
+            // Check if empty
+            if (!value) {
+                input.classList.remove("valid");
+                input.classList.remove("error");
+                return false;
+            }
+
+            // Check if contains only digits
+            if (!/^\d*$/.test(value)) {
+                showFieldError(input, "Aadhaar Number must contain only digits", errorId);
+                return false;
+            }
+
+            // Check length
+            if (value.length !== 12) {
+                if (value.length < 12) {
+                    showFieldError(input, `Aadhaar Number must be 12 digits (${value.length}/12 entered)`, errorId);
+                } else {
+                    showFieldError(input, "Aadhaar Number must be exactly 12 digits", errorId);
+                }
+                return false;
+            }
+
+            // Check if exactly 12 digits
+            if (!/^\d{12}$/.test(value)) {
+                showFieldError(input, "Aadhaar Number must be exactly 12 digits", errorId);
+                return false;
+            }
+
+            // Add success styling
+            input.classList.add("valid");
+            input.classList.remove("error");
+
+            // Add hint with formatted value
+            addFieldHint(input, `✓ Valid Aadhaar: ${rawValue}`, "aadhaar-hint", "#10b981");
+            return true;
+        }
+
+        // =======================================================
+        // PAN CARD VALIDATION AND FORMATTING
+        // =======================================================
+        function formatPanCard(input) {
+            // Get cursor position
+            const cursorPos = input.selectionStart;
+            const oldLength = input.value.length;
+
+            // Convert to uppercase and remove invalid chars
+            let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            // PAN format: 5 alphabets + 4 numbers + 1 alphabet
+            let formatted = '';
+
+            // Process each character
+            for (let i = 0; i < value.length; i++) {
+                const char = value[i];
+
+                if (i < 5) {
+                    // First 5 characters must be alphabets
+                    if (/[A-Z]/.test(char)) {
+                        formatted += char;
+                    }
+                } else if (i < 9) {
+                    // Next 4 characters must be numbers
+                    if (/[0-9]/.test(char)) {
+                        formatted += char;
+                    }
+                } else if (i < 10) {
+                    // Last character must be alphabet
+                    if (/[A-Z]/.test(char)) {
+                        formatted += char;
+                    }
+                }
+            }
+
+            // Limit to 10 characters
+            if (formatted.length > 10) {
+                formatted = formatted.slice(0, 10);
+            }
+
+            input.value = formatted;
+
+            // Adjust cursor position
+            const newLength = input.value.length;
+            if (newLength > oldLength && cursorPos < newLength) {
+                input.setSelectionRange(cursorPos + 1, cursorPos + 1);
+            } else if (newLength < oldLength && cursorPos > 0) {
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+
+            validatePanCard(input);
+        }
+
+        function validatePanCard(input) {
+            const value = input.value;
+            const errorId = "pan-error";
+            let existingError = document.getElementById(errorId);
+
+            // Remove any existing error
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Remove any existing hint
+            const existingHint = document.getElementById("pan-hint");
+            if (existingHint) {
+                existingHint.remove();
+            }
+
+            // Check if empty
+            if (!value) {
+                input.classList.remove("valid");
+                input.classList.remove("error");
+                return false;
+            }
+
+            // Check each character type as user types
+            let errorMessage = '';
+
+            for (let i = 0; i < value.length; i++) {
+                const char = value[i];
+
+                if (i < 5) {
+                    // First 5 must be alphabets
+                    if (!/[A-Z]/.test(char)) {
+                        errorMessage = `Character ${i+1} must be an alphabet (A-Z)`;
+                        break;
+                    }
+                } else if (i < 9) {
+                    // Next 4 must be numbers
+                    if (!/[0-9]/.test(char)) {
+                        errorMessage = `Character ${i+1} must be a number (0-9)`;
+                        break;
+                    }
+                } else if (i < 10) {
+                    // Last must be alphabet
+                    if (!/[A-Z]/.test(char)) {
+                        errorMessage = `Character ${i+1} must be an alphabet (A-Z)`;
+                        break;
+                    }
+                }
+            }
+
+            if (errorMessage) {
+                showFieldError(input, errorMessage, errorId);
+                return false;
+            }
+
+            // Check length
+            if (value.length < 10) {
+                showFieldError(input, `PAN Card must be 10 characters (${value.length}/10 entered)`, errorId);
+                return false;
+            }
+
+            // Final validation with regex
+            const pattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+
+            if (!pattern.test(value)) {
+                let message = "PAN Card must be in format: ";
+                message += "<br>• First 5 characters: Alphabets (A-Z)";
+                message += "<br>• Next 4 characters: Numbers (0-9)";
+                message += "<br>• Last character: Alphabet (A-Z)";
+                showFieldError(input, message, errorId);
+                return false;
+            }
+
+            // Add success styling
+            input.classList.add("valid");
+            input.classList.remove("error");
+
+            // Add hint with validation
+            addFieldHint(input, "✓ Valid PAN format", "pan-hint", "#10b981");
+            return true;
+        }
+
+        // =======================================================
+        // CDA ACCOUNT NUMBER VALIDATION AND FORMATTING
+        // =======================================================
+        function formatCDAAccount(input) {
+            // Get cursor position
+            const cursorPos = input.selectionStart;
+            const oldLength = input.value.length;
+
+            // Remove any invalid characters, keep alphanumeric
+            let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            // Format: XX/XXX/XXXXXX (2 digits + slash + 3 digits + slash + 6 alphanumeric)
+            let formatted = '';
+            let slashCount = 0;
+
+            for (let i = 0; i < value.length; i++) {
+                const char = value[i];
+
+                if (i < 2) {
+                    // First 2 must be digits
+                    if (/[0-9]/.test(char)) {
+                        formatted += char;
+                        if (i === 1) {
+                            formatted += '/';
+                            slashCount++;
+                        }
+                    }
+                } else if (i < 5) {
+                    // Next 3 must be digits
+                    if (/[0-9]/.test(char)) {
+                        formatted += char;
+                        if (i === 4) {
+                            formatted += '/';
+                            slashCount++;
+                        }
+                    }
+                } else if (i < 11) {
+                    // Last 6 can be alphanumeric
+                    if (/[A-Z0-9]/.test(char)) {
+                        formatted += char;
+                    }
+                }
+            }
+
+            input.value = formatted;
+
+            // Adjust cursor position for slashes
+            const newLength = input.value.length;
+            const slashesBeforeCursor = (formatted.substring(0, cursorPos).match(/\//g) || []).length;
+
+            if (newLength > oldLength) {
+                // Character was added
+                let newPos = cursorPos + 1;
+                // Skip over automatically added slash
+                if (formatted[newPos - 1] === '/' && formatted[newPos] !== '/') {
+                    newPos++;
+                }
+                input.setSelectionRange(newPos, newPos);
+            } else if (newLength < oldLength && cursorPos > 0) {
+                // Character was deleted
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+
+            validateCDAAccount(input);
+        }
+
+        function validateCDAAccount(input) {
+            const value = input.value;
+            const errorId = "cda-error";
+            let existingError = document.getElementById(errorId);
+
+            // Remove any existing error
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Remove any existing hint
+            const existingHint = document.getElementById("cda-hint");
+            if (existingHint) {
+                existingHint.remove();
+            }
+
+            // Check if empty
+            if (!value) {
+                input.classList.remove("valid");
+                input.classList.remove("error");
+                return false;
+            }
+
+            // Check format parts as user types
+            const parts = value.split('/');
+
+            if (parts.length > 0 && parts[0]) {
+                // First part should be 2 digits
+                if (parts[0].length > 2) {
+                    showFieldError(input, "First part must be exactly 2 digits", errorId);
+                    return false;
+                }
+                if (!/^\d*$/.test(parts[0])) {
+                    showFieldError(input, "First part must contain only digits", errorId);
+                    return false;
+                }
+            }
+
+            if (parts.length > 1 && parts[1]) {
+                // Second part should be 3 digits
+                if (parts[1].length > 3) {
+                    showFieldError(input, "Second part must be exactly 3 digits", errorId);
+                    return false;
+                }
+                if (!/^\d*$/.test(parts[1])) {
+                    showFieldError(input, "Second part must contain only digits", errorId);
+                    return false;
+                }
+            }
+
+            if (parts.length > 2 && parts[2]) {
+                // Third part should be 6 alphanumeric
+                if (parts[2].length > 6) {
+                    showFieldError(input, "Third part must be exactly 6 characters", errorId);
+                    return false;
+                }
+                if (!/^[A-Z0-9]*$/.test(parts[2])) {
+                    showFieldError(input, "Third part must contain only letters and numbers", errorId);
+                    return false;
+                }
+            }
+
+            // Check complete format
+            const pattern = /^\d{2}\/\d{3}\/[A-Z0-9]{6}$/;
+
+            if (!pattern.test(value)) {
+                if (value.length < 14) { // 2+1+3+1+6 = 13 characters + 2 slashes = 15 total
+                    let entered = value.replace(/\//g, '').length;
+                    showFieldError(input, `CDA Account: ${entered}/11 characters entered`, errorId);
+                } else {
+                    showFieldError(input, "Invalid CDA format. Example: 15/102/234180K", errorId);
+                }
+                return false;
+            }
+
+            // Add success styling
+            input.classList.add("valid");
+            input.classList.remove("error");
+
+            // Add hint with validation
+            addFieldHint(input, "✓ Valid CDA format", "cda-hint", "#10b981");
+            return true;
+        }
 
         // Load stations from JSON file
         async function loadStations() {
@@ -1181,7 +1694,6 @@
                 { id: 'dateOfBirth', name: 'Date of Birth' },
                 { id: 'gender', name: 'Gender' },
                 { id: 'placeOfBirth', name: 'Place of Birth' },
-                { id: 'nrs', name: 'NRS' },
                 { id: 'religion', name: 'Religion' },
                 { id: 'aadhaarNumber', name: 'Aadhaar Number' },
                 { id: 'panCard', name: 'PAN Card' },
@@ -1194,22 +1706,27 @@
                 { id: 'pinCode', name: 'PIN Code' },
                 { id: 'mobileNumber', name: 'Mobile Number' },
                 { id: 'emailAddress', name: 'Email Address' },
-                { id: 'nsgEmail', name: 'NSG Email' },
-                { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' }
+                { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' },
+                { id: 'nrs', name: 'NRS (Nearest Railway Station)' }
             ];
 
             let isValid = true;
 
-            // Validate image
+            // Validate image with preview
             const imageFile = document.getElementById("officerImageFile").files[0];
             const imageError = document.getElementById("image-error");
+
             if (!imageFile) {
-                if (imageError) imageError.style.display = "block";
-                alert("Officer Image is required");
-                document.getElementById("officerImageFile").focus();
+                if (imageError) {
+                    imageError.style.display = "block";
+                    imageError.textContent = "Officer Image is required";
+                }
+                // Highlight the upload box
+                document.querySelector('.upload-box').style.borderColor = '#dc2626';
                 isValid = false;
             } else {
                 if (imageError) imageError.style.display = "none";
+                document.querySelector('.upload-box').style.borderColor = '#d1d5db';
 
                 // Validate file type
                 const fileType = imageFile.type;
@@ -1226,7 +1743,7 @@
                 }
             }
 
-            // Validate family members
+            // Validate family members (existing code)
             const familyItems = document.querySelectorAll("#family-container .repeater-item");
             if (familyItems.length > 0) {
                 for (let i = 0; i < familyItems.length; i++) {
@@ -2106,51 +2623,15 @@
             // Add real-time validation
             addRealTimeValidation();
 
+            // Setup drag and drop for image upload
+            setupDragAndDrop();
+
             // Attach save button event listener
             const saveBtn = document.getElementById("savePersonnelBtn");
             if (saveBtn) {
                 saveBtn.addEventListener("click", savePersonnel);
             }
         });
-
-        // =======================================================
-        // ADD REAL-TIME VALIDATION
-        // =======================================================
-        function addRealTimeValidation() {
-            // Army No real-time formatting
-            const armyNoInput = document.getElementById("armyNo");
-            if (armyNoInput) {
-                armyNoInput.addEventListener("input", function(e) {
-                    // Store cursor position
-                    const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    const oldLength = this.value.length;
-
-                    formatArmyNumber();
-
-                    // Adjust cursor position if needed
-                    const newLength = this.value.length;
-                    if (newLength > oldLength) {
-                        this.setSelectionRange(start + (newLength - oldLength), end + (newLength - oldLength));
-                    }
-                });
-
-                armyNoInput.addEventListener("blur", function() {
-                    validateArmyNumber();
-                });
-            }
-
-            // Date validations on change
-            const dateFields = ["dateOfCommission", "dateOfSeniority", "dateOfBirth"];
-            dateFields.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener("change", function() {
-                        validateDates();
-                    });
-                }
-            });
-        }
 
 
         // =======================================================
@@ -2237,17 +2718,6 @@
             armyNoInput.classList.add("valid");
             armyNoInput.classList.remove("error");
             return true;
-        }
-
-        function showFieldError(element, message, errorId) {
-            element.classList.add("error");
-            element.classList.remove("valid");
-
-            const error = document.createElement("span");
-            error.id = errorId;
-            error.className = "error-message";
-            error.textContent = message;
-            element.parentNode.appendChild(error);
         }
 
         // =======================================================
@@ -2338,6 +2808,124 @@
 
             birthField.parentNode.appendChild(hint);
         }
+
+        // Preview image after selection
+        function previewImage(input) {
+            const previewContainer = document.getElementById("imagePreviewContainer");
+            const preview = document.getElementById("imagePreview");
+            const imageDetails = document.getElementById("imageDetails");
+            const imageError = document.getElementById("image-error");
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    alert("Please select a valid image file (JPG/PNG)");
+                    input.value = '';
+                    previewContainer.style.display = 'none';
+                    return;
+                }
+
+                // Validate file size (max 2MB)
+                const maxSize = 2 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert("Image size should be less than 2MB");
+                    input.value = '';
+                    previewContainer.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+
+                    // Format file size
+                    const fileSize = (file.size / 1024).toFixed(2);
+                    imageDetails.textContent = `${file.name} (${fileSize} KB)`;
+
+                    // Hide error message if visible
+                    if (imageError) {
+                        imageError.style.display = 'none';
+                    }
+                }
+
+                reader.readAsDataURL(file);
+            } else {
+                // No file selected
+                previewContainer.style.display = 'none';
+                imageDetails.textContent = '';
+            }
+        }
+
+        // Remove selected image
+        function removeImage() {
+            const fileInput = document.getElementById("officerImageFile");
+            const previewContainer = document.getElementById("imagePreviewContainer");
+            const preview = document.getElementById("imagePreview");
+            const imageDetails = document.getElementById("imageDetails");
+            const imageError = document.getElementById("image-error");
+
+            // Clear file input
+            fileInput.value = '';
+
+            // Hide preview
+            previewContainer.style.display = 'none';
+            preview.src = '#';
+            imageDetails.textContent = '';
+
+            // Show error if field is required (optional)
+            // imageError.style.display = 'block';
+        }
+
+        // Optional: Add drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadBox = document.querySelector('.upload-box');
+            const fileInput = document.getElementById('officerImageFile');
+
+            if (!uploadBox || !fileInput) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadBox.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadBox.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadBox.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadBox.style.borderColor = '#1b4332';
+                uploadBox.style.backgroundColor = '#f0f7f3';
+            }
+
+            function unhighlight() {
+                uploadBox.style.borderColor = '#d1d5db';
+                uploadBox.style.backgroundColor = '';
+            }
+
+            uploadBox.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    previewImage(fileInput);
+                }
+            }
+        }
     </script>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -2378,7 +2966,23 @@
                     </div>
                     JPG / PNG, Max 2MB
                     <br><br>
-                    <input type="file" id="officerImageFile" accept="image/*" required>
+                    <input type="file" id="officerImageFile" accept="image/*" onchange="previewImage(this)" required>
+
+                    <!-- Image Preview Container -->
+                    <div id="imagePreviewContainer" style="margin-top: 15px; display: none;">
+                        <div style="position: relative; display: inline-block;">
+                            <img id="imagePreview" src="#" alt="Officer Preview"
+                                 style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #1b4332; padding: 4px;">
+                            <button type="button" onclick="removeImage()"
+                                    style="position: absolute; top: -10px; right: -10px; background: #dc2626; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">
+                                ×
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                            <span id="imageDetails"></span>
+                        </div>
+                    </div>
+
                     <div id="image-error" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;">
                         Please select an image
                     </div>
@@ -2517,7 +3121,7 @@
                         </div>
 
                         <div>
-                            <label class="required">Nearest Airport</label>
+                            <label>Nearest Airport</label>
                             <div style="position: relative;">
                                 <!-- Button to trigger dropdown -->
                                 <div onclick="toggleDropdown('airportDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
@@ -2556,11 +3160,13 @@
                         </div>
                         <div>
                             <label class="required">Aadhaar Number</label>
-                            <input id="aadhaarNumber">
+                            <input id="aadhaarNumber" placeholder="1234 5678 9012">
+                            <span class="field-hint">Format: 1234 5678 9012</span>
                         </div>
                         <div>
                             <label class="required">PAN Card</label>
-                            <input id="panCard">
+                            <input id="panCard" placeholder="ABCDE1234F">
+                            <span class="field-hint">Format: 5 letters + 4 numbers + 1 letter</span>
                         </div>
                         <div>
                             <label class="required">Marital Status</label>
@@ -2568,11 +3174,15 @@
                                 <option value="">Select Marital Status</option>
                                 <option value="Married">Married</option>
                                 <option value="Unmarried">Unmarried</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Separated">Separated</option>
                             </select>
                         </div>
                         <div>
                             <label class="required">CDA Account No</label>
-                            <input id="cdaAccountNo">
+                            <input id="cdaAccountNo" placeholder="15/102/234180K">
+                            <span class="field-hint">Format: 12/345/67890A</span>
                         </div>
                     </div>
                 </div>
@@ -2628,7 +3238,7 @@
                             <input type="email" id="emailAddress">
                         </div>
                         <div class="grid-1">
-                            <label class="required">NSG Email</label>
+                            <label>NSG Email</label>
                             <input type="email" id="nsgEmail">
                         </div>
                     </div>
