@@ -48,8 +48,8 @@ public class CreatePersonnelRequest {
     public String alternateMobile;
     public String emailAddress;
 
-    @JsonProperty("nsgEmmail")
-    public String nsgEmail;
+    @JsonProperty("nicEmail")
+    public String nicEmail;
 
     public String medicalCategory;
     public String medicalRemark;

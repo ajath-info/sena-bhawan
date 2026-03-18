@@ -284,7 +284,7 @@ public class PersonnelServiceImpl implements PersonnelService {
             p.setMobileNumber(req.mobileNumber);
             p.setAlternateMobile(req.alternateMobile);
             p.setEmailAddress(req.emailAddress);
-            p.setNsgEmail(req.nsgEmail);
+            p.setNsgEmail(req.nicEmail);
 
             // Medical basic info
             p.setMedicalCategory(req.medicalCategory);
