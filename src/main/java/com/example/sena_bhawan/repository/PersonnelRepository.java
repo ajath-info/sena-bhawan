@@ -26,7 +26,7 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     WHERE LOWER(p.armyNo) LIKE LOWER(CONCAT(:term, '%'))
     ORDER BY p.armyNo
     """)
-    List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term, Pageable pageable);
+    List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term);
 
     @Query("SELECT distinct medicalCategory FROM Personnel")
     List<String> getMedicalCategory();

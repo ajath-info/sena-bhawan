@@ -23,26 +23,25 @@ public class EstablishmentController {
         );
     }
 
-    // 🔹 Get data when PE/WE selected
-    @GetMapping("/{orbatId}/{type}")
-    public ResponseEntity<?> getByOrbatAndType(
+    // 🔹 Get data for a unit - type parameter is now a query param
+    @GetMapping("/{orbatId}")
+    public ResponseEntity<?> getByOrbatId(
             @PathVariable Long orbatId,
-            @PathVariable FormationEstablishment.EstablishmentType type) {
+            @RequestParam(required = false) FormationEstablishment.EstablishmentType type) {
 
         return ResponseEntity.ok(
-                service.getByOrbatAndType(orbatId, type)
+                service.getByOrbatId(orbatId, type)
         );
     }
 
-    // 🔹 Update button click
-    @PutMapping("/{orbatId}/{type}")
+    // 🔹 Update button click - type in path is removed, now in request body
+    @PutMapping("/{orbatId}")
     public ResponseEntity<String> updateEstablishment(
             @PathVariable Long orbatId,
-            @PathVariable FormationEstablishment.EstablishmentType type,
             @RequestBody EstablishmentRequest request) {
 
         return ResponseEntity.ok(
-                service.updateEstablishment(orbatId, type, request)
+                service.updateEstablishment(orbatId, request)
         );
     }
 }

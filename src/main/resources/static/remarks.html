@@ -161,6 +161,22 @@
             position: relative;
             width: 100%;
         }
+
+        /* Course dropdown styles */
+        #courseSelect {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: "Inter", sans-serif;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+
+        #courseSelect:focus {
+            outline: none;
+            border-color: #1b4332;
+        }
     </style>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -201,48 +217,34 @@
                     <input type="hidden" id="selectedPersonnelId">
                 </div>
 
-                <!-- BEFORE DETAILMENT -->
+                <!-- COURSE DETAILMENT STATUS -->
                 <div class="section">
-                    <div class="section-title">Before Detailment</div>
+                    <div class="section-title">Course Detailment Status</div>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="before" value="Volunteer">
+                            <input type="radio" name="status" value="Volunteer">
                             Volunteer
                         </label>
                         <label>
-                            <input type="radio" name="before" value="NotDetail">
+                            <input type="radio" name="status" value="NotDetail">
                             Not to Detail
                         </label>
                     </div>
-
-                    <div id="notDetailReason" style="display:none;margin-top:10px;">
-                        <textarea id="beforeReason" placeholder="Reason for not detailing"></textarea>
-                    </div>
                 </div>
 
-                <!-- AFTER DETAILMENT -->
+                <!-- COURSE SELECTION -->
                 <div class="section">
-                    <div class="section-title">After Detailment</div>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="after" value="TakenOff">
-                            Taken Off
-                        </label>
-                        <label>
-                            <input type="radio" name="after" value="Continuing">
-                            Continuing
-                        </label>
-                    </div>
-
-                    <div id="takenOffReason" style="display:none;margin-top:10px;">
-                        <textarea id="afterReason" placeholder="Reason for taken off"></textarea>
-                    </div>
+                    <div class="section-title">Select Course</div>
+                    <select id="courseSelect">
+                        <option value="">-- Select Course --</option>
+                        <!-- Courses will be loaded here -->
+                    </select>
                 </div>
 
-                <!-- GENERAL REMARK -->
+                <!-- GENERAL REMARK - SINGLE TEXTAREA FOR ALL REMARKS -->
                 <div class="section">
-                    <div class="section-title">General Remarks</div>
-                    <textarea id="generalRemarks" placeholder="General remarks"></textarea>
+                    <div class="section-title">General/Detailment Remarks</div>
+                    <textarea id="generalRemarks" placeholder="Enter any remarks or reason here..."></textarea>
                 </div>
 
                 <div style="text-align:right;">
@@ -259,16 +261,69 @@
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_API = `${BASE_URL}/api/remarks/save`;
 
+    // ==================== COURSE API CONFIGURATION ====================
+    // 🔴 TEMPORARY API - Replace with actual API when available
+    // Expected API format: GET /api/courses
+    // Expected Response: Array of objects with { id, courseName, courseCode, duration, ... }
+    const COURSE_API = `${BASE_URL}/api/courses`;  // 🔴 REPLACE THIS WITH ACTUAL API
+
+    // Sample data for testing until API is ready
+    const SAMPLE_COURSES = [
+        { id: 1, courseName: "Young Officers Course", courseCode: "YOC-2024", duration: "6 months" },
+        { id: 2, courseName: "Defence Services Staff College", courseCode: "DSSC-2024", duration: "1 year" },
+        { id: 3, courseName: "Higher Command Course", courseCode: "HCC-2024", duration: "8 months" },
+        { id: 4, courseName: "National Defence College", courseCode: "NDC-2024", duration: "1 year" },
+        { id: 5, courseName: "Technical Instructors Course", courseCode: "TIC-2024", duration: "3 months" }
+    ];
+
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
     const searchResults = document.getElementById('searchResults');
     const selectedPersonnelInfo = document.getElementById('selectedPersonnelInfo');
     const selectedPersonnelId = document.getElementById('selectedPersonnelId');
+    const courseSelect = document.getElementById('courseSelect');
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    const generalRemarks = document.getElementById('generalRemarks');
 
     // ==================== STATE ====================
     let selectedPersonnel = null;
     let searchTimeout = null;
     let abortController = null;
+    let courses = []; // Store courses
+
+    // ==================== LOAD COURSES ====================
+    async function loadCourses() {
+        try {
+            // 🔴 TODO: Replace with actual API call when ready
+            // const response = await fetch(COURSE_API);
+            // const data = await response.json();
+            // courses = data;
+
+            // Using sample data for now
+            courses = SAMPLE_COURSES;
+
+            // Populate dropdown
+            courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = `${course.courseName} (${course.courseCode})`;
+                courseSelect.appendChild(option);
+            });
+
+            console.log('✅ Courses loaded:', courses);
+        } catch (error) {
+            console.error('Error loading courses:', error);
+            // Fallback to sample data if API fails
+            courses = SAMPLE_COURSES;
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = `${course.courseName} (${course.courseCode})`;
+                courseSelect.appendChild(option);
+            });
+        }
+    }
 
     // ==================== SEARCH FUNCTION ====================
     if (searchInput) {
@@ -367,42 +422,40 @@
 
     // ==================== SAVE REMARKS ====================
     window.saveRemarks = function() {
+        // Validate personnel selection
         if (!selectedPersonnel) {
             alert("Please select personnel");
             return;
         }
 
-        const beforeRadio = document.querySelector('input[name="before"]:checked');
-        if (!beforeRadio) {
-            alert("Please select Before Detailment");
+        // Validate status selection
+        const selectedStatus = document.querySelector('input[name="status"]:checked');
+        if (!selectedStatus) {
+            alert("Please select Course Detailment Status");
             return;
         }
 
-        const afterRadio = document.querySelector('input[name="after"]:checked');
-        if (!afterRadio) {
-            alert("Please select After Detailment");
+        // Validate course selection
+        const selectedCourseId = courseSelect.value;
+        if (!selectedCourseId) {
+            alert("Please select a course");
             return;
         }
 
-        let beforeReason = '';
-        if (beforeRadio.value === 'NotDetail') {
-            beforeReason = document.getElementById('beforeReason').value.trim();
-        }
+        // Get selected course details
+        const selectedCourse = courses.find(c => c.id == selectedCourseId);
 
-        let afterReason = '';
-        if (afterRadio.value === 'TakenOff') {
-            afterReason = document.getElementById('afterReason').value.trim();
-        }
+        // Get general remarks (this will contain any reason if needed)
+        const remarks = generalRemarks.value.trim();
 
-        const generalRemarks = document.getElementById("generalRemarks").value.trim();
-
+        // 🔴 PAYLOAD STRUCTURE - Modify according to your actual API
         const payload = {
             personnelId: selectedPersonnel.id,
-            beforeDetailment: beforeRadio.value,
-            afterDetailment: afterRadio.value,
-            beforeReason: beforeReason,
-            afterReason: afterReason,
-            generalRemarks: generalRemarks
+            status: selectedStatus.value,  // 'Volunteer' or 'NotDetail'
+            courseId: selectedCourseId,
+            courseName: selectedCourse ? selectedCourse.courseName : '',
+            courseCode: selectedCourse ? selectedCourse.courseCode : '',
+            remarks: remarks  // Single remarks field for everything
         };
 
         console.log("📤 Sending:", payload);
@@ -432,59 +485,26 @@
         if (selectedPersonnelInfo) selectedPersonnelInfo.style.display = 'none';
         if (searchResults) searchResults.style.display = 'none';
 
-        document.querySelectorAll('input[name="before"]').forEach(r => r.checked = false);
-        document.querySelectorAll('input[name="after"]').forEach(r => r.checked = false);
+        // Clear radio buttons
+        statusRadios.forEach(r => r.checked = false);
 
-        const generalRemarks = document.getElementById('generalRemarks');
+        // Clear course selection
+        courseSelect.value = '';
+
+        // Clear general remarks
         if (generalRemarks) generalRemarks.value = '';
-
-        const beforeReason = document.getElementById('beforeReason');
-        if (beforeReason) beforeReason.value = '';
-
-        const afterReason = document.getElementById('afterReason');
-        if (afterReason) afterReason.value = '';
-
-        const notDetailReason = document.getElementById('notDetailReason');
-        if (notDetailReason) notDetailReason.style.display = 'none';
-
-        const takenOffReason = document.getElementById('takenOffReason');
-        if (takenOffReason) takenOffReason.style.display = 'none';
     }
 
-    // ==================== RADIO BUTTON LOGIC ====================
-    document.querySelectorAll('input[name="before"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const notDetailReason = document.getElementById('notDetailReason');
-            if (notDetailReason) {
-                notDetailReason.style.display = this.value === 'NotDetail' ? 'block' : 'none';
-            }
-        });
-    });
-
-    document.querySelectorAll('input[name="after"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const takenOffReason = document.getElementById('takenOffReason');
-            if (takenOffReason) {
-                takenOffReason.style.display = this.value === 'TakenOff' ? 'block' : 'none';
-            }
-        });
-    });
-
-    // ==================== FIXED: SIDEBAR LOADER ====================
+    // ==================== SIDEBAR LOADER ====================
     async function loadSidebar() {
         try {
-            // sidebar.js ka loadSidebar function call karo
             if (typeof window.loadSidebar === 'function') {
-                window.loadSidebar(); // ✅ YEH SAHI HAI
+                window.loadSidebar();
             } else {
-                console.warn('loadSidebar function not found in sidebar.js');
-
-                // Fallback: sirf session.html load karo
                 const response = await fetch('/session.html');
                 const html = await response.text();
                 document.getElementById('sidebarContainer').innerHTML = html;
 
-                // Logout button setup
                 const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
                 if (logoutBtn) {
                     logoutBtn.addEventListener("click", () => {
@@ -498,10 +518,11 @@
         }
     }
 
-    // Load sidebar when page loads
+    // Load sidebar and courses when page loads
     document.addEventListener("DOMContentLoaded", function() {
         console.log('✅ DOM loaded');
         loadSidebar();
+        loadCourses(); // Load courses dropdown
     });
 </script>
 

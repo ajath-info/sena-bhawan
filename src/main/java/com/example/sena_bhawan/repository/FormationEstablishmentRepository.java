@@ -14,9 +14,7 @@ public interface FormationEstablishmentRepository extends JpaRepository<Formatio
     @Query("SELECT distinct establishmentType FROM FormationEstablishment")
     List<String> listOfEstablishmentType();
 
-    Optional<FormationEstablishment>
-    findByOrbatIdAndEstablishmentType(
-            Long orbatId,
-            FormationEstablishment.EstablishmentType type
-    );
+    // Find by ORBAT ID only (type is now just a field, not part of the key)
+    Optional<FormationEstablishment> findByOrbatId(Long orbatId);
+
 }
