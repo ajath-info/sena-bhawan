@@ -54,6 +54,25 @@ public class PersonnelController {
         }
     }
 
+    @DeleteMapping("/cancel-under-posting")
+    public ResponseEntity<?> cancelUnderPosting(@RequestParam Long personnelId) {
+        try {
+            PostingDetails restored = postingService.cancelUnderPostingByPersonnelId(personnelId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Current UNDER_POSTING cancelled. Previous POSTED restored.");
+            response.put("data", restored);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "message", e.getMessage())
+            );
+        }
+    }
+
     @GetMapping("/{personnelId}/current-posting")
     public ResponseEntity<?> getCurrentPosting(@PathVariable Long personnelId) {
 

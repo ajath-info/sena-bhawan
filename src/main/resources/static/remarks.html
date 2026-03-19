@@ -177,6 +177,24 @@
             outline: none;
             border-color: #1b4332;
         }
+
+        /* Loading indicator */
+        .loading-courses {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 5px;
+            font-size: 14px;
+        }
     </style>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -237,8 +255,9 @@
                     <div class="section-title">Select Course</div>
                     <select id="courseSelect">
                         <option value="">-- Select Course --</option>
-                        <!-- Courses will be loaded here -->
                     </select>
+                    <div id="courseLoading" class="loading-courses" style="display: none;">Loading courses...</div>
+                    <div id="courseError" class="error-message" style="display: none;"></div>
                 </div>
 
                 <!-- GENERAL REMARK - SINGLE TEXTAREA FOR ALL REMARKS -->
@@ -260,21 +279,7 @@
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_API = `${BASE_URL}/api/remarks/save`;
-
-    // ==================== COURSE API CONFIGURATION ====================
-    // 🔴 TEMPORARY API - Replace with actual API when available
-    // Expected API format: GET /api/courses
-    // Expected Response: Array of objects with { id, courseName, courseCode, duration, ... }
-    const COURSE_API = `${BASE_URL}/api/courses`;  // 🔴 REPLACE THIS WITH ACTUAL API
-
-    // Sample data for testing until API is ready
-    const SAMPLE_COURSES = [
-        { id: 1, courseName: "Young Officers Course", courseCode: "YOC-2024", duration: "6 months" },
-        { id: 2, courseName: "Defence Services Staff College", courseCode: "DSSC-2024", duration: "1 year" },
-        { id: 3, courseName: "Higher Command Course", courseCode: "HCC-2024", duration: "8 months" },
-        { id: 4, courseName: "National Defence College", courseCode: "NDC-2024", duration: "1 year" },
-        { id: 5, courseName: "Technical Instructors Course", courseCode: "TIC-2024", duration: "3 months" }
-    ];
+    const COURSE_API = `${BASE_URL}/api/course`;  // Your actual course API
 
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
@@ -284,6 +289,8 @@
     const courseSelect = document.getElementById('courseSelect');
     const statusRadios = document.querySelectorAll('input[name="status"]');
     const generalRemarks = document.getElementById('generalRemarks');
+    const courseLoading = document.getElementById('courseLoading');
+    const courseError = document.getElementById('courseError');
 
     // ==================== STATE ====================
     let selectedPersonnel = null;
@@ -291,37 +298,82 @@
     let abortController = null;
     let courses = []; // Store courses
 
-    // ==================== LOAD COURSES ====================
+    // ==================== LOAD COURSES FROM ACTUAL API ====================
     async function loadCourses() {
         try {
-            // 🔴 TODO: Replace with actual API call when ready
-            // const response = await fetch(COURSE_API);
-            // const data = await response.json();
-            // courses = data;
+            // Show loading indicator
+            courseSelect.style.display = 'none';
+            courseLoading.style.display = 'block';
+            courseError.style.display = 'none';
 
-            // Using sample data for now
-            courses = SAMPLE_COURSES;
+            console.log('📚 Loading courses from API...');
+
+            // Call your actual Course API
+            const response = await fetch(COURSE_API, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add authorization header if required
+                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('📦 Courses received:', data);
+
+            // Store courses
+            courses = data;
+
+            // Hide loading, show select
+            courseLoading.style.display = 'none';
+            courseSelect.style.display = 'block';
 
             // Populate dropdown
-            courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
-            courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = `${course.courseName} (${course.courseCode})`;
-                courseSelect.appendChild(option);
-            });
+            populateCourseDropdown(courses);
 
-            console.log('✅ Courses loaded:', courses);
         } catch (error) {
-            console.error('Error loading courses:', error);
-            // Fallback to sample data if API fails
-            courses = SAMPLE_COURSES;
+            console.error('❌ Error loading courses:', error);
+
+            // Show error message
+            courseLoading.style.display = 'none';
+            courseError.style.display = 'block';
+            courseError.textContent = `Failed to load courses: ${error.message}`;
+
+            // Show empty select
+            courseSelect.style.display = 'block';
+            courseSelect.innerHTML = '<option value="">-- Error loading courses --</option>';
+        }
+    }
+
+    // Helper function to populate course dropdown
+    function populateCourseDropdown(courses) {
+        // Clear existing options except the first one
+        courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+
+        if (courses && courses.length > 0) {
             courses.forEach(course => {
                 const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = `${course.courseName} (${course.courseCode})`;
+                option.value = course.srno || course.id; // Using srno as per your DTO
+
+                // Format course name based on available fields
+                let displayText = course.courseName;
+                if (course.duration) {
+                    displayText += ` (${course.duration})`;
+                }
+                if (course.location) {
+                    displayText += ` - ${course.location}`;
+                }
+
+                option.textContent = displayText;
                 courseSelect.appendChild(option);
             });
+            console.log(`✅ Loaded ${courses.length} courses`);
+        } else {
+            courseSelect.innerHTML = '<option value="">-- No courses available --</option>';
         }
     }
 
@@ -356,11 +408,16 @@
 
             console.log('🔍 Searching for:', term);
             const response = await fetch(`${SEARCH_API}?term=${encodeURIComponent(term)}`, {
-                signal: abortController.signal
+                signal: abortController.signal,
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add authorization header if required
+                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
             });
 
             const result = await response.json();
-            console.log('📦 Response:', result);
+            console.log('📦 Search Response:', result);
 
             if (result.success && result.data && result.data.length > 0) {
                 displaySearchResults(result.data);
@@ -443,29 +500,39 @@
         }
 
         // Get selected course details
-        const selectedCourse = courses.find(c => c.id == selectedCourseId);
+        const selectedCourse = courses.find(c => (c.srno == selectedCourseId || c.id == selectedCourseId));
 
         // Get general remarks (this will contain any reason if needed)
         const remarks = generalRemarks.value.trim();
 
-        // 🔴 PAYLOAD STRUCTURE - Modify according to your actual API
+        // Payload structure matching your backend
         const payload = {
             personnelId: selectedPersonnel.id,
             status: selectedStatus.value,  // 'Volunteer' or 'NotDetail'
             courseId: selectedCourseId,
             courseName: selectedCourse ? selectedCourse.courseName : '',
-            courseCode: selectedCourse ? selectedCourse.courseCode : '',
+            courseDuration: selectedCourse ? selectedCourse.duration : '',
+            courseLocation: selectedCourse ? selectedCourse.location : '',
             remarks: remarks  // Single remarks field for everything
         };
 
-        console.log("📤 Sending:", payload);
+        console.log("📤 Sending payload:", payload);
 
         fetch(REMARKS_API, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                // Add authorization header if required
+                // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
             alert("Remarks updated successfully ✅");
             console.log("✅ Saved:", data);
@@ -473,7 +540,7 @@
         })
         .catch(error => {
             console.error("❌ Error:", error);
-            alert("Error saving remarks ❌");
+            alert("Error saving remarks: " + error.message);
         });
     };
 
@@ -494,6 +561,11 @@
         // Clear general remarks
         if (generalRemarks) generalRemarks.value = '';
     }
+
+    // ==================== RETRY LOADING COURSES ====================
+    window.retryLoadCourses = function() {
+        loadCourses();
+    };
 
     // ==================== SIDEBAR LOADER ====================
     async function loadSidebar() {
@@ -522,7 +594,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         console.log('✅ DOM loaded');
         loadSidebar();
-        loadCourses(); // Load courses dropdown
+        loadCourses(); // Load courses from actual API
     });
 </script>
 
