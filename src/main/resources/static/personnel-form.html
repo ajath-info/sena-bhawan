@@ -781,6 +781,283 @@
         let currentCityList = [];
 
         // =======================================================
+        // ADDITIONAL QUALIFICATIONS (MIL) - UPDATED VERSION
+        // =======================================================
+        async function addAdditionalQualification(isFirst = false) {
+            const index = additionalIndex++;
+            const id = `additional-${index}`;
+
+            const container = document.getElementById("additional-qualifications-container");
+            if (!container) return;
+
+            // Load dropdown data
+            const armyCourses = await loadArmyCourses();
+
+            // Build qualification dropdown options
+            let qualificationOptions = '<option value="">Select Qualification</option>';
+            armyCourses.forEach(item => {
+                qualificationOptions += `<option value="${item.name}">${item.name}</option>`;
+            });
+
+            // Generate year options for date input is not needed, using date picker instead
+
+            container.insertAdjacentHTML(
+                "beforeend",
+                `
+        <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <!-- Qualification with Search (searchable dropdown) -->
+                <div>
+                    <label class="required">Qualification</label>
+                    <div style="position: relative;">
+                        <div onclick="toggleAdditionalQualificationDropdown(${index})" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span id="selectedAdditionalQualificationDisplay-${index}">Select Qualification</span>
+                            <span style="font-size: 12px;">▼</span>
+                        </div>
+                        <input type="hidden" class="additional-qualification-code" id="additionalQualificationCode-${index}" name="additionalQualifications[${index}][code]">
+
+                        <!-- Dropdown with search input -->
+                        <div id="additionalQualificationDropdown-${index}" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 350px; overflow-y: auto; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 4px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <input type="text"
+                                   placeholder="Search qualification..."
+                                   id="additionalQualificationSearch-${index}"
+                                   onkeyup="filterAdditionalQualifications(${index})"
+                                   onclick="event.stopPropagation()"
+                                   style="width: 100%; padding: 12px; border: none; border-bottom: 1px solid #d1d5db; border-radius: 8px 8px 0 0; outline: none; font-size: 14px; box-sizing: border-box;">
+                            <div id="additionalQualificationItemsContainer-${index}" style="max-height: 300px; overflow-y: auto;">
+                                ${qualificationOptions.replace(/<option value="(.*?)">(.*?)<\/option>/g, (match, value, text) => {
+                    return `<div class="dropdown-item" onclick="selectAdditionalQualification(${index}, '${value.replace(/'/g, "\\'")}', '${text.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                                        <span style="font-weight: 500;">${text}</span>
+                                    </div>`;
+                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authority No. (replaces Authority field) -->
+                <div>
+                    <label class="required">Authority No.</label>
+                    <input type="text" class="additional-authority-no" placeholder="Enter authority number" oninput="validateAdditionalQualification(this.closest('.repeater-item'))">
+                </div>
+
+                <!-- Date (replaces Year field) -->
+                <div>
+                    <label class="required">Date</label>
+                    <input type="date" class="additional-date" onchange="validateAdditionalQualification(this.closest('.repeater-item'))">
+                </div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <!-- Location -->
+                <div>
+                    <label class="required">Location</label>
+                    <input type="text" class="additional-location" placeholder="Enter location" oninput="validateAdditionalQualification(this.closest('.repeater-item'))">
+                </div>
+
+                <!-- Part II Order No. (with auto-format) -->
+                <div>
+                    <label class="required">Part II Order No.</label>
+                    <input type="text" class="additional-order-no" placeholder="0/0013/0001/2026" oninput="formatAdditionalPartIIOrderNo(this); validateAdditionalQualification(this.closest('.repeater-item'))">
+                    <span class="field-hint">Format: X/XXXX/XXXX/YYYY (auto-formatted)</span>
+                </div>
+
+                <!-- Order Date -->
+                <div>
+                    <label class="required">Order Date</label>
+                    <input type="date" class="additional-order-date" onchange="validateAdditionalQualification(this.closest('.repeater-item'))">
+                </div>
+            </div>
+
+            ${!isFirst ? `
+                <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove Qualification</button>
+                </div>
+            ` : ""}
+        </div>
+        `
+            );
+        }
+
+        // =======================================================
+        // ADDITIONAL QUALIFICATIONS DROPDOWN FUNCTIONS
+        // =======================================================
+        let allArmyCourses = [];
+
+        async function loadArmyCourses() {
+            try {
+                const res = await fetch("http://localhost:6060/api/dropdown/ARMY_COURSES");
+                allArmyCourses = await res.json();
+                return allArmyCourses;
+            } catch (err) {
+                console.error("Failed loading army courses:", err);
+                return [];
+            }
+        }
+
+        function toggleAdditionalQualificationDropdown(index) {
+            const dropdown = document.getElementById(`additionalQualificationDropdown-${index}`);
+            const isVisible = dropdown.style.display === 'block';
+
+            // Close all other qualification dropdowns
+            document.querySelectorAll('[id^="additionalQualificationDropdown-"]').forEach(d => {
+                d.style.display = 'none';
+            });
+
+            dropdown.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                setTimeout(() => {
+                    document.getElementById(`additionalQualificationSearch-${index}`).focus();
+                }, 100);
+            }
+        }
+
+        function filterAdditionalQualifications(index) {
+            const input = document.getElementById(`additionalQualificationSearch-${index}`);
+            const filter = input.value.toUpperCase();
+            const container = document.getElementById(`additionalQualificationItemsContainer-${index}`);
+
+            if (!container) return;
+
+            const filtered = allArmyCourses.filter(item =>
+                item.name.toUpperCase().includes(filter)
+            );
+
+            let html = '';
+            filtered.forEach(item => {
+                html += `<div class="dropdown-item" onclick="selectAdditionalQualification(${index}, '${item.name.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}')" style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+            <span style="font-weight: 500;">${item.name}</span>
+        </div>`;
+            });
+
+            if (filtered.length === 0) {
+                html = '<div style="padding: 12px; color: #6b7280; text-align: center;">No qualifications found</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function selectAdditionalQualification(index, code, name) {
+            document.getElementById(`selectedAdditionalQualificationDisplay-${index}`).textContent = name;
+            document.getElementById(`additionalQualificationCode-${index}`).value = code;
+            document.getElementById(`additionalQualificationDropdown-${index}`).style.display = 'none';
+            document.getElementById(`additionalQualificationSearch-${index}`).value = '';
+
+            // Validate the qualification section
+            const repeaterItem = document.getElementById(`additional-${index}`).closest('.repeater-item');
+            validateAdditionalQualification(repeaterItem);
+        }
+
+        // =======================================================
+        // FORMAT ADDITIONAL PART II ORDER NO. WITH AUTO SLASHES
+        // =======================================================
+        function formatAdditionalPartIIOrderNo(input) {
+            // Get cursor position
+            const cursorPos = input.selectionStart;
+            const oldLength = input.value.length;
+
+            // Remove any non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Format: X/XXXX/XXXX/YYYY (max 13 digits: 1+4+4+4)
+            let formatted = '';
+
+            for (let i = 0; i < value.length; i++) {
+                if (i === 1 || i === 5 || i === 9) {
+                    // Add slash after 1st, 5th, and 9th digits
+                    formatted += '/';
+                }
+                formatted += value[i];
+
+                // Limit to 13 digits (1+4+4+4)
+                if (i === 12) break;
+            }
+
+            input.value = formatted;
+
+            // Adjust cursor position to account for auto-inserted slashes
+            const newLength = input.value.length;
+            if (newLength > oldLength) {
+                // Character was added
+                let newPos = cursorPos + 1;
+                // Skip over automatically added slash
+                if (formatted[newPos - 1] === '/' && formatted[newPos] !== '/') {
+                    newPos++;
+                }
+                input.setSelectionRange(newPos, newPos);
+            } else if (newLength < oldLength && cursorPos > 0) {
+                // Character was deleted
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+        }
+
+        // =======================================================
+        // VALIDATE ADDITIONAL QUALIFICATION
+        // =======================================================
+        function validateAdditionalQualification(repeaterItem) {
+            if (!repeaterItem) return true;
+
+            const qualificationSelect = repeaterItem.querySelector('.additional-qualification-code');
+            const authorityNoInput = repeaterItem.querySelector('.additional-authority-no');
+            const dateInput = repeaterItem.querySelector('.additional-date');
+            const locationInput = repeaterItem.querySelector('.additional-location');
+            const orderNoInput = repeaterItem.querySelector('.additional-order-no');
+            const orderDateInput = repeaterItem.querySelector('.additional-order-date');
+
+            // Check if qualification is selected
+            const hasQualification = qualificationSelect && qualificationSelect.value;
+
+            // Remove any existing error messages in this repeater
+            repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            if (hasQualification) {
+                let isValid = true;
+
+                // Validate Authority No.
+                if (!authorityNoInput || !authorityNoInput.value.trim()) {
+                    showFieldError(authorityNoInput, "Authority No. is required", `auth-error-${Date.now()}`);
+                    isValid = false;
+                }
+
+                // Validate Date
+                if (!dateInput || !dateInput.value) {
+                    showFieldError(dateInput, "Date is required", `date-error-${Date.now()}`);
+                    isValid = false;
+                }
+
+                // Validate Location
+                if (!locationInput || !locationInput.value.trim()) {
+                    showFieldError(locationInput, "Location is required", `loc-error-${Date.now()}`);
+                    isValid = false;
+                }
+
+                // Validate Part II Order No.
+                if (!orderNoInput || !orderNoInput.value.trim()) {
+                    showFieldError(orderNoInput, "Part II Order No. is required", `order-error-${Date.now()}`);
+                    isValid = false;
+                } else {
+                    // Validate format: X/XXXX/XXXX/YYYY
+                    const pattern = /^\d\/\d{4}\/\d{4}\/\d{4}$/;
+                    if (!pattern.test(orderNoInput.value)) {
+                        showFieldError(orderNoInput, "Format must be: X/XXXX/XXXX/YYYY (e.g., 0/0013/0001/2026)", `order-error-${Date.now()}`);
+                        isValid = false;
+                    }
+                }
+
+                // Validate Order Date
+                if (!orderDateInput || !orderDateInput.value) {
+                    showFieldError(orderDateInput, "Order Date is required", `orderdate-error-${Date.now()}`);
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            return true; // No qualification selected, so validation passes
+        }
+
+        // =======================================================
         // LOAD STATES FROM JSON
         // =======================================================
         async function loadStates() {
@@ -2172,30 +2449,6 @@
             container.innerHTML = html;
         }
 
-        // Toggle dropdown
-        function toggleDropdown(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            const isVisible = dropdown.style.display === 'block';
-
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-content').forEach(d => {
-                d.style.display = 'none';
-            });
-
-            // Toggle current dropdown
-            dropdown.style.display = isVisible ? 'none' : 'block';
-
-            if (!isVisible) {
-                // Focus the search input when dropdown opens
-                setTimeout(() => {
-                    const searchInput = dropdownId === 'nrsDropdown' ?
-                        document.getElementById("nrsSearchInput") :
-                        document.getElementById("airportSearchInput");
-                    if (searchInput) searchInput.focus();
-                }, 100);
-            }
-        }
-
         // Select station
         function selectStation(code, displayText) {
             document.getElementById("selectedNrsDisplay").textContent = displayText;
@@ -2338,16 +2591,16 @@
             }
         }
 
-        async function loadArmyCourses() {
-            try {
-                const res = await fetch("http://localhost:6060/api/dropdown/ARMY_COURSES");
-                const courses = await res.json();
-                return courses; // Returns array of {id, name}
-            } catch (err) {
-                console.error("Failed loading army courses:", err);
-                return [];
-            }
-        }
+        // async function loadArmyCourses() {
+        //     try {
+        //         const res = await fetch("http://localhost:6060/api/dropdown/ARMY_COURSES");
+        //         const courses = await res.json();
+        //         return courses; // Returns array of {id, name}
+        //     } catch (err) {
+        //         console.error("Failed loading army courses:", err);
+        //         return [];
+        //     }
+        // }
 
         // =======================================================
         // MODIFIED VALIDATE REQUIRED FIELDS FUNCTION
@@ -3233,46 +3486,46 @@
         // =======================================================
         // ADDITIONAL QUALIFICATIONS
         // =======================================================
-        async function addAdditionalQualification(isFirst = false) {
-            const index = additionalIndex++;
-            const id = `additional-${index}`;
-
-            const container = document.getElementById("additional-qualifications-container");
-            if (!container) return;
-
-            // Load dropdown data
-            const armyCourses = await loadArmyCourses();
-
-            // Build dropdown options
-            let courseOptions = '<option value="">Select Qualification</option>';
-            armyCourses.forEach(item => {
-                courseOptions += `<option value="${item.name}">${item.name}</option>`;
-            });
-
-            container.insertAdjacentHTML(
-                "beforeend",
-                `
-                <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
-                    <div>
-                        <label>Qualification</label>
-                        <select class="additional-qualification-select">${courseOptions}</select>
-                    </div>
-                    <div><label>Authority</label><input type="text" placeholder="Enter authority" class="additional-authority"></div>
-                    <div><label>Year</label><input type="text" placeholder="Enter year" class="additional-year"></div>
-                    <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no." class="additional-authority-no"></div>
-                    <div><label>Location</label><input type="text" placeholder="Enter location" class="additional-location"></div>
-                    <div><label>Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="additional-order-no"></div>
-                    <div><label>Order Date</label><input type="date" class="additional-order-date"></div>
-                    ${!isFirst ? `
-                        <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
-                    ` : ""}
-                </div>
-                `
-            );
-        }
+        // async function addAdditionalQualification(isFirst = false) {
+        //     const index = additionalIndex++;
+        //     const id = `additional-${index}`;
+        //
+        //     const container = document.getElementById("additional-qualifications-container");
+        //     if (!container) return;
+        //
+        //     // Load dropdown data
+        //     const armyCourses = await loadArmyCourses();
+        //
+        //     // Build dropdown options
+        //     let courseOptions = '<option value="">Select Qualification</option>';
+        //     armyCourses.forEach(item => {
+        //         courseOptions += `<option value="${item.name}">${item.name}</option>`;
+        //     });
+        //
+        //     container.insertAdjacentHTML(
+        //         "beforeend",
+        //         `
+        //         <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
+        //             <div>
+        //                 <label>Qualification</label>
+        //                 <select class="additional-qualification-select">${courseOptions}</select>
+        //             </div>
+        //             <div><label>Authority</label><input type="text" placeholder="Enter authority" class="additional-authority"></div>
+        //             <div><label>Year</label><input type="text" placeholder="Enter year" class="additional-year"></div>
+        //             <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no." class="additional-authority-no"></div>
+        //             <div><label>Location</label><input type="text" placeholder="Enter location" class="additional-location"></div>
+        //             <div><label>Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="additional-order-no"></div>
+        //             <div><label>Order Date</label><input type="date" class="additional-order-date"></div>
+        //             ${!isFirst ? `
+        //                 <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
+        //             ` : ""}
+        //         </div>
+        //         `
+        //     );
+        // }
 
         // =======================================================
-        // SPORTS DETAILS
+        // SPORTS DETAILS - UPDATED WITH PLACE DROPDOWN
         // =======================================================
         async function addSportsDetail(isFirst = false) {
             const index = sportsIndex++;
@@ -3296,42 +3549,109 @@
                 sportsLevelOptions += `<option value="${item.name}">${item.name}</option>`;
             });
 
+            // Place dropdown options
+            const placeOptions = `
+        <option value="">Select Place</option>
+        <option value="1st Place">1st Place</option>
+        <option value="2nd Place">2nd Place</option>
+        <option value="3rd Place">3rd Place</option>
+        <option value="Participate">Participate</option>
+    `;
+
             container.insertAdjacentHTML(
                 "beforeend",
                 `
-                <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
-                    <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 16px;">
-                        <div>
-                            <label>Sport Name</label>
-                            <select>${sportsTypeOptions}</select>
-                        </div>
-                        <div>
-                            <label>Sports Level</label>
-                            <select>${sportsLevelOptions}</select>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 16px;">
-                        <label>Achievements / Remarks</label>
-                        <textarea
-                            placeholder="Enter achievements or remarks"
-                            rows="3"
-                            style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; resize: vertical;"
-                        ></textarea>
-                    </div>
-
-                    ${!isFirst ? `
-                        <div style="display: flex; justify-content: flex-end;">
-                            <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-                        </div>
-                    ` : ""}
+        <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <!-- Sport Name -->
+                <div>
+                    <label>Sport Name</label>
+                    <select class="sport-name" onchange="validateSportsDetail(this.closest('.repeater-item'))">
+                        ${sportsTypeOptions}
+                    </select>
                 </div>
-                `
+
+                <!-- Sports Level -->
+                <div>
+                    <label>Sports Level</label>
+                    <select class="sport-level" onchange="validateSportsDetail(this.closest('.repeater-item'))">
+                        ${sportsLevelOptions}
+                    </select>
+                </div>
+
+                <!-- Place Dropdown -->
+                <div>
+                    <label>Place</label>
+                    <select class="sport-place" onchange="validateSportsDetail(this.closest('.repeater-item'))">
+                        ${placeOptions}
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label>Achievements / Remarks</label>
+                <textarea
+                    class="sport-achievements"
+                    placeholder="Enter achievements or remarks"
+                    rows="3"
+                    style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; resize: vertical;"
+                    oninput="validateSportsDetail(this.closest('.repeater-item'))"
+                ></textarea>
+            </div>
+
+            ${!isFirst ? `
+                <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove Sport</button>
+                </div>
+            ` : ""}
+        </div>
+        `
             );
         }
 
         // =======================================================
-        // FAMILY DETAILS
+        // VALIDATE SPORTS DETAIL
+        // =======================================================
+        function validateSportsDetail(repeaterItem) {
+            if (!repeaterItem) return true;
+
+            const sportNameSelect = repeaterItem.querySelector('.sport-name');
+            const sportLevelSelect = repeaterItem.querySelector('.sport-level');
+            const sportPlaceSelect = repeaterItem.querySelector('.sport-place');
+            const achievementsInput = repeaterItem.querySelector('.sport-achievements');
+
+            // Remove any existing error messages in this repeater
+            repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            // Check if any field is filled (optional section)
+            const hasAnyValue = (sportNameSelect && sportNameSelect.value) ||
+                (sportLevelSelect && sportLevelSelect.value) ||
+                (sportPlaceSelect && sportPlaceSelect.value) ||
+                (achievementsInput && achievementsInput.value.trim());
+
+            if (hasAnyValue) {
+                let isValid = true;
+
+                // If sport name is selected, validate other fields
+                if (sportNameSelect && sportNameSelect.value) {
+                    if (!sportLevelSelect || !sportLevelSelect.value) {
+                        showFieldError(sportLevelSelect, "Sports level is required when sport is selected", `level-error-${Date.now()}`);
+                        isValid = false;
+                    }
+                    if (!sportPlaceSelect || !sportPlaceSelect.value) {
+                        showFieldError(sportPlaceSelect, "Place is required when sport is selected", `place-error-${Date.now()}`);
+                        isValid = false;
+                    }
+                }
+
+                return isValid;
+            }
+
+            return true; // No fields filled, validation passes
+        }
+
+        // =======================================================
+        // FAMILY DETAILS - UPDATED WITH FIRST NAME & LAST NAME
         // =======================================================
         async function addFamilyMember(isFirst = false) {
             const index = familyIndex++;
@@ -3350,24 +3670,158 @@
             container.insertAdjacentHTML(
                 "beforeend",
                 `
-                <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
-                    <div>
-                        <label class="required">Name</label>
-                        <input type="text" placeholder="Enter name" class="family-name">
-                    </div>
-                    <div>
-                        <label class="required">Relationship</label>
-                        <select class="family-relationship">${relationshipOptions}</select>
-                    </div>
-                    <div><label>Contact Number (Optional)</label><input type="tel" placeholder="Enter contact number" class="family-contact"></div>
-                    <div><label class="required">Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="family-order-no"></div>
-                    <div><label>Order Date</label><input type="date" class="family-order-date"></div>
-                    ${!isFirst ? `
-                        <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
-                    ` : ""}
+        <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <!-- First Name -->
+                <div>
+                    <label class="required">First Name</label>
+                    <input type="text" class="family-first-name" placeholder="Enter first name" oninput="validateFamilyMember(this.closest('.repeater-item'))">
                 </div>
-                `
+
+                <!-- Last Name -->
+                <div>
+                    <label class="required">Last Name</label>
+                    <input type="text" class="family-last-name" placeholder="Enter last name" oninput="validateFamilyMember(this.closest('.repeater-item'))">
+                </div>
+
+                <!-- Relationship -->
+                <div>
+                    <label class="required">Relationship</label>
+                    <select class="family-relationship" onchange="validateFamilyMember(this.closest('.repeater-item'))">
+                        ${relationshipOptions}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                <!-- Contact Number -->
+                <div>
+                    <label>Contact Number (Optional)</label>
+                    <input type="tel" class="family-contact" placeholder="Enter contact number" maxlength="10" oninput="formatMobileNumber(this)">
+                </div>
+
+                <!-- Part II Order No. -->
+                <div>
+                    <label class="required">Part II Order No.</label>
+                    <input type="text" class="family-order-no" placeholder="0/0013/0001/2026" oninput="formatFamilyPartIIOrderNo(this); validateFamilyMember(this.closest('.repeater-item'))">
+                    <span class="field-hint">Format: X/XXXX/XXXX/YYYY</span>
+                </div>
+
+                <!-- Order Date -->
+                <div>
+                    <label class="required">Order Date</label>
+                    <input type="date" class="family-order-date" onchange="validateFamilyMember(this.closest('.repeater-item'))">
+                </div>
+            </div>
+
+            ${!isFirst ? `
+                <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove Member</button>
+                </div>
+            ` : ""}
+        </div>
+        `
             );
+        }
+
+        // =======================================================
+        // FORMAT FAMILY PART II ORDER NO. WITH AUTO SLASHES
+        // =======================================================
+        function formatFamilyPartIIOrderNo(input) {
+            // Get cursor position
+            const cursorPos = input.selectionStart;
+            const oldLength = input.value.length;
+
+            // Remove any non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Format: X/XXXX/XXXX/YYYY (max 13 digits: 1+4+4+4)
+            let formatted = '';
+
+            for (let i = 0; i < value.length; i++) {
+                if (i === 1 || i === 5 || i === 9) {
+                    // Add slash after 1st, 5th, and 9th digits
+                    formatted += '/';
+                }
+                formatted += value[i];
+
+                // Limit to 13 digits (1+4+4+4)
+                if (i === 12) break;
+            }
+
+            input.value = formatted;
+
+            // Adjust cursor position to account for auto-inserted slashes
+            const newLength = input.value.length;
+            if (newLength > oldLength) {
+                // Character was added
+                let newPos = cursorPos + 1;
+                // Skip over automatically added slash
+                if (formatted[newPos - 1] === '/' && formatted[newPos] !== '/') {
+                    newPos++;
+                }
+                input.setSelectionRange(newPos, newPos);
+            } else if (newLength < oldLength && cursorPos > 0) {
+                // Character was deleted
+                input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+            }
+        }
+
+        // =======================================================
+        // VALIDATE FAMILY MEMBER
+        // =======================================================
+        function validateFamilyMember(repeaterItem) {
+            if (!repeaterItem) return true;
+
+            const firstNameInput = repeaterItem.querySelector('.family-first-name');
+            const lastNameInput = repeaterItem.querySelector('.family-last-name');
+            const relationshipSelect = repeaterItem.querySelector('.family-relationship');
+            const orderNoInput = repeaterItem.querySelector('.family-order-no');
+            const orderDateInput = repeaterItem.querySelector('.family-order-date');
+
+            // Remove any existing error messages in this repeater
+            repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            let isValid = true;
+
+            // Validate First Name
+            if (!firstNameInput || !firstNameInput.value.trim()) {
+                showFieldError(firstNameInput, "First name is required", `fname-error-${Date.now()}`);
+                isValid = false;
+            }
+
+            // Validate Last Name
+            if (!lastNameInput || !lastNameInput.value.trim()) {
+                showFieldError(lastNameInput, "Last name is required", `lname-error-${Date.now()}`);
+                isValid = false;
+            }
+
+            // Validate Relationship
+            if (!relationshipSelect || !relationshipSelect.value) {
+                showFieldError(relationshipSelect, "Relationship is required", `rel-error-${Date.now()}`);
+                isValid = false;
+            }
+
+            // Validate Part II Order No.
+            if (!orderNoInput || !orderNoInput.value.trim()) {
+                showFieldError(orderNoInput, "Part II Order No. is required", `order-error-${Date.now()}`);
+                isValid = false;
+            } else {
+                // Validate format: X/XXXX/XXXX/YYYY
+                const pattern = /^\d\/\d{4}\/\d{4}\/\d{4}$/;
+                if (!pattern.test(orderNoInput.value)) {
+                    showFieldError(orderNoInput, "Format must be: X/XXXX/XXXX/YYYY (e.g., 0/0013/0001/2026)", `order-error-${Date.now()}`);
+                    isValid = false;
+                }
+            }
+
+            // Validate Order Date
+            if (!orderDateInput || !orderDateInput.value) {
+                showFieldError(orderDateInput, "Order Date is required", `orderdate-error-${Date.now()}`);
+                isValid = false;
+            }
+
+            return isValid;
         }
 
         // =======================================================
@@ -3506,38 +3960,47 @@
 
             // Collect additional qualifications (MIL)
             document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
-                const qualificationSelect = item.querySelector(".additional-qualification-select");
-                const authorityInput = item.querySelector(".additional-authority");
-                const yearInput = item.querySelector(".additional-year");
+                const qualificationCode = item.querySelector(".additional-qualification-code");
                 const authorityNoInput = item.querySelector(".additional-authority-no");
+                const dateInput = item.querySelector(".additional-date");
                 const locationInput = item.querySelector(".additional-location");
                 const orderNoInput = item.querySelector(".additional-order-no");
                 const orderDateInput = item.querySelector(".additional-order-date");
 
-                if (qualificationSelect && qualificationSelect.value) {
-                    payload.additionalQualifications.push({
-                        qualification: qualificationSelect.value,  // This will be the name from dropdown
-                        issuingAuthority: authorityInput ? authorityInput.value : "",
-                        year: yearInput ? yearInput.value : "",
+                // Only add if qualification is selected
+                if (qualificationCode && qualificationCode.value) {
+                    const qualificationObj = {
+                        qualification: qualificationCode.value,
                         authorityNo: authorityNoInput ? authorityNoInput.value : "",
+                        date: dateInput ? dateInput.value : "",
                         location: locationInput ? locationInput.value : "",
                         part2OrderNo: orderNoInput ? orderNoInput.value : "",
                         orderDate: orderDateInput ? orderDateInput.value : ""
-                    });
+                    };
+
+                    // Validate all fields are filled
+                    if (qualificationObj.authorityNo && qualificationObj.date &&
+                        qualificationObj.location && qualificationObj.part2OrderNo &&
+                        qualificationObj.orderDate) {
+                        payload.additionalQualifications.push(qualificationObj);
+                    }
                 }
             });
 
             // Collect family details
             document.querySelectorAll("#family-container .repeater-item").forEach(item => {
-                const nameInput = item.querySelector(".family-name");
+                const firstNameInput = item.querySelector(".family-first-name");
+                const lastNameInput = item.querySelector(".family-last-name");
                 const relationshipSelect = item.querySelector(".family-relationship");
                 const contactInput = item.querySelector(".family-contact");
                 const orderNoInput = item.querySelector(".family-order-no");
                 const orderDateInput = item.querySelector(".family-order-date");
 
-                if (nameInput && nameInput.value) {
+                if (firstNameInput && firstNameInput.value && lastNameInput && lastNameInput.value) {
                     payload.family.push({
-                        name: nameInput.value,
+                        firstName: firstNameInput.value,
+                        lastName: lastNameInput.value,
+                        fullName: firstNameInput.value + " " + lastNameInput.value,
                         relationship: relationshipSelect ? relationshipSelect.value : "",
                         contactNumber: contactInput ? contactInput.value : "",  // Optional field
                         part2OrderNo: orderNoInput ? orderNoInput.value : "",
@@ -3548,16 +4011,18 @@
 
             // Collect sports details
             document.querySelectorAll("#sports-container .repeater-item").forEach(item => {
-                const selects = item.querySelectorAll("select");
-                const textareas = item.querySelectorAll("textarea");
-                if (selects.length >= 2) {
-                    if (selects[0].value) {
-                        payload.sports.push({
-                            sportName: selects[0].value,
-                            sportsLevel: selects[1].value,
-                            achievements: textareas[0] ? textareas[0].value : ""
-                        });
-                    }
+                const sportNameSelect = item.querySelector(".sport-name");
+                const sportLevelSelect = item.querySelector(".sport-level");
+                const sportPlaceSelect = item.querySelector(".sport-place");
+                const achievementsInput = item.querySelector(".sport-achievements");
+
+                if (sportNameSelect && sportNameSelect.value) {
+                    payload.sports.push({
+                        sportName: sportNameSelect.value,
+                        sportsLevel: sportLevelSelect ? sportLevelSelect.value : "",
+                        place: sportPlaceSelect ? sportPlaceSelect.value : "",
+                        achievements: achievementsInput ? achievementsInput.value : ""
+                    });
                 }
             });
 
