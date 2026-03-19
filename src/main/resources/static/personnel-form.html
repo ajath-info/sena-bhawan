@@ -3827,6 +3827,163 @@
         }
 
         // =======================================================
+        // MEDICAL CODE GENERATION AND BUTTON FUNCTIONS
+        // =======================================================
+
+        // Store original medical data for cancel functionality
+        let originalMedicalData = null;
+
+        // Generate medical code from current selections
+        function generateMedicalCode() {
+            let code = '';
+            const letters = ['S', 'H', 'A', 'P', 'E'];
+
+            letters.forEach(letter => {
+                const value = medicalData[letter].value;
+                const type = medicalData[letter].type;
+                const period = medicalData[letter].period;
+
+                code += letter + value;
+
+                // Add type and period if value > 1 and type is selected
+                if (value !== '1' && type) {
+                    code += type;
+                    if (period) {
+                        code += period;
+                    }
+                }
+            });
+
+            return code;
+        }
+
+        // Update medical code display
+        function updateMedicalCodeDisplay() {
+            const codeDisplay = document.getElementById('medicalCodeDisplay');
+            if (codeDisplay) {
+                codeDisplay.textContent = generateMedicalCode();
+            }
+        }
+
+        // Apply medical changes (OK button)
+        function applyMedicalChanges() {
+            // Save current state as original for cancel
+            originalMedicalData = JSON.parse(JSON.stringify(medicalData));
+
+            // Update the code display
+            updateMedicalCodeDisplay();
+
+            // Show success message or visual feedback
+            const codeDisplay = document.getElementById('medicalCodeDisplay');
+            codeDisplay.style.animation = 'none';
+            codeDisplay.offsetHeight; // Trigger reflow
+            codeDisplay.style.animation = 'fadeIn 0.3s ease';
+
+            console.log('Medical changes applied:', medicalData);
+        }
+
+        // Cancel medical changes (Cancel button)
+        function cancelMedicalChanges() {
+            if (originalMedicalData) {
+                // Restore original data
+                medicalData = JSON.parse(JSON.stringify(originalMedicalData));
+
+                // Update all UI elements to match original data
+                const letters = ['S', 'H', 'A', 'P', 'E'];
+                letters.forEach(letter => {
+                    // Restore value select
+                    const valueSelect = document.getElementById(`medical${letter}`);
+                    if (valueSelect) {
+                        valueSelect.value = medicalData[letter].value;
+
+                        // Enable/disable fields based on value
+                        if (medicalData[letter].value !== '1') {
+                            enableMedicalFields(letter);
+                        } else {
+                            disableMedicalFields(letter);
+                        }
+                    }
+
+                    // Restore type select
+                    const typeSelect = document.getElementById(`medicalType${letter}`);
+                    if (typeSelect) {
+                        typeSelect.value = medicalData[letter].type || '';
+                    }
+
+                    // Restore period input
+                    const periodInput = document.getElementById(`medicalPeriod${letter}`);
+                    if (periodInput) {
+                        periodInput.value = medicalData[letter].period || '';
+                    }
+
+                    // Restore remark input
+                    const remarkInput = document.getElementById(`medicalRemark${letter}`);
+                    if (remarkInput) {
+                        remarkInput.value = medicalData[letter].remark || '';
+                    }
+                });
+
+                // Update code display
+                updateMedicalCodeDisplay();
+
+                console.log('Medical changes cancelled, restored to:', medicalData);
+            }
+        }
+
+        // Override the existing update functions to also update the code display
+        const originalUpdateMedicalRow = updateMedicalRow;
+        updateMedicalRow = function(letter, value) {
+            originalUpdateMedicalRow(letter, value);
+            updateMedicalCodeDisplay();
+        };
+
+        const originalUpdateMedicalType = updateMedicalType;
+        updateMedicalType = function(letter, type) {
+            originalUpdateMedicalType(letter, type);
+            updateMedicalCodeDisplay();
+        };
+
+        const originalUpdateMedicalPeriod = updateMedicalPeriod;
+        updateMedicalPeriod = function(letter, period) {
+            originalUpdateMedicalPeriod(letter, period);
+            updateMedicalCodeDisplay();
+        };
+
+        const originalUpdateMedicalRemark = updateMedicalRemark;
+        updateMedicalRemark = function(letter, remark) {
+            originalUpdateMedicalRemark(letter, remark);
+            updateMedicalCodeDisplay();
+        };
+
+        // Initialize original data when medical section is initialized
+        function initMedicalSection() {
+            console.log("Initializing medical section...");
+            // Set initial values to 1
+            const valueSelects = document.querySelectorAll('.medical-select');
+            valueSelects.forEach(select => {
+                select.value = '1';
+            });
+
+            // All type, period, and remark fields start disabled
+            disableMedicalFieldsForAll();
+
+            // Initialize medical data with default values
+            medicalData = {
+                S: { value: '1', type: '', period: '', remark: '' },
+                H: { value: '1', type: '', period: '', remark: '' },
+                A: { value: '1', type: '', period: '', remark: '' },
+                P: { value: '1', type: '', period: '', remark: '' },
+                E: { value: '1', type: '', period: '', remark: '' }
+            };
+
+            // Save as original for cancel
+            originalMedicalData = JSON.parse(JSON.stringify(medicalData));
+
+            // Update code display
+            updateMedicalCodeDisplay();
+        }
+
+        // =======================================================
         // MEDICAL SELECTION
         // =======================================================
         function getMedicalCategoryString() {
@@ -4975,6 +5132,18 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Medical Code Display -->
+                    <div style="margin-top: 20px; padding: 16px; background: #f0f7f3; border: 1px solid #d7ebe1; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <span style="font-weight: 600; color: #1b4332;">Medical Code:</span>
+                            <span id="medicalCodeDisplay" style="margin-left: 12px; font-family: monospace; font-size: 16px; font-weight: 600; color: #1b4332;">S1H1A1P1E1</span>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button type="button" class="btn btn-secondary" style="min-width: 80px; height: 36px;" onclick="cancelMedicalChanges()">Cancel</button>
+                            <button type="button" class="btn btn-primary" style="min-width: 80px; height: 36px; background: #1b4332;" onclick="applyMedicalChanges()">OK</button>
+                        </div>
                     </div>
                 </div>
 
