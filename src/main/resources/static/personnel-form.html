@@ -2632,7 +2632,6 @@
                 { id: 'pinCode', name: 'PIN Code' },
                 { id: 'mobileNumber', name: 'Mobile Number' },
                 { id: 'emailAddress', name: 'Email Address' },
-                { id: 'shapeMedicalCategory', name: 'SHAPE Medical Category' },
                 { id: 'nrs', name: 'NRS (Nearest Railway Station)' }
             ];
 
@@ -2740,8 +2739,20 @@
             }
         }
 
+
+
         // =======================================================
-        // MEDICAL SECTION WITH DYNAMIC FIELDS
+        // GLOBAL VARIABLES - Define all indices at the top
+        // =======================================================
+        let decorationIndex = 0;
+        let civilIndex = 0;
+        let additionalIndex = 0;
+        let familyIndex = 0;
+        let sportsIndex = 0;  // Add this
+        let selectedMedicals = {};
+
+        // =======================================================
+        // MEDICAL SECTION WITH TABULAR FORMAT
         // =======================================================
 
         // Store medical data
@@ -2755,128 +2766,129 @@
 
         // Initialize medical section
         function initMedicalSection() {
-            const selects = document.querySelectorAll('.medical-select');
-
-            selects.forEach(select => {
-                const letter = select.dataset.letter;
-
-                // Set initial value to 1
+            console.log("Initializing medical section...");
+            // Set initial values to 1
+            const valueSelects = document.querySelectorAll('.medical-select');
+            valueSelects.forEach(select => {
                 select.value = '1';
+            });
 
-                // Add change event listener
-                select.addEventListener('change', function() {
-                    const value = this.value;
-                    medicalData[letter].value = value;
+            // All type, period, and remark fields start disabled
+            disableMedicalFieldsForAll();
+        }
 
-                    if (value !== '1') {
-                        showMedicalDetails(letter, value);
-                    } else {
-                        hideMedicalDetails(letter);
-                        // Reset additional fields for this letter
-                        medicalData[letter].type = '';
-                        medicalData[letter].period = '';
-                        medicalData[letter].remark = '';
-                    }
-                });
+        // Disable fields for a specific letter
+        function disableMedicalFields(letter) {
+            const typeSelect = document.getElementById(`medicalType${letter}`);
+            const periodInput = document.getElementById(`medicalPeriod${letter}`);
+            const remarkInput = document.getElementById(`medicalRemark${letter}`);
+
+            if (typeSelect) {
+                typeSelect.disabled = true;
+                typeSelect.style.background = '#f3f4f6';
+                typeSelect.value = '';
+            }
+
+            if (periodInput) {
+                periodInput.disabled = true;
+                periodInput.style.background = '#f3f4f6';
+                periodInput.value = '';
+            }
+
+            if (remarkInput) {
+                remarkInput.disabled = true;
+                remarkInput.style.background = '#f3f4f6';
+                remarkInput.value = '';
+            }
+        }
+
+        // Enable fields for a specific letter
+        function enableMedicalFields(letter) {
+            const typeSelect = document.getElementById(`medicalType${letter}`);
+            const periodInput = document.getElementById(`medicalPeriod${letter}`);
+            const remarkInput = document.getElementById(`medicalRemark${letter}`);
+
+            if (typeSelect) {
+                typeSelect.disabled = false;
+                typeSelect.style.background = 'white';
+            }
+
+            if (periodInput) {
+                periodInput.disabled = false;
+                periodInput.style.background = 'white';
+            }
+
+            if (remarkInput) {
+                remarkInput.disabled = false;
+                remarkInput.style.background = 'white';
+            }
+        }
+
+        // Disable all medical fields initially
+        function disableMedicalFieldsForAll() {
+            const letters = ['S', 'H', 'A', 'P', 'E'];
+            letters.forEach(letter => {
+                disableMedicalFields(letter);
             });
         }
 
-        // Show medical details for a specific letter
-        function showMedicalDetails(letter, value) {
-            const container = document.getElementById('medical-details-container');
+        // Update medical row when value changes
+        function updateMedicalRow(letter, value) {
+            console.log(`Updating medical row for ${letter} with value ${value}`);
+            medicalData[letter].value = value;
 
-            // Check if details for this letter already exist
-            let existingDetail = document.getElementById(`medical-detail-${letter}`);
-
-            if (!existingDetail) {
-                // Create new detail section
-                const detailDiv = document.createElement('div');
-                detailDiv.id = `medical-detail-${letter}`;
-                detailDiv.className = 'medical-detail-item';
-                detailDiv.style.cssText = 'border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; background: #f9fafb;';
-
-                detailDiv.innerHTML = `
-                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                        <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Medical Category ${letter} - Value ${value}</h4>
-                        <button type="button" class="btn btn-secondary" style="margin-left: auto; padding: 4px 12px; height: 32px;" onclick="removeMedicalDetail('${letter}')">Remove</button>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Type</label>
-                            <div style="display: flex; gap: 16px;">
-                                <label style="display: flex; align-items: center; gap: 4px;">
-                                    <input type="radio" name="medicalType-${letter}" value="TEMPORARY" onchange="updateMedicalType('${letter}', 'TEMPORARY')"> Temporary
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 4px;">
-                                    <input type="radio" name="medicalType-${letter}" value="PERMANENT" onchange="updateMedicalType('${letter}', 'PERMANENT')"> Permanent
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Period (months)</label>
-                            <input type="number" min="1" max="24" placeholder="Max 24 months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;" onchange="updateMedicalPeriod('${letter}', this.value)">
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Remark</label>
-                            <input type="text" placeholder="Enter remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;" onchange="updateMedicalRemark('${letter}', this.value)">
-                        </div>
-                    </div>
-                `;
-
-                container.appendChild(detailDiv);
+            if (value !== '1') {
+                // Enable fields for this letter
+                enableMedicalFields(letter);
             } else {
-                // Update the value display in existing detail
-                const header = existingDetail.querySelector('h4');
-                if (header) {
-                    header.innerHTML = `Medical Category ${letter} - Value ${value}`;
-                }
+                // Disable and clear fields for this letter
+                disableMedicalFields(letter);
+
+                // Reset medical data for this letter
+                medicalData[letter].type = '';
+                medicalData[letter].period = '';
+                medicalData[letter].remark = '';
             }
-        }
-
-        // Hide medical details for a specific letter
-        function hideMedicalDetails(letter) {
-            const existingDetail = document.getElementById(`medical-detail-${letter}`);
-            if (existingDetail) {
-                existingDetail.remove();
-            }
-        }
-
-        // Remove medical detail (called by remove button)
-        function removeMedicalDetail(letter) {
-            // Reset the select value to 1
-            const select = document.getElementById(`medical${letter}`);
-            if (select) {
-                select.value = '1';
-                medicalData[letter].value = '1';
-            }
-
-            // Reset medical data for this letter
-            medicalData[letter].type = '';
-            medicalData[letter].period = '';
-            medicalData[letter].remark = '';
-
-            // Remove the detail div
-            hideMedicalDetails(letter);
         }
 
         // Update medical type
         function updateMedicalType(letter, type) {
+            console.log(`Updating medical type for ${letter} with type ${type}`);
             medicalData[letter].type = type;
+
+            // Update period placeholder based on type
+            const periodInput = document.getElementById(`medicalPeriod${letter}`);
+            if (periodInput) {
+                if (type === 'T') {
+                    periodInput.placeholder = 'Max 24 months';
+                    periodInput.max = 24;
+                    if (parseInt(periodInput.value) > 24) {
+                        periodInput.value = '24';
+                    }
+                } else if (type === 'P') {
+                    periodInput.placeholder = 'Max 24 months';
+                    periodInput.max = 24;
+                }
+            }
         }
 
         // Update medical period
         function updateMedicalPeriod(letter, period) {
-            // Ensure period is not more than 24
-            if (parseInt(period) > 24) {
+            console.log(`Updating medical period for ${letter} with period ${period}`);
+            const type = medicalData[letter].type;
+
+            // Validate based on type
+            if (type === 'T' && parseInt(period) > 24) {
                 period = '24';
-                const input = event.target;
-                if (input) input.value = '24';
+                document.getElementById(`medicalPeriod${letter}`).value = '24';
             }
+
             medicalData[letter].period = period;
         }
 
         // Update medical remark
         function updateMedicalRemark(letter, remark) {
+            console.log(`Updating medical remark for ${letter} with remark ${remark}`);
             medicalData[letter].remark = remark;
         }
 
@@ -2908,16 +2920,6 @@
 
             return payload;
         }
-
-        // =======================================================
-        // GLOBAL VARIABLES - Define all indices at the top
-        // =======================================================
-        let decorationIndex = 0;
-        let civilIndex = 0;
-        let additionalIndex = 0;
-        let familyIndex = 0;
-        let sportsIndex = 0;  // Add this
-        let selectedMedicals = {};
 
         // =======================================================
         // DROPDOWN LOADING FUNCTIONS
@@ -3894,7 +3896,6 @@
                 alternateMobile: alternateMobile ? alternateMobile.value : "",
                 emailAddress: emailAddress ? emailAddress.value : "",
                 nicEmail: nicEmail ? nicEmail.value : "",
-                medicalCategory: getMedicalCategoryString(),
                 decorations: [],
                 qualifications: [],
                 additionalQualifications: [],
@@ -4811,78 +4812,170 @@
                         <span>🩺 Medical Category</span>
                     </div>
 
-                    <!-- SHAPE MEDICAL CATEGORY DROPDOWN -->
-                    <div style="margin-bottom: 20px;">
-                        <label class="required" style="display: block; margin-bottom: 8px; font-weight: 600;">SHAPE Medical Category</label>
-                        <select id="shapeMedicalCategory" style="width: 100%; max-width: 300px; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
-                            <option value="">Select SHAPE Category</option>
-                            <option value="SHAPE-I">SHAPE-I</option>
-                            <option value="SHAPE-II">SHAPE-II</option>
-                            <option value="SHAPE-III">SHAPE-III</option>
-                            <option value="SHAPE-IV">SHAPE-IV</option>
-                            <option value="SHAPE-V">SHAPE-V</option>
-                        </select>
-                    </div>
+                    <!-- Medical Category Table -->
+                    <div style="overflow-x: auto; margin-top: 16px;">
+                        <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <!-- Table Header -->
+                            <thead style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                            <tr>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937; width: 60px;">Category</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937;">S</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937;">H</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937;">A</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937;">P</th>
+                                <th style="padding: 12px; text-align: center; font-weight: 700; color: #1f2937;">E</th>
+                            </tr>
+                            </thead>
 
-                    <!-- Main Medical Category Dropdowns -->
-                    <div class="medical-category" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
-                        <div class="medical-item" style="min-width: 80px;">
-                            <label style="display: block; text-align: center; font-weight: bold;">S</label>
-                            <select class="medical-select" data-letter="S" id="medicalS" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
-                                <option value="1" selected>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="medical-item" style="min-width: 80px;">
-                            <label style="display: block; text-align: center; font-weight: bold;">H</label>
-                            <select class="medical-select" data-letter="H" id="medicalH" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
-                                <option value="1" selected>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="medical-item" style="min-width: 80px;">
-                            <label style="display: block; text-align: center; font-weight: bold;">A</label>
-                            <select class="medical-select" data-letter="A" id="medicalA" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
-                                <option value="1" selected>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="medical-item" style="min-width: 80px;">
-                            <label style="display: block; text-align: center; font-weight: bold;">P</label>
-                            <select class="medical-select" data-letter="P" id="medicalP" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
-                                <option value="1" selected>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <div class="medical-item" style="min-width: 80px;">
-                            <label style="display: block; text-align: center; font-weight: bold;">E</label>
-                            <select class="medical-select" data-letter="E" id="medicalE" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
-                                <option value="1" selected>1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                    </div>
+                            <!-- Table Body -->
+                            <tbody>
+                            <!-- Value Row -->
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-weight: 600; background: #f9fafb; text-align: center;">Value</td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-select" data-letter="S" id="medicalS" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;" onchange="updateMedicalRow('S', this.value)">
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-select" data-letter="H" id="medicalH" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;" onchange="updateMedicalRow('H', this.value)">
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-select" data-letter="A" id="medicalA" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;" onchange="updateMedicalRow('A', this.value)">
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-select" data-letter="P" id="medicalP" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;" onchange="updateMedicalRow('P', this.value)">
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-select" data-letter="E" id="medicalE" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;" onchange="updateMedicalRow('E', this.value)">
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                            </tr>
 
-                    <!-- Container for additional medical details (appears when value > 1 is selected) -->
-                    <div id="medical-details-container" style="margin-top: 20px;">
-                        <!-- Dynamic content will be inserted here -->
-                    </div>
+                            <!-- Temp/Perm Row -->
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-weight: 600; background: #f9fafb; text-align: center;">Temp/Perm</td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-type" data-letter="S" id="medicalTypeS" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalType('S', this.value)">
+                                        <option value="">Select</option>
+                                        <option value="T">T (Temporary)</option>
+                                        <option value="P">P (Permanent)</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-type" data-letter="H" id="medicalTypeH" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalType('H', this.value)">
+                                        <option value="">Select</option>
+                                        <option value="T">T (Temporary)</option>
+                                        <option value="P">P (Permanent)</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-type" data-letter="A" id="medicalTypeA" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalType('A', this.value)">
+                                        <option value="">Select</option>
+                                        <option value="T">T (Temporary)</option>
+                                        <option value="P">P (Permanent)</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-type" data-letter="P" id="medicalTypeP" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalType('P', this.value)">
+                                        <option value="">Select</option>
+                                        <option value="T">T (Temporary)</option>
+                                        <option value="P">P (Permanent)</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 8px;">
+                                    <select class="medical-type" data-letter="E" id="medicalTypeE" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalType('E', this.value)">
+                                        <option value="">Select</option>
+                                        <option value="T">T (Temporary)</option>
+                                        <option value="P">P (Permanent)</option>
+                                    </select>
+                                </td>
+                            </tr>
 
+                            <!-- Period Row -->
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-weight: 600; background: #f9fafb; text-align: center;">Period</td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-period" data-letter="S" id="medicalPeriodS" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('S', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-period" data-letter="H" id="medicalPeriodH" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('H', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-period" data-letter="A" id="medicalPeriodA" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('A', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-period" data-letter="P" id="medicalPeriodP" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('P', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-period" data-letter="E" id="medicalPeriodE" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('E', this.value)">
+                                </td>
+                            </tr>
+
+                            <!-- Remark Row -->
+                            <tr>
+                                <td style="padding: 12px; font-weight: 600; background: #f9fafb; text-align: center;">Remark</td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-remark" data-letter="S" id="medicalRemarkS" placeholder="Remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalRemark('S', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-remark" data-letter="H" id="medicalRemarkH" placeholder="Remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalRemark('H', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-remark" data-letter="A" id="medicalRemarkA" placeholder="Remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalRemark('A', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-remark" data-letter="P" id="medicalRemarkP" placeholder="Remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalRemark('P', this.value)">
+                                </td>
+                                <td style="padding: 8px;">
+                                    <input type="text" class="medical-remark" data-letter="E" id="medicalRemarkE" placeholder="Remark" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalRemark('E', this.value)">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
 
