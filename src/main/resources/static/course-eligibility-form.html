@@ -871,8 +871,9 @@
     }
 
     // Load Units
+    // Load Units from ORBAT endpoint
     function loadUnits() {
-        fetch('http://localhost:6060/api/unit')
+        fetch('http://localhost:6060/api/orbat/units')
             .then(response => {
                 if (!response.ok) throw new Error('Failed to load units');
                 return response.json();
@@ -881,6 +882,11 @@
                 const unitList = document.getElementById('unitList');
                 unitList.innerHTML = '';
 
+                if (!units || units.length === 0) {
+                    unitList.innerHTML = '<div style="padding: 10px; color: #666;">No units available</div>';
+                    return;
+                }
+
                 units.forEach(unit => {
                     const label = document.createElement('label');
                     label.className = 'rank-item';
@@ -888,6 +894,10 @@
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.value = unit.id;
+
+                    // Check if this unit is already selected (for when populating existing data)
+                    checkbox.checked = selectedUnitIds.includes(unit.id);
+
                     checkbox.addEventListener('change', function() {
                         if (this.checked) {
                             if (!selectedUnitIds.includes(unit.id)) {
@@ -899,13 +909,14 @@
                     });
 
                     label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${unit.unitName}`));
+                    label.appendChild(document.createTextNode(` ${unit.name}`));
                     unitList.appendChild(label);
                 });
             })
             .catch(error => {
                 console.error('Error loading units:', error);
-                document.getElementById('unitList').innerHTML = 'Failed to load units';
+                // Show error message to user, no mock data
+                document.getElementById('unitList').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load units. Please try again later.</div>';
             });
     }
 
