@@ -351,16 +351,14 @@
     // ===============================
     document.getElementById("formationTypeDropdown").addEventListener("change", function() {
       const formationType = this.value;
-      console.log("Selected formation type:", formationType); // Debug log
+      console.log("Selected formation type:", formationType);
 
       const formationNameDropdown = document.getElementById("formationNameDropdown");
 
       if (formationType) {
-        // Enable second dropdown and load formation names from orbat table
         formationNameDropdown.disabled = false;
         formationNameDropdown.innerHTML = '<option value="">Loading...</option>';
 
-        // Call orbat API to get formations by type name (not ID)
         fetch(`/api/orbat/formation-type/${formationType}`)
           .then(response => {
             if (!response.ok) throw new Error("Failed to load formations");
@@ -374,7 +372,7 @@
             if (data && data.length > 0) {
               data.forEach(item => {
                 const option = document.createElement("option");
-                option.value = item.id; // Store the ID for API calls
+                option.value = item.id;
                 option.setAttribute("data-orbat-id", item.orbatId || item.id);
                 option.setAttribute("data-name", item.name);
                 option.textContent = item.name;
@@ -404,19 +402,21 @@
       const orbatId = this.value;
 
       if (orbatId) {
-        // Get formation details for display
         const formationType = document.getElementById("formationTypeDropdown").value;
         const formationName = selectedOption.getAttribute("data-name") || selectedOption.textContent;
         const orbatIdValue = selectedOption.getAttribute("data-orbat-id") || orbatId;
 
-        // Show selected formation info
         document.getElementById("selectedFormationType").textContent = formationType;
         document.getElementById("selectedFormationName").textContent = formationName;
         document.getElementById("selectedOrbatId").textContent = orbatIdValue;
         document.getElementById("selectedFormationInfo").style.display = "block";
 
-        // Load establishment data
-        loadEstablishmentData(orbatId);
+        // Get selected establishment type
+        const selectedRadio = document.querySelector("input[name='estType']:checked");
+        const type = selectedRadio ? selectedRadio.value : "PE";
+
+        // Load establishment data with type as query parameter
+        loadEstablishmentData(orbatId, type);
       } else {
         document.getElementById("selectedFormationInfo").style.display = "none";
         clearForm();
@@ -424,13 +424,14 @@
     });
 
     // ===============================
-    // PE/WE RADIO CHANGE - Reload Data
+    // PE/WE RADIO CHANGE - Reload Data with new type
     // ===============================
     document.querySelectorAll("input[name='estType']").forEach(radio => {
       radio.addEventListener("change", function() {
         const orbatId = document.getElementById("formationNameDropdown").value;
         if (orbatId) {
-          loadEstablishmentData(orbatId);
+          const type = this.value;
+          loadEstablishmentData(orbatId, type);
         }
       });
     });
@@ -451,15 +452,14 @@
         return response.json();
       })
       .then(data => {
-        console.log("Dropdown master data:", data); // Debug log
+        console.log("Dropdown master data:", data);
 
         const dropdown = document.getElementById("formationTypeDropdown");
         dropdown.innerHTML = '<option value="">-- Select Formation Type --</option>';
 
-        // ✅ FIX: Use item.name as value (not item.id)
         data.forEach(item => {
           const option = document.createElement("option");
-          option.value = item.name; // "Command", "Corps", "Division", "Brigade", "Unit"
+          option.value = item.name;
           option.textContent = item.name;
           dropdown.appendChild(option);
         });
@@ -468,7 +468,6 @@
       })
       .catch(error => {
         console.error("Error loading formation types:", error);
-        // Fallback to hardcoded values
         const dropdown = document.getElementById("formationTypeDropdown");
         dropdown.innerHTML = `
           <option value="">-- Select Formation Type --</option>
@@ -484,18 +483,22 @@
   // ===============================
   // LOAD ESTABLISHMENT DATA
   // ===============================
-  function loadEstablishmentData(orbatId) {
+  function loadEstablishmentData(orbatId, type) {
     if (!orbatId) return;
 
-    const selectedRadio = document.querySelector("input[name='estType']:checked");
-    const type = selectedRadio ? selectedRadio.value : "PE";
-
-    fetch(`/api/establishment/${orbatId}/${type}`)
+    // Pass type as query parameter
+    fetch(`/api/establishment/${orbatId}?type=${type}`)
       .then(response => {
         if (!response.ok) throw new Error("No data found");
         return response.json();
       })
-      .then(data => fillForm(data))
+      .then(data => {
+        fillForm(data);
+        // Set the radio button to match the returned/requested type
+        if (data.establishmentType) {
+          document.querySelector(`input[name='estType'][value='${data.establishmentType}']`).checked = true;
+        }
+      })
       .catch(error => {
         console.error("Error loading data:", error);
         clearForm();
@@ -622,7 +625,7 @@
     }
 
     const payload = {
-      establishmentType: type,
+      establishmentType: type,  // Now part of the request body
       formationType: formationType,
       formationName: formationName,
       orbatId: orbatIdValue,
@@ -646,7 +649,8 @@
 
     console.log("Sending payload:", payload);
 
-    fetch(`/api/establishment/${orbatId}/${type}`, {
+    // Updated endpoint - no type in URL
+    fetch(`/api/establishment/${orbatId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -659,8 +663,8 @@
     })
     .then(message => {
       alert(message);
-      // Reload data to show updated values
-      loadEstablishmentData(orbatId);
+      // Reload data to show updated values with current type
+      loadEstablishmentData(orbatId, type);
     })
     .catch(error => {
       console.error("Update Error:", error);

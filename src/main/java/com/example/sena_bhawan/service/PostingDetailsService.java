@@ -15,7 +15,7 @@ public interface PostingDetailsService {
     List<PostingHistoryDTO> getPostingHistory(Long personnelId);
     List<PostingDetails> getByPersonnel(Long personnelId);
 
-
+    PostingDetails cancelUnderPostingByPersonnelId(Long personnelId);
     // Main method to handle both save and update
     PostingDetails upsertPosting(PostingRequestDTO dto);
 

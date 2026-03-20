@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto;
 
+import com.example.sena_bhawan.entity.FormationEstablishment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EstablishmentRequest {
 
-    private String establishmentType;
+    private FormationEstablishment.EstablishmentType establishmentType;
 
     private Integer totalAuthorizedOfficers;
     private Integer totalHardScale;

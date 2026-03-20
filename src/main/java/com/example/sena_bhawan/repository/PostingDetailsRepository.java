@@ -17,16 +17,71 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
     List<PostingDetailsProjection> findByPersonnelIdInAndStatus(List<Long> personnelIds, String status);
     List<PostingDetails> findByPersonnelId(Long personnelId);
 
-    // ✅ Order by tosUpdatedDate instead of fromDate
-    List<PostingDetails> findByPersonnelIdOrderByTosUpdatedDateDesc(Long personnelId);
+    @Query(value = """
+        SELECT * FROM posting_details 
+        WHERE personnel_id = :personnelId 
+        AND status = 'PREVIOUS_POSTING'
+        AND posting_id < :currentPostingId
+        ORDER BY tos_updated_date DESC 
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<PostingDetails> findLatestPreviousPostingBeforeId(
+            @Param("personnelId") Long personnelId,
+            @Param("currentPostingId") Long currentPostingId
+    );
 
-    // Find current UNDER_POSTING
+    // ✅ Find latest POSTED
+    @Query(value = """
+        SELECT * FROM posting_details 
+        WHERE personnel_id = :personnelId 
+        AND status = 'POSTED'
+        ORDER BY tos_updated_date DESC 
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<PostingDetails> findLatestPosted(@Param("personnelId") Long personnelId);
+
+    // ✅ Find current UNDER_POSTING
     @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'UNDER_POSTING'")
     Optional<PostingDetails> findCurrentUnderPosting(@Param("personnelId") Long personnelId);
 
-    // Find latest POSTED (using tosUpdatedDate)
-    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'POSTED' ORDER BY p.tosUpdatedDate DESC")
-    Optional<PostingDetails> findLatestPosted(@Param("personnelId") Long personnelId);
+    // ✅ Find latest POSTED before a specific ID
+    @Query(value = """
+        SELECT * FROM posting_details 
+        WHERE personnel_id = :personnelId 
+        AND status = 'POSTED'
+        AND posting_id < :currentPostingId
+        ORDER BY tos_updated_date DESC 
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<PostingDetails> findLatestPostedBeforeId(
+            @Param("personnelId") Long personnelId,
+            @Param("currentPostingId") Long currentPostingId
+    );
+
+    // ✅ Find the immediate previous POSTED record (the one before current)
+    @Query(value = """
+        SELECT * FROM posting_details 
+        WHERE personnel_id = :personnelId 
+        AND status = 'POSTED'
+        AND posting_id < :currentPostingId
+        ORDER BY tos_updated_date DESC 
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<PostingDetails> findImmediatePreviousPosted(
+            @Param("personnelId") Long personnelId,
+            @Param("currentPostingId") Long currentPostingId
+    );
+
+    // ✅ Order by tosUpdatedDate instead of fromDate
+    List<PostingDetails> findByPersonnelIdOrderByTosUpdatedDateDesc(Long personnelId);
+
+//    // Find current UNDER_POSTING
+//    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'UNDER_POSTING'")
+//    Optional<PostingDetails> findCurrentUnderPosting(@Param("personnelId") Long personnelId);
+//
+//    // Find latest POSTED (using tosUpdatedDate)
+//    @Query("SELECT p FROM PostingDetails p WHERE p.personnelId = :personnelId AND p.status = 'POSTED' ORDER BY p.tosUpdatedDate DESC")
+//    Optional<PostingDetails> findLatestPosted(@Param("personnelId") Long personnelId);
 
 
     // Find all previous postings for history

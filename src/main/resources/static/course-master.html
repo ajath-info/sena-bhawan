@@ -226,6 +226,24 @@
       cursor: pointer;
     }
 
+    .btn-primary:hover {
+      background: #2d6a4f;
+    }
+
+    .btn-secondary {
+      padding: 10px 16px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -258,11 +276,132 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      background: white;
+      transition: all 0.2s;
     }
 
-    .icon-btn.edit { color: #3b82f6; border-color: #3b82f6; }
-    .icon-btn.delete { color: #ef4444; border-color: #ef4444; }
+    .icon-btn.edit {
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
 
+    .icon-btn.edit:hover {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .icon-btn.delete {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .icon-btn.delete:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* ================= MODAL STYLES ================= */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      width: 450px;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content h3 {
+      margin-bottom: 24px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1b4332;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 12px;
+    }
+
+    .modal-content .form-group {
+      margin-bottom: 20px;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .modal-content input:focus {
+      outline: none;
+      border-color: #1b4332;
+      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+    }
+
+    .modal-content input:hover {
+      border-color: #9ca3af;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 28px;
+    }
+
+    /* Loading spinner */
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading-spinner::after {
+      content: '';
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #1b4332;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 
   <link rel="stylesheet" href="sidebar.css">
@@ -291,7 +430,7 @@
 
       <div class="header-right">
         <div class="search-box">
-          <input type="text" placeholder="Search courses..." />
+          <input type="text" id="searchInput" placeholder="Search courses..." onkeyup="searchCourses()" />
         </div>
       </div>
     </header>
@@ -316,7 +455,7 @@
           </thead>
 
           <tbody id="courseTable">
-          <tr><td colspan="5">Loading...</td></tr>
+          <tr><td colspan="5" style="text-align: center;">Loading courses...</td></tr>
           </tbody>
         </table>
 
@@ -326,20 +465,66 @@
   </main>
 </div>
 
+<!-- Custom Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3>Edit Course</h3>
 
+    <input type="hidden" id="editSrno">
+
+    <div class="form-group">
+      <label for="editCourseName">Course Name <span style="color: #ef4444;">*</span></label>
+      <input type="text" id="editCourseName" placeholder="Enter course name" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="editLocation">Location <span style="color: #ef4444;">*</span></label>
+      <input type="text" id="editLocation" placeholder="Enter location" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="editDuration">Duration (weeks) <span style="color: #ef4444;">*</span></label>
+      <input type="number" id="editDuration" placeholder="Enter duration in weeks" min="1" step="1">
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success/Error Toast Notification (hidden by default) -->
+<div id="toast" style="position: fixed; bottom: 20px; right: 20px; background: #1b4332; color: white; padding: 12px 24px; border-radius: 8px; display: none; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
 
 <!-- ============= API SCRIPT =============== -->
 <script>
 
   const tableBody = document.getElementById("courseTable");
   const courseCountEl = document.getElementById("courseCount");
+  const searchInput = document.getElementById("searchInput");
 
   const API = "http://localhost:6060/api/course";
+
+  // Store all courses for search functionality
+  let allCourses = [];
 
   window.onload = () => {
     loadCourseCount();
     loadCourseList();
   };
+
+  /* ========== TOAST NOTIFICATION ========== */
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.background = isError ? '#ef4444' : '#1b4332';
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  }
 
   /* ========== LOAD COURSE COUNT ========== */
   function loadCourseCount() {
@@ -353,97 +538,200 @@
       });
   }
 
-
   /* ========== LOAD COURSE LIST ========== */
   function loadCourseList() {
     fetch(API)
       .then(res => res.json())
       .then(data => {
-        tableBody.innerHTML = "";
-
-        if (!data || data.length === 0) {
-          tableBody.innerHTML = `<tr><td colspan="5">No courses found</td></tr>`;
-          return;
-        }
-
-        data.forEach((course, index) => {
-          tableBody.innerHTML += `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${course.courseName || "-"}</td>
-              <td>${course.location || "-"}</td>
-              <td>${course.duration || "-"}</td>
-              <td class="actions">
-                <div class="icon-btn edit" onclick="editCourse(${course.srno})">✏️</div>
-                <div class="icon-btn delete" onclick="deleteCourse(${course.srno})">🗑️</div>
-              </td>
-            </tr>
-          `;
-        });
+        allCourses = data;
+        displayCourses(data);
       })
       .catch(err => {
-        tableBody.innerHTML = `<tr><td colspan="5">Failed to load courses</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="color: #ef4444; text-align: center;">Failed to load courses. Please try again.</td></tr>`;
       });
   }
 
+  /* ========== DISPLAY COURSES ========== */
+  function displayCourses(courses) {
+    tableBody.innerHTML = "";
 
+    if (!courses || courses.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No courses found</td></tr>`;
+      return;
+    }
+
+    courses.forEach((course, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${course.courseName || "-"}</td>
+        <td>${course.location || "-"}</td>
+        <td>${course.duration || "-"}</td>
+        <td class="actions">
+          <div class="icon-btn edit" onclick="editCourse(${course.srno})" title="Edit Course">✏️</div>
+          <div class="icon-btn delete" onclick="deleteCourse(${course.srno})" title="Delete Course">🗑️</div>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  /* ========== SEARCH COURSES ========== */
+  function searchCourses() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+
+    if (!searchTerm) {
+      displayCourses(allCourses);
+      return;
+    }
+
+    const filtered = allCourses.filter(course =>
+      course.courseName.toLowerCase().includes(searchTerm) ||
+      course.location.toLowerCase().includes(searchTerm)
+    );
+
+    displayCourses(filtered);
+  }
 
   /* ========== DELETE COURSE ========== */
   function deleteCourse(srno) {
-    if (!confirm("Are you sure you want to delete this course?")) return;
+    if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
 
     fetch(`${API}/${srno}`, { method: "DELETE" })
       .then(res => {
         if (!res.ok) {
-          alert("Failed to delete course");
-          return;
+          throw new Error("Failed to delete course");
         }
-        alert("Course deleted successfully");
+        showToast("Course deleted successfully");
         loadCourseList();
         loadCourseCount();
       })
-      .catch(() => alert("Server error while deleting"));
+      .catch(() => showToast("Failed to delete course", true));
   }
 
+  /* ========== CUSTOM MODAL EDIT FUNCTIONS ========== */
+  let currentEditSrno = null;
 
-
-  /* ========== EDIT COURSE ========== */
   function editCourse(srno) {
-    const newName = prompt("Enter new Course Name:");
-    const newLocation = prompt("Enter new Location:");
-    const newDuration = prompt("Enter new Duration (weeks):");
+    // Show loading state in modal
+    showEditModalWithLoading();
 
-    if (!newName || !newLocation || !newDuration) {
-      alert("All fields are required!");
+    fetch(`${API}/${srno}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch course details');
+        return res.json();
+      })
+      .then(course => {
+        currentEditSrno = srno;
+        document.getElementById('editSrno').value = srno;
+        document.getElementById('editCourseName').value = course.courseName || '';
+        document.getElementById('editLocation').value = course.location || '';
+        document.getElementById('editDuration').value = course.duration || '';
+
+        document.getElementById('editModal').style.display = 'flex';
+      })
+      .catch(() => {
+        showToast("Failed to fetch course details", true);
+        closeEditModal();
+      });
+  }
+
+  function showEditModalWithLoading() {
+    document.getElementById('editSrno').value = '';
+    document.getElementById('editCourseName').value = 'Loading...';
+    document.getElementById('editLocation').value = 'Loading...';
+    document.getElementById('editDuration').value = 'Loading...';
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    currentEditSrno = null;
+  }
+
+  function saveEdit() {
+    const srno = currentEditSrno;
+    const courseName = document.getElementById('editCourseName').value.trim();
+    const location = document.getElementById('editLocation').value.trim();
+    const duration = document.getElementById('editDuration').value.trim();
+
+    // Validation
+    if (!courseName || !location || !duration) {
+      showToast("All fields are required!", true);
+      return;
+    }
+
+    if (isNaN(duration) || duration <= 0) {
+      showToast("Duration must be a positive number", true);
+      return;
+    }
+
+    // Check if any changes were made
+    const originalCourse = allCourses.find(c => c.srno === srno);
+    if (originalCourse &&
+        originalCourse.courseName === courseName &&
+        originalCourse.location === location &&
+        originalCourse.duration === parseInt(duration)) {
+      showToast("No changes detected");
+      closeEditModal();
       return;
     }
 
     const payload = {
-      courseName: newName,
-      location: newLocation,
-      duration: newDuration
+      courseName: courseName,
+      location: location,
+      duration: parseInt(duration)
     };
+
+    // Disable save button to prevent double submission
+    const saveBtn = document.querySelector('.modal-buttons .btn-primary');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
 
     fetch(`${API}/${srno}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
-      .then(res => res.json())
-      .then(() => {
-        alert("Course updated successfully");
-        loadCourseList();
-      })
-      .catch(() => alert("Failed to update course"));
+    .then(res => {
+      if (!res.ok) throw new Error('Update failed');
+      return res.json();
+    })
+    .then(() => {
+      showToast("Course updated successfully");
+      closeEditModal();
+      loadCourseList();
+      loadCourseCount();
+    })
+    .catch(() => {
+      showToast("Failed to update course", true);
+    })
+    .finally(() => {
+      // Re-enable save button
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    });
   }
 
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target === modal) {
+      closeEditModal();
+    }
+  }
 
+  // Handle Escape key to close modal
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeEditModal();
+    }
+  });
 
   /* ========== ADD COURSE REDIRECT ========== */
   function openAddCourse() {
     window.location.href = "/addcourse.html";
   }
-
 
   /* ========== HIGHLIGHT ACTIVE MENU ========== */
   (function () {
@@ -457,6 +745,24 @@
       }
     });
   })();
+
+  // Add debounce to search for better performance
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Improve search with debounce
+  const debouncedSearch = debounce(searchCourses, 300);
+  searchInput.addEventListener('keyup', debouncedSearch);
+
 </script>
 
 </body>

@@ -15,10 +15,18 @@ public class DropdownMasterServiceImpl implements MasterDropdownService{
     @Autowired
     DropdownMasterRepository dropdownMasterRepository;
 
-    public List<DropdownDTO> getByType(String type) {
-        return dropdownMasterRepository.findByTypeIgnoreCaseAndStatusOrderByIdAsc(type, 1)
-                .stream()
-                .map(d -> new DropdownDTO(d.getId(), d.getName()))
+    public List<DropdownDTO> getByType(String type, Integer code) {
+        List<DropdownMaster> dropdowns = dropdownMasterRepository
+                .findByTypeIgnoreCaseAndStatusOrderByIdAsc(type, 1);
+
+        return dropdowns.stream()
+                .map(d -> {
+                    if (code == 1) {
+                        return new DropdownDTO(d.getId(), d.getName(), d.getCode());
+                    } else {
+                        return new DropdownDTO(d.getId(), d.getName(), null);
+                    }
+                })
                 .toList();
     }
 }

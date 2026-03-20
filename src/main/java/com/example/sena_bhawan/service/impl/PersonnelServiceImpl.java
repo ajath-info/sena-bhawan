@@ -49,8 +49,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         log.info("Searching Personnel with term: {}", term);
 
         // Step 2: Search in database
-        Pageable pageable = PageRequest.of(0, 10);
-        List<Personnel> personnels = personnelRepository.findDistinctByArmyNoStartingWith(term, pageable);
+        List<Personnel> personnels = personnelRepository.findDistinctByArmyNoStartingWith(term);
 
         // Step 3: Convert to DTO (only id and name)
         return personnels.stream()
@@ -284,7 +283,7 @@ public class PersonnelServiceImpl implements PersonnelService {
             p.setMobileNumber(req.mobileNumber);
             p.setAlternateMobile(req.alternateMobile);
             p.setEmailAddress(req.emailAddress);
-            p.setNsgEmail(req.nsgEmail);
+            p.setNsgEmail(req.nicEmail);
 
             // Medical basic info
             p.setMedicalCategory(req.medicalCategory);
