@@ -103,12 +103,7 @@
             background: #2d6a4f;
         }
 
-        /* Search styles - exactly like working page */
-        .search-container {
-            position: relative;
-            width: 100%;
-        }
-
+        /* Search styles */
         #personnelSearch {
             width: 100%;
             padding: 8px;
@@ -162,8 +157,43 @@
             border-left: 3px solid #1b4332;
         }
 
-        select, input[type="text"] {
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Course dropdown styles */
+        #courseSelect {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
             font-family: "Inter", sans-serif;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+
+        #courseSelect:focus {
+            outline: none;
+            border-color: #1b4332;
+        }
+
+        /* Loading indicator */
+        .loading-courses {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 5px;
+            font-size: 14px;
         }
     </style>
 
@@ -189,10 +219,10 @@
                     <p>Update remarks before and after course detailment</p>
                 </div>
 
-                <!-- SELECT PERSONNEL - Like working page -->
+                <!-- SELECT PERSONNEL -->
                 <div class="section">
                     <div class="section-title">Select Personnel</div>
-                    <div style="position: relative;">
+                    <div class="search-container">
                         <input
                                 type="text"
                                 id="personnelSearch"
@@ -205,48 +235,35 @@
                     <input type="hidden" id="selectedPersonnelId">
                 </div>
 
-                <!-- BEFORE DETAILMENT -->
+                <!-- COURSE DETAILMENT STATUS -->
                 <div class="section">
-                    <div class="section-title">Before Detailment</div>
+                    <div class="section-title">Course Detailment Status</div>
                     <div class="radio-group">
                         <label>
-                            <input type="radio" name="before" value="Volunteer">
+                            <input type="radio" name="status" value="Volunteer">
                             Volunteer
                         </label>
                         <label>
-                            <input type="radio" name="before" value="NotDetail">
+                            <input type="radio" name="status" value="NotDetail">
                             Not to Detail
                         </label>
                     </div>
-
-                    <div id="notDetailReason" style="display:none;margin-top:10px;">
-                        <textarea id="beforeReason" placeholder="Reason for not detailing"></textarea>
-                    </div>
                 </div>
 
-                <!-- AFTER DETAILMENT -->
+                <!-- COURSE SELECTION -->
                 <div class="section">
-                    <div class="section-title">After Detailment</div>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="after" value="TakenOff">
-                            Taken Off
-                        </label>
-                        <label>
-                            <input type="radio" name="after" value="Continuing">
-                            Continuing
-                        </label>
-                    </div>
-
-                    <div id="takenOffReason" style="display:none;margin-top:10px;">
-                        <textarea id="afterReason" placeholder="Reason for taken off"></textarea>
-                    </div>
+                    <div class="section-title">Select Course</div>
+                    <select id="courseSelect">
+                        <option value="">-- Select Course --</option>
+                    </select>
+                    <div id="courseLoading" class="loading-courses" style="display: none;">Loading courses...</div>
+                    <div id="courseError" class="error-message" style="display: none;"></div>
                 </div>
 
-                <!-- GENERAL REMARK -->
+                <!-- GENERAL REMARK - SINGLE TEXTAREA FOR ALL REMARKS -->
                 <div class="section">
-                    <div class="section-title">General Remarks</div>
-                    <textarea id="generalRemarks" placeholder="General remarks"></textarea>
+                    <div class="section-title">General/Detailment Remarks</div>
+                    <textarea id="generalRemarks" placeholder="Enter any remarks or reason here..."></textarea>
                 </div>
 
                 <div style="text-align:right;">
@@ -258,46 +275,128 @@
 </div>
 
 <script>
-    // ==================== CONFIGURATION - Like working page ====================
+    // ==================== CONFIGURATION ====================
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_API = `${BASE_URL}/api/remarks/save`;
+    const COURSE_API = `${BASE_URL}/api/course`;  // Your actual course API
 
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
     const searchResults = document.getElementById('searchResults');
     const selectedPersonnelInfo = document.getElementById('selectedPersonnelInfo');
     const selectedPersonnelId = document.getElementById('selectedPersonnelId');
+    const courseSelect = document.getElementById('courseSelect');
+    const statusRadios = document.querySelectorAll('input[name="status"]');
+    const generalRemarks = document.getElementById('generalRemarks');
+    const courseLoading = document.getElementById('courseLoading');
+    const courseError = document.getElementById('courseError');
 
     // ==================== STATE ====================
     let selectedPersonnel = null;
     let searchTimeout = null;
     let abortController = null;
+    let courses = []; // Store courses
 
-    // ==================== INITIAL LOAD ====================
-    document.addEventListener("DOMContentLoaded", function() {
-        console.log('✅ DOM loaded');
-        loadSidebar();
-    });
+    // ==================== LOAD COURSES FROM ACTUAL API ====================
+    async function loadCourses() {
+        try {
+            // Show loading indicator
+            courseSelect.style.display = 'none';
+            courseLoading.style.display = 'block';
+            courseError.style.display = 'none';
 
-    // ==================== SEARCH FUNCTION - Exactly like working page ====================
-    searchInput.addEventListener("input", (e) => {
-        const searchTerm = e.target.value.trim();
-        selectedPersonnelId.value = "";
-        selectedPersonnel = null;
+            console.log('📚 Loading courses from API...');
 
-        clearTimeout(searchTimeout);
+            // Call your actual Course API
+            const response = await fetch(COURSE_API, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add authorization header if required
+                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
 
-        if (searchTerm.length < 4) {
-            searchResults.style.display = "none";
-            selectedPersonnelInfo.style.display = "none";
-            return;
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('📦 Courses received:', data);
+
+            // Store courses
+            courses = data;
+
+            // Hide loading, show select
+            courseLoading.style.display = 'none';
+            courseSelect.style.display = 'block';
+
+            // Populate dropdown
+            populateCourseDropdown(courses);
+
+        } catch (error) {
+            console.error('❌ Error loading courses:', error);
+
+            // Show error message
+            courseLoading.style.display = 'none';
+            courseError.style.display = 'block';
+            courseError.textContent = `Failed to load courses: ${error.message}`;
+
+            // Show empty select
+            courseSelect.style.display = 'block';
+            courseSelect.innerHTML = '<option value="">-- Error loading courses --</option>';
         }
+    }
 
-        searchTimeout = setTimeout(() => {
-            searchPersonnel(searchTerm);
-        }, 500);
-    });
+    // Helper function to populate course dropdown
+    function populateCourseDropdown(courses) {
+        // Clear existing options except the first one
+        courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+
+        if (courses && courses.length > 0) {
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.srno || course.id; // Using srno as per your DTO
+
+                // Format course name based on available fields
+                let displayText = course.courseName;
+                if (course.duration) {
+                    displayText += ` (${course.duration})`;
+                }
+                if (course.location) {
+                    displayText += ` - ${course.location}`;
+                }
+
+                option.textContent = displayText;
+                courseSelect.appendChild(option);
+            });
+            console.log(`✅ Loaded ${courses.length} courses`);
+        } else {
+            courseSelect.innerHTML = '<option value="">-- No courses available --</option>';
+        }
+    }
+
+    // ==================== SEARCH FUNCTION ====================
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.trim();
+            selectedPersonnelId.value = "";
+            selectedPersonnel = null;
+
+            clearTimeout(searchTimeout);
+
+            if (searchTerm.length < 4) {
+                searchResults.style.display = "none";
+                selectedPersonnelInfo.style.display = "none";
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                searchPersonnel(searchTerm);
+            }, 500);
+        });
+    }
 
     async function searchPersonnel(term) {
         if (abortController) abortController.abort();
@@ -309,11 +408,16 @@
 
             console.log('🔍 Searching for:', term);
             const response = await fetch(`${SEARCH_API}?term=${encodeURIComponent(term)}`, {
-                signal: abortController.signal
+                signal: abortController.signal,
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add authorization header if required
+                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
             });
 
             const result = await response.json();
-            console.log('📦 Response:', result);
+            console.log('📦 Search Response:', result);
 
             if (result.success && result.data && result.data.length > 0) {
                 displaySearchResults(result.data);
@@ -368,59 +472,67 @@
 
     // ==================== CLICK OUTSIDE ====================
     document.addEventListener("click", (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        if (searchInput && !searchInput.contains(e.target) && searchResults && !searchResults.contains(e.target)) {
             searchResults.style.display = "none";
         }
     });
 
     // ==================== SAVE REMARKS ====================
     window.saveRemarks = function() {
+        // Validate personnel selection
         if (!selectedPersonnel) {
             alert("Please select personnel");
             return;
         }
 
-        const beforeRadio = document.querySelector('input[name="before"]:checked');
-        if (!beforeRadio) {
-            alert("Please select Before Detailment");
+        // Validate status selection
+        const selectedStatus = document.querySelector('input[name="status"]:checked');
+        if (!selectedStatus) {
+            alert("Please select Course Detailment Status");
             return;
         }
 
-        const afterRadio = document.querySelector('input[name="after"]:checked');
-        if (!afterRadio) {
-            alert("Please select After Detailment");
+        // Validate course selection
+        const selectedCourseId = courseSelect.value;
+        if (!selectedCourseId) {
+            alert("Please select a course");
             return;
         }
 
-        let beforeReason = '';
-        if (beforeRadio.value === 'NotDetail') {
-            beforeReason = document.getElementById('beforeReason').value.trim();
-        }
+        // Get selected course details
+        const selectedCourse = courses.find(c => (c.srno == selectedCourseId || c.id == selectedCourseId));
 
-        let afterReason = '';
-        if (afterRadio.value === 'TakenOff') {
-            afterReason = document.getElementById('afterReason').value.trim();
-        }
+        // Get general remarks (this will contain any reason if needed)
+        const remarks = generalRemarks.value.trim();
 
-        const generalRemarks = document.getElementById("generalRemarks").value.trim();
-
+        // Payload structure matching your backend
         const payload = {
             personnelId: selectedPersonnel.id,
-            beforeDetailment: beforeRadio.value,
-            afterDetailment: afterRadio.value,
-            beforeReason: beforeReason,
-            afterReason: afterReason,
-            generalRemarks: generalRemarks
+            status: selectedStatus.value,  // 'Volunteer' or 'NotDetail'
+            courseId: selectedCourseId,
+            courseName: selectedCourse ? selectedCourse.courseName : '',
+            courseDuration: selectedCourse ? selectedCourse.duration : '',
+            courseLocation: selectedCourse ? selectedCourse.location : '',
+            remarks: remarks  // Single remarks field for everything
         };
 
-        console.log("📤 Sending:", payload);
+        console.log("📤 Sending payload:", payload);
 
         fetch(REMARKS_API, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                // Add authorization header if required
+                // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
             alert("Remarks updated successfully ✅");
             console.log("✅ Saved:", data);
@@ -428,121 +540,62 @@
         })
         .catch(error => {
             console.error("❌ Error:", error);
-            alert("Error saving remarks ❌");
+            alert("Error saving remarks: " + error.message);
         });
     };
 
     // ==================== CLEAR FORM ====================
     function clearForm() {
-        searchInput.value = '';
+        if (searchInput) searchInput.value = '';
         selectedPersonnel = null;
-        selectedPersonnelId.value = '';
-        selectedPersonnelInfo.style.display = 'none';
-        searchResults.style.display = 'none';
+        if (selectedPersonnelId) selectedPersonnelId.value = '';
+        if (selectedPersonnelInfo) selectedPersonnelInfo.style.display = 'none';
+        if (searchResults) searchResults.style.display = 'none';
 
-        document.querySelectorAll('input[name="before"]').forEach(r => r.checked = false);
-        document.querySelectorAll('input[name="after"]').forEach(r => r.checked = false);
+        // Clear radio buttons
+        statusRadios.forEach(r => r.checked = false);
 
-        document.getElementById('generalRemarks').value = '';
-        document.getElementById('beforeReason').value = '';
-        document.getElementById('afterReason').value = '';
+        // Clear course selection
+        courseSelect.value = '';
 
-        document.getElementById('notDetailReason').style.display = 'none';
-        document.getElementById('takenOffReason').style.display = 'none';
+        // Clear general remarks
+        if (generalRemarks) generalRemarks.value = '';
     }
 
-    // ==================== RADIO BUTTON LOGIC ====================
-    document.querySelectorAll('input[name="before"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.getElementById('notDetailReason').style.display =
-                this.value === 'NotDetail' ? 'block' : 'none';
-        });
-    });
+    // ==================== RETRY LOADING COURSES ====================
+    window.retryLoadCourses = function() {
+        loadCourses();
+    };
 
-    document.querySelectorAll('input[name="after"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.getElementById('takenOffReason').style.display =
-                this.value === 'TakenOff' ? 'block' : 'none';
-        });
-    });
-
-    // ==================== SIDEBAR FUNCTIONS ====================
+    // ==================== SIDEBAR LOADER ====================
     async function loadSidebar() {
         try {
-            const response = await fetch('/session.html');
-            const html = await response.text();
-            document.getElementById('sidebarContainer').innerHTML = html;
-            initializeSidebar();
+            if (typeof window.loadSidebar === 'function') {
+                window.loadSidebar();
+            } else {
+                const response = await fetch('/session.html');
+                const html = await response.text();
+                document.getElementById('sidebarContainer').innerHTML = html;
+
+                const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
+                if (logoutBtn) {
+                    logoutBtn.addEventListener("click", () => {
+                        sessionStorage.clear();
+                        window.location.replace("/login.html");
+                    });
+                }
+            }
         } catch (error) {
             console.error('Error loading sidebar:', error);
         }
     }
 
-    function initializeSidebar() {
-        const userId = sessionStorage.getItem("userId");
-        const token = sessionStorage.getItem("token");
-
-        if (!userId) {
-            window.location.replace("/login.html");
-            return;
-        }
-
-        fetch(`http://localhost:6060/api/users/${userId}/permissions`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const container = document.querySelector("#sidebarContainer .sidebar-nav");
-            if (!container) return;
-
-            let html = "";
-            data.modules.forEach(module => {
-                const allowed = module.permissions.filter(p => p.allowed === true);
-                if (allowed.length === 0) return;
-
-                html += `<div class="nav-section-title">${module.moduleName}</div>`;
-
-                allowed.forEach(perm => {
-                    let page = perm.url ? perm.url : "#";
-                    let icon = autoEmoji(perm.label, module.moduleName);
-                    html += `
-                        <a href="${page}" class="nav-item">
-                            <div class="nav-icon">${icon}</div>
-                            <span>${perm.label}</span>
-                        </a>
-                    `;
-                });
-            });
-            container.innerHTML = html;
-            highlightActivePage();
-        })
-        .catch(error => console.error('Error loading permissions:', error));
-
-        const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                sessionStorage.clear();
-                window.location.replace("/login.html");
-            });
-        }
-    }
-
-
-    function autoEmoji(label, moduleName) {
-        const text = (label + " " + moduleName).toLowerCase();
-        for (const item of keywordEmojis) {
-            if (text.includes(item.key)) return item.icon;
-        }
-        return "📁";
-    }
-
-    function highlightActivePage() {
-        const current = location.pathname.split('/').pop().split('?')[0];
-        document.querySelectorAll("#sidebarContainer .nav-item").forEach(item => {
-            const page = item.getAttribute("href").split('/').pop();
-            if (current === page) item.classList.add("active");
-        });
-    }
+    // Load sidebar and courses when page loads
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('✅ DOM loaded');
+        loadSidebar();
+        loadCourses(); // Load courses from actual API
+    });
 </script>
 
 </body>

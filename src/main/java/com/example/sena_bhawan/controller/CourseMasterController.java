@@ -5,6 +5,7 @@ import com.example.sena_bhawan.entity.CourseMaster;
 import com.example.sena_bhawan.repository.CourseMasterRepository;
 import com.example.sena_bhawan.service.CourseMasterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,12 @@ public class CourseMasterController {
                     return dto;
                 })
                 .toList();
+    }
+
+    @GetMapping("/{srno}")
+    public ResponseEntity<CourseMaster> getCourse(@PathVariable Integer srno) {
+        CourseMaster course = service.getCourseById(srno);
+        return ResponseEntity.ok(course);
     }
 
     // ---------------- GET COURSE COUNT ----------------

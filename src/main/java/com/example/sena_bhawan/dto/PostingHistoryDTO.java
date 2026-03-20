@@ -2,6 +2,8 @@ package com.example.sena_bhawan.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class PostingHistoryDTO {
     private Long postingId;
@@ -11,4 +13,5 @@ public class PostingHistoryDTO {
     private String rank;                // Rank during that posting
     private String duration;             // Calculated (e.g., "3 yrs 2 m")
     private String status;               // PREVIOUS_POSTING
+    private LocalDate tosUpdatedDate;
 }

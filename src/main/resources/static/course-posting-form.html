@@ -586,17 +586,28 @@
         </div>
       </div>
 
-      <!-- Current Status Display -->
+      <!-- Current Status Display - With Current Unit and Posted To -->
       <div id="currentStatusCard" class="card" style="display: none; background: #f0f9ff; border-left: 4px solid #1b4332;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <span style="font-weight: 600;">Current Status:</span>
-            <span id="currentStatusText" style="background: #1b4332; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;"></span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+
+          <!-- Status Badge -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 600; color: #1f2937;">Current Status:</span>
+            <span id="currentStatusText" style="background: #1b4332; color: white; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;"></span>
           </div>
-          <div>
-            <span style="font-weight: 600;">Current Unit:</span>
-            <span id="currentUnitText"></span>
+
+          <!-- Current Unit -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 600; color: #1f2937;">Current Unit:</span>
+            <span id="currentUnitText" style="font-weight: 500;"></span>
           </div>
+
+          <!-- Posted To (Next Unit) -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 600; color: #1f2937;">Posted To:</span>
+            <span id="currentPostedToText" style="font-weight: 500;"></span>
+          </div>
+
         </div>
       </div>
 
@@ -613,6 +624,7 @@
               <th style="padding: 12px; text-align: left; background: #f9fafb;">Appointment</th>
               <th style="padding: 12px; text-align: left; background: #f9fafb;">Type of Posting</th>
               <th style="padding: 12px; text-align: left; background: #f9fafb;">Rank</th>
+              <th style="padding: 12px; text-align: left; background: #f9fafb;">TOS Date</th>
               <th style="padding: 12px; text-align: left; background: #f9fafb;">Duration</th>
               <th style="padding: 12px; text-align: left; background: #f9fafb;">Status</th>
             </tr>
@@ -646,6 +658,7 @@
   const PERSONNEL_API = `${BASE_URL}/api/personnel`;
   const SAVE_API = `${BASE_URL}/personnel-full-details/save`;
   const ORBAT_SEARCH_API = `${BASE_URL}/api/orbat/search`;
+  const CANCEL_POSTING_API = `${BASE_URL}/api/personnel/cancel-under-posting`; // 🔥 NEW
 
   // ==================== DOM ELEMENTS ====================
   const movementDate = document.getElementById("movementDate");
@@ -728,6 +741,41 @@
       return date.toISOString().split('T')[0];
     }
     return "";
+  }
+
+  // ==================== DATE VALIDATION FUNCTION ====================
+  function validateDates() {
+    const issueDate = postingOrderIssueDate.value;
+    const moveDate = movementDate.value;
+    const tosDate = tosUpdatedDate.value;
+
+    // Skip validation if dates are empty (optional fields)
+    if (!issueDate && !moveDate && !tosDate) return true;
+
+    // Convert to Date objects for comparison
+    const issue = issueDate ? new Date(issueDate) : null;
+    const move = moveDate ? new Date(moveDate) : null;
+    const tos = tosDate ? new Date(tosDate) : null;
+
+    // Validation 1: issue_date <= movement_date (if both present)
+    if (issue && move && issue > move) {
+      alert("❌ Posting Order Issue Date cannot be after Movement Date");
+      return false;
+    }
+
+    // Validation 2: movement_date <= tos_date (if both present)
+    if (move && tos && move > tos) {
+      alert("❌ Movement Date cannot be after TOS Update Date");
+      return false;
+    }
+
+    // Validation 3: issue_date <= tos_date (if both present)
+    if (issue && tos && issue > tos) {
+      alert("❌ Posting Order Issue Date cannot be after TOS Update Date");
+      return false;
+    }
+
+    return true;
   }
 
   // ==================== OFFICER SEARCH ====================
@@ -847,55 +895,65 @@
   }
 
   // ==================== LOAD CURRENT POSTING ====================
-  async function loadCurrentPosting(personnelId) {
+async function loadCurrentPosting(personnelId) {
     try {
-      const response = await fetch(`${PERSONNEL_API}/${personnelId}/current-posting`);
-      const result = await response.json();
+        const response = await fetch(`${PERSONNEL_API}/${personnelId}/current-posting`);
+        const result = await response.json();
 
-      if (result.success && result.data) {
-        const posting = result.data;
+        if (result.success && result.data) {
+            const posting = result.data;
 
-        currentStatusCard.style.display = "block";
-        currentStatusText.textContent = posting.status || 'UNDER_POSTING';
-        currentUnitText.textContent = posting.postedTo || 'Not assigned';
+            // Show status card
+            currentStatusCard.style.display = "block";
+            currentStatusText.textContent = posting.status || 'UNDER_POSTING';
 
-        if (posting.status === 'POSTED') {
-          currentStatusText.style.background = '#059669';
-        } else if (posting.status === 'UNDER_POSTING') {
-          currentStatusText.style.background = '#d97706';
-        }
+            // ✅ FIXED: Show unit_name in Current Unit
+            currentUnitText.textContent = posting.unitName || 'Not assigned';
 
-        if (posting.status === 'UNDER_POSTING') {
-          movementDate.value = formatDateForInput(posting.movementDate);
-          postingOrderIssueDate.value = formatDateForInput(posting.postingOrderIssueDate);
-          tosUpdatedDate.value = formatDateForInput(posting.tosUpdatedDate);
-          postedTo.value = posting.postedTo || '';
-          appointmentSelect.value = posting.appointment || '';
-          postingTypeSelect.value = posting.typeOfPosting || '';
+            // ✅ NEW: Show posted_to separately
+            const postedToText = document.getElementById("currentPostedToText");
+            if (postedToText) {
+                postedToText.textContent = posting.postedTo || 'Not assigned';
+            }
 
-          // SIMPLIFIED RANK LOGIC: Always use posting rank if available, otherwise personnel rank
-          if (posting.rank) {
-            rankSelect.value = posting.rank;
-          } else {
-            rankSelect.value = personnelRank.value;
-          }
+            // Set color based on status
+            if (posting.status === 'POSTED') {
+                currentStatusText.style.background = '#059669';
+            } else if (posting.status === 'UNDER_POSTING') {
+                currentStatusText.style.background = '#d97706';
+            }
 
-          if (posting.orbatId) selectedOrbatId.value = posting.orbatId;
-          if (posting.postingId) {
-            currentPostingId.value = posting.postingId;
-            currentPostingIdValue = posting.postingId;
-          }
+            if (posting.status === 'UNDER_POSTING') {
+                movementDate.value = formatDateForInput(posting.movementDate);
+                postingOrderIssueDate.value = formatDateForInput(posting.postingOrderIssueDate);
+                tosUpdatedDate.value = formatDateForInput(posting.tosUpdatedDate);
+                postedTo.value = posting.postedTo || '';
+                appointmentSelect.value = posting.appointment || '';
+                postingTypeSelect.value = posting.typeOfPosting || '';
+
+                // Rank logic
+                if (posting.rank) {
+                    rankSelect.value = posting.rank;
+                } else {
+                    rankSelect.value = personnelRank.value;
+                }
+
+                if (posting.orbatId) selectedOrbatId.value = posting.orbatId;
+                if (posting.postingId) {
+                    currentPostingId.value = posting.postingId;
+                    currentPostingIdValue = posting.postingId;
+                }
+            } else {
+                clearForm();
+            }
         } else {
-          clearForm();
+            currentStatusCard.style.display = "none";
+            clearForm();
         }
-      } else {
-        currentStatusCard.style.display = "none";
-        clearForm();
-      }
     } catch (error) {
-      console.error("Error loading current posting:", error);
+        console.error("Error loading current posting:", error);
     }
-  }
+}
 
   // ==================== UNIT SEARCH ====================
   postedTo.addEventListener("input", (e) => {
@@ -972,50 +1030,60 @@
   });
 
   // ==================== LOAD POSTING HISTORY ====================
-  async function loadPostingHistory(personnelId) {
+async function loadPostingHistory(personnelId) {
     try {
-      const response = await fetch(`${PERSONNEL_API}/${personnelId}/posting-history`);
-      const result = await response.json();
+        const response = await fetch(`${PERSONNEL_API}/${personnelId}/posting-history`);
+        const result = await response.json();
 
-      const historySection = document.getElementById("historySection");
-      const tableBody = document.getElementById("historyTableBody");
-      const noHistoryMessage = document.getElementById("noHistoryMessage");
+        const historySection = document.getElementById("historySection");
+        const tableBody = document.getElementById("historyTableBody");
+        const noHistoryMessage = document.getElementById("noHistoryMessage");
 
-      if (result.success && result.data && result.data.length > 0) {
-        historySection.style.display = "block";
-        noHistoryMessage.style.display = "none";
-        tableBody.innerHTML = "";
+        if (result.success && result.data && result.data.length > 0) {
+            historySection.style.display = "block";
+            noHistoryMessage.style.display = "none";
+            tableBody.innerHTML = "";
 
-        result.data.forEach((item, index) => {
-          const row = document.createElement("tr");
-          const statusColor = '#6b7280';
-          const statusText = 'PREVIOUS';
+            result.data.forEach((item, index) => {
+                const row = document.createElement("tr");
 
-          row.innerHTML = `
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.unitName || '-'}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.appointment || '-'}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.typeOfPosting || '-'}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.rank || '-'}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.duration || '-'}</td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
-                ${statusText}
-              </span>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-      } else {
-        historySection.style.display = "block";
-        tableBody.innerHTML = "";
-        noHistoryMessage.style.display = "block";
-      }
+                // Format TOS date
+                let tosDateFormatted = '-';
+                if (item.tosUpdatedDate) {
+                    const date = new Date(item.tosUpdatedDate);
+                    tosDateFormatted = date.toLocaleDateString('en-GB'); // DD/MM/YYYY format
+                }
+
+                const statusColor = item.status === 'POSTED' ? '#059669' :
+                                   item.status === 'UNDER_POSTING' ? '#d97706' : '#6b7280';
+                const statusText = item.status === 'POSTED' ? 'POSTED' :
+                                  item.status === 'UNDER_POSTING' ? 'UNDER POSTING' : 'PREVIOUS';
+
+                row.innerHTML = `
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.unitName || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.appointment || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.typeOfPosting || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.rank || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${tosDateFormatted || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.duration || '-'}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                        <span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                            ${statusText}
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            historySection.style.display = "block";
+            tableBody.innerHTML = "";
+            noHistoryMessage.style.display = "block";
+        }
     } catch (error) {
-      console.error("Error loading posting history:", error);
+        console.error("Error loading posting history:", error);
     }
-  }
-
+}
   // ==================== SAVE BUTTON ====================
   saveBtn.onclick = async () => {
     if (!selectedPersonnelId.value) {
@@ -1033,6 +1101,11 @@
     if (!selectedOrbatId.value) {
       alert("Please select a unit from recommendations");
       postedTo.focus();
+      return;
+    }
+
+    // ✅ Date validation before save
+    if (!validateDates()) {
       return;
     }
 
@@ -1085,20 +1158,66 @@
     }
   };
 
-  // ==================== CANCEL BUTTON ====================
-  cancelBtn.onclick = () => {
-    if (confirm("Clear form? Unsaved changes will be lost.")) {
-      clearForm();
-      officerInput.value = "";
-      selectedPersonnelId.value = "";
-      officerDetails.style.display = "none";
-      currentStatusCard.style.display = "none";
-      currentArmyNo = null;
-      currentPersonnelId = null;
-      currentPostingIdValue = null;
-      currentPostingId.value = "";
-      selectedOrbatId.value = "";
-      personnelRank.value = "";
+  // ==================== CANCEL BUTTON - UPDATED WITH DELETE API ====================
+  cancelBtn.onclick = async () => {
+    // Check if personnel is selected
+    if (!selectedPersonnelId.value) {
+      alert("Please select an officer first");
+      return;
+    }
+
+    // Check if current status is UNDER_POSTING (only then cancel allowed)
+    const currentStatus = currentStatusText.textContent;
+    if (currentStatus !== 'UNDER_POSTING') {
+      alert("❌ Only UNDER_POSTING records can be cancelled. Current status: " + currentStatus);
+      return;
+    }
+
+    // Confirmation popup
+    const confirmCancel = confirm("⚠️ Are you sure you want to cancel this under posting? This action cannot be undone.");
+    if (!confirmCancel) {
+      return;
+    }
+
+    // Disable button during API call
+    cancelBtn.disabled = true;
+    cancelBtn.innerHTML = 'Cancelling...';
+
+    try {
+      const response = await fetch(`${CANCEL_POSTING_API}?personnelId=${currentPersonnelId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("✅ " + result.message);
+
+        // Clear form and reload data
+        clearForm();
+        officerInput.value = "";
+        selectedPersonnelId.value = "";
+        officerDetails.style.display = "none";
+        currentStatusCard.style.display = "none";
+        currentArmyNo = null;
+        currentPersonnelId = null;
+        currentPostingIdValue = null;
+        currentPostingId.value = "";
+        selectedOrbatId.value = "";
+        personnelRank.value = "";
+
+        // Optionally reload page or show success message
+        console.log("Under posting cancelled successfully");
+      } else {
+        alert("❌ " + result.message);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("❌ Network error occurred while cancelling");
+    } finally {
+      cancelBtn.disabled = false;
+      cancelBtn.innerHTML = 'Delete/Cancel';
     }
   };
 

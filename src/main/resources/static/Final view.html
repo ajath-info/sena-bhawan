@@ -244,23 +244,6 @@
           font-family: "Inter", sans-serif;
         }
 
-        .radio-group {
-          display: flex;
-          gap: 25px;
-          align-items: center;
-        }
-
-        .radio-group div {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .radio-group input[type="radio"] {
-          transform: scale(1.1);
-          accent-color: #1b4332;
-        }
-
         .card {
           background: white;
           border: 1px solid #e5e7eb;
@@ -366,7 +349,7 @@
         </div>
 
         <div class="content-area">
-            <!-- SELECT FORMATION SECTION -->
+            <!-- SELECT FORMATION SECTION - Radio buttons removed -->
             <div class="formation-row">
                 <div class="field-group">
                     <label>Formation Type *</label>
@@ -380,17 +363,6 @@
                     <select id="unitNameSelect" onchange="onUnitChange()" disabled>
                         <option value="">-- Select Formation type first --</option>
                     </select>
-                </div>
-
-                <div class="radio-group">
-                    <div>
-                        <input type="radio" id="peRadio" name="estabType" value="PE" checked onchange="onEstabTypeChange()" />
-                        <label for="peRadio">Peace Establishment (PE)</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="weRadio" name="estabType" value="WE" onchange="onEstabTypeChange()" />
-                        <label for="weRadio">War Establishment (WE)</label>
-                    </div>
                 </div>
             </div>
 
@@ -485,177 +457,160 @@
 
     // Load formation types on page load
     document.addEventListener("DOMContentLoaded", function () {
-      loadFormationTypes();
+        loadFormationTypes();
     });
 
     // Function to load formation types from API
     async function loadFormationTypes() {
-      const select = document.getElementById("formationTypeSelect");
+        const select = document.getElementById("formationTypeSelect");
 
-      try {
-        select.innerHTML = '<option value="">Loading...</option>';
+        try {
+            select.innerHTML = '<option value="">Loading...</option>';
 
-        const response = await fetch(`${BASE_URL}/api/dropdown/FORMATION_TYPE`);
+            const response = await fetch(`${BASE_URL}/api/dropdown/FORMATION_TYPE`);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Formation types received:", data);
+
+            select.innerHTML = '<option value="">-- Select --</option>';
+
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach((item) => {
+                    const option = document.createElement("option");
+                    option.value = item.name || item;
+                    option.textContent = item.name || item;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">-- No data available --</option>';
+            }
+        } catch (error) {
+            console.error("Error loading formation types:", error);
+            select.innerHTML = '<option value="">-- Error loading data --</option>';
         }
-
-        const data = await response.json();
-        console.log("Formation types received:", data);
-
-        select.innerHTML = '<option value="">-- Select --</option>';
-
-        if (Array.isArray(data) && data.length > 0) {
-          data.forEach((item) => {
-            const option = document.createElement("option");
-            option.value = item.name || item;
-            option.textContent = item.name || item;
-            select.appendChild(option);
-          });
-        } else {
-          select.innerHTML = '<option value="">-- No data available --</option>';
-        }
-      } catch (error) {
-        console.error("Error loading formation types:", error);
-        select.innerHTML = '<option value="">-- Error loading data --</option>';
-      }
     }
 
     // Handle formation type change
     async function onFormationTypeChange() {
-      const formationSelect = document.getElementById("formationTypeSelect");
-      const unitSelect = document.getElementById("unitNameSelect");
+        const formationSelect = document.getElementById("formationTypeSelect");
+        const unitSelect = document.getElementById("unitNameSelect");
 
-      if (!formationSelect.value) {
-        unitSelect.innerHTML =
-          '<option value="">-- Select Formation type first --</option>';
-        unitSelect.disabled = true;
-        resetAllData();
-        return;
-      }
-
-      selectedFormationName = formationSelect.value;
-      console.log("Selected formation:", selectedFormationName);
-
-      unitSelect.disabled = false;
-      unitSelect.innerHTML = '<option value="">Loading units...</option>';
-
-      try {
-        const response = await fetch(
-          `${BASE_URL}/api/orbat/formation-type/${encodeURIComponent(
-            selectedFormationName
-          )}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (!formationSelect.value) {
+            unitSelect.innerHTML = '<option value="">-- Select Formation type first --</option>';
+            unitSelect.disabled = true;
+            resetAllData();
+            return;
         }
 
-        const data = await response.json();
-        console.log("Units received:", data);
+        selectedFormationName = formationSelect.value;
+        console.log("Selected formation:", selectedFormationName);
 
-        unitSelect.innerHTML = '<option value="">-- Select --</option>';
+        unitSelect.disabled = false;
+        unitSelect.innerHTML = '<option value="">Loading units...</option>';
 
-        if (Array.isArray(data) && data.length > 0) {
-          data.forEach((unit) => {
-            const option = document.createElement("option");
-            option.value = unit.orbatId || unit.id;
-            option.textContent = unit.name || unit.unitName || "Unknown";
-            unitSelect.appendChild(option);
-          });
-        } else {
-          unitSelect.innerHTML = '<option value="">-- No units available --</option>';
+        try {
+            const response = await fetch(
+                `${BASE_URL}/api/orbat/formation-type/${encodeURIComponent(selectedFormationName)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Units received:", data);
+
+            unitSelect.innerHTML = '<option value="">-- Select --</option>';
+
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach((unit) => {
+                    const option = document.createElement("option");
+                    option.value = unit.orbatId || unit.id;
+                    option.textContent = unit.name || unit.unitName || "Unknown";
+                    unitSelect.appendChild(option);
+                });
+            } else {
+                unitSelect.innerHTML = '<option value="">-- No units available --</option>';
+            }
+        } catch (error) {
+            console.error("Error loading units:", error);
+            unitSelect.innerHTML = '<option value="">-- Error loading units --</option>';
         }
-      } catch (error) {
-        console.error("Error loading units:", error);
-        unitSelect.innerHTML = '<option value="">-- Error loading units --</option>';
-      }
     }
 
-    // Handle unit change
+    // Handle unit change - NOW LOADS BOTH ESTABLISHMENT AND OFFICER DATA
     async function onUnitChange() {
-      const unitSelect = document.getElementById("unitNameSelect");
-      const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+        const unitSelect = document.getElementById("unitNameSelect");
+        const selectedOption = unitSelect.options[unitSelect.selectedIndex];
 
-      if (!unitSelect.value) {
-        currentOrbatId = null;
-        document.getElementById("hq").innerText = "Select Formation/Unit";
-        resetAllData();
-        return;
-      }
-
-      currentOrbatId = unitSelect.value;
-      currentUnitName = selectedOption.textContent;
-      selectedUnitName = currentUnitName;
-
-      document.getElementById("hq").innerText = currentUnitName;
-
-      console.log("Selected unit ID:", currentOrbatId, "Name:", currentUnitName);
-
-      // Load establishment data for selected unit
-      const estabType = document.querySelector(
-        'input[name="estabType"]:checked'
-      ).value;
-      await fetchEstablishment(currentOrbatId, estabType);
-
-      // Load officer details (NOW INCLUDES SUMMARY)
-      await fetchOfficerDetails(selectedFormationName, currentUnitName);
-    }
-
-    // Handle radio button change
-    async function onEstabTypeChange() {
-      if (!currentOrbatId) {
-        alert("Please select a Formation/Unit first");
-        document.getElementById("peRadio").checked = true;
-        return;
-      }
-
-      const type = document.querySelector('input[name="estabType"]:checked').value;
-      console.log("Establishment type changed to:", type);
-      await fetchEstablishment(currentOrbatId, type);
-    }
-
-    // Fetch establishment data
-    async function fetchEstablishment(orbatId, type) {
-      console.log(`Fetching establishment for orbatId: ${orbatId}, type: ${type}`);
-
-      document.getElementById("authorisedGrid").innerHTML =
-        '<div class="grid-item" colspan="7">Loading...</div>';
-      document.getElementById("hardScaleGrid").innerHTML =
-        '<div class="grid-item" colspan="7">Loading...</div>';
-
-      try {
-        const response = await fetch(
-          `${BASE_URL}/api/establishment/${orbatId}/${type}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (!unitSelect.value) {
+            currentOrbatId = null;
+            document.getElementById("hq").innerText = "Select Formation/Unit";
+            resetAllData();
+            return;
         }
 
-        const data = await response.json();
-        console.log("Establishment data received:", data);
+        currentOrbatId = unitSelect.value;
+        currentUnitName = selectedOption.textContent;
+        selectedUnitName = currentUnitName;
 
-        if (data.name) {
-          document.getElementById("hq").innerText = data.name;
+        document.getElementById("hq").innerText = currentUnitName;
+
+        console.log("Selected unit ID:", currentOrbatId, "Name:", currentUnitName);
+
+        // Load establishment data (without PE/WE type)
+        await fetchEstablishment(currentOrbatId);
+
+        // Load officer details
+        await fetchOfficerDetails(selectedFormationName, currentUnitName);
+    }
+
+    // Fetch establishment data - NO TYPE PARAMETER NEEDED
+    async function fetchEstablishment(orbatId) {
+        console.log(`Fetching establishment for orbatId: ${orbatId}`);
+
+        document.getElementById("authorisedGrid").innerHTML =
+            '<div class="grid-item" colspan="7">Loading...</div>';
+        document.getElementById("hardScaleGrid").innerHTML =
+            '<div class="grid-item" colspan="7">Loading...</div>';
+
+        try {
+            // New endpoint - no /{type} in URL
+            const response = await fetch(`${BASE_URL}/api/establishment/${orbatId}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // No establishment data found - show zeros
+                    resetStrengthGrids();
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Establishment data received:", data);
+
+            if (data.name) {
+                document.getElementById("hq").innerText = data.name;
+            }
+
+            updateStrengthGrids(data);
+        } catch (error) {
+            console.error("Error loading establishment data:", error);
+            resetStrengthGrids();
         }
-
-        updateStrengthGrids(data);
-      } catch (error) {
-        console.error("Error loading establishment data:", error);
-        resetStrengthGrids();
-      }
     }
 
     // Fetch officer details from the API
     async function fetchOfficerDetails(formationType, unitName) {
-      console.log(
-        `Fetching officer details for formation: ${formationType}, unit: ${unitName}`
-      );
+        console.log(`Fetching officer details for formation: ${formationType}, unit: ${unitName}`);
 
-      // Show loading states
-      document.getElementById("summaryGrid").innerHTML = `
+        // Show loading states
+        document.getElementById("summaryGrid").innerHTML = `
             <div class="grid-item"><b>Total Officers:</b> Loading...</div>
             <div class="grid-item"><b>Total Courses Done:</b> Loading...</div>
             <div class="grid-item"><b>Courses (Training Yr):</b> Loading...</div>
@@ -666,104 +621,85 @@
             <div class="grid-item"><b>Latest Commission:</b> Loading...</div>
         `;
 
-      document.getElementById("officerTableBody").innerHTML =
-        '<tr><td colspan="10" class="loading">Loading officer details...</td></tr>';
+        document.getElementById("officerTableBody").innerHTML =
+            '<tr><td colspan="10" class="loading">Loading officer details...</td></tr>';
 
-      try {
-        // Call your single API that returns both summary and table data
-        const response = await fetch(
-          `${BASE_URL}/api/officers/by-formation-unit?formationType=${encodeURIComponent(
-            formationType
-          )}&unitName=${encodeURIComponent(unitName)}`
-        );
+        try {
+            const response = await fetch(
+                `${BASE_URL}/api/officers/by-formation-unit?formationType=${encodeURIComponent(formationType)}&unitName=${encodeURIComponent(unitName)}`
+            );
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Officer data received:", data);
+
+            // Update officer count
+            document.getElementById("officerCount").innerText = data.officers?.length || "0";
+
+            // Update SUMMARY section
+            updateSummarySection(data.summary);
+
+            // Update TABLE section
+            updateOfficerTable(data.officers);
+        } catch (error) {
+            console.error("Error loading officer details:", error);
+            handleOfficerDataError(error);
         }
+    }
 
-        const data = await response.json();
-        console.log("API Response received:", data);
-
-        // Update officer count
-        document.getElementById("officerCount").innerText =
-          data.officers?.length || "0";
-
-        // Update SUMMARY section
-        updateSummarySection(data.summary);
-
-        // Update TABLE section
-        updateOfficerTable(data.officers);
-      } catch (error) {
-        console.error("Error loading officer details:", error);
-
-        // Show error in summary
+    // Handle officer data error
+    function handleOfficerDataError(error) {
         document.getElementById("summaryGrid").innerHTML = `
-            <div class="grid-item"><b>Total Officers:</b> Error</div>
-            <div class="grid-item"><b>Total Courses Done:</b> Error</div>
-            <div class="grid-item"><b>Courses (Training Yr):</b> Error</div>
-            <div class="grid-item"><b>Courses in This Unit:</b> Error</div>
-            <div class="grid-item"><b>Earliest Seniority:</b> Error</div>
-            <div class="grid-item"><b>Latest Seniority:</b> Error</div>
-            <div class="grid-item"><b>Earliest Commission:</b> Error</div>
-            <div class="grid-item"><b>Latest Commission:</b> Error</div>
+            <div class="grid-item"><b>Total Officers:</b> -</div>
+            <div class="grid-item"><b>Total Courses Done:</b> -</div>
+            <div class="grid-item"><b>Courses (Training Yr):</b> -</div>
+            <div class="grid-item"><b>Courses in This Unit:</b> -</div>
+            <div class="grid-item"><b>Earliest Seniority:</b> -</div>
+            <div class="grid-item"><b>Latest Seniority:</b> -</div>
+            <div class="grid-item"><b>Earliest Commission:</b> -</div>
+            <div class="grid-item"><b>Latest Commission:</b> -</div>
         `;
 
-        // Show error in table
         document.getElementById("officerTableBody").innerHTML =
-          '<tr><td colspan="10" class="error-message">Error loading officer details: ' +
-          error.message +
-          "</td></tr>";
-      }
+            '<tr><td colspan="10" class="error-message">Error loading officer details: ' + error.message + '</td></tr>';
     }
 
     // Update summary section with data from API
     function updateSummarySection(summary) {
-      if (!summary) {
-        resetUnitSummary();
-        return;
-      }
+        if (!summary) {
+            resetUnitSummary();
+            return;
+        }
 
-      const summaryGrid = document.getElementById("summaryGrid");
-      summaryGrid.innerHTML = `
+        const summaryGrid = document.getElementById("summaryGrid");
+        summaryGrid.innerHTML = `
             <div class="grid-item"><b>Total Officers:</b> ${summary.totalOfficers ?? "-"}</div>
-            <div class="grid-item"><b>Total Courses Done:</b> ${
-              summary.totalCoursesDone ?? "-"
-            }</div>
-            <div class="grid-item"><b>Courses (Training Yr):</b> ${
-              summary.coursesTrainingYr ?? "-"
-            }</div>
-            <div class="grid-item"><b>Courses in This Unit:</b> ${
-              summary.coursesInUnit ?? "-"
-            }</div>
-            <div class="grid-item"><b>Earliest Seniority:</b> ${
-              formatDate(summary.earliestSeniority) || "-"
-            }</div>
-            <div class="grid-item"><b>Latest Seniority:</b> ${
-              formatDate(summary.latestSeniority) || "-"
-            }</div>
-            <div class="grid-item"><b>Earliest Commission:</b> ${
-              formatDate(summary.earliestCommission) || "-"
-            }</div>
-            <div class="grid-item"><b>Latest Commission:</b> ${
-              formatDate(summary.latestCommission) || "-"
-            }</div>
+            <div class="grid-item"><b>Total Courses Done:</b> ${summary.totalCoursesDone ?? "-"}</div>
+            <div class="grid-item"><b>Courses (Training Yr):</b> ${summary.coursesTrainingYr ?? "-"}</div>
+            <div class="grid-item"><b>Courses in This Unit:</b> ${summary.coursesInUnit ?? "-"}</div>
+            <div class="grid-item"><b>Earliest Seniority:</b> ${formatDate(summary.earliestSeniority) || "-"}</div>
+            <div class="grid-item"><b>Latest Seniority:</b> ${formatDate(summary.latestSeniority) || "-"}</div>
+            <div class="grid-item"><b>Earliest Commission:</b> ${formatDate(summary.earliestCommission) || "-"}</div>
+            <div class="grid-item"><b>Latest Commission:</b> ${formatDate(summary.latestCommission) || "-"}</div>
         `;
     }
 
     // Update officer table with API data
     function updateOfficerTable(officers) {
-      const tbody = document.getElementById("officerTableBody");
+        const tbody = document.getElementById("officerTableBody");
 
-      if (!officers || officers.length === 0) {
-        tbody.innerHTML =
-          '<tr><td colspan="10" class="no-data">No officers found</td></tr>';
-        return;
-      }
+        if (!officers || officers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="no-data">No officers found</td></tr>';
+            return;
+        }
 
-      let html = "";
-      officers.forEach((officer) => {
-        html += `
+        let html = "";
+        officers.forEach((officer) => {
+            html += `
                 <tr>
                     <td>${officer.armyNo || "-"}</td>
                     <td>${officer.rank || "-"}</td>
@@ -777,29 +713,29 @@
                     <td>${officer.coursesInUnit || "0"}</td>
                 </tr>
             `;
-      });
+        });
 
-      tbody.innerHTML = html;
+        tbody.innerHTML = html;
     }
 
     // Format date to DD-MM-YYYY
     function formatDate(dateStr) {
-      if (!dateStr) return "-";
-      try {
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "-";
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-      } catch (e) {
-        return dateStr;
-      }
+        if (!dateStr) return "-";
+        try {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return "-";
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        } catch (e) {
+            return dateStr;
+        }
     }
 
     // Reset unit summary to default
     function resetUnitSummary() {
-      document.getElementById("summaryGrid").innerHTML = `
+        document.getElementById("summaryGrid").innerHTML = `
             <div class="grid-item"><b>Total Officers:</b> -</div>
             <div class="grid-item"><b>Total Courses Done:</b> -</div>
             <div class="grid-item"><b>Courses (Training Yr):</b> -</div>
@@ -813,21 +749,21 @@
 
     // Reset all data
     function resetAllData() {
-      resetStrengthGrids();
-      resetUnitSummary();
-      document.getElementById("officerTableBody").innerHTML =
-        '<tr><td colspan="10" class="no-data">Select Formation and Unit to view data</td></tr>';
-      document.getElementById("officerCount").innerText = "0";
-      document.getElementById("hq").innerText = "Select Formation/Unit";
+        resetStrengthGrids();
+        resetUnitSummary();
+        document.getElementById("officerTableBody").innerHTML =
+            '<tr><td colspan="10" class="no-data">Select Formation and Unit to view data</td></tr>';
+        document.getElementById("officerCount").innerText = "0";
+        document.getElementById("hq").innerText = "Select Formation/Unit";
     }
 
     // Update strength grids with API data
     function updateStrengthGrids(data) {
-      const auth = data.authorized || {};
-      const hard = data.hardScale || {};
+        const auth = data.authorized || {};
+        const hard = data.hardScale || {};
 
-      const authGrid = document.getElementById("authorisedGrid");
-      authGrid.innerHTML = `
+        const authGrid = document.getElementById("authorisedGrid");
+        authGrid.innerHTML = `
             <div class="grid-item">Lt Gen: ${auth.ltGen ?? auth.authLtGen ?? "-"}</div>
             <div class="grid-item">Maj Gen: ${auth.majGen ?? auth.authMajGen ?? "-"}</div>
             <div class="grid-item">Brig: ${auth.brig ?? auth.authBrig ?? "-"}</div>
@@ -837,8 +773,8 @@
             <div class="grid-item">Capt/Lt: ${auth.ltCapt ?? auth.authLtCapt ?? auth.captLt ?? "-"}</div>
         `;
 
-      const hardGrid = document.getElementById("hardScaleGrid");
-      hardGrid.innerHTML = `
+        const hardGrid = document.getElementById("hardScaleGrid");
+        hardGrid.innerHTML = `
             <div class="grid-item">Lt Gen: ${hard.ltGen ?? hard.hardLtGen ?? "-"}</div>
             <div class="grid-item">Maj Gen: ${hard.majGen ?? hard.hardMajGen ?? "-"}</div>
             <div class="grid-item">Brig: ${hard.brig ?? hard.hardBrig ?? "-"}</div>
@@ -851,7 +787,7 @@
 
     // Reset grids to default state
     function resetStrengthGrids() {
-      const defaultGrid = `
+        const defaultGrid = `
             <div class="grid-item">Lt Gen: -</div>
             <div class="grid-item">Maj Gen: -</div>
             <div class="grid-item">Brig: -</div>
@@ -861,10 +797,9 @@
             <div class="grid-item">Capt/Lt: -</div>
         `;
 
-      document.getElementById("authorisedGrid").innerHTML = defaultGrid;
-      document.getElementById("hardScaleGrid").innerHTML = defaultGrid;
+        document.getElementById("authorisedGrid").innerHTML = defaultGrid;
+        document.getElementById("hardScaleGrid").innerHTML = defaultGrid;
     }
-
 </script>
 </body>
 </html>
