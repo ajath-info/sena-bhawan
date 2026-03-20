@@ -1390,13 +1390,19 @@
 
         // Update the showFieldError function to handle HTML
         function showFieldError(element, message, errorId) {
+            if (!element) return;
+
             element.classList.add("error");
             element.classList.remove("valid");
+
+            // Remove existing error
+            const existingError = document.getElementById(errorId);
+            if (existingError) existingError.remove();
 
             const error = document.createElement("span");
             error.id = errorId;
             error.className = "error-message";
-            error.innerHTML = message; // Using innerHTML to support line breaks
+            error.innerHTML = message;
             element.parentNode.appendChild(error);
         }
 
@@ -1486,12 +1492,12 @@
             }
 
             // NSG Email validation
-            const nsgEmailInput = document.getElementById("nsgEmail");
-            if (nsgEmailInput) {
-                nsgEmailInput.addEventListener("input", function() {
+            const nicEmailInput = document.getElementById("nicEmail");
+            if (nicEmailInput) {
+                nicEmailInput.addEventListener("input", function() {
                     validateEmail(this);
                 });
-                nsgEmailInput.addEventListener("blur", function() {
+                nicEmailInput.addEventListener("blur", function() {
                     validateEmail(this);
                 });
             }
@@ -1895,7 +1901,7 @@
             }
 
             // If optional field and empty, return valid
-            if (inputId === 'nsgEmail' && !value) {
+            if (inputId === 'nicEmail' && !value) {
                 input.classList.remove("error", "valid");
                 return true;
             }
@@ -2606,7 +2612,6 @@
         // MODIFIED VALIDATE REQUIRED FIELDS FUNCTION
         // =======================================================
         function validateRequiredFields() {
-            // Clear all previous errors first
             clearAllErrors();
 
             const requiredFields = [
@@ -2614,11 +2619,10 @@
                 { id: 'armyNo', name: 'Army No' },
                 { id: 'rank', name: 'Rank' },
                 { id: 'firstName', name: 'First Name' },
-                { id: 'lastName', name: 'Last Name' },
+                { id: 'gender', name: 'Gender' },
                 { id: 'dateOfCommission', name: 'Date of Commission' },
                 { id: 'dateOfSeniority', name: 'Date of Seniority' },
                 { id: 'dateOfBirth', name: 'Date of Birth' },
-                { id: 'gender', name: 'Gender' },
                 { id: 'placeOfBirth', name: 'Place of Birth' },
                 { id: 'religion', name: 'Religion' },
                 { id: 'aadhaarNumber', name: 'Aadhaar Number' },
@@ -2631,76 +2635,41 @@
                 { id: 'state', name: 'State' },
                 { id: 'pinCode', name: 'PIN Code' },
                 { id: 'mobileNumber', name: 'Mobile Number' },
-                { id: 'emailAddress', name: 'Email Address' },
-                { id: 'nrs', name: 'NRS (Nearest Railway Station)' }
+                { id: 'emailAddress', name: 'Email Address' }
             ];
 
             let isValid = true;
 
-            // Validate image with preview
+            // Validate image
             const imageFile = document.getElementById("officerImageFile").files[0];
             const imageError = document.getElementById("image-error");
+            const uploadBox = document.querySelector('.upload-box');
 
             if (!imageFile) {
                 if (imageError) {
                     imageError.style.display = "block";
                     imageError.textContent = "Officer Image is required";
                 }
-                // Highlight the upload box
-                document.querySelector('.upload-box').style.borderColor = '#dc2626';
+                if (uploadBox) uploadBox.style.borderColor = '#dc2626';
                 isValid = false;
             } else {
                 if (imageError) imageError.style.display = "none";
-                document.querySelector('.upload-box').style.borderColor = '#d1d5db';
+                if (uploadBox) uploadBox.style.borderColor = '#d1d5db';
 
                 // Validate file type
-                const fileType = imageFile.type;
-                if (!fileType.match('image.*')) {
+                if (!imageFile.type.match('image.*')) {
                     alert("Please select a valid image file (JPG/PNG)");
                     isValid = false;
                 }
 
                 // Validate file size (max 2MB)
-                const maxSize = 2 * 1024 * 1024;
-                if (imageFile.size > maxSize) {
+                if (imageFile.size > 2 * 1024 * 1024) {
                     alert("Image size should be less than 2MB");
                     isValid = false;
                 }
             }
 
-            // Validate family members (existing code)
-            const familyItems = document.querySelectorAll("#family-container .repeater-item");
-            if (familyItems.length > 0) {
-                for (let i = 0; i < familyItems.length; i++) {
-                    const item = familyItems[i];
-                    const nameInput = item.querySelector(".family-name");
-                    const relationshipSelect = item.querySelector(".family-relationship");
-                    const orderNoInput = item.querySelector(".family-order-no");
-
-                    if (nameInput && !nameInput.value.trim()) {
-                        alert(`Family Member #${i+1}: Name is required`);
-                        nameInput.focus();
-                        isValid = false;
-                        break;
-                    }
-
-                    if (relationshipSelect && !relationshipSelect.value) {
-                        alert(`Family Member #${i+1}: Relationship is required`);
-                        relationshipSelect.focus();
-                        isValid = false;
-                        break;
-                    }
-
-                    if (orderNoInput && !orderNoInput.value.trim()) {
-                        alert(`Family Member #${i+1}: Part II Order No. is required`);
-                        orderNoInput.focus();
-                        isValid = false;
-                        break;
-                    }
-                }
-            }
-
-            // Validate regular fields
+            // Validate required fields
             for (let field of requiredFields) {
                 const element = document.getElementById(field.id);
                 if (element && !element.value.trim()) {
@@ -2719,23 +2688,70 @@
                 isValid = false;
             }
 
+            // Validate family members
+            const familyItems = document.querySelectorAll("#family-container .repeater-item");
+            for (let i = 0; i < familyItems.length; i++) {
+                const item = familyItems[i];
+                const firstNameInput = item.querySelector(".family-first-name");
+                const lastNameInput = item.querySelector(".family-last-name");
+                const relationshipSelect = item.querySelector(".family-relationship");
+                const orderNoInput = item.querySelector(".family-order-no");
+                const orderDateInput = item.querySelector(".family-order-date");
+
+                if (!firstNameInput?.value.trim()) {
+                    alert(`Family Member #${i+1}: First name is required`);
+                    firstNameInput?.focus();
+                    isValid = false;
+                    break;
+                }
+
+                if (!lastNameInput?.value.trim()) {
+                    alert(`Family Member #${i+1}: Last name is required`);
+                    lastNameInput?.focus();
+                    isValid = false;
+                    break;
+                }
+
+                if (!relationshipSelect?.value) {
+                    alert(`Family Member #${i+1}: Relationship is required`);
+                    relationshipSelect?.focus();
+                    isValid = false;
+                    break;
+                }
+
+                if (!orderNoInput?.value.trim()) {
+                    alert(`Family Member #${i+1}: Part II Order No. is required`);
+                    orderNoInput?.focus();
+                    isValid = false;
+                    break;
+                }
+
+                if (!orderDateInput?.value) {
+                    alert(`Family Member #${i+1}: Order Date is required`);
+                    orderDateInput?.focus();
+                    isValid = false;
+                    break;
+                }
+            }
+
             return isValid;
         }
 
-        function clearAllErrors() {
-            // Remove all error messages
-            document.querySelectorAll('.error-message').forEach(el => el.remove());
-            document.querySelectorAll('.field-hint').forEach(el => el.remove());
 
-            // Remove error classes from all inputs
+        function clearAllErrors() {
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
             document.querySelectorAll('input, select, textarea').forEach(el => {
                 el.classList.remove('error', 'valid');
             });
 
-            // Hide image error
             const imageError = document.getElementById("image-error");
             if (imageError) {
                 imageError.style.display = "none";
+            }
+
+            const uploadBox = document.querySelector('.upload-box');
+            if (uploadBox) {
+                uploadBox.style.borderColor = '#d1d5db';
             }
         }
 
@@ -2763,19 +2779,6 @@
             P: { value: '1', type: '', period: '', remark: '' },
             E: { value: '1', type: '', period: '', remark: '' }
         };
-
-        // Initialize medical section
-        function initMedicalSection() {
-            console.log("Initializing medical section...");
-            // Set initial values to 1
-            const valueSelects = document.querySelectorAll('.medical-select');
-            valueSelects.forEach(select => {
-                select.value = '1';
-            });
-
-            // All type, period, and remark fields start disabled
-            disableMedicalFieldsForAll();
-        }
 
         // Disable fields for a specific letter
         function disableMedicalFields(letter) {
@@ -2832,88 +2835,219 @@
             });
         }
 
-        // Update medical row when value changes
+        // =======================================================
+        // REPLACE THIS FUNCTION
+        //=======================================================
         function updateMedicalRow(letter, value) {
             console.log(`Updating medical row for ${letter} with value ${value}`);
-            medicalData[letter].value = value;
+
+            // Make sure window.medicalData exists
+            if (!window.medicalData) {
+                window.medicalData = {
+                    S: { value: '1', type: '', period: '', remark: '' },
+                    H: { value: '1', type: '', period: '', remark: '' },
+                    A: { value: '1', type: '', period: '', remark: '' },
+                    P: { value: '1', type: '', period: '', remark: '' },
+                    E: { value: '1', type: '', period: '', remark: '' }
+                };
+            }
+
+            window.medicalData[letter].value = value;
 
             if (value !== '1') {
-                // Enable fields for this letter
                 enableMedicalFields(letter);
             } else {
-                // Disable and clear fields for this letter
                 disableMedicalFields(letter);
+                window.medicalData[letter].type = '';
+                window.medicalData[letter].period = '';
+                window.medicalData[letter].remark = '';
 
-                // Reset medical data for this letter
-                medicalData[letter].type = '';
-                medicalData[letter].period = '';
-                medicalData[letter].remark = '';
+                const existingError = document.getElementById(`selection-error-${letter}`);
+                if (existingError) existingError.remove();
+
+                const periodError = document.getElementById(`period-error-${letter}`);
+                if (periodError) periodError.remove();
             }
+        }
+
+        // Validate that type and period are selected when value > 1
+        function validateMedicalSelections(letter) {
+            // Use window.medicalData instead of medicalData
+            const value = window.medicalData[letter].value;
+            const type = window.medicalData[letter].type;
+            const period = window.medicalData[letter].period;
+
+            // Clear any existing selection error
+            const existingError = document.getElementById(`selection-error-${letter}`);
+            if (existingError) existingError.remove();
+
+            if (value !== '1') {
+                if (!type) {
+                    // Highlight type select
+                    const typeSelect = document.getElementById(`medicalType${letter}`);
+                    typeSelect.classList.add("error");
+
+                    const error = document.createElement("span");
+                    error.id = `selection-error-${letter}`;
+                    error.className = "error-message";
+                    error.textContent = "Temp/Perm is required";
+                    typeSelect.parentNode.appendChild(error);
+                    return false;
+                } else {
+                    document.getElementById(`medicalType${letter}`).classList.remove("error");
+                }
+
+                if (!period) {
+                    // Highlight period input
+                    const periodInput = document.getElementById(`medicalPeriod${letter}`);
+                    periodInput.classList.add("error");
+
+                    const error = document.createElement("span");
+                    error.id = `selection-error-${letter}`;
+                    error.className = "error-message";
+                    error.textContent = "Period is required";
+                    periodInput.parentNode.appendChild(error);
+                    return false;
+                } else {
+                    document.getElementById(`medicalPeriod${letter}`).classList.remove("error");
+                }
+            }
+
+            return true;
         }
 
         // Update medical type
         function updateMedicalType(letter, type) {
             console.log(`Updating medical type for ${letter} with type ${type}`);
-            medicalData[letter].type = type;
 
-            // Update period placeholder based on type
+            if (!window.medicalData) {
+                window.medicalData = {
+                    S: { value: '1', type: '', period: '', remark: '' },
+                    H: { value: '1', type: '', period: '', remark: '' },
+                    A: { value: '1', type: '', period: '', remark: '' },
+                    P: { value: '1', type: '', period: '', remark: '' },
+                    E: { value: '1', type: '', period: '', remark: '' }
+                };
+            }
+
+            window.medicalData[letter].type = type;
+
             const periodInput = document.getElementById(`medicalPeriod${letter}`);
             if (periodInput) {
-                if (type === 'T') {
-                    periodInput.placeholder = 'Max 24 months';
-                    periodInput.max = 24;
-                    if (parseInt(periodInput.value) > 24) {
-                        periodInput.value = '24';
-                    }
-                } else if (type === 'P') {
-                    periodInput.placeholder = 'Max 24 months';
-                    periodInput.max = 24;
-                }
+                periodInput.value = '';
+                periodInput.placeholder = type === 'T' ? 'Max 24 months' : 'Max 2 years';
+                window.medicalData[letter].period = '';
+
+                const existingError = document.getElementById(`period-error-${letter}`);
+                if (existingError) existingError.remove();
+                periodInput.classList.remove("error");
             }
+
+            const selectionError = document.getElementById(`selection-error-${letter}`);
+            if (selectionError) selectionError.remove();
         }
 
         // Update medical period
         function updateMedicalPeriod(letter, period) {
             console.log(`Updating medical period for ${letter} with period ${period}`);
-            const type = medicalData[letter].type;
 
-            // Validate based on type
-            if (type === 'T' && parseInt(period) > 24) {
-                period = '24';
-                document.getElementById(`medicalPeriod${letter}`).value = '24';
+            if (!window.medicalData) {
+                window.medicalData = {
+                    S: { value: '1', type: '', period: '', remark: '' },
+                    H: { value: '1', type: '', period: '', remark: '' },
+                    A: { value: '1', type: '', period: '', remark: '' },
+                    P: { value: '1', type: '', period: '', remark: '' },
+                    E: { value: '1', type: '', period: '', remark: '' }
+                };
             }
 
-            medicalData[letter].period = period;
+            if (validateMedicalPeriod(letter, period)) {
+                window.medicalData[letter].period = period;
+            }
         }
 
-        // Update medical remark
+        // =======================================================
+        // REPLACE THIS FUNCTION
+        // =======================================================
+        function initMedicalSection() {
+            console.log("Initializing medical section...");
+
+            // Initialize medical data
+            window.medicalData = {
+                S: { value: '1', type: '', period: '', remark: '' },
+                H: { value: '1', type: '', period: '', remark: '' },
+                A: { value: '1', type: '', period: '', remark: '' },
+                P: { value: '1', type: '', period: '', remark: '' },
+                E: { value: '1', type: '', period: '', remark: '' }
+            };
+
+            // Set initial values to 1
+            const valueSelects = document.querySelectorAll('.medical-select');
+            valueSelects.forEach(select => {
+                select.value = '1';
+            });
+
+            // All type, period, and remark fields start disabled
+            disableMedicalFieldsForAll();
+
+            // Save as original for cancel
+            window.originalMedicalData = JSON.parse(JSON.stringify(window.medicalData));
+
+            // Set default medical code
+            window.medicalCode = 'S1H1A1P1E1';
+            updateMedicalCodeDisplay();
+        }
+
+        // =======================================================
+        // REPLACE THIS FUNCTION
+        // =======================================================
         function updateMedicalRemark(letter, remark) {
             console.log(`Updating medical remark for ${letter} with remark ${remark}`);
-            medicalData[letter].remark = remark;
+
+            if (!window.medicalData) {
+                window.medicalData = {
+                    S: { value: '1', type: '', period: '', remark: '' },
+                    H: { value: '1', type: '', period: '', remark: '' },
+                    A: { value: '1', type: '', period: '', remark: '' },
+                    P: { value: '1', type: '', period: '', remark: '' },
+                    E: { value: '1', type: '', period: '', remark: '' }
+                };
+            }
+
+            window.medicalData[letter].remark = remark;
         }
 
         // Get medical payload
         function getMedicalPayload() {
+            const medicalData = window.medicalData || {
+                S: { value: '1', type: '', period: '', remark: '' },
+                H: { value: '1', type: '', period: '', remark: '' },
+                A: { value: '1', type: '', period: '', remark: '' },
+                P: { value: '1', type: '', period: '', remark: '' },
+                E: { value: '1', type: '', period: '', remark: '' }
+            };
+
             const payload = {
                 medicalValues: {
-                    S: medicalData.S.value,
-                    H: medicalData.H.value,
-                    A: medicalData.A.value,
-                    P: medicalData.P.value,
-                    E: medicalData.E.value
+                    S: medicalData.S?.value || '1',
+                    H: medicalData.H?.value || '1',
+                    A: medicalData.A?.value || '1',
+                    P: medicalData.P?.value || '1',
+                    E: medicalData.E?.value || '1'
                 },
-                medicalDetails: []
+                medicalDetails: [],
+                medicalCode: window.medicalCode || 'S1H1A1P1E1'
             };
 
             // Add details for values > 1
             Object.keys(medicalData).forEach(letter => {
-                if (medicalData[letter].value !== '1') {
+                if (medicalData[letter]?.value && medicalData[letter].value !== '1') {
                     payload.medicalDetails.push({
                         category: letter,
                         value: medicalData[letter].value,
-                        type: medicalData[letter].type,
-                        period: medicalData[letter].period,
-                        remark: medicalData[letter].remark
+                        type: medicalData[letter].type || '',
+                        period: medicalData[letter].period || '',
+                        remark: medicalData[letter].remark || ''
                     });
                 }
             });
@@ -2930,9 +3064,13 @@
                 const commissionRes = await fetch("http://localhost:6060/api/dropdown/COMMISSION_TYPE");
                 const commissionTypes = await commissionRes.json();
                 const commissionSelect = document.getElementById("commission");
+
                 if (commissionSelect) {
                     commissionSelect.innerHTML = '<option value="">Select Commission Type</option>';
+
+                    // Add options directly from API - use name as both value and display
                     commissionTypes.forEach(item => {
+                        // The 'name' field contains values like "SS", "IC", "WS", "SL", "SC"
                         commissionSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
                     });
                 }
@@ -2950,6 +3088,9 @@
 
                 // Load Case Types
                 await loadCaseTypes();
+
+                // Setup commission listener after dropdown is loaded
+                setupCommissionListener();
 
             } catch (err) {
                 console.error("Failed loading dropdowns:", err);
@@ -3041,18 +3182,25 @@
             await loadDecorationCategories(index);
         }
 
+        // =======================================================
+        // REPLACE THIS FUNCTION
+        // =======================================================
         async function loadDecorationCategories(index) {
             try {
-                // Add code=1 parameter to get the code field
                 const res = await fetch("http://localhost:6060/api/dropdown/DECORATION_CATEGORY?code=1");
                 const categories = await res.json();
 
                 const dropdown = document.getElementById(`decorationCategory-${index}`);
                 if (dropdown) {
                     dropdown.innerHTML = '<option value="">Select Category</option>';
+
+                    // Store both code and name as data attributes
                     categories.forEach(cat => {
-                        // cat will now have {id, name, code}
-                        dropdown.innerHTML += `<option value="${cat.code}">${cat.name}</option>`;
+                        const option = document.createElement('option');
+                        option.value = cat.code; // Keep code as value for selection
+                        option.textContent = cat.name; // Show name to user
+                        option.setAttribute('data-name', cat.name); // Store name as data attribute
+                        dropdown.appendChild(option);
                     });
                 }
             } catch (err) {
@@ -3094,6 +3242,9 @@
             populateCaseTypeItems(filteredItems);
         }
 
+        // =======================================================
+        // REPLACE THIS FUNCTION
+        // =======================================================
         async function loadAwardsForCategory(categoryCode, index) {
             const awardDropdown = document.getElementById(`decorationName-${index}`);
             if (!awardDropdown) return;
@@ -3106,16 +3257,16 @@
             awardDropdown.innerHTML = '<option value="">Loading...</option>';
 
             try {
-                // Use the category code to fetch awards
                 const res = await fetch(`http://localhost:6060/api/dropdown/${categoryCode}?code=1`);
                 const awards = await res.json();
 
                 awardDropdown.innerHTML = '<option value="">Select Award</option>';
-                awards.forEach(a => {
-                    // a will have {id, name, code}
-                    awardDropdown.innerHTML += `
-                <option value="${a.code}">${a.name}</option>
-            `;
+                awards.forEach(award => {
+                    const option = document.createElement('option');
+                    option.value = award.code; // Keep code as value for selection
+                    option.textContent = award.name; // Show name to user
+                    option.setAttribute('data-name', award.name); // Store name as data attribute
+                    awardDropdown.appendChild(option);
                 });
             } catch (err) {
                 console.error("Failed loading awards:", err);
@@ -3832,101 +3983,211 @@
 
         // Store original medical data for cancel functionality
         let originalMedicalData = null;
+        let medicalCode = 'S1H1A1P1E1'; // Default code
 
-        // Generate medical code from current selections
+        // Validate period based on type
+        function validateMedicalPeriod(letter, period) {
+            // Use window.medicalData instead of medicalData
+            const type = window.medicalData[letter].type;
+            let isValid = true;
+            let errorMessage = '';
+
+            // Clear any existing error for this field
+            const periodInput = document.getElementById(`medicalPeriod${letter}`);
+            const existingError = document.getElementById(`period-error-${letter}`);
+            if (existingError) existingError.remove();
+
+            if (period) {
+                const periodNum = parseInt(period);
+
+                if (isNaN(periodNum)) {
+                    errorMessage = "Period must be a number";
+                    isValid = false;
+                } else if (type === 'T' && (periodNum < 1 || periodNum > 24)) {
+                    errorMessage = "For Temporary, period must be between 1-24 months";
+                    isValid = false;
+                } else if (type === 'P' && (periodNum < 1 || periodNum > 2)) {
+                    errorMessage = "For Permanent, period must be between 1-2 years";
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                periodInput.classList.add("error");
+                const error = document.createElement("span");
+                error.id = `period-error-${letter}`;
+                error.className = "error-message";
+                error.textContent = errorMessage;
+                periodInput.parentNode.appendChild(error);
+            } else {
+                periodInput.classList.remove("error");
+            }
+
+            return isValid;
+        }
+
+        // Generate medical code from current selections (single bracket next to highest character)
         function generateMedicalCode() {
             let code = '';
             const letters = ['S', 'H', 'A', 'P', 'E'];
 
-            letters.forEach(letter => {
-                const value = medicalData[letter].value;
-                const type = medicalData[letter].type;
-                const period = medicalData[letter].period;
+            // Find the category with the highest priority
+            let highestCategory = null;
+            let highestPriority = -1;
+            let highestType = '';
+            let highestPeriod = '';
 
+            // Priority rules:
+            // 1. Permanent (P) has higher priority than Temporary (T)
+            // 2. If same type, higher period wins
+            // 3. If same period, higher value wins
+            // 4. If same value, order S > H > A > P > E
+
+            const typePriority = { 'P': 2, 'T': 1 };
+            const letterPriority = { 'S': 5, 'H': 4, 'A': 3, 'P': 2, 'E': 1 };
+
+            letters.forEach(letter => {
+                // Use window.medicalData instead of medicalData
+                const value = parseInt(window.medicalData[letter].value);
+                const type = window.medicalData[letter].type;
+                const period = window.medicalData[letter].period;
+
+                // Only consider if value > 1 and has type and period
+                if (value > 1 && type && period) {
+                    // Convert period to months for comparison
+                    const periodInMonths = type === 'P' ? parseInt(period) * 12 : parseInt(period);
+
+                    // Calculate priority score
+                    const priorityScore = (typePriority[type] * 10000) + (periodInMonths * 100) + (value * 10) + letterPriority[letter];
+
+                    console.log(`${letter}: Type=${type}, Period=${period}, PeriodMonths=${periodInMonths}, Value=${value}, Score=${priorityScore}`);
+
+                    if (priorityScore > highestPriority) {
+                        highestPriority = priorityScore;
+                        highestCategory = letter;
+                        highestType = type;
+                        highestPeriod = period;
+                    }
+                }
+            });
+
+            // Build the code
+            letters.forEach(letter => {
+                // Use window.medicalData instead of medicalData
+                const value = window.medicalData[letter].value;
+
+                // Add the letter and value
                 code += letter + value;
 
-                // Add type and period if value > 1 and type is selected
-                if (value !== '1' && type) {
-                    code += type;
-                    if (period) {
-                        code += period;
-                    }
+                // Add bracket only for the highest priority category
+                if (letter === highestCategory) {
+                    code += `(${highestType}${highestPeriod})`;
                 }
             });
 
             return code;
         }
 
+
         // Update medical code display
         function updateMedicalCodeDisplay() {
             const codeDisplay = document.getElementById('medicalCodeDisplay');
             if (codeDisplay) {
-                codeDisplay.textContent = generateMedicalCode();
+                // Use window.medicalCode instead of local medicalCode
+                codeDisplay.textContent = window.medicalCode || 'S1H1A1P1E1';
             }
         }
 
         // Apply medical changes (OK button)
         function applyMedicalChanges() {
-            // Save current state as original for cancel
-            originalMedicalData = JSON.parse(JSON.stringify(medicalData));
+            console.log('Applying medical changes with data:', window.medicalData);
 
-            // Update the code display
+            const letters = ['S', 'H', 'A', 'P', 'E'];
+            let isValid = true;
+
+            letters.forEach(letter => {
+                const value = window.medicalData[letter].value;
+                if (value !== '1') {
+                    if (!window.medicalData[letter].type || !window.medicalData[letter].period) {
+                        validateMedicalSelections(letter);
+                        isValid = false;
+                    }
+
+                    if (window.medicalData[letter].period && !validateMedicalPeriod(letter, window.medicalData[letter].period)) {
+                        isValid = false;
+                    }
+                }
+            });
+
+            if (!isValid) {
+                alert("Please fill in all required Temp/Perm and Period fields with valid values");
+                return;
+            }
+
+            window.medicalCode = generateMedicalCode();
+            window.originalMedicalData = JSON.parse(JSON.stringify(window.medicalData));
+
             updateMedicalCodeDisplay();
 
-            // Show success message or visual feedback
-            const codeDisplay = document.getElementById('medicalCodeDisplay');
-            codeDisplay.style.animation = 'none';
-            codeDisplay.offsetHeight; // Trigger reflow
-            codeDisplay.style.animation = 'fadeIn 0.3s ease';
-
-            console.log('Medical changes applied:', medicalData);
+            console.log('Medical changes applied:', window.medicalData);
+            console.log('Medical code:', window.medicalCode);
         }
+
 
         // Cancel medical changes (Cancel button)
         function cancelMedicalChanges() {
-            if (originalMedicalData) {
-                // Restore original data
-                medicalData = JSON.parse(JSON.stringify(originalMedicalData));
+            if (window.originalMedicalData) {
+                console.log('Cancelling changes, restoring to:', window.originalMedicalData);
 
-                // Update all UI elements to match original data
+                window.medicalData = JSON.parse(JSON.stringify(window.originalMedicalData));
+
                 const letters = ['S', 'H', 'A', 'P', 'E'];
                 letters.forEach(letter => {
-                    // Restore value select
                     const valueSelect = document.getElementById(`medical${letter}`);
                     if (valueSelect) {
-                        valueSelect.value = medicalData[letter].value;
+                        valueSelect.value = window.medicalData[letter].value;
 
-                        // Enable/disable fields based on value
-                        if (medicalData[letter].value !== '1') {
+                        if (window.medicalData[letter].value !== '1') {
                             enableMedicalFields(letter);
                         } else {
                             disableMedicalFields(letter);
                         }
                     }
 
-                    // Restore type select
                     const typeSelect = document.getElementById(`medicalType${letter}`);
                     if (typeSelect) {
-                        typeSelect.value = medicalData[letter].type || '';
+                        typeSelect.value = window.medicalData[letter].type || '';
+                        typeSelect.classList.remove("error");
                     }
 
-                    // Restore period input
                     const periodInput = document.getElementById(`medicalPeriod${letter}`);
                     if (periodInput) {
-                        periodInput.value = medicalData[letter].period || '';
+                        periodInput.value = window.medicalData[letter].period || '';
+                        periodInput.classList.remove("error");
+                        if (window.medicalData[letter].type === 'T') {
+                            periodInput.placeholder = 'Max 24 months';
+                        } else if (window.medicalData[letter].type === 'P') {
+                            periodInput.placeholder = 'Max 2 years';
+                        } else {
+                            periodInput.placeholder = 'Months';
+                        }
                     }
 
-                    // Restore remark input
                     const remarkInput = document.getElementById(`medicalRemark${letter}`);
                     if (remarkInput) {
-                        remarkInput.value = medicalData[letter].remark || '';
+                        remarkInput.value = window.medicalData[letter].remark || '';
                     }
+
+                    const selectionError = document.getElementById(`selection-error-${letter}`);
+                    if (selectionError) selectionError.remove();
+
+                    const periodError = document.getElementById(`period-error-${letter}`);
+                    if (periodError) periodError.remove();
                 });
 
-                // Update code display
-                updateMedicalCodeDisplay();
-
-                console.log('Medical changes cancelled, restored to:', medicalData);
+                console.log('Medical changes cancelled, restored to:', window.medicalData);
+            } else {
+                console.log('No original data to restore');
             }
         }
 
@@ -3955,40 +4216,6 @@
             updateMedicalCodeDisplay();
         };
 
-        // Initialize original data when medical section is initialized
-        function initMedicalSection() {
-            console.log("Initializing medical section...");
-            // Set initial values to 1
-            const valueSelects = document.querySelectorAll('.medical-select');
-            valueSelects.forEach(select => {
-                select.value = '1';
-            });
-
-            // All type, period, and remark fields start disabled
-            disableMedicalFieldsForAll();
-
-            // Initialize medical data with default values
-            medicalData = {
-                S: { value: '1', type: '', period: '', remark: '' },
-                H: { value: '1', type: '', period: '', remark: '' },
-                A: { value: '1', type: '', period: '', remark: '' },
-                P: { value: '1', type: '', period: '', remark: '' },
-                E: { value: '1', type: '', period: '', remark: '' }
-            };
-
-            // Save as original for cancel
-            originalMedicalData = JSON.parse(JSON.stringify(medicalData));
-
-            // Update code display
-            updateMedicalCodeDisplay();
-        }
-
-        // =======================================================
-        // MEDICAL SELECTION
-        // =======================================================
-        function getMedicalCategoryString() {
-            return document.getElementById("shapeMedicalCategory") ? document.getElementById("shapeMedicalCategory").value : "";
-        }
 
         // =======================================================
         // SAVE PERSONNEL FUNCTION
@@ -3997,117 +4224,137 @@
             if (!validateRequiredFields()) {
                 return;
             }
-            // Get form elements
-            const commission = document.getElementById("commission");
-            const armyNo = document.getElementById("armyNo");
-            const rank = document.getElementById("rank");
-            const firstName = document.getElementById("firstName");
-            const lastName = document.getElementById("lastName");
-            const caseType = document.getElementById("caseType");
-            const dateOfCommission = document.getElementById("dateOfCommission");
-            const dateOfSeniority = document.getElementById("dateOfSeniority");
-            const dateOfBirth = document.getElementById("dateOfBirth");
-            const placeOfBirth = document.getElementById("placeOfBirth");
-            const nrs = document.getElementById("nrs");
-            const nearestAirport = document.getElementById("nearestAirport");
-            const religion = document.getElementById("religion");
-            const aadhaarNumber = document.getElementById("aadhaarNumber");
-            const panCard = document.getElementById("panCard");
-            const maritalStatus = document.getElementById("maritalStatus");
-            const cdaAccountNo = document.getElementById("cdaAccountNo");
-            const permanentAddress = document.getElementById("permanentAddress");
-            const city = document.getElementById("city");
-            const district = document.getElementById("district");
-            const state = document.getElementById("state");
-            const pinCode = document.getElementById("pinCode");
-            const mobileNumber = document.getElementById("mobileNumber");
-            const alternateMobile = document.getElementById("alternateMobile");
-            const emailAddress = document.getElementById("emailAddress");
-            const nicEmail = document.getElementById("nicEmail");
 
-            // Build payload
+            // Get all form elements
+            const formElements = {
+                // Basic Information
+                commission: document.getElementById("commission"),
+                armyNo: document.getElementById("armyNo"),
+                rank: document.getElementById("rank"),
+                firstName: document.getElementById("firstName"),
+                lastName: document.getElementById("lastName"),
+                gender: document.getElementById("gender"),
+                caseType: document.getElementById("caseType"),
+                dateOfCommission: document.getElementById("dateOfCommission"),
+                dateOfSeniority: document.getElementById("dateOfSeniority"),
+                dateOfBirth: document.getElementById("dateOfBirth"),
+                placeOfBirth: document.getElementById("placeOfBirth"),
+
+                // Service Details
+                nrs: document.getElementById("nrs"),
+                nearestAirport: document.getElementById("nearestAirport"),
+                religion: document.getElementById("religion"),
+                aadhaarNumber: document.getElementById("aadhaarNumber"),
+                panCard: document.getElementById("panCard"),
+                maritalStatus: document.getElementById("maritalStatus"),
+                cdaAccountNo: document.getElementById("cdaAccountNo"),
+
+                // Address
+                permanentAddress: document.getElementById("permanentAddress"),
+                city: document.getElementById("city"),
+                district: document.getElementById("district"),
+                state: document.getElementById("state"),
+                pinCode: document.getElementById("pinCode"),
+
+                // Contact
+                mobileNumber: document.getElementById("mobileNumber"),
+                alternateMobile: document.getElementById("alternateMobile"),
+                emailAddress: document.getElementById("emailAddress"),
+                nicEmail: document.getElementById("nicEmail")
+            };
+
+            // Build main payload with required fields validation
             const payload = {
-                commission: commission ? commission.value : "",
-                armyNo: armyNo ? armyNo.value : "",
-                rank: rank ? rank.value : "",
-                firstName: firstName ? firstName.value : "",
-                lastName: lastName ? lastName.value : "",
-                fullName: (firstName ? firstName.value : "") + " " + (lastName ? lastName.value : ""),
-                gender: document.getElementById("gender") ? document.getElementById("gender").value : "",
-                caseType: caseType ? caseType.value : "",
-                dateOfCommission: dateOfCommission ? dateOfCommission.value : "",
-                dateOfSeniority: dateOfSeniority ? dateOfSeniority.value : "",
-                dateOfBirth: dateOfBirth ? dateOfBirth.value : "",
-                placeOfBirth: placeOfBirth ? placeOfBirth.value : "",
-                religion: religion ? religion.value : "",
-                aadhaarNumber: aadhaarNumber ? aadhaarNumber.value : "",
-                panCard: panCard ? panCard.value : "",
-                maritalStatus: maritalStatus ? maritalStatus.value : "",
-                cdaAccountNo: cdaAccountNo ? cdaAccountNo.value : "",
-                permanentAddress: permanentAddress ? permanentAddress.value : "",
-                city: city ? city.value : "",
-                district: district ? district.value : "",
-                state: state ? state.value : "",
-                pinCode: pinCode ? pinCode.value : "",
-                mobileNumber: mobileNumber ? mobileNumber.value : "",
-                alternateMobile: alternateMobile ? alternateMobile.value : "",
-                emailAddress: emailAddress ? emailAddress.value : "",
-                nicEmail: nicEmail ? nicEmail.value : "",
+                // Required fields
+                commission: formElements.commission?.value || "",
+                armyNo: formElements.armyNo?.value || "",
+                rank: formElements.rank?.value || "",
+                firstName: formElements.firstName?.value || "",
+                lastName: formElements.lastName?.value || "",
+                fullName: `${formElements.firstName?.value || ""} ${formElements.lastName?.value || ""}`.trim(),
+                gender: formElements.gender?.value || "",
+                caseType: formElements.caseType?.value || "",
+                dateOfCommission: formElements.dateOfCommission?.value || "",
+                dateOfSeniority: formElements.dateOfSeniority?.value || "",
+                dateOfBirth: formElements.dateOfBirth?.value || "",
+                placeOfBirth: formElements.placeOfBirth?.value || "",
+                religion: formElements.religion?.value || "",
+                aadhaarNumber: formElements.aadhaarNumber?.value?.replace(/\s/g, '') || "", // Remove spaces
+                panCard: formElements.panCard?.value?.toUpperCase() || "",
+                maritalStatus: formElements.maritalStatus?.value || "",
+                cdaAccountNo: formElements.cdaAccountNo?.value || "",
+                permanentAddress: formElements.permanentAddress?.value || "",
+                city: formElements.city?.value || "",
+                district: formElements.district?.value || "",
+                state: formElements.state?.value || "",
+                pinCode: formElements.pinCode?.value || "",
+                mobileNumber: formElements.mobileNumber?.value || "",
+                emailAddress: formElements.emailAddress?.value || "",
+
+                // Optional fields
+                nrs: formElements.nrs?.value || "",
+                nearestAirport: formElements.nearestAirport?.value || "",
+                alternateMobile: formElements.alternateMobile?.value || "",
+                nicEmail: formElements.nicEmail?.value || "",
+
+                // Collections
                 decorations: [],
                 qualifications: [],
                 additionalQualifications: [],
                 family: [],
                 sports: [],
-                medical: getMedicalPayload()
+                medical: {}
             };
-            payload.nrs = nrs ? nrs.value : "";
-            payload.nearestAirport = nearestAirport ? nearestAirport.value : "";
 
-            // For decorations collection
+            // Collect Decorations - FIXED VERSION
             document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
-                const categorySelect = item.querySelector('select[name*="[category]"]');
-                const nameSelect = item.querySelector('select[name*="[name]"]');
-                if (categorySelect && nameSelect) {
+                const categorySelect = item.querySelector('select[id^="decorationCategory-"]');
+                const nameSelect = item.querySelector('select[id^="decorationName-"]');
+
+                if (categorySelect?.value && nameSelect?.value) {
+                    // Get the selected options
+                    const categoryOption = categorySelect.options[categorySelect.selectedIndex];
+                    const nameOption = nameSelect.options[nameSelect.selectedIndex];
+
+                    // Get the names from data attributes or text content
+                    const categoryName = categoryOption.getAttribute('data-name') || categoryOption.textContent;
+                    const awardName = nameOption.getAttribute('data-name') || nameOption.textContent;
+
                     payload.decorations.push({
-                        decorationCategory: categorySelect.value, // This is now the category code
-                        decorationName: nameSelect.value // This is now the award code
+                        decorationCategory: categoryName, // Send full name instead of code
+                        decorationName: awardName // Send award name instead of code
+                    });
+
+                    console.log('Decoration added:', {
+                        categoryCode: categorySelect.value,
+                        categoryName: categoryName,
+                        awardCode: nameSelect.value,
+                        awardName: awardName
                     });
                 }
             });
 
-            // Collect decorations
-            document.querySelectorAll("#decorations-container .repeater-item").forEach(item => {
-                const categorySelect = item.querySelector('select[name*="[category]"]');
-                const nameSelect = item.querySelector('select[name*="[name]"]');
-                if (categorySelect && nameSelect) {
-                    payload.decorations.push({
-                        decorationCategory: categorySelect.value,
-                        decorationName: nameSelect.value
-                    });
-                }
-            });
-
-            // Collect civil qualifications
+            // Collect Civil Qualifications
             document.querySelectorAll("#civil-qualifications-container .repeater-item").forEach(item => {
                 const qualificationCode = item.querySelector(".civil-qualification-code");
-                const boardSelect = item.querySelector(".civil-board");
+                const boardInput = item.querySelector(".civil-board");
                 const yearSelect = item.querySelector(".civil-year");
                 const institutionInput = item.querySelector(".civil-institution");
                 const gradeInput = item.querySelector(".civil-grade");
                 const orderNoInput = item.querySelector(".civil-order-no");
 
-                // Only add if qualification is selected
-                if (qualificationCode && qualificationCode.value) {
+                // Only add if qualification is selected (required fields)
+                if (qualificationCode?.value) {
                     const qualificationObj = {
                         qualification: qualificationCode.value,
-                        board: boardSelect ? boardSelect.value : "",
-                        yearOfCompletion: yearSelect ? yearSelect.value : "",
-                        institution: institutionInput ? institutionInput.value : "",
-                        gradePercentage: gradeInput ? gradeInput.value.replace('%', '') : "", // Remove % for storage
-                        part2OrderNo: orderNoInput ? orderNoInput.value : ""
+                        board: boardInput?.value || "",
+                        yearOfCompletion: yearSelect?.value || "",
+                        institution: institutionInput?.value || "",
+                        gradePercentage: gradeInput?.value?.replace('%', '')?.trim() || "",
+                        part2OrderNo: orderNoInput?.value || ""
                     };
 
-                    // Validate all fields are filled
+                    // Only push if all required fields are filled
                     if (qualificationObj.board && qualificationObj.yearOfCompletion &&
                         qualificationObj.institution && qualificationObj.gradePercentage &&
                         qualificationObj.part2OrderNo) {
@@ -4116,7 +4363,7 @@
                 }
             });
 
-            // Collect additional qualifications (MIL)
+            // Collect Additional Qualifications (MIL)
             document.querySelectorAll("#additional-qualifications-container .repeater-item").forEach(item => {
                 const qualificationCode = item.querySelector(".additional-qualification-code");
                 const authorityNoInput = item.querySelector(".additional-authority-no");
@@ -4125,18 +4372,17 @@
                 const orderNoInput = item.querySelector(".additional-order-no");
                 const orderDateInput = item.querySelector(".additional-order-date");
 
-                // Only add if qualification is selected
-                if (qualificationCode && qualificationCode.value) {
+                if (qualificationCode?.value) {
                     const qualificationObj = {
                         qualification: qualificationCode.value,
-                        authorityNo: authorityNoInput ? authorityNoInput.value : "",
-                        date: dateInput ? dateInput.value : "",
-                        location: locationInput ? locationInput.value : "",
-                        part2OrderNo: orderNoInput ? orderNoInput.value : "",
-                        orderDate: orderDateInput ? orderDateInput.value : ""
+                        authorityNo: authorityNoInput?.value || "",
+                        date: dateInput?.value || "",
+                        location: locationInput?.value || "",
+                        part2OrderNo: orderNoInput?.value || "",
+                        orderDate: orderDateInput?.value || ""
                     };
 
-                    // Validate all fields are filled
+                    // Only push if all required fields are filled
                     if (qualificationObj.authorityNo && qualificationObj.date &&
                         qualificationObj.location && qualificationObj.part2OrderNo &&
                         qualificationObj.orderDate) {
@@ -4145,7 +4391,7 @@
                 }
             });
 
-            // Collect family details
+            // Collect Family Details
             document.querySelectorAll("#family-container .repeater-item").forEach(item => {
                 const firstNameInput = item.querySelector(".family-first-name");
                 const lastNameInput = item.querySelector(".family-last-name");
@@ -4154,43 +4400,63 @@
                 const orderNoInput = item.querySelector(".family-order-no");
                 const orderDateInput = item.querySelector(".family-order-date");
 
-                if (firstNameInput && firstNameInput.value && lastNameInput && lastNameInput.value) {
+                if (firstNameInput?.value && lastNameInput?.value) {
                     payload.family.push({
                         firstName: firstNameInput.value,
                         lastName: lastNameInput.value,
-                        fullName: firstNameInput.value + " " + lastNameInput.value,
-                        relationship: relationshipSelect ? relationshipSelect.value : "",
-                        contactNumber: contactInput ? contactInput.value : "",  // Optional field
-                        part2OrderNo: orderNoInput ? orderNoInput.value : "",
-                        orderDate: orderDateInput ? orderDateInput.value : ""
+                        fullName: `${firstNameInput.value} ${lastNameInput.value}`.trim(),
+                        relationship: relationshipSelect?.value || "",
+                        contactNumber: contactInput?.value || "",
+                        part2OrderNo: orderNoInput?.value || "",
+                        orderDate: orderDateInput?.value || ""
                     });
                 }
             });
 
-            // Collect sports details
+            // Collect Sports Details (Optional)
             document.querySelectorAll("#sports-container .repeater-item").forEach(item => {
                 const sportNameSelect = item.querySelector(".sport-name");
                 const sportLevelSelect = item.querySelector(".sport-level");
                 const sportPlaceSelect = item.querySelector(".sport-place");
                 const achievementsInput = item.querySelector(".sport-achievements");
 
-                if (sportNameSelect && sportNameSelect.value) {
+                if (sportNameSelect?.value) {
                     payload.sports.push({
                         sportName: sportNameSelect.value,
-                        sportsLevel: sportLevelSelect ? sportLevelSelect.value : "",
-                        place: sportPlaceSelect ? sportPlaceSelect.value : "",
-                        achievements: achievementsInput ? achievementsInput.value : ""
+                        sportsLevel: sportLevelSelect?.value || "",
+                        place: sportPlaceSelect?.value || "",
+                        achievements: achievementsInput?.value || ""
                     });
                 }
             });
 
-            // Create FormData and send
+            // Collect Medical Data
+            payload.medical = getMedicalPayload();
+
+            // Additional validations for specific fields
+            if (payload.aadhaarNumber) {
+                // Remove spaces for storage
+                payload.aadhaarNumber = payload.aadhaarNumber.replace(/\s/g, '');
+            }
+
+            if (payload.panCard) {
+                // Ensure PAN is uppercase
+                payload.panCard = payload.panCard.toUpperCase();
+            }
+
+            if (payload.cdaAccountNo) {
+                // Ensure CDA account has correct format
+                payload.cdaAccountNo = payload.cdaAccountNo.toUpperCase();
+            }
+
+            // Create FormData for file upload
             const formData = new FormData();
             formData.append(
                 "data",
                 new Blob([JSON.stringify(payload)], { type: "application/json" })
             );
 
+            // Add image file if present
             const imageFile = document.getElementById("officerImageFile").files[0];
             if (imageFile) {
                 formData.append("image", imageFile);
@@ -4201,17 +4467,25 @@
                     method: "POST",
                     body: formData
                 });
+
                 const data = await res.json();
+
                 if (!res.ok) {
-                    alert(data.message);
+                    alert(data.message || "Failed to save personnel");
                     return;
                 }
+
                 alert("Personnel saved successfully.");
+
+                // Optional: Reset form or redirect
+                // window.location.href = "/personnel-list.html";
+
             } catch (err) {
-                console.error(err);
-                alert(err.message);
+                console.error("Error saving personnel:", err);
+                alert(err.message || "An error occurred while saving");
             }
         }
+
         // Code Save
 
         // =======================================================
@@ -4276,78 +4550,82 @@
         // =======================================================
         function formatArmyNumber() {
             const armyNoInput = document.getElementById("armyNo");
-            if (!armyNoInput) return;
+            const commissionSelect = document.getElementById("commission");
+
+            if (!armyNoInput || !commissionSelect) return;
+
+            const selectedCommission = commissionSelect.value;
+
+            // If no commission selected, don't format
+            if (!selectedCommission) {
+                return;
+            }
+
+            // Use the selected commission value as prefix
+            const prefix = selectedCommission;
 
             let value = armyNoInput.value;
 
             // Remove any existing hyphens and convert to uppercase
             value = value.replace(/-/g, '').toUpperCase();
 
-            // Check if it starts with IC or SC
-            if (value.length >= 2) {
-                const prefix = value.substring(0, 2);
-                if (prefix !== 'IC' && prefix !== 'SC') {
-                    // Auto-correct: if it starts with I or S, try to fix
-                    if (value.startsWith('I')) {
-                        value = 'IC' + value.substring(1);
-                    } else if (value.startsWith('S')) {
-                        value = 'SC' + value.substring(1);
-                    }
+            // Remove any existing prefix if present (IC, SC, SS, WS, SL etc.)
+            const existingPrefixes = ['IC', 'SC', 'SS', 'WS', 'SL'];
+            existingPrefixes.forEach(p => {
+                if (value.startsWith(p)) {
+                    value = value.substring(p.length);
+                }
+            });
+
+            // Format: prefix + hyphen + 5 digits + 1 letter
+            let formatted = prefix + '-';
+
+            // Extract digits and letter from remaining value
+            let digits = value.replace(/[^0-9]/g, '').substring(0, 5);
+            let letters = value.replace(/[^A-Z]/g, '');
+
+            if (digits.length > 0) {
+                formatted += digits;
+
+                // Add letter if we have one
+                if (letters.length > 0) {
+                    formatted += letters.substring(0, 1);
                 }
             }
 
-            // Format: IC/SC + hyphen + 5 digits + 1 letter
-            let formatted = '';
-
-            if (value.length >= 2) {
-                const prefix = value.substring(0, 2);
-                if (prefix === 'IC' || prefix === 'SC') {
-                    formatted = prefix + '-';
-
-                    // Extract digits and letter
-                    let remaining = value.substring(2);
-                    let digits = remaining.replace(/[^0-9]/g, '').substring(0, 5);
-                    let letters = remaining.replace(/[^A-Z]/g, '');
-
-                    if (digits.length > 0) {
-                        formatted += digits;
-
-                        // Add hyphen after digits if we have a letter
-                        if (letters.length > 0) {
-                            formatted += letters.substring(0, 1);
-                        }
-                    }
-
-                    armyNoInput.value = formatted;
-                } else {
-                    armyNoInput.value = value;
-                }
-            } else {
-                armyNoInput.value = value;
-            }
+            armyNoInput.value = formatted;
         }
 
         function validateArmyNumber() {
             const armyNoInput = document.getElementById("armyNo");
-            if (!armyNoInput) return true;
+            const commissionSelect = document.getElementById("commission");
 
+            if (!armyNoInput || !commissionSelect) return true;
+
+            const selectedCommission = commissionSelect.value;
             const value = armyNoInput.value;
             const errorId = "armyNo-error";
-            let existingError = document.getElementById(errorId);
 
-            // Remove any existing error
-            if (existingError) {
-                existingError.remove();
+            let existingError = document.getElementById(errorId);
+            if (existingError) existingError.remove();
+
+            // Check if commission is selected
+            if (!selectedCommission) {
+                showFieldError(commissionSelect, "Please select Types of Commission first", "commission-error");
+                return false;
             }
 
-            // Pattern: IC-12345A or SC-12345A
-            const pattern = /^(IC|SC)-[0-9]{5}[A-Z]$/;
+            // Use selected commission as prefix
+            const expectedPrefix = selectedCommission;
+
+            // Pattern: prefix-12345A
+            const pattern = new RegExp(`^${expectedPrefix}-[0-9]{5}[A-Z]$`);
 
             if (!value) {
                 showFieldError(armyNoInput, "Army No is required", errorId);
                 return false;
             } else if (!pattern.test(value)) {
-                showFieldError(armyNoInput, "Army No must be in format: IC-12345A or SC-12345A (5 digits + 1 capital letter)", errorId);
+                showFieldError(armyNoInput, `Army No must be in format: ${expectedPrefix}-12345A (5 digits + 1 capital letter)`, errorId);
                 return false;
             }
 
@@ -4355,6 +4633,45 @@
             armyNoInput.classList.add("valid");
             armyNoInput.classList.remove("error");
             return true;
+        }
+
+        function setupCommissionListener() {
+            const commissionSelect = document.getElementById("commission");
+            const armyNoInput = document.getElementById("armyNo");
+
+            if (commissionSelect && armyNoInput) {
+                commissionSelect.addEventListener("change", function() {
+                    const selectedCommission = this.value;
+
+                    if (selectedCommission) {
+                        // Clear the army number when commission changes
+                        armyNoInput.value = '';
+
+                        // Set placeholder with correct format
+                        armyNoInput.placeholder = `${selectedCommission}-12345A`;
+
+                        // Enable the army number input
+                        armyNoInput.disabled = false;
+                    } else {
+                        armyNoInput.placeholder = 'Select commission type first';
+                        armyNoInput.disabled = true;
+                        armyNoInput.value = '';
+                    }
+
+                    // Remove any error messages
+                    const errorId = "armyNo-error";
+                    const existingError = document.getElementById(errorId);
+                    if (existingError) existingError.remove();
+
+                    armyNoInput.classList.remove("error", "valid");
+                });
+
+                // Trigger initial state
+                if (!commissionSelect.value) {
+                    armyNoInput.placeholder = 'Select commission type first';
+                    armyNoInput.disabled = true;
+                }
+            }
         }
 
         // =======================================================
@@ -4563,6 +4880,346 @@
                 }
             }
         }
+
+        // =======================================================
+        // CANCEL/RESET FORM FUNCTIONALITY
+        // =======================================================
+
+        function resetForm() {
+            // Show confirmation dialog
+            if (confirm("Are you sure you want to cancel? All entered data will be lost.")) {
+
+                // Clear all text inputs, textareas, and selects
+                clearAllFormFields();
+
+                // Clear all repeaters (decorations, qualifications, family, sports)
+                clearAllRepeaters();
+
+                // Clear medical data
+                resetMedicalData();
+
+                // Clear image upload
+                clearImageUpload();
+
+                // Reset all dropdowns to default state
+                resetDropdowns();
+
+                // Clear any validation errors/hints
+                clearAllErrors();
+
+                // Reset indices for repeaters
+                resetRepeaterIndices();
+
+                // Add back the first/default items for each repeater
+                addDefaultRepeaterItems();
+
+                // Show success message
+                alert("Form has been cleared successfully.");
+            }
+        }
+
+        // =======================================================
+        // CLEAR ALL FORM FIELDS
+        // =======================================================
+        function clearAllFormFields() {
+            // Clear all text inputs
+            document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea').forEach(input => {
+                input.value = '';
+            });
+
+            // Reset all select dropdowns to first option
+            document.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+
+            // Clear hidden inputs
+            document.querySelectorAll('input[type="hidden"]').forEach(input => {
+                input.value = '';
+            });
+
+            // Reset radio buttons and checkboxes
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+                input.checked = false;
+            });
+
+            // Clear specific fields with special handling
+            clearSpecialFields();
+        }
+
+        // =======================================================
+        // CLEAR SPECIAL FIELDS WITH CUSTOM HANDLING
+        // =======================================================
+        function clearSpecialFields() {
+            // Clear Army Number (disable it until commission is selected)
+            const armyNoInput = document.getElementById("armyNo");
+            if (armyNoInput) {
+                armyNoInput.value = '';
+                armyNoInput.disabled = true;
+                armyNoInput.placeholder = 'Select commission type first';
+            }
+
+            // Clear Commission and trigger change event
+            const commissionSelect = document.getElementById("commission");
+            if (commissionSelect) {
+                commissionSelect.selectedIndex = 0;
+                commissionSelect.dispatchEvent(new Event('change'));
+            }
+
+            // Clear dropdown displays
+            const dropdownDisplays = [
+                'selectedStateDisplay', 'selectedDistrictDisplay', 'selectedCityDisplay',
+                'selectedNrsDisplay', 'selectedAirportDisplay', 'selectedCaseTypeDisplay'
+            ];
+
+            dropdownDisplays.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = id.includes('State') ? 'Select State' :
+                        id.includes('District') ? 'Select District' :
+                            id.includes('City') ? 'Select City' :
+                                id.includes('Nrs') ? 'Select Railway Station' :
+                                    id.includes('Airport') ? 'Select Airport' :
+                                        id.includes('CaseType') ? 'Select Case Type' : '';
+                }
+            });
+
+            // Clear Aadhaar, PAN, CDA formatting
+            const aadhaarInput = document.getElementById("aadhaarNumber");
+            if (aadhaarInput) aadhaarInput.value = '';
+
+            const panInput = document.getElementById("panCard");
+            if (panInput) panInput.value = '';
+
+            const cdaInput = document.getElementById("cdaAccountNo");
+            if (cdaInput) cdaInput.value = '';
+        }
+
+        // =======================================================
+        // CLEAR ALL REPEATER SECTIONS
+        // =======================================================
+        function clearAllRepeaters() {
+            // Clear Decorations
+            const decorationsContainer = document.getElementById("decorations-container");
+            if (decorationsContainer) {
+                decorationsContainer.innerHTML = '';
+            }
+
+            // Clear Civil Qualifications
+            const civilContainer = document.getElementById("civil-qualifications-container");
+            if (civilContainer) {
+                civilContainer.innerHTML = '';
+            }
+
+            // Clear Additional Qualifications
+            const additionalContainer = document.getElementById("additional-qualifications-container");
+            if (additionalContainer) {
+                additionalContainer.innerHTML = '';
+            }
+
+            // Clear Family Members
+            const familyContainer = document.getElementById("family-container");
+            if (familyContainer) {
+                familyContainer.innerHTML = '';
+            }
+
+            // Clear Sports
+            const sportsContainer = document.getElementById("sports-container");
+            if (sportsContainer) {
+                sportsContainer.innerHTML = '';
+            }
+        }
+
+        // =======================================================
+        // RESET MEDICAL DATA
+        // =======================================================
+        function resetMedicalData() {
+            // Reset medical data object
+            window.medicalData = {
+                S: { value: '1', type: '', period: '', remark: '' },
+                H: { value: '1', type: '', period: '', remark: '' },
+                A: { value: '1', type: '', period: '', remark: '' },
+                P: { value: '1', type: '', period: '', remark: '' },
+                E: { value: '1', type: '', period: '', remark: '' }
+            };
+
+            // Reset original medical data
+            window.originalMedicalData = JSON.parse(JSON.stringify(window.medicalData));
+
+            // Reset medical code
+            window.medicalCode = 'S1H1A1P1E1';
+
+            // Update UI for medical section
+            const letters = ['S', 'H', 'A', 'P', 'E'];
+            letters.forEach(letter => {
+                // Reset value selects
+                const valueSelect = document.getElementById(`medical${letter}`);
+                if (valueSelect) {
+                    valueSelect.value = '1';
+                }
+
+                // Reset type selects
+                const typeSelect = document.getElementById(`medicalType${letter}`);
+                if (typeSelect) {
+                    typeSelect.value = '';
+                    typeSelect.disabled = true;
+                    typeSelect.style.background = '#f3f4f6';
+                }
+
+                // Reset period inputs
+                const periodInput = document.getElementById(`medicalPeriod${letter}`);
+                if (periodInput) {
+                    periodInput.value = '';
+                    periodInput.disabled = true;
+                    periodInput.style.background = '#f3f4f6';
+                    periodInput.placeholder = 'Months';
+                }
+
+                // Reset remark inputs
+                const remarkInput = document.getElementById(`medicalRemark${letter}`);
+                if (remarkInput) {
+                    remarkInput.value = '';
+                    remarkInput.disabled = true;
+                    remarkInput.style.background = '#f3f4f6';
+                }
+
+                // Remove any error messages
+                const selectionError = document.getElementById(`selection-error-${letter}`);
+                if (selectionError) selectionError.remove();
+
+                const periodError = document.getElementById(`period-error-${letter}`);
+                if (periodError) periodError.remove();
+            });
+
+            // Update medical code display
+            const codeDisplay = document.getElementById('medicalCodeDisplay');
+            if (codeDisplay) {
+                codeDisplay.textContent = 'S1H1A1P1E1';
+            }
+        }
+
+        // =======================================================
+        // CLEAR IMAGE UPLOAD
+        // =======================================================
+        function clearImageUpload() {
+            const fileInput = document.getElementById("officerImageFile");
+            const previewContainer = document.getElementById("imagePreviewContainer");
+            const preview = document.getElementById("imagePreview");
+            const imageDetails = document.getElementById("imageDetails");
+            const imageError = document.getElementById("image-error");
+            const uploadBox = document.querySelector('.upload-box');
+
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+            if (previewContainer) {
+                previewContainer.style.display = 'none';
+            }
+
+            if (preview) {
+                preview.src = '#';
+            }
+
+            if (imageDetails) {
+                imageDetails.textContent = '';
+            }
+
+            if (imageError) {
+                imageError.style.display = 'none';
+            }
+
+            if (uploadBox) {
+                uploadBox.style.borderColor = '#d1d5db';
+            }
+        }
+
+        // =======================================================
+        // RESET DROPDOWNS
+        // =======================================================
+        function resetDropdowns() {
+            // Close all dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                dropdown.style.display = 'none';
+            });
+
+            // Clear search inputs
+            document.querySelectorAll('.dropdown-content input[type="text"]').forEach(input => {
+                input.value = '';
+            });
+
+            // Reset pagination for stations and airports
+            window.currentStationPage = 1;
+            window.currentAirportPage = 1;
+
+            // Reset state, district, city data
+            window.currentStateDistricts = [];
+            window.currentCityList = [];
+        }
+
+        // =======================================================
+        // RESET REPEATER INDICES
+        // =======================================================
+        function resetRepeaterIndices() {
+            window.decorationIndex = 0;
+            window.civilIndex = 0;
+            window.additionalIndex = 0;
+            window.familyIndex = 0;
+            window.sportsIndex = 0;
+        }
+
+        // =======================================================
+        // ADD DEFAULT REPEATER ITEMS (first items)
+        // =======================================================
+        async function addDefaultRepeaterItems() {
+            // Add default decoration
+            if (typeof addDecoration === 'function') {
+                await addDecoration(true);
+            }
+
+            // Add default civil qualification
+            if (typeof addCivilQualification === 'function') {
+                await addCivilQualification(true);
+            }
+
+            // Add default additional qualification
+            if (typeof addAdditionalQualification === 'function') {
+                await addAdditionalQualification(true);
+            }
+
+            // Add default family member
+            if (typeof addFamilyMember === 'function') {
+                await addFamilyMember(true);
+            }
+
+            // Add default sports detail
+            if (typeof addSportsDetail === 'function') {
+                await addSportsDetail(true);
+            }
+        }
+
+        // =======================================================
+        // ALTERNATIVE: HARD RESET (Reload page)
+        // =======================================================
+        function hardResetForm() {
+            if (confirm("Are you sure you want to cancel? All entered data will be lost.")) {
+                window.location.reload();
+            }
+        }
+
+        // =======================================================
+        // ATTACH CANCEL BUTTON EVENT LISTENER
+        // =======================================================
+        document.addEventListener("DOMContentLoaded", function() {
+            // Find cancel button and attach reset function
+            const cancelBtn = document.querySelector('.actions .btn-secondary');
+            if (cancelBtn) {
+                // Remove any existing event listeners
+                cancelBtn.removeEventListener('click', resetForm);
+                // Add new event listener
+                cancelBtn.addEventListener('click', resetForm);
+            }
+
+        });
     </script>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -4638,8 +5295,8 @@
                         </div>
                         <div>
                             <label class="required">Army No</label>
-                            <input id="armyNo">
-                            <span class="field-hint">Format: IC-12345A or SC-12345A</span>
+                            <input id="armyNo" placeholder="Select commission type first" disabled>
+                            <span class="field-hint">Format: [Commission Type prefix]-12345A (5 digits + 1 capital letter)</span>
                         </div>
                         <div>
                             <label class="required">Rank</label>
@@ -4920,9 +5577,9 @@
                             <span class="field-hint">Enter a valid email address</span>
                         </div>
                         <div>
-                            <label>NSG Email</label>
-                            <input type="email" id="nsgEmail" placeholder="name@nsg.gov.in">
-                            <span class="field-hint">Optional NSG email address</span>
+                            <label>NIC Email</label>
+                            <input type="email" id="nicEmail" placeholder="">
+                            <span class="field-hint">Optional NIC email address</span>
                         </div>
                     </div>
                 </div>
@@ -4964,7 +5621,7 @@
 
 
                 <!-- MEDICAL CATEGORY -->
-                <div id="section-medical" class="section">
+                <div id="section-medical" class="section"   >
                     <div class="section-title">
                         <span>🩺 Medical Category</span>
                     </div>
@@ -4996,9 +5653,6 @@
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
                                     </select>
                                 </td>
                                 <td style="padding: 8px;">
@@ -5008,9 +5662,6 @@
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
                                     </select>
                                 </td>
                                 <td style="padding: 8px;">
@@ -5020,9 +5671,6 @@
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
                                     </select>
                                 </td>
                                 <td style="padding: 8px;">
@@ -5032,9 +5680,6 @@
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
                                     </select>
                                 </td>
                                 <td style="padding: 8px;">
@@ -5044,9 +5689,6 @@
                                         <option value="3">3</option>
                                         <option value="4">4</option>
                                         <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
                                     </select>
                                 </td>
                             </tr>
