@@ -53,51 +53,51 @@ public class PanelSelectionServiceImpl implements PanelSelectionService {
 //                    );
 //                });
 //    }
-@Override
-public List<PanelOfficerDTO> getOfficers() {
-
-    return personnelRepository.findAll()
-            .stream()
-            .map(personnel -> {
-
-                PostingDetails posting =
-                        (PostingDetails) postingDetailsRepository
-                                .findTopByPersonnelIdOrderByFromDateDesc(personnel.getId())
-                                .orElse(null);
-
-                return new PanelOfficerDTO(
-                        personnel.getId(),
-
-                        personnel.getFullName(),
-                        personnel.getArmyNo(),
-                        personnel.getRank(),
-
-                        posting != null ? posting.getUnitName() : "NA",
-                        posting != null ? posting.getCommand() : "NA",
-
-                        personnel.getDateOfCommission(),
-                        personnel.getDateOfSeniority(),
-                        personnel.getDateOfBirth(),
-
-                        personnel.getReligion(),
-                        personnel.getMaritalStatus(),
-                        personnel.getMedicalCategory(),
-                        personnel.getMedicalRemark(),
-
-
-
-                        personnel.getMobileNumber(),
-                        personnel.getEmailAddress(),
-
-                        personnel.getCity(),
-                        personnel.getState(),
-
-                        personnel.getOfficerImage()
-                );
-            })
-            .toList();
-}
-
+//@Override
+//public List<PanelOfficerDTO> getOfficers() {
+//
+//    return personnelRepository.findAll()
+//            .stream()
+//            .map(personnel -> {
+//
+//                PostingDetails posting =
+//                        (PostingDetails) postingDetailsRepository
+//                                .findTopByPersonnelIdOrderByFromDateDesc(personnel.getId())
+//                                .orElse(null);
+//
+//                return new PanelOfficerDTO(
+//                        personnel.getId(),
+//
+//                        personnel.getFullName(),
+//                        personnel.getArmyNo(),
+//                        personnel.getRank(),
+//
+//                        posting != null ? posting.getUnitName() : "NA",
+//                        posting != null ? posting.getCommand() : "NA",
+//
+//                        personnel.getDateOfCommission(),
+//                        personnel.getDateOfSeniority(),
+//                        personnel.getDateOfBirth(),
+//
+//                        personnel.getReligion(),
+//                        personnel.getMaritalStatus(),
+//                        personnel.getMedicalCategory(),
+//                        personnel.getMedicalRemark(),
+//
+//
+//
+//                        personnel.getMobileNumber(),
+//                        personnel.getEmailAddress(),
+//
+//                        personnel.getCity(),
+//                        personnel.getState(),
+//
+//                        personnel.getOfficerImage()
+//                );
+//            })
+//            .toList();
+//}
+//
 
 
 

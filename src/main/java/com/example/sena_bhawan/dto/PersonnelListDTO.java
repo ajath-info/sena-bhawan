@@ -64,7 +64,7 @@ public class PersonnelListDTO {
         dto.setDateOfCommission(personnel.getDateOfCommission() != null ? personnel.getDateOfCommission().format(formatter) : "—");
         dto.setDateOfSeniority(personnel.getDateOfSeniority() != null ? personnel.getDateOfSeniority().format(formatter) : "—");
         dto.setPlaceOfBirth(personnel.getPlaceOfBirth());
-        dto.setMedicalCategory(personnel.getMedicalCategory() != null ? personnel.getMedicalCategory() : "—");
+//        dto.setMedicalCategory(personnel.getMedicalCategory() != null ? personnel.getMedicalCategory() : "—");
 
         // New fields mapping
         dto.setReligion(personnel.getReligion() != null ? personnel.getReligion() : "—");

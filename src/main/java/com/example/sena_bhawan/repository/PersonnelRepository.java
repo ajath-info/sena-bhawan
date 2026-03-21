@@ -28,8 +28,8 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     """)
     List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term);
 
-    @Query("SELECT distinct medicalCategory FROM Personnel")
-    List<String> getMedicalCategory();
+//    @Query("SELECT distinct medicalCategory FROM Personnel")
+//    List<String> getMedicalCategory();
 
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")
@@ -56,12 +56,12 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
                                           @Param("date45") LocalDate date45,
                                           @Param("date50") LocalDate date50);
 
-    // Add this method to your existing PersonnelRepository
-    @Query("SELECT p.medicalCategory as medicalCategory, COUNT(p) as count " +
-            "FROM Personnel p " +
-            "WHERE p.medicalCategory IS NOT NULL AND p.medicalCategory <> '' " +
-            "GROUP BY p.medicalCategory")
-    List<MedicalCategoryProjection> getMedicalCategoryCounts();
+//    // Add this method to your existing PersonnelRepository
+//    @Query("SELECT p.medicalCategory as medicalCategory, COUNT(p) as count " +
+//            "FROM Personnel p " +
+//            "WHERE p.medicalCategory IS NOT NULL AND p.medicalCategory <> '' " +
+//            "GROUP BY p.medicalCategory")
+//    List<MedicalCategoryProjection> getMedicalCategoryCounts();
 
     // Method 3: Combined - uses seniority if available, otherwise commission
     @Query(value = "SELECT retirement_year as retirementYear, COUNT(*) as count FROM (" +

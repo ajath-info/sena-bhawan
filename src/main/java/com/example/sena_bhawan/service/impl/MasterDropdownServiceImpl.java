@@ -12,15 +12,15 @@ import java.util.List;
 public class MasterDropdownServiceImpl implements MasterDropdownService {
     private final EstablishmentTypeMasterRepository estRepo;
     private final PostingDueMonthsMasterRepository postingRepo;
-    private final PersonnelRepository personnelRepository;
+//    private final PersonnelRepository personnelRepository;
     private final OrbatStructureRepository orbatStructureRepository;
     private final PersonnelAdditionalQualificationsRepository personnelAdditionalQualificationsRepository;
     private final PersonnelSportsRepository personnelSportsRepository;
 
-    @Override
-    public List<String> getMedicalCategoryDropdown() {
-        return personnelRepository.getMedicalCategory();
-    }
+//    @Override
+//    public List<String> getMedicalCategoryDropdown() {
+//        return personnelRepository.getMedicalCategory();
+//    }
 
     @Override
     public List<String> getEstablishmentTypeDropdown() {

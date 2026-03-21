@@ -14,20 +14,19 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PersonnelSports {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public String sportName;
-    public String level;
-    public String remarks;
-
+    private String sportName;
+    private String level;
+    private String place;
+    private String remarks;
     private LocalDate createdAt;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")
     @JsonBackReference
     private Personnel personnel;
-
-
 }

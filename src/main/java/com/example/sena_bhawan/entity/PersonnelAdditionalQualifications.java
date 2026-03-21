@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "personnel_additional_qualifications")
-@Setter
 @Getter
+@Setter
 public class PersonnelAdditionalQualifications {
 
     @Id
@@ -20,22 +20,15 @@ public class PersonnelAdditionalQualifications {
     private Long id;
 
     private String qualification;
-    private String issuingAuthority;
     private String authorityNo;
+    private LocalDate date;
     private String location;
     private String part2OrderNo;
-    private LocalDate orderDate;
-    private Integer year;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate validity;
-
     private LocalDate createdAt;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")
     @JsonBackReference
     private Personnel personnel;
-
-    // getters/setters
 }
 

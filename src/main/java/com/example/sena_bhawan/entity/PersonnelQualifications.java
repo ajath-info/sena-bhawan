@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "personnel_qualifications")
 @Getter
@@ -20,18 +19,16 @@ public class PersonnelQualifications {
     private Long id;
 
     private String qualification;
-    private String stream;
+    private String board;
     private String institution;
     private Integer yearOfCompletion;
     private String gradePercentage;
-
+    private String part2OrderNo;
     private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")
     @JsonBackReference
     private Personnel personnel;
-
-    // getters/setters
 }
 

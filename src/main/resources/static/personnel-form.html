@@ -780,6 +780,118 @@
         let currentStateDistricts = [];
         let currentCityList = [];
 
+
+        // =======================================================
+        // SPORTS DROPDOWN FUNCTIONS
+        // =======================================================
+
+        // Store sports data globally for filtering
+        let allSportsTypes = [];
+
+        // Function to toggle sports dropdown
+        function toggleSportsDropdown(index) {
+            const dropdown = document.getElementById(`sportsDropdown-${index}`);
+            const isVisible = dropdown.style.display === 'block';
+
+            // Close all other sports dropdowns
+            document.querySelectorAll('[id^="sportsDropdown-"]').forEach(d => {
+                d.style.display = 'none';
+            });
+
+            dropdown.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                setTimeout(() => {
+                    const searchInput = document.getElementById(`sportsSearch-${index}`);
+                    if (searchInput) searchInput.focus();
+                }, 100);
+            }
+        }
+
+        // Function to filter sports
+        async function filterSports(index) {
+            const input = document.getElementById(`sportsSearch-${index}`);
+            const filter = input.value.toUpperCase();
+            const container = document.getElementById(`sportsItemsContainer-${index}`);
+
+            if (!container) return;
+
+            // Load sports if not already loaded
+            if (allSportsTypes.length === 0) {
+                allSportsTypes = await loadSportsTypes();
+            }
+
+            const filtered = allSportsTypes.filter(sport =>
+                sport.name.toUpperCase().includes(filter)
+            );
+
+            let html = '';
+            filtered.forEach(sport => {
+                html += `
+            <div class="dropdown-item" onclick="selectSport(${index}, '${sport.name.replace(/'/g, "\\'")}')"
+                 style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <span style="font-weight: 500;">${sport.name}</span>
+            </div>
+        `;
+            });
+
+            if (filtered.length === 0) {
+                html = '<div style="padding: 12px; color: #6b7280; text-align: center;">No sports found</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Function to select sport
+        function selectSport(index, sportName) {
+            // Update display
+            document.getElementById(`selectedSportDisplay-${index}`).textContent = sportName;
+
+            // Update hidden input
+            document.getElementById(`sportName-${index}`).value = sportName;
+
+            // Close dropdown
+            document.getElementById(`sportsDropdown-${index}`).style.display = 'none';
+
+            // Clear search input
+            const searchInput = document.getElementById(`sportsSearch-${index}`);
+            if (searchInput) searchInput.value = '';
+
+            // Trigger validation
+            const repeaterItem = document.getElementById(`sports-${index}`).closest('.repeater-item');
+            validateSportsDetail(repeaterItem);
+        }
+
+        function validateNameField(input, fieldName) {
+            const value = input.value;
+            const errorId = `${input.id}-name-error`;
+
+            // Remove any existing error
+            const existingError = document.getElementById(errorId);
+            if (existingError) existingError.remove();
+
+            // Check if contains numbers
+            if (value && /[0-9]/.test(value)) {
+                showFieldError(input, `${fieldName} cannot contain numbers`, errorId);
+                return false;
+            }
+
+            // Remove error class if valid
+            input.classList.remove("error");
+            return true;
+        }
+
+        // Format name field (only letters, spaces, and hyphens allowed)
+        function formatNameField(input) {
+            // Replace numbers with empty string
+            let value = input.value.replace(/[0-9]/g, '');
+
+            // Optional: Allow only letters, spaces, hyphens, and apostrophes
+            // value = value.replace(/[^a-zA-Z\s\-']/g, '');
+
+            input.value = value;
+        }
+
         // =======================================================
         // ADDITIONAL QUALIFICATIONS (MIL) - UPDATED VERSION
         // =======================================================
@@ -799,8 +911,6 @@
                 qualificationOptions += `<option value="${item.name}">${item.name}</option>`;
             });
 
-            // Generate year options for date input is not needed, using date picker instead
-
             container.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -808,7 +918,7 @@
             <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
                 <!-- Qualification with Search (searchable dropdown) -->
                 <div>
-                    <label class="required">Qualification</label>
+                    <label>Qualification</label>
                     <div style="position: relative;">
                         <div onclick="toggleAdditionalQualificationDropdown(${index})" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                             <span id="selectedAdditionalQualificationDisplay-${index}">Select Qualification</span>
@@ -835,37 +945,31 @@
                     </div>
                 </div>
 
-                <!-- Authority No. (replaces Authority field) -->
+                <!-- Authority No. -->
                 <div>
-                    <label class="required">Authority No.</label>
+                    <label>Authority No.</label>
                     <input type="text" class="additional-authority-no" placeholder="Enter authority number" oninput="validateAdditionalQualification(this.closest('.repeater-item'))">
                 </div>
 
-                <!-- Date (replaces Year field) -->
+                <!-- Date -->
                 <div>
-                    <label class="required">Date</label>
+                    <label>Date</label>
                     <input type="date" class="additional-date" onchange="validateAdditionalQualification(this.closest('.repeater-item'))">
                 </div>
             </div>
 
-            <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+            <div class="grid" style="grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
                 <!-- Location -->
                 <div>
-                    <label class="required">Location</label>
+                    <label>Location</label>
                     <input type="text" class="additional-location" placeholder="Enter location" oninput="validateAdditionalQualification(this.closest('.repeater-item'))">
                 </div>
 
                 <!-- Part II Order No. (with auto-format) -->
                 <div>
-                    <label class="required">Part II Order No.</label>
+                    <label>Part II Order No.</label>
                     <input type="text" class="additional-order-no" placeholder="0/0013/0001/2026" oninput="formatAdditionalPartIIOrderNo(this); validateAdditionalQualification(this.closest('.repeater-item'))">
                     <span class="field-hint">Format: X/XXXX/XXXX/YYYY (auto-formatted)</span>
-                </div>
-
-                <!-- Order Date -->
-                <div>
-                    <label class="required">Order Date</label>
-                    <input type="date" class="additional-order-date" onchange="validateAdditionalQualification(this.closest('.repeater-item'))">
                 </div>
             </div>
 
@@ -1003,13 +1107,18 @@
             const dateInput = repeaterItem.querySelector('.additional-date');
             const locationInput = repeaterItem.querySelector('.additional-location');
             const orderNoInput = repeaterItem.querySelector('.additional-order-no');
-            const orderDateInput = repeaterItem.querySelector('.additional-order-date');
 
             // Check if qualification is selected
             const hasQualification = qualificationSelect && qualificationSelect.value;
 
             // Remove any existing error messages in this repeater
             repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            // Clear error classes from all fields
+            if (authorityNoInput) authorityNoInput.classList.remove("error");
+            if (dateInput) dateInput.classList.remove("error");
+            if (locationInput) locationInput.classList.remove("error");
+            if (orderNoInput) orderNoInput.classList.remove("error");
 
             if (hasQualification) {
                 let isValid = true;
@@ -1037,18 +1146,11 @@
                     showFieldError(orderNoInput, "Part II Order No. is required", `order-error-${Date.now()}`);
                     isValid = false;
                 } else {
-                    // Validate format: X/XXXX/XXXX/YYYY
                     const pattern = /^\d\/\d{4}\/\d{4}\/\d{4}$/;
                     if (!pattern.test(orderNoInput.value)) {
                         showFieldError(orderNoInput, "Format must be: X/XXXX/XXXX/YYYY (e.g., 0/0013/0001/2026)", `order-error-${Date.now()}`);
                         isValid = false;
                     }
-                }
-
-                // Validate Order Date
-                if (!orderDateInput || !orderDateInput.value) {
-                    showFieldError(orderDateInput, "Order Date is required", `orderdate-error-${Date.now()}`);
-                    isValid = false;
                 }
 
                 return isValid;
@@ -1422,6 +1524,28 @@
                 });
                 armyNoInput.addEventListener("blur", function() {
                     validateArmyNumber();
+                });
+            }
+
+            const firstNameInput = document.getElementById("firstName");
+            if (firstNameInput) {
+                firstNameInput.addEventListener("input", function() {
+                    formatNameField(this);
+                    validateNameField(this, "First Name");
+                });
+                firstNameInput.addEventListener("blur", function() {
+                    validateNameField(this, "First Name");
+                });
+            }
+
+            const lastNameInput = document.getElementById("lastName");
+            if (lastNameInput) {
+                lastNameInput.addEventListener("input", function() {
+                    formatNameField(this);
+                    validateNameField(this, "Last Name");
+                });
+                lastNameInput.addEventListener("blur", function() {
+                    validateNameField(this, "Last Name");
                 });
             }
 
@@ -2656,13 +2780,11 @@
                 if (imageError) imageError.style.display = "none";
                 if (uploadBox) uploadBox.style.borderColor = '#d1d5db';
 
-                // Validate file type
                 if (!imageFile.type.match('image.*')) {
                     alert("Please select a valid image file (JPG/PNG)");
                     isValid = false;
                 }
 
-                // Validate file size (max 2MB)
                 if (imageFile.size > 2 * 1024 * 1024) {
                     alert("Image size should be less than 2MB");
                     isValid = false;
@@ -2676,6 +2798,20 @@
                     showFieldError(element, `${field.name} is required`, `${field.id}-required-error`);
                     isValid = false;
                 }
+            }
+
+            // Validate First Name for numbers
+            const firstNameElement = document.getElementById("firstName");
+            if (firstNameElement && firstNameElement.value.trim() && /[0-9]/.test(firstNameElement.value)) {
+                showFieldError(firstNameElement, "First Name cannot contain numbers", "firstName-number-error");
+                isValid = false;
+            }
+
+            // Validate Last Name for numbers
+            const lastNameElement = document.getElementById("lastName");
+            if (lastNameElement && lastNameElement.value.trim() && /[0-9]/.test(lastNameElement.value)) {
+                showFieldError(lastNameElement, "Last Name cannot contain numbers", "lastName-number-error");
+                isValid = false;
             }
 
             // Validate Army Number format
@@ -2695,11 +2831,17 @@
                 const firstNameInput = item.querySelector(".family-first-name");
                 const lastNameInput = item.querySelector(".family-last-name");
                 const relationshipSelect = item.querySelector(".family-relationship");
-                const orderNoInput = item.querySelector(".family-order-no");
-                const orderDateInput = item.querySelector(".family-order-date");
 
                 if (!firstNameInput?.value.trim()) {
                     alert(`Family Member #${i+1}: First name is required`);
+                    firstNameInput?.focus();
+                    isValid = false;
+                    break;
+                }
+
+                // Check for numbers in family first name
+                if (firstNameInput?.value.trim() && /[0-9]/.test(firstNameInput.value)) {
+                    alert(`Family Member #${i+1}: First name cannot contain numbers`);
                     firstNameInput?.focus();
                     isValid = false;
                     break;
@@ -2712,23 +2854,17 @@
                     break;
                 }
 
+                // Check for numbers in family last name
+                if (lastNameInput?.value.trim() && /[0-9]/.test(lastNameInput.value)) {
+                    alert(`Family Member #${i+1}: Last name cannot contain numbers`);
+                    lastNameInput?.focus();
+                    isValid = false;
+                    break;
+                }
+
                 if (!relationshipSelect?.value) {
                     alert(`Family Member #${i+1}: Relationship is required`);
                     relationshipSelect?.focus();
-                    isValid = false;
-                    break;
-                }
-
-                if (!orderNoInput?.value.trim()) {
-                    alert(`Family Member #${i+1}: Part II Order No. is required`);
-                    orderNoInput?.focus();
-                    isValid = false;
-                    break;
-                }
-
-                if (!orderDateInput?.value) {
-                    alert(`Family Member #${i+1}: Order Date is required`);
-                    orderDateInput?.focus();
                     isValid = false;
                     break;
                 }
@@ -2935,7 +3071,7 @@
             const periodInput = document.getElementById(`medicalPeriod${letter}`);
             if (periodInput) {
                 periodInput.value = '';
-                periodInput.placeholder = type === 'T' ? 'Max 24 months' : 'Max 2 years';
+                periodInput.placeholder = type === 'T' ? 'Max 24 weeks' : 'Max 2 years';
                 window.medicalData[letter].period = '';
 
                 const existingError = document.getElementById(`period-error-${letter}`);
@@ -2959,6 +3095,18 @@
                     P: { value: '1', type: '', period: '', remark: '' },
                     E: { value: '1', type: '', period: '', remark: '' }
                 };
+            }
+
+            // Clear error immediately on input
+            const periodInput = document.getElementById(`medicalPeriod${letter}`);
+            const existingError = document.getElementById(`period-error-${letter}`);
+            if (existingError) existingError.remove();
+            if (periodInput) periodInput.classList.remove("error");
+
+            // Also clear selection error if it's the period error
+            const selectionError = document.getElementById(`selection-error-${letter}`);
+            if (selectionError && selectionError.textContent === "Period is required") {
+                selectionError.remove();
             }
 
             if (validateMedicalPeriod(letter, period)) {
@@ -3112,7 +3260,8 @@
             try {
                 const res = await fetch("http://localhost:6060/api/dropdown/SPORTS");
                 const sportsTypes = await res.json();
-                return sportsTypes;
+                // Sort alphabetically by name
+                return sportsTypes.sort((a, b) => a.name.localeCompare(b.name));
             } catch (err) {
                 console.error("Failed loading sports types:", err);
                 return [];
@@ -3423,6 +3572,13 @@
             // Remove any existing error messages in this repeater
             repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
 
+            // Clear error classes from all fields
+            if (boardInput) boardInput.classList.remove("error");
+            if (yearSelect) yearSelect.classList.remove("error");
+            if (institutionInput) institutionInput.classList.remove("error");
+            if (gradeInput) gradeInput.classList.remove("error");
+            if (orderNoInput) orderNoInput.classList.remove("error");
+
             if (hasQualification) {
                 let isValid = true;
 
@@ -3464,7 +3620,6 @@
                     showFieldError(orderNoInput, "Part II Order No. is required", `order-error-${Date.now()}`);
                     isValid = false;
                 } else {
-                    // Validate format: X/XXXX/XXXX/YYYY
                     const pattern = /^\d\/\d{4}\/\d{4}\/\d{4}$/;
                     if (!pattern.test(orderNoInput.value)) {
                         showFieldError(orderNoInput, "Format must be: X/XXXX/XXXX/YYYY (e.g., 0/0013/0001/2026)", `order-error-${Date.now()}`);
@@ -3637,47 +3792,6 @@
         }
 
         // =======================================================
-        // ADDITIONAL QUALIFICATIONS
-        // =======================================================
-        // async function addAdditionalQualification(isFirst = false) {
-        //     const index = additionalIndex++;
-        //     const id = `additional-${index}`;
-        //
-        //     const container = document.getElementById("additional-qualifications-container");
-        //     if (!container) return;
-        //
-        //     // Load dropdown data
-        //     const armyCourses = await loadArmyCourses();
-        //
-        //     // Build dropdown options
-        //     let courseOptions = '<option value="">Select Qualification</option>';
-        //     armyCourses.forEach(item => {
-        //         courseOptions += `<option value="${item.name}">${item.name}</option>`;
-        //     });
-        //
-        //     container.insertAdjacentHTML(
-        //         "beforeend",
-        //         `
-        //         <div class="grid repeater-item" id="${id}" style="grid-template-columns: repeat(2, 1fr);">
-        //             <div>
-        //                 <label>Qualification</label>
-        //                 <select class="additional-qualification-select">${courseOptions}</select>
-        //             </div>
-        //             <div><label>Authority</label><input type="text" placeholder="Enter authority" class="additional-authority"></div>
-        //             <div><label>Year</label><input type="text" placeholder="Enter year" class="additional-year"></div>
-        //             <div><label>Authority No.</label><input type="number" min="0" step="1" placeholder="Enter authority no." class="additional-authority-no"></div>
-        //             <div><label>Location</label><input type="text" placeholder="Enter location" class="additional-location"></div>
-        //             <div><label>Part II Order No.</label><input type="number" min="0" step="1" placeholder="Enter order no." class="additional-order-no"></div>
-        //             <div><label>Order Date</label><input type="date" class="additional-order-date"></div>
-        //             ${!isFirst ? `
-        //                 <button type="button" class="btn btn-secondary" style="grid-column: span 2;" onclick="removeBlock('${id}')">Remove</button>
-        //             ` : ""}
-        //         </div>
-        //         `
-        //     );
-        // }
-
-        // =======================================================
         // SPORTS DETAILS - UPDATED WITH PLACE DROPDOWN
         // =======================================================
         async function addSportsDetail(isFirst = false) {
@@ -3691,8 +3805,8 @@
             const sportsTypes = await loadSportsTypes();
             const sportsLevels = await loadSportsLevels();
 
-            // Build dropdown options
-            let sportsTypeOptions = '<option value="">Select Sport Name</option>';
+            // Build sport name options (sorted already)
+            let sportsTypeOptions = '';
             sportsTypes.forEach(item => {
                 sportsTypeOptions += `<option value="${item.name}">${item.name}</option>`;
             });
@@ -3708,6 +3822,9 @@
         <option value="1st Place">1st Place</option>
         <option value="2nd Place">2nd Place</option>
         <option value="3rd Place">3rd Place</option>
+        <option value="Gold Medalist">Gold Medalist</option>
+        <option value="Silver Medalist">Silver Medalist</option>
+        <option value="Bronze Medalist">Bronze Medalist</option>
         <option value="Participate">Participate</option>
     `;
 
@@ -3716,12 +3833,30 @@
                 `
         <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
             <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
-                <!-- Sport Name -->
+                <!-- Sport Name with Searchable Dropdown -->
                 <div>
                     <label>Sport Name</label>
-                    <select class="sport-name" onchange="validateSportsDetail(this.closest('.repeater-item'))">
-                        ${sportsTypeOptions}
-                    </select>
+                    <div style="position: relative;">
+                        <div onclick="toggleSportsDropdown(${index})"
+                             style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                            <span id="selectedSportDisplay-${index}">Select Sport</span>
+                            <span style="font-size: 12px;">▼</span>
+                        </div>
+                        <input type="hidden" class="sport-name" id="sportName-${index}" name="sports[${index}][name]">
+
+                        <!-- Dropdown with search input -->
+                        <div id="sportsDropdown-${index}" class="dropdown-content" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 350px; overflow-y: auto; background: white; border: 1px solid #d1d5db; border-radius: 8px; margin-top: 4px; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <input type="text"
+                                   placeholder="Search sport..."
+                                   id="sportsSearch-${index}"
+                                   onkeyup="filterSports(${index})"
+                                   onclick="event.stopPropagation()"
+                                   style="width: 100%; padding: 12px; border: none; border-bottom: 1px solid #d1d5db; border-radius: 8px 8px 0 0; outline: none; font-size: 14px; box-sizing: border-box;">
+                            <div id="sportsItemsContainer-${index}" style="max-height: 300px; overflow-y: auto;">
+                                ${generateSportsOptions(sportsTypes, index)}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sports Level -->
@@ -3762,13 +3897,27 @@
             );
         }
 
+        // Helper function to generate sports options HTML
+        function generateSportsOptions(sportsTypes, index) {
+            let html = '';
+            sportsTypes.forEach(sport => {
+                html += `
+            <div class="dropdown-item" onclick="selectSport(${index}, '${sport.name.replace(/'/g, "\\'")}')"
+                 style="padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s ease;">
+                <span style="font-weight: 500;">${sport.name}</span>
+            </div>
+        `;
+            });
+            return html;
+        }
+
         // =======================================================
         // VALIDATE SPORTS DETAIL
         // =======================================================
         function validateSportsDetail(repeaterItem) {
             if (!repeaterItem) return true;
 
-            const sportNameSelect = repeaterItem.querySelector('.sport-name');
+            const sportNameInput = repeaterItem.querySelector('.sport-name');
             const sportLevelSelect = repeaterItem.querySelector('.sport-level');
             const sportPlaceSelect = repeaterItem.querySelector('.sport-place');
             const achievementsInput = repeaterItem.querySelector('.sport-achievements');
@@ -3777,7 +3926,7 @@
             repeaterItem.querySelectorAll('.error-message').forEach(el => el.remove());
 
             // Check if any field is filled (optional section)
-            const hasAnyValue = (sportNameSelect && sportNameSelect.value) ||
+            const hasAnyValue = (sportNameInput && sportNameInput.value) ||
                 (sportLevelSelect && sportLevelSelect.value) ||
                 (sportPlaceSelect && sportPlaceSelect.value) ||
                 (achievementsInput && achievementsInput.value.trim());
@@ -3786,15 +3935,24 @@
                 let isValid = true;
 
                 // If sport name is selected, validate other fields
-                if (sportNameSelect && sportNameSelect.value) {
+                if (sportNameInput && sportNameInput.value) {
                     if (!sportLevelSelect || !sportLevelSelect.value) {
                         showFieldError(sportLevelSelect, "Sports level is required when sport is selected", `level-error-${Date.now()}`);
                         isValid = false;
+                    } else {
+                        sportLevelSelect.classList.remove("error");
                     }
+
                     if (!sportPlaceSelect || !sportPlaceSelect.value) {
                         showFieldError(sportPlaceSelect, "Place is required when sport is selected", `place-error-${Date.now()}`);
                         isValid = false;
+                    } else {
+                        sportPlaceSelect.classList.remove("error");
                     }
+                } else {
+                    // If sport name is not selected, clear errors from other fields
+                    if (sportLevelSelect) sportLevelSelect.classList.remove("error");
+                    if (sportPlaceSelect) sportPlaceSelect.classList.remove("error");
                 }
 
                 return isValid;
@@ -3825,19 +3983,23 @@
                 `
         <div class="repeater-item" id="${id}" style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 12px; background: #f9fafb;">
             <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
-                <!-- First Name -->
+                <!-- First Name - Required -->
                 <div>
                     <label class="required">First Name</label>
-                    <input type="text" class="family-first-name" placeholder="Enter first name" oninput="validateFamilyMember(this.closest('.repeater-item'))">
+                    <input type="text" class="family-first-name" placeholder="Enter first name"
+                           oninput="formatNameField(this); validateFamilyMember(this.closest('.repeater-item'))"
+                           onblur="validateNameField(this, 'First Name')">
                 </div>
 
-                <!-- Last Name -->
+                <!-- Last Name - Required -->
                 <div>
                     <label class="required">Last Name</label>
-                    <input type="text" class="family-last-name" placeholder="Enter last name" oninput="validateFamilyMember(this.closest('.repeater-item'))">
+                    <input type="text" class="family-last-name" placeholder="Enter last name"
+                           oninput="formatNameField(this); validateFamilyMember(this.closest('.repeater-item'))"
+                           onblur="validateNameField(this, 'Last Name')">
                 </div>
 
-                <!-- Relationship -->
+                <!-- Relationship - Required -->
                 <div>
                     <label class="required">Relationship</label>
                     <select class="family-relationship" onchange="validateFamilyMember(this.closest('.repeater-item'))">
@@ -3847,23 +4009,24 @@
             </div>
 
             <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
-                <!-- Contact Number -->
+                <!-- Contact Number (Optional) -->
                 <div>
                     <label>Contact Number (Optional)</label>
                     <input type="tel" class="family-contact" placeholder="Enter contact number" maxlength="10" oninput="formatMobileNumber(this)">
                 </div>
 
-                <!-- Part II Order No. -->
+                <!-- Part II Order No. - Optional (no star) -->
                 <div>
-                    <label class="required">Part II Order No.</label>
-                    <input type="text" class="family-order-no" placeholder="0/0013/0001/2026" oninput="formatFamilyPartIIOrderNo(this); validateFamilyMember(this.closest('.repeater-item'))">
-                    <span class="field-hint">Format: X/XXXX/XXXX/YYYY</span>
+                    <label>Part II Order No.</label>
+                    <input type="text" class="family-order-no" placeholder="0/0013/0001/2026" oninput="formatFamilyPartIIOrderNo(this)">
+                    <span class="field-hint">Format: X/XXXX/XXXX/YYYY (Optional)</span>
                 </div>
 
-                <!-- Order Date -->
+                <!-- Date - Optional (no star) -->
                 <div>
-                    <label class="required">Order Date</label>
-                    <input type="date" class="family-order-date" onchange="validateFamilyMember(this.closest('.repeater-item'))">
+                    <label>Date</label>
+                    <input type="date" class="family-order-date">
+                    <span class="field-hint">Optional</span>
                 </div>
             </div>
 
@@ -3937,41 +4100,61 @@
 
             let isValid = true;
 
-            // Validate First Name
+            // Validate First Name (Required)
             if (!firstNameInput || !firstNameInput.value.trim()) {
                 showFieldError(firstNameInput, "First name is required", `fname-error-${Date.now()}`);
                 isValid = false;
+            } else {
+                // Check for numbers in first name
+                if (/[0-9]/.test(firstNameInput.value)) {
+                    showFieldError(firstNameInput, "First name cannot contain numbers", `fname-num-error-${Date.now()}`);
+                    isValid = false;
+                } else {
+                    firstNameInput.classList.remove("error");
+                }
             }
 
-            // Validate Last Name
+            // Validate Last Name (Required)
             if (!lastNameInput || !lastNameInput.value.trim()) {
                 showFieldError(lastNameInput, "Last name is required", `lname-error-${Date.now()}`);
                 isValid = false;
+            } else {
+                // Check for numbers in last name
+                if (/[0-9]/.test(lastNameInput.value)) {
+                    showFieldError(lastNameInput, "Last name cannot contain numbers", `lname-num-error-${Date.now()}`);
+                    isValid = false;
+                } else {
+                    lastNameInput.classList.remove("error");
+                }
             }
 
-            // Validate Relationship
+            // Validate Relationship (Required)
             if (!relationshipSelect || !relationshipSelect.value) {
                 showFieldError(relationshipSelect, "Relationship is required", `rel-error-${Date.now()}`);
                 isValid = false;
+            } else {
+                relationshipSelect.classList.remove("error");
             }
 
-            // Validate Part II Order No.
-            if (!orderNoInput || !orderNoInput.value.trim()) {
-                showFieldError(orderNoInput, "Part II Order No. is required", `order-error-${Date.now()}`);
-                isValid = false;
-            } else {
-                // Validate format: X/XXXX/XXXX/YYYY
+            // Part II Order No. - Optional validation (only if value is entered)
+            if (orderNoInput && orderNoInput.value.trim()) {
                 const pattern = /^\d\/\d{4}\/\d{4}\/\d{4}$/;
                 if (!pattern.test(orderNoInput.value)) {
                     showFieldError(orderNoInput, "Format must be: X/XXXX/XXXX/YYYY (e.g., 0/0013/0001/2026)", `order-error-${Date.now()}`);
                     isValid = false;
+                } else {
+                    orderNoInput.classList.remove("error");
                 }
+            } else {
+                // Remove error if field is empty (optional)
+                const existingError = orderNoInput?.parentNode?.querySelector('.error-message');
+                if (existingError) existingError.remove();
+                if (orderNoInput) orderNoInput.classList.remove("error");
             }
 
-            // Validate Order Date
-            if (!orderDateInput || !orderDateInput.value) {
-                showFieldError(orderDateInput, "Order Date is required", `orderdate-error-${Date.now()}`);
-                isValid = false;
+            // Order Date - Optional (no validation needed)
+            if (orderDateInput) {
+                orderDateInput.classList.remove("error");
             }
 
             return isValid;
@@ -3981,13 +4164,8 @@
         // MEDICAL CODE GENERATION AND BUTTON FUNCTIONS
         // =======================================================
 
-        // Store original medical data for cancel functionality
-        let originalMedicalData = null;
-        let medicalCode = 'S1H1A1P1E1'; // Default code
-
         // Validate period based on type
         function validateMedicalPeriod(letter, period) {
-            // Use window.medicalData instead of medicalData
             const type = window.medicalData[letter].type;
             let isValid = true;
             let errorMessage = '';
@@ -4004,7 +4182,7 @@
                     errorMessage = "Period must be a number";
                     isValid = false;
                 } else if (type === 'T' && (periodNum < 1 || periodNum > 24)) {
-                    errorMessage = "For Temporary, period must be between 1-24 months";
+                    errorMessage = "For Temporary, period must be between 1-24 weeks";
                     isValid = false;
                 } else if (type === 'P' && (periodNum < 1 || periodNum > 2)) {
                     errorMessage = "For Permanent, period must be between 1-2 years";
@@ -4021,6 +4199,11 @@
                 periodInput.parentNode.appendChild(error);
             } else {
                 periodInput.classList.remove("error");
+                // Remove the selection error if period is now valid
+                const selectionError = document.getElementById(`selection-error-${letter}`);
+                if (selectionError && selectionError.textContent === "Period is required") {
+                    selectionError.remove();
+                }
             }
 
             return isValid;
@@ -4031,57 +4214,17 @@
             let code = '';
             const letters = ['S', 'H', 'A', 'P', 'E'];
 
-            // Find the category with the highest priority
-            let highestCategory = null;
-            let highestPriority = -1;
-            let highestType = '';
-            let highestPeriod = '';
-
-            // Priority rules:
-            // 1. Permanent (P) has higher priority than Temporary (T)
-            // 2. If same type, higher period wins
-            // 3. If same period, higher value wins
-            // 4. If same value, order S > H > A > P > E
-
-            const typePriority = { 'P': 2, 'T': 1 };
-            const letterPriority = { 'S': 5, 'H': 4, 'A': 3, 'P': 2, 'E': 1 };
-
             letters.forEach(letter => {
-                // Use window.medicalData instead of medicalData
-                const value = parseInt(window.medicalData[letter].value);
+                const value = window.medicalData[letter].value;
                 const type = window.medicalData[letter].type;
                 const period = window.medicalData[letter].period;
-
-                // Only consider if value > 1 and has type and period
-                if (value > 1 && type && period) {
-                    // Convert period to months for comparison
-                    const periodInMonths = type === 'P' ? parseInt(period) * 12 : parseInt(period);
-
-                    // Calculate priority score
-                    const priorityScore = (typePriority[type] * 10000) + (periodInMonths * 100) + (value * 10) + letterPriority[letter];
-
-                    console.log(`${letter}: Type=${type}, Period=${period}, PeriodMonths=${periodInMonths}, Value=${value}, Score=${priorityScore}`);
-
-                    if (priorityScore > highestPriority) {
-                        highestPriority = priorityScore;
-                        highestCategory = letter;
-                        highestType = type;
-                        highestPeriod = period;
-                    }
-                }
-            });
-
-            // Build the code
-            letters.forEach(letter => {
-                // Use window.medicalData instead of medicalData
-                const value = window.medicalData[letter].value;
 
                 // Add the letter and value
                 code += letter + value;
 
-                // Add bracket only for the highest priority category
-                if (letter === highestCategory) {
-                    code += `(${highestType}${highestPeriod})`;
+                // Add bracket with type and period if value > 1
+                if (value !== '1' && type && period) {
+                    code += `(${type}${period})`;
                 }
             });
 
@@ -4370,7 +4513,6 @@
                 const dateInput = item.querySelector(".additional-date");
                 const locationInput = item.querySelector(".additional-location");
                 const orderNoInput = item.querySelector(".additional-order-no");
-                const orderDateInput = item.querySelector(".additional-order-date");
 
                 if (qualificationCode?.value) {
                     const qualificationObj = {
@@ -4378,14 +4520,12 @@
                         authorityNo: authorityNoInput?.value || "",
                         date: dateInput?.value || "",
                         location: locationInput?.value || "",
-                        part2OrderNo: orderNoInput?.value || "",
-                        orderDate: orderDateInput?.value || ""
+                        part2OrderNo: orderNoInput?.value || ""
                     };
 
-                    // Only push if all required fields are filled
+                    // Only push if all required fields are filled (when qualification is selected)
                     if (qualificationObj.authorityNo && qualificationObj.date &&
-                        qualificationObj.location && qualificationObj.part2OrderNo &&
-                        qualificationObj.orderDate) {
+                        qualificationObj.location && qualificationObj.part2OrderNo) {
                         payload.additionalQualifications.push(qualificationObj);
                     }
                 }
@@ -4408,21 +4548,21 @@
                         relationship: relationshipSelect?.value || "",
                         contactNumber: contactInput?.value || "",
                         part2OrderNo: orderNoInput?.value || "",
-                        orderDate: orderDateInput?.value || ""
+                        date: orderDateInput?.value || ""
                     });
                 }
             });
 
             // Collect Sports Details (Optional)
             document.querySelectorAll("#sports-container .repeater-item").forEach(item => {
-                const sportNameSelect = item.querySelector(".sport-name");
+                const sportNameInput = item.querySelector(".sport-name");
                 const sportLevelSelect = item.querySelector(".sport-level");
                 const sportPlaceSelect = item.querySelector(".sport-place");
                 const achievementsInput = item.querySelector(".sport-achievements");
 
-                if (sportNameSelect?.value) {
+                if (sportNameInput?.value) {
                     payload.sports.push({
-                        sportName: sportNameSelect.value,
+                        sportName: sportNameInput.value,
                         sportsLevel: sportLevelSelect?.value || "",
                         place: sportPlaceSelect?.value || "",
                         achievements: achievementsInput?.value || ""
@@ -4494,6 +4634,9 @@
         // Update the initialization to include case type search
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("DOM fully loaded, initializing form...");
+
+            // Preload sports data for faster dropdown filtering
+            allSportsTypes = await loadSportsTypes();
 
             // Medical category click handling
             document.querySelectorAll(".medical-box").forEach(box => {
@@ -5737,19 +5880,19 @@
                             <tr style="border-bottom: 1px solid #e5e7eb;">
                                 <td style="padding: 12px; font-weight: 600; background: #f9fafb; text-align: center;">Period</td>
                                 <td style="padding: 8px;">
-                                    <input type="text" class="medical-period" data-letter="S" id="medicalPeriodS" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('S', this.value)">
+                                    <input type="text" class="medical-period" data-letter="S" id="medicalPeriodS" placeholder="Weeks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('S', this.value)">
                                 </td>
                                 <td style="padding: 8px;">
-                                    <input type="text" class="medical-period" data-letter="H" id="medicalPeriodH" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('H', this.value)">
+                                    <input type="text" class="medical-period" data-letter="H" id="medicalPeriodH" placeholder="Weeks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('H', this.value)">
                                 </td>
                                 <td style="padding: 8px;">
-                                    <input type="text" class="medical-period" data-letter="A" id="medicalPeriodA" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('A', this.value)">
+                                    <input type="text" class="medical-period" data-letter="A" id="medicalPeriodA" placeholder="Weeks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('A', this.value)">
                                 </td>
                                 <td style="padding: 8px;">
-                                    <input type="text" class="medical-period" data-letter="P" id="medicalPeriodP" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('P', this.value)">
+                                    <input type="text" class="medical-period" data-letter="P" id="medicalPeriodP" placeholder="Weeks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('P', this.value)">
                                 </td>
                                 <td style="padding: 8px;">
-                                    <input type="text" class="medical-period" data-letter="E" id="medicalPeriodE" placeholder="Months" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('E', this.value)">
+                                    <input type="text" class="medical-period" data-letter="E" id="medicalPeriodE" placeholder="Weeks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; background: #f3f4f6;" disabled onchange="updateMedicalPeriod('E', this.value)">
                                 </td>
                             </tr>
 

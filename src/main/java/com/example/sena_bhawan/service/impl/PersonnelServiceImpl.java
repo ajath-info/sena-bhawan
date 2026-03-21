@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,6 +40,7 @@ public class PersonnelServiceImpl implements PersonnelService {
     private final PostingDetailsRepository postingDetailsRepository;
     private final PersonnelRepository personnelRepository;
     private final CoursePanelRepository coursePanelRepository;
+    private final String IMAGE_UPLOAD_DIR = "uploads/officer-images/";
 
 
     @Override
@@ -125,29 +127,29 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
-    @Override
-    public MedicalCategoryResponse getMedicalCategoryDistribution() {
-        List<MedicalCategoryProjection> projections =
-                personnelRepository.getMedicalCategoryCounts();
-
-        List<String> labels = new ArrayList<>();
-        List<Integer> data = new ArrayList<>();
-
-        for (MedicalCategoryProjection projection : projections) {
-            String category = projection.getMedicalCategory();
-            if (category != null && !category.trim().isEmpty()) {
-                labels.add(category.trim());
-                data.add(projection.getCount().intValue());
-            }
-        }
-
-        return MedicalCategoryResponse.builder()
-                .labels(labels)
-                .data(data)
-                .chartType("doughnut")
-                .title("Medical Category Distribution")
-                .build();
-    }
+//    @Override
+//    public MedicalCategoryResponse getMedicalCategoryDistribution() {
+//        List<MedicalCategoryProjection> projections =
+//                personnelRepository.getMedicalCategoryCounts();
+//
+//        List<String> labels = new ArrayList<>();
+//        List<Integer> data = new ArrayList<>();
+//
+//        for (MedicalCategoryProjection projection : projections) {
+//            String category = projection.getMedicalCategory();
+//            if (category != null && !category.trim().isEmpty()) {
+//                labels.add(category.trim());
+//                data.add(projection.getCount().intValue());
+//            }
+//        }
+//
+//        return MedicalCategoryResponse.builder()
+//                .labels(labels)
+//                .data(data)
+//                .chartType("doughnut")
+//                .title("Medical Category Distribution")
+//                .build();
+//    }
 
     @Override
     public RankStrengthResponse getOfficerStrengthByRank() {
@@ -240,23 +242,22 @@ public class PersonnelServiceImpl implements PersonnelService {
     @Override
     @Transactional
     public Long createPersonnel(CreatePersonnelRequest req, MultipartFile officerImage) {
-
         try {
             Personnel p = new Personnel();
 
             // Basic Info
-            p.setCommissionType(req.commissionType);
-            p.setArmyNo(req.armyNo);
-            p.setRank(req.rank);
-            p.setFirstName(req.firstName);
-            p.setLastName(req.lastName);
-            p.setFullName(req.fullName);
-            p.setDateOfCommission(req.dateOfCommission);
-            p.setDateOfSeniority(req.dateOfSeniority);
-            p.setDateOfBirth(req.dateOfBirth);
-            p.setPlaceOfBirth(req.placeOfBirth);
-            p.setCaseType(req.caseType);
-            p.setGender(req.gender);
+            p.setCommissionType(req.getCommission());
+            p.setArmyNo(req.getArmyNo());
+            p.setRank(req.getRank());
+            p.setFirstName(req.getFirstName());
+            p.setLastName(req.getLastName());
+            p.setFullName(req.getFullName());
+            p.setGender(req.getGender());
+            p.setCaseType(req.getCaseType());
+            p.setDateOfCommission(req.getDateOfCommission());
+            p.setDateOfSeniority(req.getDateOfSeniority());
+            p.setDateOfBirth(req.getDateOfBirth());
+            p.setPlaceOfBirth(req.getPlaceOfBirth());
 
             // Image handling
             if (officerImage != null && !officerImage.isEmpty()) {
@@ -264,47 +265,48 @@ public class PersonnelServiceImpl implements PersonnelService {
                 p.setOfficerImage(imagePath);
             }
 
-            // Service
-            p.setNrs(req.nrs);
-            p.setReligion(req.religion);
-            p.setAadhaarNumber(req.aadhaarNumber);
-            p.setPanCard(req.panCard);
-            p.setMaritalStatus(req.maritalStatus);
-            p.setCdaAccountNo(req.cdaAccountNo);
+            // Service Details
+            p.setNrs(req.getNrs());
+            p.setNearestAirport(req.getNearestAirport());
+            p.setReligion(req.getReligion());
+            p.setAadhaarNumber(req.getAadhaarNumber());
+            p.setPanCard(req.getPanCard());
+            p.setMaritalStatus(req.getMaritalStatus());
+            p.setCdaAccountNo(req.getCdaAccountNo());
 
             // Address
-            p.setPermanentAddress(req.permanentAddress);
-            p.setCity(req.city);
-            p.setDistrict(req.district);
-            p.setState(req.state);
-            p.setPinCode(req.pinCode);
+            p.setPermanentAddress(req.getPermanentAddress());
+            p.setCity(req.getCity());
+            p.setDistrict(req.getDistrict());
+            p.setState(req.getState());
+            p.setPinCode(req.getPinCode());
 
             // Contact
-            p.setMobileNumber(req.mobileNumber);
-            p.setAlternateMobile(req.alternateMobile);
-            p.setEmailAddress(req.emailAddress);
-            p.setNsgEmail(req.nicEmail);
+            p.setMobileNumber(req.getMobileNumber());
+            p.setAlternateMobile(req.getAlternateMobile());
+            p.setEmailAddress(req.getEmailAddress());
+            p.setNicEmail(req.getNicEmail());
 
-            // Medical basic info
-            p.setMedicalCategory(req.medicalCategory);
-            p.setMedicalRemark(req.medicalRemark);
+            // Medical
+            if (req.getMedical() != null) {
+                p.setMedicalCode(req.getMedical().getMedicalCode());
 
-            if (req.medical != null) {
-                String medicalCode = generateMedicalCode(req.medical);
-                p.setMedicalCode(medicalCode);
+                // Set medical values
+                if (req.getMedical().getMedicalValues() != null) {
+                    p.setMedicalValuesS(req.getMedical().getMedicalValues().getS());
+                    p.setMedicalValuesH(req.getMedical().getMedicalValues().getH());
+                    p.setMedicalValuesA(req.getMedical().getMedicalValues().getA());
+                    p.setMedicalValuesP(req.getMedical().getMedicalValues().getP());
+                    p.setMedicalValuesE(req.getMedical().getMedicalValues().getE());
+                }
             }
 
-            p.setCreatedAt(LocalDateTime.now());
-            p.setUpdatedAt(LocalDateTime.now());
-
             // Handle Decorations
-            if (req.decorations != null) {
-                p.setDecorations(req.decorations.stream().map(d -> {
+            if (req.getDecorations() != null) {
+                p.setDecorations(req.getDecorations().stream().map(d -> {
                     PersonnelDecorations deco = new PersonnelDecorations();
-                    deco.setDecorationCategory(d.decorationCategory);
-                    deco.setDecorationName(d.decorationName);
-                    deco.setAwardDate(d.awardDate);
-                    deco.setCitation(d.citation);
+                    deco.setDecorationCategory(d.getDecorationCategory());
+                    deco.setDecorationName(d.getDecorationName());
                     deco.setPersonnel(p);
                     deco.setCreatedAt(LocalDateTime.now());
                     return deco;
@@ -312,14 +314,15 @@ public class PersonnelServiceImpl implements PersonnelService {
             }
 
             // Handle Qualifications
-            if (req.qualifications != null) {
-                p.setQualifications(req.qualifications.stream().map(q -> {
+            if (req.getQualifications() != null) {
+                p.setQualifications(req.getQualifications().stream().map(q -> {
                     PersonnelQualifications pq = new PersonnelQualifications();
-                    pq.setQualification(q.qualification);
-                    pq.setStream(q.stream);
-                    pq.setInstitution(q.institution);
-                    pq.setYearOfCompletion(q.yearOfCompletion);
-                    pq.setGradePercentage(q.gradePercentage);
+                    pq.setQualification(q.getQualification());
+                    pq.setBoard(q.getBoard());
+                    pq.setInstitution(q.getInstitution());
+                    pq.setYearOfCompletion(q.getYearOfCompletion());
+                    pq.setGradePercentage(q.getGradePercentage());
+                    pq.setPart2OrderNo(q.getPart2OrderNo());
                     pq.setPersonnel(p);
                     pq.setCreatedAt(LocalDateTime.now());
                     return pq;
@@ -327,17 +330,14 @@ public class PersonnelServiceImpl implements PersonnelService {
             }
 
             // Handle Additional Qualifications
-            if (req.additionalQualifications != null) {
-                p.setAdditionalQualifications(req.additionalQualifications.stream().map(a -> {
+            if (req.getAdditionalQualifications() != null) {
+                p.setAdditionalQualifications(req.getAdditionalQualifications().stream().map(a -> {
                     PersonnelAdditionalQualifications aq = new PersonnelAdditionalQualifications();
-                    aq.setQualification(a.qualification);
-                    aq.setIssuingAuthority(a.issuingAuthority);
-                    aq.setYear(a.year);
-                    aq.setAuthorityNo(a.authorityNo);
-                    aq.setLocation(a.location);
-                    aq.setPart2OrderNo(a.part2OrderNo);
-                    aq.setOrderDate(a.orderDate);
-                    aq.setValidity(a.validity);
+                    aq.setQualification(a.getQualification());
+                    aq.setAuthorityNo(a.getAuthorityNo());
+                    aq.setDate(a.getDate());
+                    aq.setLocation(a.getLocation());
+                    aq.setPart2OrderNo(a.getPart2OrderNo());
                     aq.setPersonnel(p);
                     aq.setCreatedAt(LocalDate.now());
                     return aq;
@@ -345,12 +345,13 @@ public class PersonnelServiceImpl implements PersonnelService {
             }
 
             // Handle Sports
-            if (req.sports != null) {
-                p.setSports(req.sports.stream().map(s -> {
+            if (req.getSports() != null) {
+                p.setSports(req.getSports().stream().map(s -> {
                     PersonnelSports ps = new PersonnelSports();
-                    ps.setSportName(s.sportName);
-                    ps.setLevel(s.level);
-                    ps.setRemarks(s.achievements);
+                    ps.setSportName(s.getSportName());
+                    ps.setLevel(s.getSportsLevel());
+                    ps.setPlace(s.getPlace());
+                    ps.setRemarks(s.getAchievements());
                     ps.setPersonnel(p);
                     ps.setCreatedAt(LocalDate.now());
                     return ps;
@@ -358,14 +359,16 @@ public class PersonnelServiceImpl implements PersonnelService {
             }
 
             // Handle Family
-            if (req.family != null) {
-                p.setFamilyMembers(req.family.stream().map(f -> {
+            if (req.getFamily() != null) {
+                p.setFamilyMembers(req.getFamily().stream().map(f -> {
                     PersonnelFamily fam = new PersonnelFamily();
-                    fam.setName(f.name);
-                    fam.setRelationship(f.relationship);
-                    fam.setContactNumber(f.contactNumber);
-                    fam.setPart2OrderNo(f.part2OrderNo);
-                    fam.setOrderDate(f.orderDate);
+                    fam.setFirstName(f.getFirstName());
+                    fam.setLastName(f.getLastName());
+                    fam.setName(f.getFullName());
+                    fam.setRelationship(f.getRelationship());
+                    fam.setContactNumber(f.getContactNumber());
+                    fam.setPart2OrderNo(f.getPart2OrderNo());
+                    fam.setOrderDate(f.getDate());
                     fam.setPersonnel(p);
                     fam.setCreatedAt(LocalDateTime.now());
                     return fam;
@@ -373,45 +376,71 @@ public class PersonnelServiceImpl implements PersonnelService {
             }
 
             // Handle Medical Details
-            if (req.medical != null && req.medical.medicalDetails != null) {
-                p.setMedicalDetails(req.medical.medicalDetails.stream().map(m -> {
+            if (req.getMedical() != null && req.getMedical().getMedicalDetails() != null) {
+                p.setMedicalDetails(req.getMedical().getMedicalDetails().stream().map(m -> {
                     PersonnelMedicalDetails md = new PersonnelMedicalDetails();
-                    md.setMedicalCategory(m.category);
-                    md.setMedicalValue(m.value);
-                    md.setType(m.type);
-                    md.setPeriod(m.period);
-                    md.setRemark(m.remark);
+                    md.setMedicalCategory(m.getCategory());
+                    md.setMedicalValue(m.getValue());
+                    md.setType(m.getType());
+                    md.setPeriod(m.getPeriod());
+                    md.setRemark(m.getRemark());
                     md.setPersonnel(p);
                     md.setCreatedAt(LocalDateTime.now());
                     return md;
                 }).collect(Collectors.toList()));
             }
 
-            // Save once - cascade will handle all children
-            return personnelRepository.save(p).getId();
+            Personnel saved = personnelRepository.save(p);
+            log.info("Personnel saved successfully with ID: {}", saved.getId());
+            return saved.getId();
+
         } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Duplicate data error");
+            log.error("Duplicate data error: {}", e.getMessage());
+            throw new RuntimeException("Duplicate data error: Army No, Aadhaar, PAN, or Email already exists");
         } catch (Exception e) {
-            throw new RuntimeException("Something went wrong");
+            log.error("Error saving personnel: {}", e.getMessage(), e);
+            throw new RuntimeException("Something went wrong while saving personnel: " + e.getMessage());
         }
     }
 
-    private String generateMedicalCode(CreatePersonnelRequest.MedicalDTO medical) {
-        if (medical == null || medical.medicalValues == null) {
-            return null;
+    private String saveOfficerImage(MultipartFile file) {
+        try {
+            // Create directory if not exists
+            Path uploadPath = Paths.get(IMAGE_UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Generate unique filename
+            String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = uploadPath.resolve(filename);
+
+            // Save file
+            Files.copy(file.getInputStream(), filePath);
+
+            return filePath.toString();
+        } catch (IOException e) {
+            log.error("Failed to save officer image: {}", e.getMessage());
+            throw new RuntimeException("Failed to save officer image");
         }
-
-        StringBuilder code = new StringBuilder();
-
-        // Always include all categories in order: S, H, A, P, E
-        code.append("S").append(medical.medicalValues.S != null ? medical.medicalValues.S : "1");
-        code.append("H").append(medical.medicalValues.H != null ? medical.medicalValues.H : "1");
-        code.append("A").append(medical.medicalValues.A != null ? medical.medicalValues.A : "1");
-        code.append("P").append(medical.medicalValues.P != null ? medical.medicalValues.P : "1");
-        code.append("E").append(medical.medicalValues.E != null ? medical.medicalValues.E : "1");
-
-        return code.toString();
     }
+
+//    private String generateMedicalCode(CreatePersonnelRequest.MedicalDTO medical) {
+//        if (medical == null || medical.medicalValues == null) {
+//            return null;
+//        }
+//
+//        StringBuilder code = new StringBuilder();
+//
+//        // Always include all categories in order: S, H, A, P, E
+//        code.append("S").append(medical.medicalValues.S != null ? medical.medicalValues.S : "1");
+//        code.append("H").append(medical.medicalValues.H != null ? medical.medicalValues.H : "1");
+//        code.append("A").append(medical.medicalValues.A != null ? medical.medicalValues.A : "1");
+//        code.append("P").append(medical.medicalValues.P != null ? medical.medicalValues.P : "1");
+//        code.append("E").append(medical.medicalValues.E != null ? medical.medicalValues.E : "1");
+//
+//        return code.toString();
+//    }
 
     // ================= SECTION-WISE UPDATES =================
     @Override
@@ -655,29 +684,29 @@ public class PersonnelServiceImpl implements PersonnelService {
 //        p.setUpdatedAt(LocalDateTime.now());
 //    }
 
-    private String saveOfficerImage(MultipartFile file) {
-
-        try {
-            String folder = "uploads/personnel/officer/";
-
-            File dir = new File(folder);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            String fileName =
-                    System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-            Path path = Paths.get(folder + fileName);
-            Files.write(path, file.getBytes());
-
-            // return RELATIVE path (stored in DB)
-            return folder + fileName;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save officer image", e);
-        }
-    }
+//    private String saveOfficerImage(MultipartFile file) {
+//
+//        try {
+//            String folder = "uploads/personnel/officer/";
+//
+//            File dir = new File(folder);
+//            if (!dir.exists()) {
+//                dir.mkdirs();
+//            }
+//
+//            String fileName =
+//                    System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//
+//            Path path = Paths.get(folder + fileName);
+//            Files.write(path, file.getBytes());
+//
+//            // return RELATIVE path (stored in DB)
+//            return folder + fileName;
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to save officer image", e);
+//        }
+//    }
 
     @Transactional
     public void updateDecorations(Long id, List<DecorationRequest> reqList) {
@@ -745,7 +774,6 @@ public class PersonnelServiceImpl implements PersonnelService {
                         .orElseThrow(() -> new RuntimeException("Qualification not found"));
 
                 q.setQualification(r.qualification);
-                q.setStream(r.stream);
                 q.setInstitution(r.institution);
                 q.setYearOfCompletion(r.yearOfCompletion);
                 q.setGradePercentage(r.gradePercentage);
@@ -754,7 +782,6 @@ public class PersonnelServiceImpl implements PersonnelService {
                 // ADD NEW
                 PersonnelQualifications q = new PersonnelQualifications();
                 q.setQualification(r.qualification);
-                q.setStream(r.stream);
                 q.setInstitution(r.institution);
                 q.setYearOfCompletion(r.yearOfCompletion);
                 q.setGradePercentage(r.gradePercentage);
@@ -793,9 +820,9 @@ public class PersonnelServiceImpl implements PersonnelService {
                         .orElseThrow(() -> new RuntimeException("Additional qualification not found"));
 
                 aq.setQualification(r.qualification);
-                aq.setIssuingAuthority(r.issuingAuthority);
-                aq.setYear(r.year);
-                aq.setValidity(r.validity);
+                aq.setAuthorityNo(r.issuingAuthority);
+//                aq.setYear(r.year);
+//                aq.setValidity(r.validity);
 
             } else {
                 // ADD NEW
@@ -803,9 +830,9 @@ public class PersonnelServiceImpl implements PersonnelService {
                         new PersonnelAdditionalQualifications();
 
                 aq.setQualification(r.qualification);
-                aq.setIssuingAuthority(r.issuingAuthority);
-                aq.setYear(r.year);
-                aq.setValidity(r.validity);
+                aq.setAuthorityNo(r.issuingAuthority);
+//                aq.setYear(r.year);
+//                aq.setValidity(r.validity);
                 aq.setPersonnel(personnel);
                 aq.setCreatedAt(LocalDate.now());
 
@@ -900,12 +927,12 @@ public class PersonnelServiceImpl implements PersonnelService {
         Personnel p = personnelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Personnel not found"));
 
-        p.setMedicalCategory(req.medicalCategory);
-        p.setMedicalDate(req.medicalDate);
-        p.setDiagnosis(req.diagnosis);
-        p.setReviewDate(req.reviewDate);
-        p.setRestriction(req.restriction);
-        p.setInjuryCategory(req.injuryCategory);
+//        p.setMedicalCategory(req.medicalCategory);
+//        p.setMedicalDate(req.medicalDate);
+//        p.setDiagnosis(req.diagnosis);
+//        p.setReviewDate(req.reviewDate);
+//        p.setRestriction(req.restriction);
+//        p.setInjuryCategory(req.injuryCategory);
 
         p.setUpdatedAt(LocalDateTime.now());
     }
@@ -922,7 +949,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         p.setReligion(req.religion);
         p.setMaritalStatus(req.maritalStatus);
         p.setEmailAddress(req.emailAddress);
-        p.setNsgEmail(req.nsgEmail);
+//        p.setNsgEmail(req.nsgEmail);
         p.setMobileNumber(req.mobileNumber);
         p.setAlternateMobile(req.alternateMobile);
 

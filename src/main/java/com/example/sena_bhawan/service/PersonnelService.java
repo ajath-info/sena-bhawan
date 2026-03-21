@@ -33,7 +33,7 @@ public interface PersonnelService {
 
     AgeBandResponse getAgeBandDistribution();
 
-    MedicalCategoryResponse getMedicalCategoryDistribution();
+//    MedicalCategoryResponse getMedicalCategoryDistribution();
     void updateBasicInfo(Long id, UpdateBasicInfoRequest req);
 
     void updateServiceDetails(Long id, UpdateServiceRequest req);
