@@ -61,7 +61,7 @@
           padding: 24px;
         }
 
-        /* ================= SEARCH STYLES (from Course Remarks) ================= */
+        /* ================= SEARCH STYLES ================= */
         .selector-area {
           max-width: 900px;
           margin: auto;
@@ -255,6 +255,97 @@
           border:1px solid #e5e7eb;
           padding:10px;
         }
+
+        /* History section styles */
+        .history-section {
+            margin-top: 26px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .history-table th,
+        .history-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .history-table th {
+            background-color: #f9fafb;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .history-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Column widths */
+        .history-table th:nth-child(1),
+        .history-table td:nth-child(1) {
+            width: 15%;
+        }
+
+        .history-table th:nth-child(2),
+        .history-table td:nth-child(2) {
+            width: 45%;
+        }
+
+        .history-table th:nth-child(3),
+        .history-table td:nth-child(3) {
+            width: 20%;
+        }
+
+        .history-table th:nth-child(4),
+        .history-table td:nth-child(4) {
+            width: 20%;
+        }
+
+        .remark-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .remark-type-General {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .remark-type-Volunteer {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .remark-type-NotDetail {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .remark-type-Continuing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .remark-type-TakenOff {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .history-loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -284,7 +375,7 @@
         <!-- BODY CONTENT -->
         <div class="content-area">
 
-            <!-- SEARCH INPUT (replaces dropdown) -->
+            <!-- SEARCH INPUT -->
             <div class="selector-area">
                 <label>Select Officer</label>
                 <div class="search-container">
@@ -342,7 +433,6 @@
                             <th>Taken on Strength</th>
                             <th>Appointment</th>
                             <th>Total Time Served</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -441,6 +531,12 @@
                     </div>
                 </div>
 
+                <!-- COURSE REMARKS HISTORY SECTION -->
+                <div class="history-section">
+                    <div class="section-title">Course Remarks History</div>
+                    <div id="historyContainer"></div>
+                </div>
+
             </div>
         </div>
 
@@ -449,22 +545,142 @@
 </div>
 
 <script>
-    // ==================== CONFIGURATION (from Course Remarks) ====================
+    // ==================== CONFIGURATION ====================
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
+    const REMARKS_HISTORY_API = `${BASE_URL}/api/remarks/history`;
 
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
     const searchResults = document.getElementById('searchResults');
     const selectedPersonnelInfo = document.getElementById('selectedPersonnelInfo');
     const selectedPersonnelId = document.getElementById('selectedPersonnelId');
+    const historyContainer = document.getElementById('historyContainer');
 
     // ==================== STATE ====================
     let selectedPersonnel = null;
     let searchTimeout = null;
     let abortController = null;
 
-    // ==================== SEARCH FUNCTION (exactly like Course Remarks) ====================
+    // ==================== DISPLAY HISTORY TABLE WITH HEADERS ====================
+    function getHistoryTableHTML() {
+        return `
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Remark Type</th>
+                        <th>Remarks</th>
+                        <th>Course Name</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                </tbody>
+            </table>
+        `;
+    }
+
+    // ==================== LOAD REMARKS HISTORY ====================
+    async function loadRemarksHistory(personnelId) {
+        if (!personnelId) {
+            historyContainer.innerHTML = getHistoryTableHTML();
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+            }
+            return;
+        }
+
+        try {
+            historyContainer.innerHTML = getHistoryTableHTML();
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;" class="history-loading">Loading remark history...</td></tr>';
+            }
+
+            console.log(`📜 Fetching remarks history for personnel ID: ${personnelId}`);
+
+            const response = await fetch(`${REMARKS_HISTORY_API}/${personnelId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('📜 History response:', result);
+
+            if (result.success && result.data && result.data.length > 0) {
+                displayRemarksHistoryData(result.data);
+            } else {
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No remarks history found for this personnel</td></tr>';
+                }
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading remarks history:', error);
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #dc3545;">Failed to load history: ${error.message}</td></tr>`;
+            }
+        }
+    }
+
+    function displayRemarksHistoryData(historyData) {
+        const tbody = document.getElementById('historyTableBody');
+        if (!tbody) return;
+
+        let html = '';
+
+        historyData.forEach(record => {
+            // Format date
+            const date = new Date(record.createdAt);
+            const formattedDate = date.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            // Course name with fallback to '-'
+            const courseName = record.courseName && record.courseName !== '' ? record.courseName : '-';
+
+            // Remark type with badge
+            const remarkTypeClass = `remark-type-${record.remarkType}`;
+
+            html += `
+                <tr>
+                    <td>
+                        <span class="remark-type-badge ${remarkTypeClass}">${escapeHtml(record.remarkType)}</span>
+                    </td>
+                    <td>${escapeHtml(record.generalRemarks || '-')}</td>
+                    <td>${escapeHtml(courseName)}</td>
+                    <td style="white-space: nowrap;">${formattedDate}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (!text) return text;
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ==================== SEARCH FUNCTION ====================
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
             const searchTerm = e.target.value.trim();
@@ -476,6 +692,12 @@
             if (searchTerm.length < 4) {
                 searchResults.style.display = "none";
                 selectedPersonnelInfo.style.display = "none";
+                // Show empty history table
+                historyContainer.innerHTML = getHistoryTableHTML();
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+                }
                 return;
             }
 
@@ -538,7 +760,7 @@
         selectedPersonnelId.value = personnelId;
 
         selectedPersonnel = {
-            id: personnelId,
+            id: Number(personnelId),
             armyNo: armyNo,
             fullName: fullName,
             rank: rank
@@ -551,8 +773,9 @@
             <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
         `;
 
-        // Load all data for selected personnel
+        // Load all data for selected personnel including remarks history
         loadAllData(personnelId);
+        loadRemarksHistory(personnelId);
     };
 
     // ==================== CLICK OUTSIDE ====================
@@ -723,10 +946,20 @@
         // Set the input to loading state
         if (searchInput) searchInput.value = "Loading...";
         loadAllData(autoId);
+        loadRemarksHistory(autoId);
 
         setTimeout(() => {
             downloadPDF();
         }, 1200);
+    }
+
+    // Initialize history table on page load
+    function initializeHistoryTable() {
+        historyContainer.innerHTML = getHistoryTableHTML();
+        const tbody = document.getElementById('historyTableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+        }
     }
 
     // ==================== SIDEBAR LOADER ====================
@@ -752,10 +985,11 @@
         }
     }
 
-    // Load sidebar when page loads
+    // Load sidebar and initialize when page loads
     document.addEventListener("DOMContentLoaded", function() {
         console.log('✅ DOM loaded');
         loadSidebar();
+        initializeHistoryTable();
     });
 </script>
 
