@@ -3,137 +3,122 @@ package com.example.sena_bhawan.dto;
 import java.time.LocalDate;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class CreatePersonnelRequest {
 
-    // PERSONNEL FIELDS
-    @JsonProperty("commission")
-    public String commissionType;
+    // Basic Information
+    private String commission;
+    private String armyNo;
+    private String rank;
+    private String firstName;
+    private String lastName;
+    private String fullName;
+    private String gender;
+    private String caseType;
+    private LocalDate dateOfCommission;
+    private LocalDate dateOfSeniority;
+    private LocalDate dateOfBirth;
+    private String placeOfBirth;
 
-    public String armyNo;
-    public String rank;
+    // Service Details
+    private String nrs;
+    private String nearestAirport;
+    private String religion;
+    private String aadhaarNumber;
+    private String panCard;
+    private String maritalStatus;
+    private String cdaAccountNo;
 
-    @JsonProperty("firstName")
-    public String firstName;
+    // Address
+    private String permanentAddress;
+    private String city;
+    private String district;
+    private String state;
+    private String pinCode;
 
-    @JsonProperty("lastName")
-    public String lastName;
+    // Contact
+    private String mobileNumber;
+    private String alternateMobile;
+    private String emailAddress;
+    private String nicEmail;
 
-    public String fullName;
+    // Collections
+    private List<DecorationDTO> decorations;
+    private List<QualificationDTO> qualifications;
+    private List<AdditionalQualificationDTO> additionalQualifications;
+    private List<SportsDTO> sports;
+    private List<FamilyDTO> family;
+    private MedicalDTO medical;
 
-    @JsonProperty("caseType")
-    public String caseType;
-
-    public LocalDate dateOfCommission;
-    public LocalDate dateOfSeniority;
-    public LocalDate dateOfBirth;
-    public String placeOfBirth;
-    public String officerImage;
-
-    public String nrs;
-    public String religion;
-    public String aadhaarNumber;
-    public String panCard;
-    public String maritalStatus;
-    public String cdaAccountNo;
-    public String gender;
-
-    public String permanentAddress;
-    public String city;
-    public String district;
-    public String state;
-    public String pinCode;
-
-    public String mobileNumber;
-    public String alternateMobile;
-    public String emailAddress;
-
-    @JsonProperty("nicEmail")
-    public String nicEmail;
-
-    public String medicalCategory;
-    public String medicalRemark;
-    public String medicalCode;
-
-    // CHILD LISTS
-    public List<DecorationDTO> decorations;
-    public List<QualificationDTO> qualifications;
-    public List<AdditionalQualificationDTO> additionalQualifications;
-    public List<SportsDTO> sports;
-    public List<FamilyDTO> family;
-
-    // NEW: Medical data
-    public MedicalDTO medical;
-
-    // CHILD DTOs
+    // Nested DTOs
+    @Data
     public static class DecorationDTO {
-        public Long id;
-        public String decorationCategory;
-        public String decorationName;
-        public LocalDate awardDate;
-        public String citation;
+        private String decorationCategory;
+        private String decorationName;
     }
 
+    @Data
     public static class QualificationDTO {
-        public Long id;
-        public String qualification;
-        public String stream;
-        public String institution;
-        public Integer yearOfCompletion;
-        public String gradePercentage;
+        private String qualification;
+        private String board;
+        private Integer yearOfCompletion;
+        private String institution;
+        private String gradePercentage;
+        private String part2OrderNo;
     }
 
+    @Data
     public static class AdditionalQualificationDTO {
-        public Long id;
-        public String qualification;
-        public String issuingAuthority;
-        public Integer year;
-        public String authorityNo;
-        public String location;
-        public String part2OrderNo;
-        public LocalDate orderDate;
-        public LocalDate validity;
+        private String qualification;
+        private String authorityNo;
+        private LocalDate date;
+        private String location;
+        private String part2OrderNo;
     }
 
+    @Data
     public static class SportsDTO {
-        public String sportName;
-
-        @JsonProperty("sportsLevel")
-        public String level;
-
-        public String achievements;
+        private String sportName;
+        private String sportsLevel;
+        private String place;
+        private String achievements;
     }
 
+    @Data
     public static class FamilyDTO {
-        public Long id;
-        public String name;
-        public String relationship;
-        public String contactNumber;
-        public String part2OrderNo;
-        public LocalDate orderDate;
+        private String firstName;
+        private String lastName;
+        private String fullName;
+        private String relationship;
+        private String contactNumber;
+        private String part2OrderNo;
+        private LocalDate date;
     }
 
-    // NEW: Medical DTOs
+    @Data
     public static class MedicalDTO {
-        @JsonProperty("medicalValues")
-        public MedicalValuesDTO medicalValues;
-
-        public List<MedicalDetailDTO> medicalDetails;
+        private MedicalValuesDTO medicalValues;
+        private List<MedicalDetailDTO> medicalDetails;
+        private String medicalCode;
     }
 
+    @Data
     public static class MedicalValuesDTO {
-        public String S;
-        public String H;
-        public String A;
-        public String P;
-        public String E;
+        private String S;
+        private String H;
+        private String A;
+        private String P;
+        private String E;
     }
 
+    @Data
     public static class MedicalDetailDTO {
-        public String category;
-        public String value;
-        public String type;      // TEMPORARY or PERMANENT
-        public String period;     // duration in months/years
-        public String remark;
+        private String category;
+        private String value;
+        private String type;
+        private String period;
+        private String remark;
     }
 }

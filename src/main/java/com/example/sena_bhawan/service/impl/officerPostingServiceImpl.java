@@ -45,10 +45,10 @@ public class officerPostingServiceImpl implements OfficerPostingService {
         return officerPostingRepository.save(posting);
     }
 
-    @Override
-    public OfficerPosting createPosting(OfficerPosting posting) {
-        return null;
-    }
+//    @Override
+//    public OfficerPosting createPosting(OfficerPosting posting) {
+//        return null;
+//    }
 
 
 

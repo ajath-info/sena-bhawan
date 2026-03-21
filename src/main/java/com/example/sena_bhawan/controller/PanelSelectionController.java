@@ -30,10 +30,10 @@ public class PanelSelectionController {
 //        return panelSelectionService.getOfficers(page, size);
 //    }
 
-    @GetMapping("/officers")
-    public List<PanelOfficerDTO> getOfficers() {
-        return panelSelectionService.getOfficers();
-    }
+//    @GetMapping("/officers")
+//    public List<PanelOfficerDTO> getOfficers() {
+//        return panelSelectionService.getOfficers();
+//    }
 
 
     @GetMapping("/attendance/all")

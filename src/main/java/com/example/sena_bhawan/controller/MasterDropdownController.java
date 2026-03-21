@@ -15,10 +15,10 @@ public class MasterDropdownController {
     private final MasterDropdownService service;
 
     // ================= MEDICAL CATEGORY =================
-    @GetMapping("/medical-category")
-    public ResponseEntity<List<String>> getMedicalCategoryDropdown() {
-        return ResponseEntity.ok(service.getMedicalCategoryDropdown());
-    }
+//    @GetMapping("/medical-category")
+//    public ResponseEntity<List<String>> getMedicalCategoryDropdown() {
+//        return ResponseEntity.ok(service.getMedicalCategoryDropdown());
+//    }
 
     // ================= ESTABLISHMENT TYPE =================
     @GetMapping("/establishment-type")

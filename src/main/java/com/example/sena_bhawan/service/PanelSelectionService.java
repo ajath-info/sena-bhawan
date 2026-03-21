@@ -11,7 +11,7 @@ public interface PanelSelectionService {
 
     List<PanelOfficerDTO> getEligibleOfficers();
 //    Page<PanelOfficerDTO> getOfficers(int page, int size);
-    List<PanelOfficerDTO> getOfficers();
+//    List<PanelOfficerDTO> getOfficers();
 
 
     void updateAttendance(Integer courseId, Long scheduleId,

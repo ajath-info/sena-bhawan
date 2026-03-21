@@ -873,7 +873,7 @@
     // Load Units
     // Load Units from ORBAT endpoint
     function loadUnits() {
-        fetch('http://localhost:6060/api/orbat/units')
+        fetch('http://localhost:6060/api/dropdown/UNIT_TYPE')
             .then(response => {
                 if (!response.ok) throw new Error('Failed to load units');
                 return response.json();

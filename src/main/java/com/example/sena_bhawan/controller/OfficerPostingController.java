@@ -23,13 +23,13 @@ public class OfficerPostingController {
     }
 
 
-    @PostMapping("/with-personnel")
-    public ResponseEntity<?> createPosting(
-            @RequestParam Long personnelId,
-            @RequestBody OfficerPosting posting
-    ) {
-        posting.setPersonnel(new Personnel(personnelId));
-        return ResponseEntity.ok(officerPostingService.createPosting(posting));
-    }
+//    @PostMapping("/with-personnel")
+//    public ResponseEntity<?> createPosting(
+//            @RequestParam Long personnelId,
+//            @RequestBody OfficerPosting posting
+//    ) {
+//        posting.setPersonnel(new Personnel(personnelId));
+//        return ResponseEntity.ok(officerPostingService.createPosting(posting));
+//    }
 
 }

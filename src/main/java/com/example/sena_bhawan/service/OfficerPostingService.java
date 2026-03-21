@@ -8,6 +8,6 @@ public interface OfficerPostingService {
 
     OfficerPosting createPosting(OfficerPostingRequestDTO dto);
 
-    @Transactional
-    OfficerPosting createPosting(OfficerPosting posting);
+//    @Transactional
+//    OfficerPosting createPosting(OfficerPosting posting);
 }

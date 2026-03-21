@@ -17,47 +17,47 @@ public class PersonnelMedicalService {
     @Autowired
     private MedicalCategoryHistoryRepository historyRepository;
 
-    public void updateMedical(MedicalUpdateRequestDTO dto) {
-
-        // 1️⃣ Personnel lao
-        Personnel p = personnelRepository.findById(dto.getPersonnelId())
-                .orElseThrow(() -> new RuntimeException("Personnel not found"));
-
-        // 2️⃣ Old value nikaalo (from medical_category)
-        int oldValue = getOldValue(p.getMedicalCategory(), dto.getCategory());
-
-        // 3️⃣ Current medical update (personnel table)
-        String updatedCategory = updateMedicalCategory(
-                p.getMedicalCategory(),
-                dto.getCategory(),
-                dto.getNewValue()
-        );
-
-        p.setMedicalCategory(updatedCategory);
-        p.setMedicalDate(dto.getChangeDate());
-        p.setDiagnosis(dto.getDiagnosis());
-        p.setReviewDate(dto.getNextReviewDate());
-        p.setRestriction(dto.getRestriction());
-
-        personnelRepository.save(p);
-
-        // 4️⃣ HISTORY INSERT (sirf jab 1 → change ho)
-        if (oldValue == 1 && dto.getNewValue() != 1) {
-
-            MedicalCategoryHistory h = new MedicalCategoryHistory();
-            h.setPersonnelId(p.getId());
-            h.setCategory(dto.getCategory());
-            h.setOldValue(oldValue);
-            h.setNewValue(dto.getNewValue());
-            h.setChangeDate(dto.getChangeDate());
-            h.setDiagnosis(dto.getDiagnosis());
-            h.setNextReviewDate(dto.getNextReviewDate());
-            h.setCategoryType(dto.getCategoryType());
-            h.setRestriction(dto.getRestriction());
-
-            historyRepository.save(h);
-        }
-    }
+//    public void updateMedical(MedicalUpdateRequestDTO dto) {
+//
+//        // 1️⃣ Personnel lao
+//        Personnel p = personnelRepository.findById(dto.getPersonnelId())
+//                .orElseThrow(() -> new RuntimeException("Personnel not found"));
+//
+//        // 2️⃣ Old value nikaalo (from medical_category)
+//        int oldValue = getOldValue(p.getMedicalCategory(), dto.getCategory());
+//
+//        // 3️⃣ Current medical update (personnel table)
+//        String updatedCategory = updateMedicalCategory(
+//                p.getMedicalCategory(),
+//                dto.getCategory(),
+//                dto.getNewValue()
+//        );
+//
+//        p.setMedicalCategory(updatedCategory);
+//        p.setMedicalDate(dto.getChangeDate());
+//        p.setDiagnosis(dto.getDiagnosis());
+//        p.setReviewDate(dto.getNextReviewDate());
+//        p.setRestriction(dto.getRestriction());
+//
+//        personnelRepository.save(p);
+//
+//        // 4️⃣ HISTORY INSERT (sirf jab 1 → change ho)
+//        if (oldValue == 1 && dto.getNewValue() != 1) {
+//
+//            MedicalCategoryHistory h = new MedicalCategoryHistory();
+//            h.setPersonnelId(p.getId());
+//            h.setCategory(dto.getCategory());
+//            h.setOldValue(oldValue);
+//            h.setNewValue(dto.getNewValue());
+//            h.setChangeDate(dto.getChangeDate());
+//            h.setDiagnosis(dto.getDiagnosis());
+//            h.setNextReviewDate(dto.getNextReviewDate());
+//            h.setCategoryType(dto.getCategoryType());
+//            h.setRestriction(dto.getRestriction());
+//
+//            historyRepository.save(h);
+//        }
+//    }
 
     // ================= HELPERS =================
 

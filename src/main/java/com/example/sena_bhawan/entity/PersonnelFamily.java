@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "personnel_family")
 @Getter
@@ -18,18 +17,21 @@ public class PersonnelFamily {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     private String name;
     private String relationship;
     private String contactNumber;
     private String part2OrderNo;
     private LocalDate orderDate;
-
     private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")
     @JsonBackReference
     private Personnel personnel;
-
-    // getters/setters
 }
