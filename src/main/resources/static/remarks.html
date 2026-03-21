@@ -195,6 +195,96 @@
             margin-top: 5px;
             font-size: 14px;
         }
+
+        /* History section styles */
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .history-table th,
+        .history-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .history-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .history-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Column widths */
+        .history-table th:nth-child(1),
+        .history-table td:nth-child(1) {
+            width: 15%;
+        }
+
+        .history-table th:nth-child(2),
+        .history-table td:nth-child(2) {
+            width: 40%;
+        }
+
+        .history-table th:nth-child(3),
+        .history-table td:nth-child(3) {
+            width: 25%;
+        }
+
+        .history-table th:nth-child(4),
+        .history-table td:nth-child(4) {
+            width: 20%;
+        }
+
+        .history-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .remark-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .remark-type-General {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .remark-type-Volunteer {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .remark-type-NotDetail {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .remark-type-Continuing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .remark-type-TakenOff {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 
     <link rel="stylesheet" href="sidebar.css">
@@ -269,6 +359,12 @@
                 <div style="text-align:right;">
                     <button class="btn-primary" onclick="saveRemarks()">Update Remarks</button>
                 </div>
+
+                <!-- COURSE REMARKS HISTORY SECTION -->
+                <div class="history-section section">
+                    <div class="section-title">Course Remarks History</div>
+                    <div id="historyContainer"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -279,7 +375,8 @@
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_API = `${BASE_URL}/api/remarks/save`;
-    const COURSE_API = `${BASE_URL}/api/course`;  // Your actual course API
+    const REMARKS_HISTORY_API = `${BASE_URL}/api/remarks/history`;
+    const COURSE_API = `${BASE_URL}/api/course`;
 
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
@@ -291,30 +388,45 @@
     const generalRemarks = document.getElementById('generalRemarks');
     const courseLoading = document.getElementById('courseLoading');
     const courseError = document.getElementById('courseError');
+    const historyContainer = document.getElementById('historyContainer');
 
     // ==================== STATE ====================
     let selectedPersonnel = null;
     let searchTimeout = null;
     let abortController = null;
-    let courses = []; // Store courses
+    let courses = [];
 
-    // ==================== LOAD COURSES FROM ACTUAL API ====================
+    // ==================== DISPLAY HISTORY TABLE WITH HEADERS ====================
+    function getHistoryTableHTML() {
+        return `
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Remark Type</th>
+                        <th>Remarks</th>
+                        <th>Course Name</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                </tbody>
+            </table>
+        `;
+    }
+
+    // ==================== LOAD COURSES FROM API ====================
     async function loadCourses() {
         try {
-            // Show loading indicator
             courseSelect.style.display = 'none';
             courseLoading.style.display = 'block';
             courseError.style.display = 'none';
 
             console.log('📚 Loading courses from API...');
 
-            // Call your actual Course API
             const response = await fetch(COURSE_API, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add authorization header if required
-                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
 
@@ -325,44 +437,36 @@
             const data = await response.json();
             console.log('📦 Courses received:', data);
 
-            // Store courses
             courses = data;
 
-            // Hide loading, show select
             courseLoading.style.display = 'none';
             courseSelect.style.display = 'block';
 
-            // Populate dropdown
             populateCourseDropdown(courses);
 
         } catch (error) {
             console.error('❌ Error loading courses:', error);
 
-            // Show error message
             courseLoading.style.display = 'none';
             courseError.style.display = 'block';
             courseError.textContent = `Failed to load courses: ${error.message}`;
 
-            // Show empty select
             courseSelect.style.display = 'block';
             courseSelect.innerHTML = '<option value="">-- Error loading courses --</option>';
         }
     }
 
-    // Helper function to populate course dropdown
     function populateCourseDropdown(courses) {
-        // Clear existing options except the first one
         courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
 
         if (courses && courses.length > 0) {
             courses.forEach(course => {
                 const option = document.createElement('option');
-                option.value = course.srno || course.id; // Using srno as per your DTO
+                option.value = course.srno || course.id;
 
-                // Format course name based on available fields
                 let displayText = course.courseName;
                 if (course.duration) {
-                    displayText += ` (${course.duration})`;
+                    displayText += ` (${course.duration} weeks)`;
                 }
                 if (course.location) {
                     displayText += ` - ${course.location}`;
@@ -377,6 +481,108 @@
         }
     }
 
+    // ==================== LOAD REMARKS HISTORY ====================
+    async function loadRemarksHistory(personnelId) {
+        if (!personnelId) {
+            // Show empty table with headers
+            historyContainer.innerHTML = getHistoryTableHTML();
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+            }
+            return;
+        }
+
+        try {
+            // Show loading state with table headers
+            historyContainer.innerHTML = getHistoryTableHTML();
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;" class="history-loading">Loading remark history...</td></tr>';
+            }
+
+            console.log(`📜 Fetching remarks history for personnel ID: ${personnelId}`);
+
+            const response = await fetch(`${REMARKS_HISTORY_API}/${personnelId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('📜 History response:', result);
+
+            if (result.success && result.data && result.data.length > 0) {
+                displayRemarksHistoryData(result.data);
+            } else {
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No remarks history found for this personnel</td></tr>';
+                }
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading remarks history:', error);
+            const tbody = document.getElementById('historyTableBody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #dc3545;">Failed to load history: ${error.message}</td></tr>`;
+            }
+        }
+    }
+
+    function displayRemarksHistoryData(historyData) {
+        const tbody = document.getElementById('historyTableBody');
+        if (!tbody) return;
+
+        let html = '';
+
+        historyData.forEach(record => {
+            // Format date
+            const date = new Date(record.createdAt);
+            const formattedDate = date.toLocaleString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            // Course name with fallback to '-'
+            const courseName = record.courseName && record.courseName !== '' ? record.courseName : '-';
+
+            // Remark type with badge
+            const remarkTypeClass = `remark-type-${record.remarkType}`;
+
+            html += `
+                <tr>
+                    <td>
+                        <span class="remark-type-badge ${remarkTypeClass}">${escapeHtml(record.remarkType)}</span>
+                    </td>
+                    <td>${escapeHtml(record.generalRemarks || '-')}</td>
+                    <td>${escapeHtml(courseName)}</td>
+                    <td style="white-space: nowrap;">${formattedDate}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (!text) return text;
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // ==================== SEARCH FUNCTION ====================
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
@@ -389,6 +595,12 @@
             if (searchTerm.length < 4) {
                 searchResults.style.display = "none";
                 selectedPersonnelInfo.style.display = "none";
+                // Show empty table when no personnel selected
+                historyContainer.innerHTML = getHistoryTableHTML();
+                const tbody = document.getElementById('historyTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+                }
                 return;
             }
 
@@ -411,8 +623,6 @@
                 signal: abortController.signal,
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add authorization header if required
-                    // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 }
             });
 
@@ -456,7 +666,7 @@
         selectedPersonnelId.value = personnelId;
 
         selectedPersonnel = {
-            id: personnelId,
+            id: Number(personnelId),
             armyNo: armyNo,
             fullName: fullName,
             rank: rank
@@ -468,6 +678,9 @@
         selectedPersonnelInfo.innerHTML = `
             <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
         `;
+
+        // Load remarks history for selected personnel
+        loadRemarksHistory(selectedPersonnel.id);
     };
 
     // ==================== CLICK OUTSIDE ====================
@@ -485,11 +698,12 @@
             return;
         }
 
-        // Validate status selection
+        // Get selected status (radio button value)
         const selectedStatus = document.querySelector('input[name="status"]:checked');
-        if (!selectedStatus) {
-            alert("Please select Course Detailment Status");
-            return;
+        let remarkType = "General";
+
+        if (selectedStatus) {
+            remarkType = selectedStatus.value;
         }
 
         // Validate course selection
@@ -502,18 +716,15 @@
         // Get selected course details
         const selectedCourse = courses.find(c => (c.srno == selectedCourseId || c.id == selectedCourseId));
 
-        // Get general remarks (this will contain any reason if needed)
+        // Get general remarks
         const remarks = generalRemarks.value.trim();
 
-        // Payload structure matching your backend
         const payload = {
             personnelId: selectedPersonnel.id,
-            status: selectedStatus.value,  // 'Volunteer' or 'NotDetail'
-            courseId: selectedCourseId,
-            courseName: selectedCourse ? selectedCourse.courseName : '',
-            courseDuration: selectedCourse ? selectedCourse.duration : '',
-            courseLocation: selectedCourse ? selectedCourse.location : '',
-            remarks: remarks  // Single remarks field for everything
+            remarkType: remarkType,
+            generalRemarks: remarks,
+            courseId: parseInt(selectedCourseId),
+            courseName: selectedCourse ? selectedCourse.courseName : ''
         };
 
         console.log("📤 Sending payload:", payload);
@@ -522,8 +733,6 @@
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                // Add authorization header if required
-                // 'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             },
             body: JSON.stringify(payload)
         })
@@ -534,9 +743,16 @@
             return res.json();
         })
         .then(data => {
-            alert("Remarks updated successfully ✅");
-            console.log("✅ Saved:", data);
-            clearForm();
+            if (data.success) {
+                alert("Remarks saved successfully ✅");
+                console.log("✅ Saved:", data);
+                clearForm();
+                if (selectedPersonnel) {
+                    loadRemarksHistory(selectedPersonnel.id);
+                }
+            } else {
+                throw new Error(data.message || "Failed to save remarks");
+            }
         })
         .catch(error => {
             console.error("❌ Error:", error);
@@ -546,26 +762,19 @@
 
     // ==================== CLEAR FORM ====================
     function clearForm() {
-        if (searchInput) searchInput.value = '';
-        selectedPersonnel = null;
-        if (selectedPersonnelId) selectedPersonnelId.value = '';
-        if (selectedPersonnelInfo) selectedPersonnelInfo.style.display = 'none';
-        if (searchResults) searchResults.style.display = 'none';
-
-        // Clear radio buttons
         statusRadios.forEach(r => r.checked = false);
-
-        // Clear course selection
         courseSelect.value = '';
-
-        // Clear general remarks
         if (generalRemarks) generalRemarks.value = '';
     }
 
-    // ==================== RETRY LOADING COURSES ====================
-    window.retryLoadCourses = function() {
-        loadCourses();
-    };
+    // ==================== INITIALIZE HISTORY TABLE ====================
+    function initializeHistoryTable() {
+        historyContainer.innerHTML = getHistoryTableHTML();
+        const tbody = document.getElementById('historyTableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+        }
+    }
 
     // ==================== SIDEBAR LOADER ====================
     async function loadSidebar() {
@@ -590,11 +799,12 @@
         }
     }
 
-    // Load sidebar and courses when page loads
+    // Load everything when page loads
     document.addEventListener("DOMContentLoaded", function() {
         console.log('✅ DOM loaded');
         loadSidebar();
-        loadCourses(); // Load courses from actual API
+        loadCourses();
+        initializeHistoryTable();
     });
 </script>
 
