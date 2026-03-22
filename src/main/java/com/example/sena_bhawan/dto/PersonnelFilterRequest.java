@@ -6,25 +6,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-
 @Data
 public class PersonnelFilterRequest {
-
-    // Single values
+    // Basic filters
+    public String armyNo;
     public String placeOfBirth;
     public LocalDate dobGreaterThan;
     public LocalDate docFrom;
     public LocalDate docTo;
     public LocalDate dosFrom;
     public LocalDate dosTo;
-    public LocalDate tosFrom;
-    public LocalDate tosTo;
-    public LocalDate courseFrom;
-    public LocalDate courseTo;
-    public String courseName;
     public String search;
 
-    // Multi-select fields (Lists)
+    // Multi-select filters
     public List<String> rank;
     public List<String> medicalCategory;
     public List<String> command;
@@ -35,4 +29,15 @@ public class PersonnelFilterRequest {
     public List<String> civilQualification;
     public List<String> sports;
     public List<Integer> postingDueMonths;
+
+    // Additional filters
+    public String courseName;
+    public LocalDate courseFrom;
+    public LocalDate courseTo;
+    public LocalDate tosFrom;
+    public LocalDate tosTo;
+
+    // Pagination
+    public int page = 0;
+    public int size = 10;
 }

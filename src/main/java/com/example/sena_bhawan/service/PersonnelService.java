@@ -2,6 +2,7 @@ package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.Personnel;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -54,7 +55,8 @@ public interface PersonnelService {
 
     void updateOfficerImage(Long id, MultipartFile image);
 
-    List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
+//    List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
+    Page<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
 
     OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId);
 

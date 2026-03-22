@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Course Schedule - ARMY HRMS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -501,7 +504,7 @@
         <p>Plan and manage course schedules across years</p>
       </div>
       <div class="header-right">
-        <button class="btn btn-secondary" onclick="printDiv('printMe')">
+        <button class="btn btn-secondary" onclick="exportToPDF()">
           <span>📊</span>
           Export Calendar
         </button>
@@ -628,6 +631,123 @@
   document.addEventListener("DOMContentLoaded", () => {
     loadCourses();
   });
+
+  async function exportToPDF() {
+    const srno = courseSelect.value;
+    if (!srno) {
+      alert("Please select a course first!");
+      return;
+    }
+
+    try {
+      // Fetch the schedule data again to ensure we have latest data
+      const response = await fetch(`http://localhost:6060/api/courseschedule/course/${srno}/summary`);
+      if (!response.ok) throw new Error("Failed to fetch schedule data");
+
+      const data = await response.json();
+
+      // Create new PDF document
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('landscape');
+
+      // Add title
+      doc.setFontSize(18);
+      doc.setTextColor(27, 67, 50);
+      doc.text(`Course Schedule Report - ${data.courseDetails.courseName}`, 14, 15);
+
+      // Add generation date
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      const currentDate = new Date().toLocaleString();
+      doc.text(`Generated on: ${currentDate}`, 14, 23);
+
+      // Add course details summary
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Location: ${data.courseDetails.location}`, 14, 32);
+      doc.text(`Duration: ${data.courseDetails.duration} weeks`, 14, 38);
+      doc.text(`Total Batches: ${data.courseCount.totalschedule}`, 14, 44);
+      doc.text(`Current Batches: ${data.courseCount.currentbatch}`, 14, 50);
+      doc.text(`Upcoming Batches: ${data.courseCount.upcoming}`, 14, 56);
+
+      // Prepare table data with separated from/to columns and added strength
+      const tableData = data.courseSchedule.map((schedule, index) => {
+        const startDate = new Date(schedule.startDate).toLocaleDateString('en-GB');
+        const endDate = new Date(schedule.endDate).toLocaleDateString('en-GB');
+
+        // Determine status for remarks
+        let status = "";
+        const today = new Date();
+        const start = new Date(schedule.startDate);
+        const end = new Date(schedule.endDate);
+
+        if (today < start) status = "Upcoming";
+        else if (today > end) status = "Completed";
+        else status = "In Progress";
+
+        return [
+          index + 1,                           // Sr No.
+          data.courseDetails.courseName,       // Course Name
+          schedule.batchNumber || "N/A",       // Batch Number
+          startDate,                           // Schedule From
+          endDate,                             // Schedule To
+          schedule.courseStrength,             // Course Strength
+          status                               // Remark
+        ];
+      });
+
+      // Add table with updated columns
+      doc.autoTable({
+        startY: 65,
+        head: [['Sr No.', 'Course Name', 'Batch No.', 'From', 'To', 'Strength', 'Remark']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [27, 67, 50],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        },
+        margin: { left: 14, right: 14 },
+        columnStyles: {
+          0: { cellWidth: 20 },      // Sr No.
+          1: { cellWidth: 55 },      // Course Name
+          2: { cellWidth: 30 },      // Batch No.
+          3: { cellWidth: 35 },      // From
+          4: { cellWidth: 35 },      // To
+          5: { cellWidth: 25 },      // Strength
+          6: { cellWidth: 35 }       // Remark
+        }
+      });
+
+      // Add footer with page numbers
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        doc.text(
+                `Page ${i} of ${pageCount}`,
+                doc.internal.pageSize.getWidth() - 20,
+                doc.internal.pageSize.getHeight() - 10
+        );
+        doc.text(
+                `ARMY HRMS - Course Schedule Report`,
+                14,
+                doc.internal.pageSize.getHeight() - 10
+        );
+      }
+
+      // Save the PDF
+      doc.save(`${data.courseDetails.courseName}_Schedule_Report.pdf`);
+
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF report. Please try again.");
+    }
+  }
 
   async function loadCourses() {
     const courseSelect = document.getElementById("courseSelect");

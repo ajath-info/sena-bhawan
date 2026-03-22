@@ -1138,11 +1138,17 @@
                   <th>Unit</th>
                   <th>Command</th>
                   <th>Corps</th>
+                  <th>Division</th>
+                  <th>Est Type</th>
                   <th>Medical</th>
+                  <th>TOS From</th>
+                  <th>TOS To</th>
                   <th>Course</th>
                   <th>Civil Qual</th>
                   <th>Sports</th>
                   <th>POB</th>
+                  <th>Area Type</th>
+                  <th>Posting Due</th>
                   <th>Actions</th>
                 </tr>
                 </thead>
@@ -1397,31 +1403,49 @@
   }
 
   // Build filter request from form
+  // Build filter request from form - UPDATED to handle null values properly
   function buildFilterRequest() {
+    const getSelectValue = (selectId) => {
+      const val = $(`#${selectId}`).val();
+      return val && val.length ? val : null;
+    };
+
+    const getInputValue = (inputId) => {
+      const val = document.getElementById(inputId).value;
+      return val && val.trim() !== '' ? val : null;
+    };
+
+    const getDateValue = (inputId) => {
+      const val = document.getElementById(inputId).value;
+      return val || null;
+    };
+
     return {
-      rank: $('#rankFilter').val() && $('#rankFilter').val().length ? $('#rankFilter').val() : null,
-      medicalCategory: $('#medicalFilter').val() && $('#medicalFilter').val().length ? $('#medicalFilter').val() : null,
-      command: $('#commandFilter').val() && $('#commandFilter').val().length ? $('#commandFilter').val() : null,
-      corps: $('#corpsFilter').val() && $('#corpsFilter').val().length ? $('#corpsFilter').val() : null,
-      division: $('#divisionFilter').val() && $('#divisionFilter').val().length ? $('#divisionFilter').val() : null,
-      establishmentType: $('#estFilter').val() && $('#estFilter').val().length ? $('#estFilter').val() : null,
-      areaType: $('#areaTypeFilter').val() && $('#areaTypeFilter').val().length ? $('#areaTypeFilter').val() : null,
-      civilQualification: $('#civilFilter').val() && $('#civilFilter').val().length ? $('#civilFilter').val() : null,
-      sports: $('#sportsFilter').val() && $('#sportsFilter').val().length ? $('#sportsFilter').val() : null,
-      postingDueMonths: $('#postingDueFilter').val() && $('#postingDueFilter').val().length ?
-              $('#postingDueFilter').val().map(v => parseInt(v)) : null,
-      courseName: document.getElementById('courseNameFilter').value || null,
-      placeOfBirth: document.getElementById('pobFilter').value || null,
-      dobGreaterThan: document.getElementById('dobFilter').value || null,
-      docFrom: document.getElementById('docFrom').value || null,
-      docTo: document.getElementById('docTo').value || null,
-      dosFrom: document.getElementById('dosFrom').value || null,
-      dosTo: document.getElementById('dosTo').value || null,
-      tosFrom: document.getElementById('tosFrom').value || null,
-      tosTo: document.getElementById('tosTo').value || null,
-      courseFrom: document.getElementById('courseFrom').value || null,
-      courseTo: document.getElementById('courseTo').value || null,
-      search: document.getElementById('globalSearch').value || null
+      rank: getSelectValue('rankFilter'),
+      medicalCategory: getSelectValue('medicalFilter'),
+      command: getSelectValue('commandFilter'),
+      corps: getSelectValue('corpsFilter'),
+      division: getSelectValue('divisionFilter'),
+      establishmentType: getSelectValue('estFilter'),
+      areaType: getSelectValue('areaTypeFilter'),
+      civilQualification: getSelectValue('civilFilter'),
+      sports: getSelectValue('sportsFilter'),
+      postingDueMonths: (() => {
+        const val = $('#postingDueFilter').val();
+        return val && val.length ? val.map(v => parseInt(v)) : null;
+      })(),
+      courseName: getInputValue('courseNameFilter'),
+      placeOfBirth: getInputValue('pobFilter'),
+      dobGreaterThan: getDateValue('dobFilter'),
+      docFrom: getDateValue('docFrom'),
+      docTo: getDateValue('docTo'),
+      dosFrom: getDateValue('dosFrom'),
+      dosTo: getDateValue('dosTo'),
+      tosFrom: getDateValue('tosFrom'),
+      tosTo: getDateValue('tosTo'),
+      courseFrom: getDateValue('courseFrom'),
+      courseTo: getDateValue('courseTo'),
+      search: getInputValue('globalSearch')
     };
   }
 
@@ -1435,32 +1459,50 @@
 
       const filterRequest = buildFilterRequest();
 
+      // Add pagination parameters to the request
+      const requestWithPagination = {
+        ...filterRequest,
+        page: currentPage - 1,  // API uses 0-based page index
+        size: itemsPerPage
+      };
+
+      console.log('Sending request:', requestWithPagination); // Debug log
+
       const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(filterRequest)
+        body: JSON.stringify(requestWithPagination)
       });
 
       if (response.ok) {
-        const data = await response.json();
-        const allData = data.data || [];
-        totalItems = allData.length;
-        totalPages = Math.ceil(totalItems / itemsPerPage);
+        const result = await response.json();
+        console.log('Received data:', result); // Debug log
 
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedData = allData.slice(start, end);
+        // Extract data from paginated response structure
+        const officers = result.content || [];
+        totalItems = result.totalElements || 0;
+        totalPages = result.totalPages || 0;
+        // Update currentPage to match API's page number (0-based)
+        currentPage = (result.number || 0) + 1;
 
-        renderTable(paginatedData);
+        renderTable(officers);
         updateResultsCount();
         renderPagination();
+        document.getElementById('unitStrength').innerText = `Unit Strength: ${totalItems}`;
+      } else {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        showToast('Error loading officer records', 'error');
+        // Show empty state
+        renderTable([]);
       }
 
     } catch (error) {
       console.error('Error fetching data:', error);
-      showToast('Error loading officer records', 'error');
+      showToast('Error loading officer records: ' + error.message, 'error');
+      renderTable([]);
     } finally {
       isLoading = false;
       showLoading(false);
@@ -1474,7 +1516,7 @@
     if (!officers || officers.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="15" style="text-align: center; padding: 40px;">
+          <td colspan="21" style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
             <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
             <div style="color: #6b7280;">Try adjusting your filters</div>
@@ -1487,14 +1529,17 @@
 
     let html = '';
     officers.forEach(o => {
+      // Format dates safely
       const dob = o.dateOfBirth ? new Date(o.dateOfBirth).toLocaleDateString('en-GB') : '—';
       const doc = o.dateOfCommission ? new Date(o.dateOfCommission).toLocaleDateString('en-GB') : '—';
       const dos = o.dateOfSeniority ? new Date(o.dateOfSeniority).toLocaleDateString('en-GB') : '—';
 
-      const courseName = o.qualifications && o.qualifications.length > 0 ? o.qualifications[0].courseName || '—' : '—';
-      const civilQual = o.qualifications && o.qualifications.length > 0 ? o.qualifications[0].qualification || '—' : '—';
-      const sports = o.additionalQualifications && o.additionalQualifications.length > 0 ?
-              o.additionalQualifications[0].sports || '—' : '—';
+      // Use actual fields from API response
+      const courseName = o.course || '—';
+      const civilQual = o.civilQual || '—';
+      const sports = o.sports || '—';
+      const medicalValue = o.medicalCode || '—';
+      const postingDue = o.postingDueMonths !== null && o.postingDueMonths !== undefined ? o.postingDueMonths : '—';
 
       html += `
         <tr>
@@ -1507,15 +1552,21 @@
           <td>${o.unit || '—'}</td>
           <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
           <td>${o.corps || '—'}</td>
-          <td><span class="badge ${o.medicalCategory === 'SHAPE-1' ? 'badge-success' : 'badge-gray'}">${o.medicalCategory || '—'}</span></td>
+          <td>${o.division || '—'}</td>
+          <td>${o.establishmentType || '—'}</td>
+          <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
+          <td>${o.tosStart || '—'}</td>
+          <td>${o.tosEnd || '—'}</td>
           <td>${courseName}</td>
           <td>${civilQual}</td>
           <td>${sports}</td>
           <td>${o.placeOfBirth || '—'}</td>
+          <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
+          <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
           <td>
             <div class="action-icons">
               <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
-              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit️</div>
+              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
             </div>
           </td>
         </tr>
@@ -1536,19 +1587,28 @@
     }
 
     let html = `
-      <div class="pagination-info">
-        Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of
-        <strong>${totalItems}</strong> officers
-      </div>
-      <div class="pagination-controls">
+        <div class="pagination-info">
+            Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of
+            <strong>${totalItems}</strong> officers
+        </div>
+        <div class="pagination-controls">
     `;
 
+    // First page button
     html += `
-      <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-        ← Previous
-      </button>
+        <button class="pagination-btn" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>
+            « First
+        </button>
     `;
 
+    // Previous button
+    html += `
+        <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+            ← Previous
+        </button>
+    `;
+
+    // Page numbers
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -1561,10 +1621,10 @@
 
     for (let i = startPage; i <= endPage; i++) {
       html += `
-        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-          ${i}
-        </button>
-      `;
+            <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                ${i}
+            </button>
+        `;
     }
 
     if (endPage < totalPages) {
@@ -1574,10 +1634,18 @@
       html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
     }
 
+    // Next button
     html += `
-      <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
-        Next →
-      </button>
+        <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+            Next →
+        </button>
+    `;
+
+    // Last page button
+    html += `
+        <button class="pagination-btn" onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>
+            Last »
+        </button>
     `;
 
     html += '</div>';
@@ -1630,7 +1698,7 @@
     document.getElementById('courseNameFilter').value = '';
     document.getElementById('pobFilter').value = '';
 
-    currentPage = 1;
+    currentPage = 1;  // Reset to first page
     fetchFilteredData();
   }
 
@@ -1823,8 +1891,7 @@
             </div>
             <div class="summary-item">
               <span class="summary-label">Medical Category</span>
-              <span class="summary-value badge ${officer.medicalCategory === 'S1' ? 'badge-success' : 'badge-gray'}">${officer.medicalCategory || '—'}</span>
-            </div>
+<span class="summary-value badge ${(officer.medicalCode || '').includes('S1') ? 'badge-success' : 'badge-gray'}">${officer.medicalCode || '—'}</span>            </div>
             <div class="summary-item">
               <span class="summary-label">Date of Birth</span>
               <span class="summary-value">${formatDate(officer.dateOfBirth)}</span>

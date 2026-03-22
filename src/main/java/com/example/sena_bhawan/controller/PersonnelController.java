@@ -8,6 +8,7 @@ import com.example.sena_bhawan.entity.PostingDetails;
 import com.example.sena_bhawan.service.PersonnelService;
 import com.example.sena_bhawan.service.PostingDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -368,18 +369,23 @@ public class PersonnelController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<?> filterPersonnel(
-            @RequestBody PersonnelFilterRequest filterRequest) {
-
-        List<PersonnelListDTO> responseList = personnelService.filterPersonnel(filterRequest);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("count", responseList.size());
-        response.put("data", responseList);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Page<PersonnelListDTO>> filterPersonnel(@RequestBody PersonnelFilterRequest filter) {
+        Page<PersonnelListDTO> result = personnelService.filterPersonnel(filter);
+        return ResponseEntity.ok(result);
     }
+
+//    @GetMapping("/{id}")
+//    public ResponseEntity<PersonnelListDTO> getPersonnelById(@PathVariable Long id) {
+//        PersonnelFilterRequest filter = new PersonnelFilterRequest();
+//        filter.page = 0;
+//        filter.size = 1;
+//        Page<PersonnelListDTO> result = personnelService.filterPersonnel(filter);
+//
+//        if (result.hasContent()) {
+//            return ResponseEntity.ok(result.getContent().get(0));
+//        }
+//        return ResponseEntity.notFound().build();
+//    }
 
 
     @GetMapping("/unit/{unitId}/summary")
