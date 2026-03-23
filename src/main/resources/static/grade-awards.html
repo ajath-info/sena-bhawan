@@ -102,6 +102,56 @@
       padding: 24px;
     }
 
+    /* Filters Row */
+    .filters-card {
+      background: white;
+      margin-bottom: 24px;
+      padding: 18px 24px;
+      border-radius: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      border: 1px solid #e2edf2;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 260px;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2c6e4f;
+    }
+
+    .filter-group select {
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1.5px solid #cbd5e1;
+      background: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: #2b6e4e;
+    }
+
+    .filter-group select:disabled {
+      background: #f3f4f6;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
     /* Course Info Card */
     .course-info-card {
       background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
@@ -171,6 +221,39 @@
       color: #78350f;
     }
 
+    /* View Toggle */
+    .view-toggle {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 8px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: #1b4332;
+      color: white;
+    }
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+
     /* Grading Table */
     .grading-section {
       background: white;
@@ -179,6 +262,7 @@
       padding: 24px;
       margin-bottom: 24px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
     }
     .section-title {
       font-size: 20px;
@@ -192,7 +276,7 @@
     .grading-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      min-width: 1000px;
     }
     .grading-table thead {
       background: #f9fafb;
@@ -204,11 +288,13 @@
       font-weight: 700;
       color: #374151;
       border-bottom: 2px solid #e5e7eb;
+      white-space: nowrap;
     }
     .grading-table td {
-      padding: 16px 12px;
+      padding: 14px 12px;
       font-size: 14px;
       border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
     }
     .grading-table tr:last-child td {
       border-bottom: none;
@@ -231,6 +317,7 @@
       border-radius: 12px;
       font-size: 12px;
       font-weight: 600;
+      white-space: nowrap;
     }
     .status-pending {
       background: #fef3c7;
@@ -240,20 +327,6 @@
       background: #d1fae5;
       color: #065f46;
     }
-    .grade-input {
-      padding: 8px 12px;
-      border: 2px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      width: 100px;
-      text-align: center;
-    }
-    .grade-input:focus {
-      outline: none;
-      border-color: #1b4332;
-      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
-    }
     .grade-select {
       padding: 8px 12px;
       border: 2px solid #d1d5db;
@@ -262,15 +335,22 @@
       font-weight: 600;
       background: white;
       cursor: pointer;
+      width: 100px;
     }
-    .grade-select:focus {
-      outline: none;
-      border-color: #1b4332;
+    .remarks-input {
+      padding: 8px 12px;
+      border: 2px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+      width: 180px;
     }
     .instructor-checkbox {
       width: 20px;
       height: 20px;
       cursor: pointer;
+      margin: 0 auto;
+      display: block;
     }
     .btn {
       padding: 10px 20px;
@@ -303,17 +383,16 @@
       color: #6b7280;
       border: 2px solid #d1d5db;
     }
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
     .form-actions {
       display: flex;
       gap: 12px;
       justify-content: flex-end;
       padding-top: 20px;
       border-top: 2px solid #e5e7eb;
-    }
-    .grade-display {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      margin-top: 20px;
     }
     .grade-badge {
       padding: 6px 16px;
@@ -322,6 +401,7 @@
       font-weight: 700;
       background: #fef3c7;
       color: #92400e;
+      display: inline-block;
     }
     .instructor-badge {
       padding: 4px 12px;
@@ -330,37 +410,112 @@
       font-weight: 600;
       background: #dcfce7;
       color: #166534;
+      display: inline-block;
     }
-    .view-toggle {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 8px;
-      margin-bottom: 24px;
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: #6c7a89;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #1b4332;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Custom Confirmation Dialog */
+    .custom-confirm {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
-      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
     }
-    .toggle-btn {
-      flex: 1;
-      padding: 12px 24px;
+    .confirm-dialog {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .confirm-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+    .confirm-message {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .confirm-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    .confirm-btn {
+      padding: 8px 20px;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      background: transparent;
-      color: #6b7280;
-      transition: all 0.2s;
     }
-    .toggle-btn.active {
-      background: #1b4332;
+    .confirm-btn-cancel {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    .confirm-btn-confirm {
+      background: #dc2626;
       color: white;
     }
-    .view-section {
-      display: none;
+    .confirm-btn-confirm:hover {
+      background: #b91c1c;
     }
-    .view-section.active {
-      display: block;
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .grading-table {
+        min-width: 900px;
+      }
+      .remarks-input {
+        width: 140px;
+      }
+      .grade-select {
+        width: 80px;
+      }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 220px;
+      }
+      .content-area {
+        padding: 16px;
+      }
+      .filters-card {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-group {
+        min-width: 100%;
+      }
     }
   </style>
   <link rel="stylesheet" href="sidebar.css">
@@ -376,423 +531,588 @@
     </div>
   </aside>
 
-    <main class="main-content">
-      <header class="header">
-        <div class="header-left">
-          <h2>Course Completion - Grade Update</h2>
-          <p>Update grades and instructor awards for completed courses</p>
+  <main class="main-content">
+    <header class="header">
+      <div class="header-left">
+        <h2>Course Completion - Grade Update</h2>
+        <p>Update grades, instructor awards & remarks for completed courses</p>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- Course & Batch Filters -->
+      <div class="filters-card">
+        <div class="filter-group">
+          <label>🎓 SELECT COURSE</label>
+          <select id="courseSelect">
+            <option value="">-- Loading courses --</option>
+          </select>
         </div>
-      </header>
-
-      <div class="content-area">
-        <!-- Course Info -->
-        <div class="course-info-card">
-          <div class="course-info-title">Mountain Warfare Course</div>
-          <div class="course-info-subtitle">Course Code: MWC-2025-09 | Status: Completed</div>
-          <div class="course-info-grid">
-            <div class="course-info-item">
-              <div class="course-info-label">Duration</div>
-              <div class="course-info-value">01 Sep 2025 - 30 Sep 2025</div>
-            </div>
-            <div class="course-info-item">
-              <div class="course-info-label">Location</div>
-              <div class="course-info-value">HAWS, Gulmarg</div>
-            </div>
-            <div class="course-info-item">
-              <div class="course-info-label">Total Participants</div>
-              <div class="course-info-value">5 Officers</div>
-            </div>
-            <div class="course-info-item">
-              <div class="course-info-label">Completion Date</div>
-              <div class="course-info-value">30 Sep 2025</div>
-            </div>
-          </div>
+        <div class="filter-group">
+          <label>📅 SELECT BATCH (SESSION)</label>
+          <select id="batchSelect" disabled>
+            <option value="">-- First choose a course --</option>
+          </select>
         </div>
+      </div>
 
-        <!-- Alert -->
-        <div class="alert-box">
-          <div class="alert-icon">⚠️</div>
-          <div class="alert-content">
-            <div class="alert-title">Grade Update Required</div>
-            <div class="alert-text">
-              This course has been completed. Please update grades and instructor awards for all participants. 
-              These grades will be visible in both the admin panel and individual officer course records.
-            </div>
-          </div>
-        </div>
-
-        <!-- View Toggle -->
-        <div class="view-toggle">
-          <button class="toggle-btn active" data-view="grading">
-            <span>📝</span>
-            Grade Update Form
-          </button>
-          <button class="toggle-btn" data-view="panel">
-            <span>📊</span>
-            Panel List View (With Grades)
-          </button>
-        </div>
-
-        <!-- Grading Form View -->
-        <div id="gradingView" class="view-section active">
-          <div class="grading-section">
-            <div class="section-title">
-              <span>📝</span>
-              Update Grades & Awards
-            </div>
-
-            <table class="grading-table">
-              <thead>
-                <tr>
-                  <th>Sr No</th>
-                  <th>Officer Details</th>
-                  <th>Unit</th>
-                  <th>Panel Position</th>
-                  <th>Grade</th>
-                  <th>Instructor Award</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>
-                    <div class="officer-name">Major Rajesh Kumar Singh</div>
-                    <div class="army-no">IC-12345</div>
-                  </td>
-                  <td>2 RAJPUT</td>
-                  <td>Detailed #1</td>
-                  <td>
-                    <select class="grade-select" data-officer="IC-12345">
-                      <option value="">Select Grade</option>
-                      <option value="A+">A+</option>
-                      <option value="A" selected>A</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B">B</option>
-                      <option value="B-">B-</option>
-                      <option value="C+">C+</option>
-                      <option value="C">C</option>
-                    </select>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="instructor-checkbox" checked data-officer="IC-12345" />
-                  </td>
-                  <td><span class="status-badge status-graded">Graded</span></td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>
-                    <div class="officer-name">Captain Vikram Sharma</div>
-                    <div class="army-no">IC-67890</div>
-                  </td>
-                  <td>11 GORKHA RIFLES</td>
-                  <td>Detailed #2</td>
-                  <td>
-                    <select class="grade-select" data-officer="IC-67890">
-                      <option value="">Select Grade</option>
-                      <option value="A+">A+</option>
-                      <option value="A">A</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B" selected>B</option>
-                      <option value="B-">B-</option>
-                      <option value="C+">C+</option>
-                      <option value="C">C</option>
-                    </select>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-67890" />
-                  </td>
-                  <td><span class="status-badge status-graded">Graded</span></td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>
-                    <div class="officer-name">Lieutenant Arun Patel</div>
-                    <div class="army-no">IC-54321</div>
-                  </td>
-                  <td>1 PARA (SF)</td>
-                  <td>Reserve #1 → Detailed</td>
-                  <td>
-                    <select class="grade-select" data-officer="IC-54321">
-                      <option value="">Select Grade</option>
-                      <option value="A+">A+</option>
-                      <option value="A">A</option>
-                      <option value="A-" selected>A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B">B</option>
-                      <option value="B-">B-</option>
-                      <option value="C+">C+</option>
-                      <option value="C">C</option>
-                    </select>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-54321" />
-                  </td>
-                  <td><span class="status-badge status-graded">Graded</span></td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>
-                    <div class="officer-name">Captain Rahul Gupta</div>
-                    <div class="army-no">IC-44444</div>
-                  </td>
-                  <td>3 GORKHA RIFLES</td>
-                  <td>Detailed #3</td>
-                  <td>
-                    <select class="grade-select" data-officer="IC-44444">
-                      <option value="" selected>Select Grade</option>
-                      <option value="A+">A+</option>
-                      <option value="A">A</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B">B</option>
-                      <option value="B-">B-</option>
-                      <option value="C+">C+</option>
-                      <option value="C">C</option>
-                    </select>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-44444" />
-                  </td>
-                  <td><span class="status-badge status-pending">Pending</span></td>
-                </tr>
-                <tr>
-                  <td>5</td>
-                  <td>
-                    <div class="officer-name">Lieutenant Sanjay Reddy</div>
-                    <div class="army-no">IC-55555</div>
-                  </td>
-                  <td>RAJPUTANA RIFLES</td>
-                  <td>Detailed #4</td>
-                  <td>
-                    <select class="grade-select" data-officer="IC-55555">
-                      <option value="" selected>Select Grade</option>
-                      <option value="A+">A+</option>
-                      <option value="A">A</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B">B</option>
-                      <option value="B-">B-</option>
-                      <option value="C+">C+</option>
-                      <option value="C">C</option>
-                    </select>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" class="instructor-checkbox" data-officer="IC-55555" />
-                  </td>
-                  <td><span class="status-badge status-pending">Pending</span></td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="form-actions">
-              <button class="btn btn-secondary">
-                <span>❌</span>
-                Cancel
-              </button>
-              <button class="btn btn-success" onclick="saveGrades()">
-                <span>💾</span>
-                Save All Grades
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Panel List View (With Grades) -->
-        <div id="panelView" class="view-section">
-          <div class="grading-section">
-            <div class="section-title">
-              <span>📊</span>
-              Panel List - Course Completion Report
-            </div>
-
-            <table class="grading-table">
-              <thead>
-                <tr>
-                  <th>Sr No</th>
-                  <th>Officer Details</th>
-                  <th>Unit</th>
-                  <th>Panel Position</th>
-                  <th>Final Grade</th>
-                  <th>Instructor Award</th>
-                  <th>Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>
-                    <div class="officer-name">Major Rajesh Kumar Singh</div>
-                    <div class="army-no">IC-12345</div>
-                  </td>
-                  <td>2 RAJPUT</td>
-                  <td>Detailed #1</td>
-                  <td>
-                    <div class="grade-display">
-                      <span class="grade-badge">Grade: A</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="instructor-badge">⭐ Instructor</span>
-                  </td>
-                  <td>Excellent Performance</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>
-                    <div class="officer-name">Captain Vikram Sharma</div>
-                    <div class="army-no">IC-67890</div>
-                  </td>
-                  <td>11 GORKHA RIFLES</td>
-                  <td>Detailed #2</td>
-                  <td>
-                    <div class="grade-display">
-                      <span class="grade-badge">Grade: B</span>
-                    </div>
-                  </td>
-                  <td>—</td>
-                  <td>Good Performance</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>
-                    <div class="officer-name">Lieutenant Arun Patel</div>
-                    <div class="army-no">IC-54321</div>
-                  </td>
-                  <td>1 PARA (SF)</td>
-                  <td>Reserve #1 → Detailed</td>
-                  <td>
-                    <div class="grade-display">
-                      <span class="grade-badge">Grade: A-</span>
-                    </div>
-                  </td>
-                  <td>—</td>
-                  <td>Very Good Performance</td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>
-                    <div class="officer-name">Captain Rahul Gupta</div>
-                    <div class="army-no">IC-44444</div>
-                  </td>
-                  <td>3 GORKHA RIFLES</td>
-                  <td>Detailed #3</td>
-                  <td>
-                    <span class="status-badge status-pending">Grade Pending</span>
-                  </td>
-                  <td>—</td>
-                  <td>—</td>
-                </tr>
-                <tr>
-                  <td>5</td>
-                  <td>
-                    <div class="officer-name">Lieutenant Sanjay Reddy</div>
-                    <div class="army-no">IC-55555</div>
-                  </td>
-                  <td>RAJPUTANA RIFLES</td>
-                  <td>Detailed #4</td>
-                  <td>
-                    <span class="status-badge status-pending">Grade Pending</span>
-                  </td>
-                  <td>—</td>
-                  <td>—</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="form-actions">
-              <button class="btn btn-primary">
-                <span>📥</span>
-                Download Report (PDF)
-              </button>
-              <button class="btn btn-primary">
-                <span>📊</span>
-                Export to Excel
-              </button>
-            </div>
+      <!-- Dynamic Content Container -->
+      <div id="batchDetailContainer">
+        <div class="grading-section">
+          <div class="empty-state">
+            <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Welcome to Course Completion Portal</div>
+            <div style="font-size: 14px; color: #6b7280;">Please select a course and batch to begin grading</div>
           </div>
         </div>
       </div>
-    </main>
-  </div>
-<script src="sidebar.js"></script>
-  <script>
+    </div>
+  </main>
+</div>
 
-    // View Toggle
-    const toggleBtns = document.querySelectorAll('.toggle-btn');
-    const viewSections = {
-      grading: document.getElementById('gradingView'),
-      panel: document.getElementById('panelView')
+<script src="sidebar.js"></script>
+<script>
+  const API_BASE_URL = 'http://localhost:6060';
+  let allCourses = [];
+  let currentScheduleId = null;
+  let gradeDataCache = {};
+  let currentData = null;
+
+  // Custom confirmation dialog
+  function showConfirmDialog(message, onConfirm, onCancel) {
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-confirm';
+    overlay.innerHTML = `
+      <div class="confirm-dialog">
+        <div class="confirm-title">Confirm Action</div>
+        <div class="confirm-message">${message}</div>
+        <div class="confirm-buttons">
+          <button class="confirm-btn confirm-btn-cancel" id="confirmNoBtn">Cancel</button>
+          <button class="confirm-btn confirm-btn-confirm" id="confirmYesBtn">Yes, Clear</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const handleYes = () => {
+      overlay.remove();
+      if (onConfirm) onConfirm();
+    };
+    const handleNo = () => {
+      overlay.remove();
+      if (onCancel) onCancel();
     };
 
-    toggleBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Remove active class from all buttons
-        toggleBtns.forEach(b => b.classList.remove('active'));
-        // Add active class to clicked button
-        this.classList.add('active');
+    document.getElementById('confirmYesBtn').addEventListener('click', handleYes);
+    document.getElementById('confirmNoBtn').addEventListener('click', handleNo);
+  }
 
-        // Hide all views
-        Object.values(viewSections).forEach(section => {
-          section.classList.remove('active');
-        });
+  // ======================== 1. LOAD COURSES - /api/course ========================
+  async function loadCourses() {
+    const courseSelect = document.getElementById('courseSelect');
+    try {
+      courseSelect.innerHTML = '<option value="">-- Loading courses --</option>';
+      const response = await fetch(`${API_BASE_URL}/api/course`);
+      if (!response.ok) throw new Error('Failed to fetch courses');
 
-        // Show selected view
-        const viewName = this.dataset.view;
-        viewSections[viewName].classList.add('active');
+      allCourses = await response.json();
+
+      courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+      allCourses.forEach(course => {
+        const option = document.createElement('option');
+        option.value = course.srno;
+        option.textContent = course.courseName;
+        courseSelect.appendChild(option);
       });
-    });
+      courseSelect.disabled = false;
 
-    // Track grade changes
-    const gradeData = {};
+    } catch (error) {
+      console.error('Error loading courses:', error);
+      courseSelect.innerHTML = '<option value="">-- Error loading courses --</option>';
+      showToast('Failed to load courses', 'error');
+    }
+  }
 
-    document.querySelectorAll('.grade-select').forEach(select => {
-      select.addEventListener('change', function() {
-        const officerId = this.dataset.officer;
-        const grade = this.value;
-        
-        if (!gradeData[officerId]) {
-          gradeData[officerId] = {};
-        }
-        gradeData[officerId].grade = grade;
+  // ======================== 2. LOAD BATCHES - /api/courseschedule/batches/{courseId} ========================
+  async function loadBatchesByCourse(courseId) {
+    const batchSelect = document.getElementById('batchSelect');
+    const container = document.getElementById('batchDetailContainer');
 
-        // Update status badge
-        const row = this.closest('tr');
-        const statusBadge = row.querySelector('.status-badge');
-        if (grade) {
-          statusBadge.textContent = 'Graded';
-          statusBadge.className = 'status-badge status-graded';
-        }
-      });
-    });
+    try {
+      batchSelect.innerHTML = '<option value="">-- Loading batches --</option>';
+      batchSelect.disabled = true;
 
-    document.querySelectorAll('.instructor-checkbox').forEach(checkbox => {
-      checkbox.addEventListener('change', function() {
-        const officerId = this.dataset.officer;
-        
-        if (!gradeData[officerId]) {
-          gradeData[officerId] = {};
-        }
-        gradeData[officerId].instructor = this.checked;
-      });
-    });
+      const response = await fetch(`${API_BASE_URL}/api/courseschedule/batches/${courseId}`);
+      if (!response.ok) throw new Error('Failed to fetch batches');
 
-    // Save grades function
-    function saveGrades() {
-    const selects = document.querySelectorAll('.grade-select');
-    for (let s of selects) {
-      if (!s.value) {
-        alert('⚠️ Please grade all officers.');
+      const batches = await response.json();
+
+      if (!batches || batches.length === 0) {
+        batchSelect.innerHTML = '<option value="">-- No batches available --</option>';
+        batchSelect.disabled = true;
+        container.innerHTML = `<div class="grading-section"><div class="empty-state">⚠️ No batches found for this course.</div></div>`;
         return;
+      }
+
+      batchSelect.innerHTML = '<option value="">-- Select Batch --</option>';
+      batches.forEach(batch => {
+        const option = document.createElement('option');
+        option.value = batch.scheduleId;
+        const startDate = formatDate(batch.startDate);
+        const endDate = formatDate(batch.endDate);
+        option.textContent = `${batch.courseName} (${startDate} → ${endDate})`;
+        batchSelect.appendChild(option);
+      });
+      batchSelect.disabled = false;
+      container.innerHTML = `<div class="grading-section"><div class="empty-state">📌 Please select a batch to view details.</div></div>`;
+
+    } catch (error) {
+      console.error('Error loading batches:', error);
+      batchSelect.innerHTML = '<option value="">-- Error loading batches --</option>';
+      showToast('Failed to load batches', 'error');
+    }
+  }
+
+  // Format date helper
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  }
+
+  // ======================== 3. COURSE SELECTION HANDLER ========================
+  document.getElementById('courseSelect').addEventListener('change', function() {
+    const courseId = this.value;
+    if (courseId) {
+      loadBatchesByCourse(courseId);
+    } else {
+      const batchSelect = document.getElementById('batchSelect');
+      batchSelect.innerHTML = '<option value="">-- First choose a course --</option>';
+      batchSelect.disabled = true;
+      document.getElementById('batchDetailContainer').innerHTML = `
+        <div class="grading-section"><div class="empty-state">📌 Please select a course to view available batches.</div></div>
+      `;
+    }
+  });
+
+  // ======================== 4. BATCH SELECTION - LOAD GRADE DATA ========================
+  document.getElementById('batchSelect').addEventListener('change', async function() {
+    const scheduleId = this.value;
+    if (!scheduleId) return;
+
+    currentScheduleId = parseInt(scheduleId);
+    showLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grade-update/${scheduleId}`);
+      if (!response.ok) throw new Error('Failed to fetch grade data');
+
+      const data = await response.json();
+      currentData = data;
+      renderGradeUpdatePage(data);
+
+    } catch (error) {
+      console.error('Error loading grade data:', error);
+      document.getElementById('batchDetailContainer').innerHTML = `
+        <div class="grading-section"><div class="empty-state">⚠️ Error loading data: ${error.message}</div></div>
+      `;
+      showToast('Failed to load grade data', 'error');
+    } finally {
+      showLoading(false);
+    }
+  });
+
+  // ======================== RENDER GRADE UPDATE PAGE ========================
+  function renderGradeUpdatePage(data) {
+    const container = document.getElementById('batchDetailContainer');
+    const { courseInfo, participants } = data;
+
+    participants.forEach(p => {
+      gradeDataCache[p.armyNo] = {
+        personnelId: p.personnelId,
+        grade: p.grade || '',
+        instructorAward: p.instructorAward || false,
+        remarks: p.remarks || ''
+      };
+    });
+
+    const courseInfoHtml = `
+      <div class="course-info-card">
+        <div class="course-info-title">${escapeHtml(courseInfo.courseName)}</div>
+        <div class="course-info-subtitle">Course Code: ${escapeHtml(courseInfo.courseCode)} | Status: ${escapeHtml(courseInfo.status)}</div>
+        <div class="course-info-grid">
+          <div class="course-info-item"><div class="course-info-label">Duration</div><div class="course-info-value">${escapeHtml(courseInfo.startDate)} - ${escapeHtml(courseInfo.endDate)}</div></div>
+          <div class="course-info-item"><div class="course-info-label">Location</div><div class="course-info-value">${escapeHtml(courseInfo.location)}</div></div>
+          <div class="course-info-item"><div class="course-info-label">Total Participants</div><div class="course-info-value">${courseInfo.totalParticipants} Officers</div></div>
+          <div class="course-info-item"><div class="course-info-label">Completion Date</div><div class="course-info-value">${escapeHtml(courseInfo.completionDate)}</div></div>
+        </div>
+      </div>
+    `;
+
+    const alertHtml = `
+      <div class="alert-box">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <div class="alert-title">Grade Update Required</div>
+          <div class="alert-text">This course has been completed. Please update grades, instructor awards and remarks for all participants.</div>
+        </div>
+      </div>
+    `;
+
+    const toggleHtml = `
+      <div class="view-toggle">
+        <button class="toggle-btn active" data-view="grading">📝 Grade Update Form (with Remarks)</button>
+        <button class="toggle-btn" data-view="panel">📊 Panel List View (With Grades)</button>
+      </div>
+    `;
+
+    const gradingFormHtml = `
+      <div class="grading-section">
+        <div class="section-title"><span>📝</span> Update Grades, Instructor Awards & Remarks</div>
+        <table class="grading-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Sr No</th>
+              <th style="width: 200px;">Officer Details</th>
+              <th style="width: 120px;">Unit</th>
+              <th style="width: 130px;">Panel Position</th>
+              <th style="width: 100px;">Grade</th>
+              <th style="width: 100px;">Instructor Award</th>
+              <th style="width: 200px;">Remarks</th>
+              <th style="width: 90px;">Status</th>
+             </thead>
+          <tbody>
+            ${participants.map(p => {
+              const cached = gradeDataCache[p.armyNo];
+              return `
+                <tr data-army="${p.armyNo}">
+                  <td style="text-align: center;">${p.srNo} \u200b</td>
+                  <td>
+                    <div class="officer-name">${escapeHtml(p.officerName)}</div>
+                    <div class="army-no">${escapeHtml(p.armyNo)}</div>
+                  </td>
+                  <td>${escapeHtml(p.unit)}</td>
+                  <td>${escapeHtml(p.panelPosition)}</td>
+                  <td>
+                    <select class="grade-select" data-army="${p.armyNo}">
+                      <option value="">Select Grade</option>
+                      ${['A+','A','A-','B+','B','B-','C+','C'].map(g => `<option value="${g}" ${cached.grade === g ? 'selected' : ''}>${g}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="instructor-checkbox" data-army="${p.armyNo}" ${cached.instructorAward ? 'checked' : ''}>
+                  </td>
+                  <td>
+                    <input type="text" class="remarks-input" data-army="${p.armyNo}" placeholder="Add remarks..." value="${escapeHtml(cached.remarks)}">
+                  </td>
+                  <td>
+                    <span class="status-badge ${cached.grade ? 'status-graded' : 'status-pending'}">${cached.grade ? 'Graded' : 'Pending'}</span>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <div class="form-actions">
+          <button class="btn btn-secondary" id="cancelGradesBtn">❌ Cancel</button>
+          <button class="btn btn-success" id="saveGradesBtn">💾 Save All Grades & Remarks</button>
+        </div>
+      </div>
+    `;
+
+    const panelViewHtml = `
+      <div class="grading-section">
+        <div class="section-title"><span>📊</span> Panel List - Course Completion Report</div>
+        <table class="grading-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Sr No</th>
+              <th style="width: 200px;">Officer Details</th>
+              <th style="width: 120px;">Unit</th>
+              <th style="width: 130px;">Panel Position</th>
+              <th style="width: 100px;">Final Grade</th>
+              <th style="width: 120px;">Instructor Award</th>
+              <th style="width: 200px;">Remarks</th>
+             </thead>
+          <tbody>
+            ${participants.map(p => {
+              const cached = gradeDataCache[p.armyNo];
+              return `
+                <tr>
+                  <td style="text-align: center;">${p.srNo}</td>
+                  <td>
+                    <div class="officer-name">${escapeHtml(p.officerName)}</div>
+                    <div class="army-no">${escapeHtml(p.armyNo)}</div>
+                  </td>
+                  <td>${escapeHtml(p.unit)}</td>
+                  <td>${escapeHtml(p.panelPosition)}</td>
+                  <td>${cached.grade ? `<span class="grade-badge">Grade: ${cached.grade}</span>` : '<span class="status-badge status-pending">Grade Pending</span>'}</td>
+                  <td>${cached.instructorAward ? '<span class="instructor-badge">⭐ Instructor</span>' : '—'}</td>
+                  <td>${cached.remarks ? escapeHtml(cached.remarks) : '—'}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="pdfBtn">📥 Download Report (PDF)</button>
+          <button class="btn btn-primary" id="excelBtn">📊 Export to Excel</button>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = `${courseInfoHtml}${alertHtml}${toggleHtml}<div id="gradingFormViewDynamic" class="view-section active">${gradingFormHtml}</div><div id="panelListViewDynamic" class="view-section">${panelViewHtml}</div>`;
+
+    attachFormEvents();
+    attachViewToggle();
+
+    document.getElementById('saveGradesBtn')?.addEventListener('click', () => saveAllGrades(participants));
+
+    document.getElementById('cancelGradesBtn')?.addEventListener('click', () => {
+      showConfirmDialog(
+        'Are you sure you want to clear all unsaved changes? All modifications will be lost.',
+        () => {
+          gradeDataCache = {};
+          if (currentData) {
+            renderGradeUpdatePage(currentData);
+          } else if (currentScheduleId) {
+            fetch(`${API_BASE_URL}/api/grade-update/${currentScheduleId}`)
+              .then(res => res.json())
+              .then(data => {
+                currentData = data;
+                renderGradeUpdatePage(data);
+              })
+              .catch(err => console.error('Error reloading data:', err));
+          }
+          showToast('Changes cleared', 'info');
+        }
+      );
+    });
+
+    // PDF Download Handler
+    document.getElementById('pdfBtn')?.addEventListener('click', async () => {
+      if (!currentScheduleId) {
+        alert('Please select a batch first');
+        return;
+      }
+
+      try {
+        showLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/grade-update/${currentScheduleId}/export/pdf`);
+
+        if (!response.ok) throw new Error('Failed to generate PDF');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `panel_report_${currentScheduleId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+        showToast('✅ PDF downloaded successfully!', 'success');
+
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+        showToast('❌ Failed to download PDF', 'error');
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    // Excel Download Handler
+    document.getElementById('excelBtn')?.addEventListener('click', async () => {
+      if (!currentScheduleId) {
+        alert('Please select a batch first');
+        return;
+      }
+
+      try {
+        showLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/grade-update/${currentScheduleId}/export/excel`);
+
+        if (!response.ok) throw new Error('Failed to generate Excel');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `panel_report_${currentScheduleId}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+        showToast('✅ Excel downloaded successfully!', 'success');
+
+      } catch (error) {
+        console.error('Error downloading Excel:', error);
+        showToast('❌ Failed to download Excel', 'error');
+      } finally {
+        showLoading(false);
+      }
+    });
+  }
+
+  function attachFormEvents() {
+    document.querySelectorAll('.grade-select').forEach(sel => {
+      sel.removeEventListener('change', gradeChangeHandler);
+      sel.addEventListener('change', gradeChangeHandler);
+    });
+    document.querySelectorAll('.instructor-checkbox').forEach(chk => {
+      chk.removeEventListener('change', instructorChangeHandler);
+      chk.addEventListener('change', instructorChangeHandler);
+    });
+    document.querySelectorAll('.remarks-input').forEach(inp => {
+      inp.removeEventListener('input', remarksInputHandler);
+      inp.addEventListener('input', remarksInputHandler);
+    });
+  }
+
+  function gradeChangeHandler(e) {
+    const army = e.target.dataset.army;
+    if (army && gradeDataCache[army]) {
+      gradeDataCache[army].grade = e.target.value;
+      updateRowStatus(army);
+    }
+  }
+
+  function instructorChangeHandler(e) {
+    const army = e.target.dataset.army;
+    if (army && gradeDataCache[army]) {
+      gradeDataCache[army].instructorAward = e.target.checked;
+    }
+  }
+
+  function remarksInputHandler(e) {
+    const army = e.target.dataset.army;
+    if (army && gradeDataCache[army]) {
+      gradeDataCache[army].remarks = e.target.value;
+    }
+  }
+
+  function updateRowStatus(army) {
+    const row = document.querySelector(`tr[data-army="${army}"]`);
+    if (row) {
+      const statusSpan = row.querySelector('.status-badge');
+      if (gradeDataCache[army]?.grade) {
+        statusSpan.textContent = 'Graded';
+        statusSpan.className = 'status-badge status-graded';
+      } else {
+        statusSpan.textContent = 'Pending';
+        statusSpan.className = 'status-badge status-pending';
+      }
+    }
+  }
+
+  function attachViewToggle() {
+    const toggleBtns = document.querySelectorAll('.toggle-btn');
+    toggleBtns.forEach(btn => {
+      btn.removeEventListener('click', toggleHandler);
+      btn.addEventListener('click', toggleHandler);
+    });
+  }
+
+  function toggleHandler(e) {
+    const targetView = e.currentTarget.dataset.view;
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    const gradingDiv = document.getElementById('gradingFormViewDynamic');
+    const panelDiv = document.getElementById('panelListViewDynamic');
+    if (targetView === 'grading') {
+      gradingDiv?.classList.add('active');
+      panelDiv?.classList.remove('active');
+    } else {
+      panelDiv?.classList.add('active');
+      gradingDiv?.classList.remove('active');
+    }
+  }
+
+  async function saveAllGrades(participants) {
+    let allGraded = true;
+    for (let p of participants) {
+      const cache = gradeDataCache[p.armyNo];
+      if (!cache || !cache.grade) {
+        allGraded = false;
+        break;
       }
     }
 
-    console.log('Grades:', gradeData);
-    alert('✅ Grades saved successfully!');
-  }
-</script>
+    if (!allGraded) {
+      alert('⚠️ Please select a grade for every officer before saving.');
+      return;
+    }
 
+    const gradeUpdates = participants.map(p => ({
+      personnelId: p.personnelId,
+      grade: gradeDataCache[p.armyNo]?.grade || '',
+      instructorAward: gradeDataCache[p.armyNo]?.instructorAward || false,
+      remarks: gradeDataCache[p.armyNo]?.remarks || ''
+    }));
+
+    showLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grade-update/${currentScheduleId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gradeUpdates })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save grades');
+      }
+
+      showToast('✅ Grades saved successfully!', 'success');
+
+      const refreshResponse = await fetch(`${API_BASE_URL}/api/grade-update/${currentScheduleId}`);
+      const refreshedData = await refreshResponse.json();
+      currentData = refreshedData;
+      renderGradeUpdatePage(refreshedData);
+
+    } catch (error) {
+      console.error('Error saving grades:', error);
+      showToast(error.message || '❌ Failed to save grades', 'error');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+  }
+
+  function showLoading(show) {
+    const loader = document.getElementById('loader-overlay');
+    if (show && !loader) {
+      const div = document.createElement('div');
+      div.id = 'loader-overlay';
+      div.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;';
+      div.innerHTML = '<div class="loading-spinner"></div><span>Loading...</span>';
+      document.body.appendChild(div);
+    } else if (!show && loader) {
+      loader.remove();
+    }
+  }
+
+  function showToast(message, type) {
+    const toast = document.createElement('div');
+    const bgColor = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6');
+    toast.style.cssText = `position:fixed;bottom:20px;right:20px;padding:12px 24px;background:${bgColor};color:white;border-radius:8px;z-index:10000;animation:slideIn 0.3s ease;`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // Initialize
+  loadCourses();
+</script>
 </body>
 </html>

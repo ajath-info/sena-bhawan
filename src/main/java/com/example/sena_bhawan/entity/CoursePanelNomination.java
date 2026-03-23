@@ -33,4 +33,17 @@ public class CoursePanelNomination {
 
     @Column(name = "attendance_status", nullable = false, length = 20)
     private String attendanceStatus; // Reserve / Retain
+
+    // New columns for grading
+    @Column(name = "grade", length = 10)
+    private String grade;
+
+    @Column(name = "instructor_award")
+    private Boolean instructorAward;
+
+    @Column(name = "grade_remarks", length = 500)
+    private String gradeRemarks;
+
+    @Column(name = "grade_status", length = 20)
+    private String gradeStatus; // Graded / Pending
 }
