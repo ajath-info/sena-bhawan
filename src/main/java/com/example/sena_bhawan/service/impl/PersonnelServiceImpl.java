@@ -3,6 +3,9 @@ package com.example.sena_bhawan.service.impl;
 import com.example.sena_bhawan.dto.CreatePersonnelRequest;
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
+import com.example.sena_bhawan.entity.formation.Command;
+import com.example.sena_bhawan.entity.formation.Corps;
+import com.example.sena_bhawan.entity.formation.Division;
 import com.example.sena_bhawan.projection.AgeBandProjection;
 import com.example.sena_bhawan.projection.MedicalCategoryProjection;
 import com.example.sena_bhawan.projection.PostingDetailsProjection;
@@ -10,9 +13,7 @@ import com.example.sena_bhawan.projection.RetirementYearProjection;
 import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
 import com.example.sena_bhawan.specification.PersonnelSpecification;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -1040,10 +1041,19 @@ public class PersonnelServiceImpl implements PersonnelService {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // Army No
-            if (filter.armyNo != null && !filter.armyNo.isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("armyNo")),
-                        "%" + filter.armyNo.toLowerCase() + "%"));
+            // Ensure we're working with distinct results for joins
+            if (hasAnyJoinFilter(filter)) {
+                query.distinct(true);
+            }
+
+            // Army No / Search
+            if (filter.search != null && !filter.search.isEmpty()) {
+                String searchPattern = "%" + filter.search.toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("armyNo")), searchPattern),
+                        cb.like(cb.lower(root.get("fullName")), searchPattern),
+                        cb.like(cb.lower(root.get("rank")), searchPattern)
+                ));
             }
 
             // Place of Birth
@@ -1057,7 +1067,7 @@ public class PersonnelServiceImpl implements PersonnelService {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfBirth"), filter.dobGreaterThan));
             }
 
-            // Date of Commission range
+            // Date of Commission
             if (filter.docFrom != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfCommission"), filter.docFrom));
             }
@@ -1065,7 +1075,7 @@ public class PersonnelServiceImpl implements PersonnelService {
                 predicates.add(cb.lessThanOrEqualTo(root.get("dateOfCommission"), filter.docTo));
             }
 
-            // Date of Seniority range
+            // Date of Seniority
             if (filter.dosFrom != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfSeniority"), filter.dosFrom));
             }
@@ -1075,25 +1085,270 @@ public class PersonnelServiceImpl implements PersonnelService {
 
             // Rank IN clause
             if (filter.rank != null && !filter.rank.isEmpty()) {
-                CriteriaBuilder.In<String> inClause = cb.in(root.get("rank"));
-                for (String rank : filter.rank) {
-                    inClause.value(rank);
-                }
-                predicates.add(inClause);
+                predicates.add(root.get("rank").in(filter.rank));
             }
 
-            // General search (armyNo, fullName, rank)
-            if (filter.search != null && !filter.search.isEmpty()) {
-                String searchPattern = "%" + filter.search.toLowerCase() + "%";
-                predicates.add(cb.or(
-                        cb.like(cb.lower(root.get("armyNo")), searchPattern),
-                        cb.like(cb.lower(root.get("fullName")), searchPattern),
-                        cb.like(cb.lower(root.get("rank")), searchPattern)
-                ));
+            // Medical Category - split S, H, A, P, E values
+            if (filter.medicalCategory != null && !filter.medicalCategory.isEmpty()) {
+                predicates.add(buildMedicalCategoryPredicate(root, query, cb, filter.medicalCategory));
+            }
+
+            // Command filter - through posting details
+            if (filter.command != null && !filter.command.isEmpty()) {
+                predicates.add(buildCommandPredicate(root, query, cb, filter.command));
+            }
+
+            // Corps filter - through posting details
+            if (filter.corps != null && !filter.corps.isEmpty()) {
+                predicates.add(buildCorpsPredicate(root, query, cb, filter.corps));
+            }
+
+            // Division filter - through posting details
+            if (filter.division != null && !filter.division.isEmpty()) {
+                predicates.add(buildDivisionPredicate(root, query, cb, filter.division));
+            }
+
+            // Establishment Type filter - through posting details
+            if (filter.establishmentType != null && !filter.establishmentType.isEmpty()) {
+                predicates.add(buildEstablishmentTypePredicate(root, query, cb, filter.establishmentType));
+            }
+
+            // Area Type filter - through orbat structure
+            if (filter.areaType != null && !filter.areaType.isEmpty()) {
+                predicates.add(buildAreaTypePredicate(root, query, cb, filter.areaType));
+            }
+
+            // Civil Qualifications - through personnel_qualifications
+            if (filter.civilQualification != null && !filter.civilQualification.isEmpty()) {
+                predicates.add(buildCivilQualificationPredicate(root, query, cb, filter.civilQualification));
+            }
+
+            // Sports - through personnel_sports
+            if (filter.sports != null && !filter.sports.isEmpty()) {
+                predicates.add(buildSportsPredicate(root, query, cb, filter.sports));
+            }
+
+            // Course Name - through course_panel_nomination
+            if (filter.courseName != null && !filter.courseName.isEmpty()) {
+                predicates.add(buildCourseNamePredicate(root, query, cb, filter.courseName));
+            }
+
+            // Posting Due Months - based on tenure end dates
+            if (filter.postingDueMonths != null && !filter.postingDueMonths.isEmpty()) {
+                predicates.add(buildPostingDueMonthsPredicate(root, query, cb, filter.postingDueMonths));
+            }
+
+            // TOS (Tenure of Service) range
+            if (filter.tosFrom != null || filter.tosTo != null) {
+                predicates.add(buildTOSPredicate(root, query, cb, filter.tosFrom, filter.tosTo));
+            }
+
+            // Course from/to dates
+            if (filter.courseFrom != null || filter.courseTo != null) {
+                predicates.add(buildCourseDatePredicate(root, query, cb, filter.courseFrom, filter.courseTo));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private boolean hasAnyJoinFilter(PersonnelFilterRequest filter) {
+        return filter.command != null || filter.corps != null || filter.division != null ||
+                filter.establishmentType != null || filter.areaType != null ||
+                filter.civilQualification != null || filter.sports != null ||
+                filter.courseName != null || filter.postingDueMonths != null ||
+                filter.tosFrom != null || filter.tosTo != null ||
+                filter.courseFrom != null || filter.courseTo != null ||
+                (filter.medicalCategory != null && !filter.medicalCategory.isEmpty());
+    }
+
+    private Predicate buildMedicalCategoryPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                                    CriteriaBuilder cb, List<String> medicalCategories) {
+        // Assuming medicalCode is stored as format like "S3H2A1P1E1"
+        List<Predicate> medicalPredicates = new ArrayList<>();
+
+        for (String category : medicalCategories) {
+            // Parse the medical category code (e.g., "S3H2A1P1E1")
+            if (category.length() >= 10) {
+                medicalPredicates.add(cb.like(root.get("medicalCode"), category));
+            }
+        }
+
+        return cb.or(medicalPredicates.toArray(new Predicate[0]));
+    }
+
+    private Predicate buildCommandPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                            CriteriaBuilder cb, List<String> commands) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
+        Join<OrbatStructure, Corps> corpsJoin = orbatJoin.join("corps");
+        Join<Corps, Command> commandJoin = corpsJoin.join("command");
+
+        subquery.select(postingRoot.get("personnel").get("id"))
+                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(commandJoin.get("commandName")).in(
+                                commands.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildCorpsPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                          CriteriaBuilder cb, List<String> corps) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
+        Join<OrbatStructure, Corps> corpsJoin = orbatJoin.join("corps");
+
+        subquery.select(postingRoot.get("personnel").get("id"))
+                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(corpsJoin.get("corpsName")).in(
+                                corps.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildDivisionPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                             CriteriaBuilder cb, List<String> divisions) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
+        Join<OrbatStructure, Division> divisionJoin = orbatJoin.join("division");
+
+        subquery.select(postingRoot.get("personnel").get("id"))
+                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(divisionJoin.get("divisionName")).in(
+                                divisions.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildEstablishmentTypePredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                                      CriteriaBuilder cb, List<String> establishmentTypes) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+        Join<PostingDetails, FormationEstablishment> formationJoin = postingRoot.join("formationEstablishment");
+
+        subquery.select(postingRoot.get("personnel").get("id"))
+                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(formationJoin.get("establishmentType")).in(
+                                establishmentTypes.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildAreaTypePredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                             CriteriaBuilder cb, List<String> areaTypes) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
+
+        subquery.select(postingRoot.get("personnel").get("id"))
+                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(orbatJoin.get("areaType")).in(
+                                areaTypes.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildCivilQualificationPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                                       CriteriaBuilder cb, List<String> qualifications) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PersonnelQualifications> qualRoot = subquery.from(PersonnelQualifications.class);
+
+        subquery.select(qualRoot.get("personnel").get("id"))
+                .where(cb.equal(qualRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(qualRoot.get("qualification")).in(
+                                qualifications.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildSportsPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                           CriteriaBuilder cb, List<String> sports) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<PersonnelSports> sportsRoot = subquery.from(PersonnelSports.class);
+
+        subquery.select(sportsRoot.get("personnel").get("id"))
+                .where(cb.equal(sportsRoot.get("personnel").get("id"), root.get("id")),
+                        cb.lower(sportsRoot.get("sportName")).in(
+                                sports.stream().map(String::toLowerCase).collect(Collectors.toList())));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildCourseNamePredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                               CriteriaBuilder cb, String courseName) {
+        Subquery<Long> subquery = query.subquery(Long.class);
+        Root<CoursePanelNomination> nominationRoot = subquery.from(CoursePanelNomination.class);
+        Join<CoursePanelNomination, CourseSchedule> scheduleJoin = nominationRoot.join("schedule");
+        Join<CourseSchedule, CourseMaster> courseJoin = scheduleJoin.join("course");
+
+        subquery.select(nominationRoot.get("personnel").get("id"))
+                .where(cb.equal(nominationRoot.get("personnel").get("id"), root.get("id")),
+                        cb.like(cb.lower(courseJoin.get("courseName")),
+                                "%" + courseName.toLowerCase() + "%"));
+
+        return cb.exists(subquery);
+    }
+
+    private Predicate buildPostingDueMonthsPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                                     CriteriaBuilder cb, List<Integer> dueMonths) {
+        List<Predicate> monthPredicates = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+
+        for (Integer months : dueMonths) {
+            LocalDate dueDate = currentDate.plusMonths(months);
+            // Assuming you have a tenure_end_date in posting_details
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
+
+            subquery.select(postingRoot.get("personnel").get("id"))
+                    .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
+                            cb.lessThanOrEqualTo(postingRoot.get("tenureEndDate"), dueDate),
+                            cb.greaterThanOrEqualTo(postingRoot.get("tenureEndDate"), currentDate));
+
+            monthPredicates.add(cb.exists(subquery));
+        }
+
+        return cb.or(monthPredicates.toArray(new Predicate[0]));
+    }
+
+    private Predicate buildTOSPredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                        CriteriaBuilder cb, LocalDate tosFrom, LocalDate tosTo) {
+        // TOS (Tenure of Service) - calculate from date of commission
+        List<Predicate> tosPredicates = new ArrayList<>();
+
+        if (tosFrom != null) {
+            tosPredicates.add(cb.greaterThanOrEqualTo(root.get("dateOfCommission"), tosFrom));
+        }
+        if (tosTo != null) {
+            tosPredicates.add(cb.lessThanOrEqualTo(root.get("dateOfCommission"), tosTo));
+        }
+
+        return cb.and(tosPredicates.toArray(new Predicate[0]));
+    }
+
+    private Predicate buildCourseDatePredicate(Root<Personnel> root, CriteriaQuery<?> query,
+                                               CriteriaBuilder cb, LocalDate courseFrom, LocalDate courseTo) {
+        Subquery <Long> subquery = query.subquery(Long.class);
+        Root<CoursePanelNomination> nominationRoot = subquery.from(CoursePanelNomination.class);
+        Join<CoursePanelNomination, CourseSchedule> scheduleJoin = nominationRoot.join("schedule");
+
+        List<Predicate> datePredicates = new ArrayList<>();
+
+        if (courseFrom != null) {
+            datePredicates.add(cb.greaterThanOrEqualTo(scheduleJoin.get("startDate"), courseFrom));
+        }
+        if (courseTo != null) {
+            datePredicates.add(cb.lessThanOrEqualTo(scheduleJoin.get("endDate"), courseTo));
+        }
+
+        subquery.select(nominationRoot.get("personnel").get("id"))
+                .where(cb.equal(nominationRoot.get("personnel").get("id"), root.get("id")),
+                        cb.and(datePredicates.toArray(new Predicate[0])));
+
+        return cb.exists(subquery);
     }
 
     private PersonnelListDTO mapToPersonnelListDTO(Object[] row) {

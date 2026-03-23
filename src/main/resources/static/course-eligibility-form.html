@@ -426,6 +426,7 @@
     }
 
     // Load all dropdown data from the new API
+    // Load all dropdown data from the new API
     function loadAllDropdowns() {
         console.log('Loading all dropdowns...');
 
@@ -440,30 +441,17 @@
                 if (data && data.length > 0) {
                     populateDropdown('dropdown-grading', data, gradingSelected);
                 } else {
-                    // Fallback mock data
-                    const mockData = [
-                        {id: 1, name: 'Grade A'},
-                        {id: 2, name: 'Grade B'},
-                        {id: 3, name: 'Grade C'},
-                        {id: 4, name: 'Grade D'}
-                    ];
-                    populateDropdown('dropdown-grading', mockData, gradingSelected);
+                    console.warn('No course grades data received');
+                    document.getElementById('dropdown-grading').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
                 }
             })
             .catch(e => {
                 console.error('Error loading grading:', e);
-                // Mock data for testing
-                const mockData = [
-                    {id: 1, name: 'Grade A'},
-                    {id: 2, name: 'Grade B'},
-                    {id: 3, name: 'Grade C'},
-                    {id: 4, name: 'Grade D'}
-                ];
-                populateDropdown('dropdown-grading', mockData, gradingSelected);
+                document.getElementById('dropdown-grading').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load course grades</div>';
             });
 
         // Load Educational Qualifications
-        fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATION')
+        fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS')
             .then(r => {
                 if (!r.ok) throw new Error('Failed to load qualifications');
                 return r.json();
@@ -473,55 +461,41 @@
                 if (data && data.length > 0) {
                     populateDropdown('dropdown-edu', data, eduSelected);
                 } else {
-                    const mockData = [
-                        {id: 1, name: 'Bachelor Degree'},
-                        {id: 2, name: 'Master Degree'},
-                        {id: 3, name: 'PhD'},
-                        {id: 4, name: 'Diploma'}
-                    ];
-                    populateDropdown('dropdown-edu', mockData, eduSelected);
+                    console.warn('No educational qualifications data received');
+                    document.getElementById('dropdown-edu').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
                 }
             })
             .catch(e => {
                 console.error('Error loading edu:', e);
-                const mockData = [
-                    {id: 1, name: 'Bachelor Degree'},
-                    {id: 2, name: 'Master Degree'},
-                    {id: 3, name: 'PhD'},
-                    {id: 4, name: 'Diploma'}
-                ];
-                populateDropdown('dropdown-edu', mockData, eduSelected);
+                document.getElementById('dropdown-edu').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load educational qualifications</div>';
             });
 
-        // Load Medical Categories
-        fetch('http://localhost:6060/api/dropdown/MEDICAL')
+        // Load Medical Categories from master/filter endpoint
+        fetch('http://localhost:6060/api/master/filter/medical-category')
             .then(r => {
                 if (!r.ok) throw new Error('Failed to load medical categories');
                 return r.json();
             })
             .then(data => {
                 console.log('Medical categories loaded:', data);
-                if (data && data.length > 0) {
-                    populateDropdown('dropdown-medical', data, medicalSelected);
+                // Filter out null values and keep the actual medical category strings
+                const categories = data
+                    .filter(cat => cat !== null && cat !== '') // Remove null/empty values
+                    .map((cat, index) => ({
+                        id: cat,  // Use the actual medical category string as ID
+                        name: cat // Use the actual medical category string as name
+                    }));
+
+                if (categories && categories.length > 0) {
+                    populateMedicalDropdown('dropdown-medical', categories, medicalSelected);
                 } else {
-                    const mockData = [
-                        {id: 1, name: 'Category A'},
-                        {id: 2, name: 'Category B'},
-                        {id: 3, name: 'Category C'},
-                        {id: 4, name: 'Category D'}
-                    ];
-                    populateDropdown('dropdown-medical', mockData, medicalSelected);
+                    console.warn('No medical categories data received');
+                    document.getElementById('dropdown-medical').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
                 }
             })
             .catch(e => {
-                console.error('Error loading medical:', e);
-                const mockData = [
-                    {id: 1, name: 'Category A'},
-                    {id: 2, name: 'Category B'},
-                    {id: 3, name: 'Category C'},
-                    {id: 4, name: 'Category D'}
-                ];
-                populateDropdown('dropdown-medical', mockData, medicalSelected);
+                console.error('Error loading medical categories:', e);
+                document.getElementById('dropdown-medical').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load medical categories</div>';
             });
 
         // Load Establishment Types
@@ -535,26 +509,64 @@
                 if (data && data.length > 0) {
                     populateDropdown('dropdown-estab', data, estabSelected);
                 } else {
-                    const mockData = [
-                        {id: 1, name: 'Type 1'},
-                        {id: 2, name: 'Type 2'},
-                        {id: 3, name: 'Type 3'},
-                        {id: 4, name: 'Type 4'}
-                    ];
-                    populateDropdown('dropdown-estab', mockData, estabSelected);
+                    console.warn('No establishment types data received');
+                    document.getElementById('dropdown-estab').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
                 }
             })
             .catch(e => {
                 console.error('Error loading estab:', e);
-                const mockData = [
-                    {id: 1, name: 'Type 1'},
-                    {id: 2, name: 'Type 2'},
-                    {id: 3, name: 'Type 3'},
-                    {id: 4, name: 'Type 4'}
-                ];
-                populateDropdown('dropdown-estab', mockData, estabSelected);
+                document.getElementById('dropdown-estab').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load establishment types</div>';
             });
     }
+
+    function populateMedicalDropdown(dropdownId, items, selectedArrayRef) {
+        const container = document.getElementById(dropdownId);
+        if (!container) return;
+        container.innerHTML = '';
+
+        items.forEach(item => {
+            const label = document.createElement('label');
+            label.style.display = 'block';
+            label.style.padding = '8px';
+            label.style.cursor = 'pointer';
+            label.style.userSelect = 'none';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = item.id; // This will be the medical category string
+            checkbox.checked = selectedArrayRef.includes(item.id);
+            checkbox.style.marginRight = '8px';
+
+            // Handle checkbox change for medical categories
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const val = this.value; // This is the medical category string
+                if (this.checked) {
+                    if (!selectedArrayRef.includes(val)) {
+                        selectedArrayRef.push(val);
+                    }
+                } else {
+                    const idx = selectedArrayRef.indexOf(val);
+                    if (idx > -1) {
+                        selectedArrayRef.splice(idx, 1);
+                    }
+                }
+                // Update button text
+                updateDropdownButtonText(dropdownId);
+            });
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${item.name}`));
+
+            // Prevent dropdown from closing when clicking on label
+            label.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            container.appendChild(label);
+        });
+    }
+
 
     // Generic function to load dropdown data from /api/dropdown/{type}
     function loadDropdown(type, elementId) {
@@ -721,7 +733,9 @@
         // Custom dropdowns
         gradingSelected = data.minCourseGrading ? data.minCourseGrading.map(id => Number(id)) : [];
         eduSelected = data.educationalQualifications ? data.educationalQualifications.map(id => Number(id)) : [];
-        medicalSelected = data.medicalCategories ? data.medicalCategories.map(id => Number(id)) : [];
+
+        // For medical categories - they are strings, not numbers
+        medicalSelected = data.medicalCategories ? [...data.medicalCategories] : [];
         estabSelected = data.establishmentTypes ? data.establishmentTypes.map(id => Number(id)) : [];
 
         // Reload dropdowns to reflect selections
@@ -745,7 +759,7 @@
 
         // Ranks
         if (data.rankIds && data.rankIds.length > 0) {
-            selectedRankIds = data.rankIds.map(id => Number(id)); // Ensure numbers
+            selectedRankIds = data.rankIds.map(id => Number(id));
             document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
                 cb.checked = selectedRankIds.includes(Number(cb.value));
             });
@@ -795,8 +809,9 @@
             $('#educationalQualifications').val([]).trigger('change');
         }
 
+        // For medical categories - they are strings, so no need to convert
         if (data.medicalCategories && data.medicalCategories.length > 0) {
-            $('#medicalCategories').val(data.medicalCategories.map(id => String(id))).trigger('change');
+            $('#medicalCategories').val(data.medicalCategories).trigger('change');
         } else {
             $('#medicalCategories').val([]).trigger('change');
         }
@@ -1005,13 +1020,13 @@
             postingTypeIds: selectedPostingTypeIds,
             minCourseGrading: gradingSelected,
             educationalQualifications: eduSelected,
-            medicalCategories: medicalSelected,
+            medicalCategories: medicalSelected, // This is now an array of strings (medical codes)
             establishmentTypes: estabSelected,
             remarks: selectedRemarks,
             additionalRemarks: document.getElementById('additionalRemarks').value || null
         };
 
-        console.log('Saving payload:', payload);
+        console.log('Saving payload with medical categories:', payload);
 
         fetch('http://localhost:6060/api/eligibility/save', {
             method: 'POST',

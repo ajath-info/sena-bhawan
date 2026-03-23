@@ -152,6 +152,43 @@
       text-decoration: none;
     }
 
+    /* ================= IMPROVED LOADING SPINNER ================= */
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #1b4332;
+      border-right-color: #1b4332;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Loading overlay for the whole table */
+    .table-loading {
+      position: relative;
+      min-height: 400px;
+    }
+
+    .table-loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
     /* ================= MAIN CONTENT ================= */
     .main-content {
       flex: 1;
@@ -1155,10 +1192,12 @@
                 </tr>
                 </thead>
                 <tbody id="tableBody">
-                <tr>
-                  <td colspan="21" style="text-align: center; padding: 40px;">
-                    <div class="loading-spinner" style="margin: 0 auto;"></div>
-                    <div style="margin-top: 16px; color: #6b7280;">Loading officer records...</div>
+                <tr id="loadingRow">
+                  <td colspan="21" style="text-align: center; padding: 60px 40px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+                      <div class="loading-spinner"></div>
+                      <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
+                    </div>
                   </td>
                 </tr>
                 </tbody>
@@ -1526,12 +1565,14 @@
   }
 
   // Fetch filtered data
+  // Fetch filtered data
   async function fetchFilteredData() {
     if (isLoading) return;
 
     try {
       isLoading = true;
       showLoading(true);
+      setTableLoading(true); // Show loading in table
 
       const filterRequest = buildFilterRequest();
 
@@ -1582,6 +1623,7 @@
     } finally {
       isLoading = false;
       showLoading(false);
+      // setTableLoading will be called inside renderTable
     }
   }
 
@@ -1591,14 +1633,16 @@
 
     if (!officers || officers.length === 0) {
       tbody.innerHTML = `
-        <tr>
-          <td colspan="21" style="text-align: center; padding: 40px;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-            <div style="font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 8px;">No officers found</div>
-            <div style="color: #6b7280;">Try adjusting your filters</div>
-          </td>
-        </tr>
-      `;
+      <tr>
+        <td colspan="21" style="text-align: center; padding: 60px 40px;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+            <div style="font-size: 48px;">🔍</div>
+            <div style="font-size: 18px; font-weight: 600; color: #1e293b;">No officers found</div>
+            <div style="color: #6b7280; font-size: 14px;">Try adjusting your filters</div>
+          </div>
+        </td>
+      </tr>
+    `;
       document.getElementById('unitStrength').innerText = 'Unit Strength: 0';
       return;
     }
@@ -1618,39 +1662,56 @@
       const postingDue = o.postingDueMonths !== null && o.postingDueMonths !== undefined ? o.postingDueMonths : '—';
 
       html += `
-        <tr>
-          <td>${o.armyNo || '—'}</td>
-          <td><span class="badge badge-info">${o.rank || '—'}</span></td>
-          <td>${o.fullName || '—'}</td>
-          <td>${dob}</td>
-          <td>${doc}</td>
-          <td>${dos}</td>
-          <td>${o.unit || '—'}</td>
-          <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
-          <td>${o.corps || '—'}</td>
-          <td>${o.division || '—'}</td>
-          <td>${o.establishmentType || '—'}</td>
-          <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
-          <td>${o.tosStart || '—'}</td>
-          <td>${o.tosEnd || '—'}</td>
-          <td>${courseName}</td>
-          <td>${civilQual}</td>
-          <td>${sports}</td>
-          <td>${o.placeOfBirth || '—'}</td>
-          <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
-          <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
-          <td>
-            <div class="action-icons">
-              <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
-              <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
-            </div>
-          </td>
-        </tr>
-      `;
+      <tr>
+        <td>${o.armyNo || '—'}</td>
+        <td><span class="badge badge-info">${o.rank || '—'}</span></td>
+        <td>${o.fullName || '—'}</td>
+        <td>${dob}</td>
+        <td>${doc}</td>
+        <td>${dos}</td>
+        <td>${o.unit || '—'}</td>
+        <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
+        <td>${o.corps || '—'}</td>
+        <td>${o.division || '—'}</td>
+        <td>${o.establishmentType || '—'}</td>
+        <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
+        <td>${o.tosStart || '—'}</td>
+        <td>${o.tosEnd || '—'}</td>
+        <td>${courseName}</td>
+        <td>${civilQual}</td>
+        <td>${sports}</td>
+        <td>${o.placeOfBirth || '—'}</td>
+        <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
+        <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
+        <td>
+          <div class="action-icons">
+            <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
+            <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
+          </div>
+        </td>
+      </tr>
+    `;
     });
 
     tbody.innerHTML = html;
     document.getElementById('unitStrength').innerText = `Unit Strength: ${totalItems}`;
+  }
+
+  // Show/hide loading state in table
+  function setTableLoading(loading) {
+    const tbody = document.getElementById('tableBody');
+    if (loading) {
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="21" style="text-align: center; padding: 60px 40px;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+            <div class="loading-spinner"></div>
+            <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
+          </div>
+        </td>
+      </tr>
+    `;
+    }
   }
 
   // Render pagination
