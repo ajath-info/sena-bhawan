@@ -9,15 +9,20 @@ import com.example.sena_bhawan.projection.PostingDetailsProjection;
 import com.example.sena_bhawan.projection.RetirementYearProjection;
 import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
+import com.example.sena_bhawan.specification.PersonnelSpecification;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +39,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PersonnelServiceImpl implements PersonnelService {
 
     private final UnitMasterRepository unitMasterRepository;
@@ -41,6 +47,7 @@ public class PersonnelServiceImpl implements PersonnelService {
     private final PersonnelRepository personnelRepository;
     private final CoursePanelRepository coursePanelRepository;
     private final String IMAGE_UPLOAD_DIR = "uploads/officer-images/";
+    private final ObjectMapper objectMapper;
 
 
     @Override
@@ -209,13 +216,14 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
-    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository, OrbatStructureRepository orbatStructureRepository) {
-        this.personnelRepository = personnelRepository;
-        this.unitMasterRepository= unitMasterRepository;
-        this.postingDetailsRepository=postingDetailsRepository;
-        this.coursePanelRepository=coursePanelRepository;
-        this.orbatStructureRepository = orbatStructureRepository;
-    }
+//    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository, ObjectMapper objectMapper, OrbatStructureRepository orbatStructureRepository) {
+//        this.personnelRepository = personnelRepository;
+//        this.unitMasterRepository= unitMasterRepository;
+//        this.postingDetailsRepository=postingDetailsRepository;
+//        this.coursePanelRepository=coursePanelRepository;
+//        this.objectMapper = objectMapper;
+//        this.orbatStructureRepository = orbatStructureRepository;
+//    }
 
     // ================= COMMON =================
     private Personnel getPersonnel(Long id) {
@@ -992,231 +1000,156 @@ public class PersonnelServiceImpl implements PersonnelService {
 //    }
 
 
-    @Override
     @Transactional(readOnly = true)
-    public List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest f) {
-        List<Personnel> personnelList = personnelRepository.findAll((root, query, cb) -> {
+    public Page<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter) {
+        try {
+            // Set defaults
+            if (filter.page < 0) filter.page = 0;
+            if (filter.size <= 0) filter.size = 1000;
+
+            // Build specification for filters
+            Specification<Personnel> spec = buildSpecification(filter);
+
+            // Get paginated personnel IDs using Specification
+            Pageable pageable = PageRequest.of(filter.page, filter.size, Sort.by(Sort.Direction.DESC, "id"));
+            Page<Personnel> personnelPage = personnelRepository.findAll(spec, pageable);
+
+            // Get IDs
+            List<Long> ids = personnelPage.getContent().stream()
+                    .map(Personnel::getId)
+                    .collect(Collectors.toList());
+
+            // Fetch detailed data with native query
+            List<PersonnelListDTO> dtos = new ArrayList<>();
+            if (!ids.isEmpty()) {
+                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByIds(ids);
+                dtos = results.stream()
+                        .map(this::mapToPersonnelListDTO)
+                        .collect(Collectors.toList());
+            }
+
+            return new PageImpl<>(dtos, pageable, personnelPage.getTotalElements());
+
+        } catch (Exception e) {
+            log.error("Error filtering personnel: {}", e.getMessage(), e);
+            throw new RuntimeException("Error filtering personnel: " + e.getMessage());
+        }
+    }
+
+    private Specification<Personnel> buildSpecification(PersonnelFilterRequest filter) {
+        return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // ================= SEARCH =================
-            if (f.search != null && !f.search.isBlank()) {
-                String searchPattern = "%" + f.search.toLowerCase() + "%";
-                Predicate searchPredicate = cb.or(
+            // Army No
+            if (filter.armyNo != null && !filter.armyNo.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("armyNo")),
+                        "%" + filter.armyNo.toLowerCase() + "%"));
+            }
+
+            // Place of Birth
+            if (filter.placeOfBirth != null && !filter.placeOfBirth.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("placeOfBirth")),
+                        "%" + filter.placeOfBirth.toLowerCase() + "%"));
+            }
+
+            // Date of Birth
+            if (filter.dobGreaterThan != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfBirth"), filter.dobGreaterThan));
+            }
+
+            // Date of Commission range
+            if (filter.docFrom != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfCommission"), filter.docFrom));
+            }
+            if (filter.docTo != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("dateOfCommission"), filter.docTo));
+            }
+
+            // Date of Seniority range
+            if (filter.dosFrom != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfSeniority"), filter.dosFrom));
+            }
+            if (filter.dosTo != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("dateOfSeniority"), filter.dosTo));
+            }
+
+            // Rank IN clause
+            if (filter.rank != null && !filter.rank.isEmpty()) {
+                CriteriaBuilder.In<String> inClause = cb.in(root.get("rank"));
+                for (String rank : filter.rank) {
+                    inClause.value(rank);
+                }
+                predicates.add(inClause);
+            }
+
+            // General search (armyNo, fullName, rank)
+            if (filter.search != null && !filter.search.isEmpty()) {
+                String searchPattern = "%" + filter.search.toLowerCase() + "%";
+                predicates.add(cb.or(
                         cb.like(cb.lower(root.get("armyNo")), searchPattern),
                         cb.like(cb.lower(root.get("fullName")), searchPattern),
                         cb.like(cb.lower(root.get("rank")), searchPattern)
-                );
-                predicates.add(searchPredicate);
+                ));
             }
 
-            // ================= RANK (Multi-select) =================
-            if (f.rank != null && !f.rank.isEmpty()) {
-                predicates.add(root.get("rank").in(f.rank));
-            }
-
-            // ================= MEDICAL CATEGORY (Multi-select) =================
-            if (f.medicalCategory != null && !f.medicalCategory.isEmpty()) {
-                predicates.add(root.get("medicalCategory").in(f.medicalCategory));
-            }
-
-            // ================= COMMAND (Multi-select) =================
-            if (f.command != null && !f.command.isEmpty() && hasField(root, "command")) {
-                predicates.add(root.get("command").in(f.command));
-            }
-
-            // ================= CORPS (Multi-select) =================
-            if (f.corps != null && !f.corps.isEmpty() && hasField(root, "corps")) {
-                predicates.add(root.get("corps").in(f.corps));
-            }
-
-            // ================= DIVISION (Multi-select) =================
-            if (f.division != null && !f.division.isEmpty() && hasField(root, "division")) {
-                predicates.add(root.get("division").in(f.division));
-            }
-
-            // ================= ESTABLISHMENT TYPE (Multi-select) =================
-            if (f.establishmentType != null && !f.establishmentType.isEmpty() && hasField(root, "establishmentType")) {
-                predicates.add(root.get("establishmentType").in(f.establishmentType));
-            }
-
-            // ================= AREA TYPE (Multi-select) =================
-            if (f.areaType != null && !f.areaType.isEmpty() && hasField(root, "areaType")) {
-                predicates.add(root.get("areaType").in(f.areaType));
-            }
-
-            // ================= CIVIL QUALIFICATION (Multi-select) =================
-            if (f.civilQualification != null && !f.civilQualification.isEmpty() && hasField(root, "civilQualification")) {
-                predicates.add(root.get("civilQualification").in(f.civilQualification));
-            }
-
-            // ================= SPORTS (Multi-select) =================
-            if (f.sports != null && !f.sports.isEmpty() && hasField(root, "sports")) {
-                predicates.add(root.get("sports").in(f.sports));
-            }
-
-            // ================= POSTING DUE MONTHS (Multi-select) =================
-            if (f.postingDueMonths != null && !f.postingDueMonths.isEmpty() && hasField(root, "postingDueDate")) {
-                List<Predicate> postingPredicates = new ArrayList<>();
-                LocalDate now = LocalDate.now();
-
-                for (Integer months : f.postingDueMonths) {
-                    LocalDate dueDate = now.plusMonths(months);
-                    postingPredicates.add(
-                            cb.lessThanOrEqualTo(root.get("postingDueDate"), dueDate)
-                    );
-                }
-
-                if (!postingPredicates.isEmpty()) {
-                    predicates.add(cb.or(postingPredicates.toArray(new Predicate[0])));
-                }
-            }
-
-            // ================= DOB (Greater Than) =================
-            if (f.dobGreaterThan != null) {
-                predicates.add(cb.greaterThan(root.get("dateOfBirth"), f.dobGreaterThan));
-            }
-
-            // ================= DATE OF COMMISSION RANGE =================
-            if (f.docFrom != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfCommission"), f.docFrom));
-            }
-            if (f.docTo != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("dateOfCommission"), f.docTo));
-            }
-
-            // ================= DATE OF SENIORITY RANGE =================
-            if (f.dosFrom != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("dateOfSeniority"), f.dosFrom));
-            }
-            if (f.dosTo != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("dateOfSeniority"), f.dosTo));
-            }
-
-            // ================= TOS RANGE =================
-            if (f.tosFrom != null && hasField(root, "tosFrom")) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("tosFrom"), f.tosFrom));
-            }
-            if (f.tosTo != null && hasField(root, "tosTo")) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("tosTo"), f.tosTo));
-            }
-
-            // ================= COURSE RANGE =================
-            if (f.courseFrom != null && hasField(root, "courseFrom")) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("courseFrom"), f.courseFrom));
-            }
-            if (f.courseTo != null && hasField(root, "courseTo")) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("courseTo"), f.courseTo));
-            }
-
-            // ================= COURSE NAME (Like) =================
-            if (f.courseName != null && !f.courseName.isBlank() && hasField(root, "courseName")) {
-                predicates.add(cb.like(cb.lower(root.get("courseName")),
-                        "%" + f.courseName.toLowerCase() + "%"));
-            }
-
-            // ================= PLACE OF BIRTH (Like) =================
-            if (f.placeOfBirth != null && !f.placeOfBirth.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("placeOfBirth")),
-                        "%" + f.placeOfBirth.toLowerCase() + "%"));
-            }
-
-            query.orderBy(cb.asc(root.get("rank")));
             return cb.and(predicates.toArray(new Predicate[0]));
-        });
-
-        List<Long> personnelIds = personnelList.stream().map(Personnel::getId).toList();
-
-        // Create a map of personnelId -> panelStatus
-        Map<Long, String> panelStatusMap = new HashMap<>();
-
-        // Create maps for unit and command by personnel ID
-        Map<Long, String> unitMap = new HashMap<>();
-        Map<Long, String> commandMap = new HashMap<>();
-
-        if (!personnelIds.isEmpty()) {
-            // Fetch course panel nominations
-            List<CoursePanelNomination> nominations = coursePanelRepository.findByPersonnelIdIn(personnelIds);
-            panelStatusMap = nominations.stream()
-                    .collect(Collectors.toMap(
-                            CoursePanelNomination::getPersonnelId,
-                            CoursePanelNomination::getAttendanceStatus,
-                            (existing, replacement) -> existing
-                    ));
-
-            // Fetch posting details for UNDER_POSTING status
-            List<PostingDetailsProjection> postingDetails = postingDetailsRepository
-                    .findByPersonnelIdInAndStatus(personnelIds, "UNDER_POSTING");
-
-            if (!postingDetails.isEmpty()) {
-                // Collect all orbat IDs
-                List<Long> orbatIds = postingDetails.stream()
-                        .map(PostingDetailsProjection::getOrbatId)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .collect(Collectors.toList());
-
-                if (!orbatIds.isEmpty()) {
-                    // Fetch orbat structures for Unit and Command formation types
-                    List<String> formationTypes = Arrays.asList("Unit", "Command");
-                    List<OrbatStructure> orbatStructures = orbatStructureRepository
-                            .findByIdInAndFormationTypeIn(orbatIds, formationTypes);
-
-                    // Create maps for orbat ID to name based on formation type
-                    Map<Long, String> unitNameMap = orbatStructures.stream()
-                            .filter(os -> "Unit".equals(os.getFormationType()))
-                            .collect(Collectors.toMap(
-                                    OrbatStructure::getId,
-                                    OrbatStructure::getName,
-                                    (existing, replacement) -> existing
-                            ));
-
-                    Map<Long, String> commandNameMap = orbatStructures.stream()
-                            .filter(os -> "Command".equals(os.getFormationType()))
-                            .collect(Collectors.toMap(
-                                    OrbatStructure::getId,
-                                    OrbatStructure::getName,
-                                    (existing, replacement) -> existing
-                            ));
-
-                    // Map posting details to personnel IDs
-                    for (PostingDetailsProjection pd : postingDetails) {
-                        Long personnelId = pd.getPersonnelId();
-                        Long orbatId = pd.getOrbatId();
-
-                        if (personnelId != null && orbatId != null) {
-                            // Check if it's a Unit
-                            if (unitNameMap.containsKey(orbatId)) {
-                                unitMap.put(personnelId, unitNameMap.get(orbatId));
-                            }
-                            // Check if it's a Command
-                            else if (commandNameMap.containsKey(orbatId)) {
-                                commandMap.put(personnelId, commandNameMap.get(orbatId));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        final Map<Long, String> finalPanelStatusMap = panelStatusMap;
-        final Map<Long, String> finalUnitMap = unitMap;
-        final Map<Long, String> finalCommandMap = commandMap;
-
-        return personnelList.stream()
-                .map(personnel -> PersonnelListDTO.fromPersonnel(
-                        personnel,
-                        finalPanelStatusMap,
-                        finalUnitMap,
-                        finalCommandMap))
-                .collect(Collectors.toList());
+        };
     }
-    private boolean hasField(Root<Personnel> root, String fieldName) {
-        try {
-            root.get(fieldName);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
+
+    private PersonnelListDTO mapToPersonnelListDTO(Object[] row) {
+        PersonnelListDTO dto = new PersonnelListDTO();
+
+        int idx = 0;
+        dto.setId(asLong(row[idx++]));
+        dto.setArmyNo(asString(row[idx++]));
+        dto.setRank(asString(row[idx++]));
+        dto.setFullName(asString(row[idx++]));
+        dto.setDateOfBirth(asString(row[idx++]));
+        dto.setDateOfCommission(asString(row[idx++]));
+        dto.setDateOfSeniority(asString(row[idx++]));
+        dto.setMedicalCode(asString(row[idx++]));
+        dto.setReligion(asString(row[idx++]));
+        dto.setMaritalStatus(asString(row[idx++]));
+        dto.setMobileNumber(asString(row[idx++]));
+        dto.setEmailAddress(asString(row[idx++]));
+        dto.setCity(asString(row[idx++]));
+        dto.setState(asString(row[idx++]));
+        dto.setPlaceOfBirth(asString(row[idx++]));
+
+        // Unit (JSONB)
+        Object unitObj = row[idx++];
+        if (unitObj != null) {
+            try {
+                String unitJson = unitObj.toString();
+                JsonNode node = objectMapper.readTree(unitJson);
+                dto.setUnit(node.get("unit_name").asText());
+                dto.setAreaType(node.get("area_type").asText());
+            } catch (Exception e) {
+                dto.setUnit("-");
+                dto.setAreaType("-");
+            }
+        } else {
+            dto.setUnit("-");
+            dto.setAreaType("-");
         }
+
+        dto.setDivision(asString(row[idx++]));
+        dto.setEstablishmentType(asString(row[idx++]));
+        dto.setCommand(asString(row[idx++]));
+        dto.setCorps(asString(row[idx++]));
+        dto.setCourse(asString(row[idx++]));
+        dto.setCivilQual(asString(row[idx++]));
+        dto.setSports(asString(row[idx++]));
+
+        return dto;
+    }
+
+    private String asString(Object obj) {
+        return obj != null ? obj.toString() : "-";
+    }
+
+    private Long asLong(Object obj) {
+        return obj != null ? Long.parseLong(obj.toString()) : null;
     }
 
 

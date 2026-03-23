@@ -19,103 +19,31 @@ public class PersonnelListDTO {
     private String dateOfCommission;
     private String dateOfSeniority;
     private String unit;
-    private String command;
-    private String corps;
+    private String areaType;
     private String division;
     private String establishmentType;
-    private String medicalCategory;
-    private String tosStart;
-    private String tosEnd;
-    private String courseName;
+    private String command;
+    private String corps;
+    private String medicalCode;
+    private String course;
     private String civilQual;
     private String sports;
-    private String placeOfBirth;
-    private String areaType;
-    private String postingDueMonths;
-    private int totalCoursesDone;
-    private int coursesTrainingYr;
-    private int coursesInUnit;
 
-
-    // New fields
+    // Additional fields with default "-"
     private String religion;
     private String maritalStatus;
     private String mobileNumber;
     private String emailAddress;
     private String city;
     private String state;
+    private String placeOfBirth;
 
-    // Course Panel Status
-    private String panelStatus; // ATTENDING / NOT_ATTENDING / null
-
-    // Transform from entity with panel status map
-    public static PersonnelListDTO fromPersonnel(Personnel personnel,
-	Map<Long, String> panelStatusMap,
-	Map<Long, String> unitMap,
-	Map<Long, String> commandMap)  {
-        PersonnelListDTO dto = new PersonnelListDTO();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        dto.setId(personnel.getId());
-        dto.setArmyNo(personnel.getArmyNo());
-        dto.setRank(personnel.getRank());
-        dto.setFullName(personnel.getFullName());
-        dto.setDateOfBirth(personnel.getDateOfBirth() != null ? personnel.getDateOfBirth().format(formatter) : "—");
-        dto.setDateOfCommission(personnel.getDateOfCommission() != null ? personnel.getDateOfCommission().format(formatter) : "—");
-        dto.setDateOfSeniority(personnel.getDateOfSeniority() != null ? personnel.getDateOfSeniority().format(formatter) : "—");
-        dto.setPlaceOfBirth(personnel.getPlaceOfBirth());
-//        dto.setMedicalCategory(personnel.getMedicalCategory() != null ? personnel.getMedicalCategory() : "—");
-
-        // New fields mapping
-        dto.setReligion(personnel.getReligion() != null ? personnel.getReligion() : "—");
-        dto.setMaritalStatus(personnel.getMaritalStatus() != null ? personnel.getMaritalStatus() : "—");
-        dto.setMobileNumber(personnel.getMobileNumber() != null ? personnel.getMobileNumber() : "—");
-        dto.setEmailAddress(personnel.getEmailAddress() != null ? personnel.getEmailAddress() : "—");
-        dto.setCity(personnel.getCity() != null ? personnel.getCity() : "—");
-        dto.setState(personnel.getState() != null ? personnel.getState() : "—");
-
-        // Set panel status from map
-        dto.setPanelStatus(panelStatusMap.getOrDefault(personnel.getId(), "—"));
-
-        // Set unit and command from posting details
-        dto.setUnit(unitMap.getOrDefault(personnel.getId(), "—"));
-        dto.setCommand(commandMap.getOrDefault(personnel.getId(), "—"));
-
-        // Handle nested data
-        if (personnel.getQualifications() != null && !personnel.getQualifications().isEmpty()) {
-            PersonnelQualifications qual = personnel.getQualifications().get(0);
-            dto.setCivilQual(qual.getQualification() != null ? qual.getQualification() : "—");
-            // If you have courseName in qualifications, otherwise use qualification
-            dto.setCourseName(qual.getQualification() != null ? qual.getQualification() : "—");
-        } else {
-            dto.setCivilQual("—");
-            dto.setCourseName("—");
-        }
-
-        // Handle sports from additionalQualifications
-        if (personnel.getAdditionalQualifications() != null && !personnel.getAdditionalQualifications().isEmpty()) {
-            // Assuming sports field exists in additionalQualifications
-            dto.setSports("—"); // Update this based on your actual sports field
-        } else {
-            dto.setSports("—");
-        }
-
-        // Set default values for fields that don't exist in your entity
-        dto.setUnit("—");
-        dto.setCommand("—");
-        dto.setCorps("—");
-        dto.setDivision("—");
-        dto.setEstablishmentType("—");
-        dto.setTosStart("—");
-        dto.setTosEnd("—");
-        dto.setAreaType("—");
-        dto.setPostingDueMonths("—");
-
-        return dto;
-    }
-
-    // Overloaded method for backward compatibility
-    public static PersonnelListDTO fromPersonnel(Personnel personnel) {
-        return fromPersonnel(personnel, new HashMap<>(), new HashMap<>(), new HashMap<>());
-    }
+    // Course Panel Status (will be computed)
+    private String panelStatus;
+    private Integer totalCoursesDone;
+    private Integer coursesTrainingYr;
+    private Integer coursesInUnit;
+    private String postingDueMonths;
+    private String tosStart;
+    private String tosEnd;
 }
