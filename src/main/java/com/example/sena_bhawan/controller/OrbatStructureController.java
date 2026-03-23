@@ -47,16 +47,16 @@ public class OrbatStructureController {
         return service.getAllCommands();
     }
 
-    // 2️⃣ Get all Corps
-//    @GetMapping("/corps")
-//    public List<DropdownDTO> getAllCorps() {
-//        return service.getAllCorps();
-//    }
-//
-//    @GetMapping("/divisions")
-//    public List<DropdownDTO> getAllDivisions() {
-//        return service.getAllDivisions();
-//    }
+
+    @GetMapping("/list/corps")
+    public List<DropdownDTO> getAllCorps() {
+        return service.getAllCorps();
+    }
+
+    @GetMapping("/list/divisions")
+    public List<DropdownDTO> getAllDivisions() {
+        return service.getAllDivisions();
+    }
 //
 //    @GetMapping("/brigades")
 //    public List<DropdownDTO> getAllBrigades() {
@@ -85,6 +85,8 @@ public class OrbatStructureController {
         }
         return service.getDivisionsByCorpsId(corpsId);
     }
+
+
 
     // Brigades filtered by divisionId (required for proper hierarchy)
     @GetMapping("/brigades")

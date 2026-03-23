@@ -29,8 +29,8 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     """)
     List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term);
 
-//    @Query("SELECT distinct medicalCategory FROM Personnel")
-//    List<String> getMedicalCategory();
+    @Query("SELECT distinct medicalCode FROM Personnel")
+    List<String> getMedicalCode();
 
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")

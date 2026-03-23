@@ -1033,7 +1033,9 @@
         <div class="filter-section">
           <div class="filter-title">📚 Course Name</div>
           <div class="filter-group">
-            <input type="text" class="filter-input" id="courseNameFilter" placeholder="e.g. DSSC">
+            <select class="filter-select" id="courseNameFilter">
+              <option value="">All Courses</option>
+            </select>
           </div>
         </div>
 
@@ -1188,6 +1190,10 @@
   let debounceTimer;
   let isLoading = false;
 
+  // Store ORBAT mappings
+  let commandsMap = new Map(); // command name -> command id
+  let corpsMap = new Map(); // corps name -> corps id
+
   // Initialize Select2 for multi-select dropdowns
   function initializeMultiSelects() {
     $('.multi-select').select2({
@@ -1212,15 +1218,18 @@
       await Promise.all([
         loadRankDropdown(),
         loadMedicalDropdown(),
-        loadCommandDropdown(),
-        loadCorpsDropdown(),
-        loadDivisionDropdown(),
+        loadCommandDropdown(), // This will load commands and then trigger corps/divisions
         loadEstablishmentDropdown(),
         loadAreaTypeDropdown(),
         loadCivilDropdown(),
         loadSportsDropdown(),
-        loadPostingDueDropdown()
+        loadPostingDueDropdown(),
+        loadCourseDropdown() // Add this line
       ]);
+
+      // Load corps and divisions initially without command filter
+      await loadCorpsDropdown(null);
+      await loadDivisionDropdown(null);
 
       initializeMultiSelects();
 
@@ -1268,29 +1277,61 @@
 
   async function loadCommandDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/command`);
+      const response = await fetch(`${API_BASE_URL}/orbat/commands`);
       if (response.ok) {
         const commands = await response.json();
         const select = $('#commandFilter');
+
+        select.empty();
+        select.append(new Option('All', '', false, false));
+
         commands.forEach(cmd => {
-          const option = new Option(cmd, cmd, false, false);
+          // Store command ID for reference
+          commandsMap.set(cmd.name, cmd.id);
+          const option = new Option(cmd.name, cmd.name, false, false);
           select.append(option);
         });
         select.trigger('change');
+
+        // Add change event listener for cascading
+        select.on('change', function() {
+          const selectedCommand = $(this).val();
+          let commandId = null;
+
+          if (selectedCommand && selectedCommand.length > 0 && selectedCommand[0] !== '') {
+            // Get the ID of the selected command (for multi-select, take the first one)
+            commandId = commandsMap.get(selectedCommand[0]);
+          }
+
+          // Load corps and divisions based on selected command
+          loadCorpsDropdown(commandId);
+          loadDivisionDropdown(commandId);
+        });
       }
     } catch (error) {
       console.error('Error loading commands:', error);
     }
   }
 
-  async function loadCorpsDropdown() {
+  async function loadCorpsDropdown(commandId = null) {
     try {
-      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/corps`);
+      let url = `${API_BASE_URL}/orbat/list/corps`;
+      if (commandId) {
+        url += `?commandId=${commandId}`;
+      }
+
+      const response = await fetch(url);
       if (response.ok) {
         const corpsList = await response.json();
         const select = $('#corpsFilter');
+
+        // Clear existing options
+        select.empty();
+        select.append(new Option('All', '', false, false));
+
         corpsList.forEach(corps => {
-          const option = new Option(corps, corps, false, false);
+          // Use corps.name for both display and value
+          const option = new Option(corps.name, corps.name, false, false);
           select.append(option);
         });
         select.trigger('change');
@@ -1300,14 +1341,25 @@
     }
   }
 
-  async function loadDivisionDropdown() {
+  async function loadDivisionDropdown(commandId = null) {
     try {
-      const response = await fetch(`${API_BASE_URL}/orbat/dropdown/division`);
+      let url = `${API_BASE_URL}/orbat/list/divisions`;
+      if (commandId) {
+        url += `?commandId=${commandId}`;
+      }
+
+      const response = await fetch(url);
       if (response.ok) {
         const divisions = await response.json();
         const select = $('#divisionFilter');
+
+        // Clear existing options
+        select.empty();
+        select.append(new Option('All', '', false, false));
+
         divisions.forEach(div => {
-          const option = new Option(div, div, false, false);
+          // Use div.name for both display and value
+          const option = new Option(div.name, div.name, false, false);
           select.append(option);
         });
         select.trigger('change');
@@ -1319,12 +1371,13 @@
 
   async function loadEstablishmentDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/establishment`);
+      const response = await fetch(`${API_BASE_URL}/dropdown/ESTABLISHMENT`);
       if (response.ok) {
-        const types = await response.json();
+        const establishments = await response.json();
         const select = $('#estFilter');
-        types.forEach(type => {
-          const option = new Option(type, type, false, false);
+        establishments.forEach(est => {
+          // Use est.name for both display and value
+          const option = new Option(est.name, est.name, false, false);
           select.append(option);
         });
         select.trigger('change');
@@ -1353,12 +1406,13 @@
 
   async function loadCivilDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/civil-qualification`);
+      const response = await fetch(`${API_BASE_URL}/dropdown/CIVIL_QUALIFICATION`);
       if (response.ok) {
-        const quals = await response.json();
+        const qualifications = await response.json();
         const select = $('#civilFilter');
-        quals.forEach(qual => {
-          const option = new Option(qual, qual, false, false);
+        qualifications.forEach(qual => {
+          // Use qual.name for both display and value
+          const option = new Option(qual.name, qual.name, false, false);
           select.append(option);
         });
         select.trigger('change');
@@ -1370,12 +1424,13 @@
 
   async function loadSportsDropdown() {
     try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/sports`);
+      const response = await fetch(`${API_BASE_URL}/dropdown/SPORTS`);
       if (response.ok) {
         const sportsList = await response.json();
         const select = $('#sportsFilter');
         sportsList.forEach(sport => {
-          const option = new Option(sport, sport, false, false);
+          // Use sport.name for both display and value
+          const option = new Option(sport.name, sport.name, false, false);
           select.append(option);
         });
         select.trigger('change');
@@ -1402,6 +1457,27 @@
     }
   }
 
+  async function loadCourseDropdown() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/course`);
+      if (response.ok) {
+        const courses = await response.json();
+        const select = $('#courseNameFilter');
+
+        select.empty();
+        select.append(new Option('All Courses', '', false, false));
+
+        courses.forEach(course => {
+          const option = new Option(course.courseName, course.courseName, false, false);
+          select.append(option);
+        });
+        select.trigger('change');
+      }
+    } catch (error) {
+      console.error('Error loading courses:', error);
+    }
+  }
+
   // Build filter request from form
   // Build filter request from form - UPDATED to handle null values properly
   function buildFilterRequest() {
@@ -1423,9 +1499,9 @@
     return {
       rank: getSelectValue('rankFilter'),
       medicalCategory: getSelectValue('medicalFilter'),
-      command: getSelectValue('commandFilter'),
-      corps: getSelectValue('corpsFilter'),
-      division: getSelectValue('divisionFilter'),
+      command: getSelectValue('commandFilter'), // Stores command names (not IDs)
+      corps: getSelectValue('corpsFilter'), // Stores corps names (not IDs)
+      division: getSelectValue('divisionFilter'), // Stores division names (not IDs)
       establishmentType: getSelectValue('estFilter'),
       areaType: getSelectValue('areaTypeFilter'),
       civilQualification: getSelectValue('civilFilter'),
@@ -1684,7 +1760,23 @@
     // Reset all select2 dropdowns
     $('.multi-select').val(null).trigger('change');
 
-    // Reset all input fields
+    // Reset command dropdown and trigger change to reload corps/divisions
+    const commandSelect = $('#commandFilter');
+    commandSelect.val(null).trigger('change');
+
+    // After reset, reload corps and divisions with null command
+    loadCorpsDropdown(null);
+    loadDivisionDropdown(null);
+
+    // Reset course dropdown if it's a select
+    const courseSelect = $('#courseNameFilter');
+    if (courseSelect.length) {
+      courseSelect.val('');
+    } else {
+      document.getElementById('courseNameFilter').value = '';
+    }
+
+    // Reset all other input fields
     document.getElementById('globalSearch').value = '';
     document.getElementById('dobFilter').value = '';
     document.getElementById('docFrom').value = '';
@@ -1695,7 +1787,6 @@
     document.getElementById('tosTo').value = '';
     document.getElementById('courseFrom').value = '';
     document.getElementById('courseTo').value = '';
-    document.getElementById('courseNameFilter').value = '';
     document.getElementById('pobFilter').value = '';
 
     currentPage = 1;  // Reset to first page
