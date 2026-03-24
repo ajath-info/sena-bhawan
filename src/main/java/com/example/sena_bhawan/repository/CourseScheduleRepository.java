@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, Long> {
@@ -42,6 +43,8 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query("SELECT cs FROM CourseSchedule cs LEFT JOIN FETCH cs.course WHERE cs.scheduleId = :scheduleId")
     Optional<CourseSchedule> findByIdWithCourse(@Param("scheduleId") Long scheduleId);
+
+    List<CourseSchedule> findByScheduleIdIn(Set<Long> scheduleIds);
 }
 
 

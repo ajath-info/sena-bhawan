@@ -56,7 +56,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
             CourseMaster course = schedule.getCourse();
 
             // 2. Fetch all nominations for this schedule
-            List<CoursePanelNomination> nominations = nominationRepository.findByScheduleId(scheduleId);
+            List<CoursePanelNomination> nominations = nominationRepository.findByScheduleIdWithDetailedStatus(scheduleId);
 
             // 3. Build base response with course info
             GradeUpdateResponseDto response = new GradeUpdateResponseDto();
