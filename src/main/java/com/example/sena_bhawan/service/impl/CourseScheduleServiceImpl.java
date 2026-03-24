@@ -5,6 +5,7 @@ import com.example.sena_bhawan.entity.CourseMaster;
 import com.example.sena_bhawan.entity.CourseSchedule;
 import com.example.sena_bhawan.repository.CourseMasterRepository;
 import com.example.sena_bhawan.repository.CourseScheduleRepository;
+import com.example.sena_bhawan.repository.PersonnelRepository;
 import com.example.sena_bhawan.service.CourseScheduleService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
     @Autowired
     private CourseScheduleRepository scheduleRepo;
+
+    @Autowired
+    private PersonnelRepository personnelRepository;
 
 
     private static final int BUFFER_SIZE = 10;
@@ -63,7 +67,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
                     dto.setCourseStrength(schedule.getCourseStrength());
                     dto.setVenue(schedule.getVenue());
                     dto.setRemarks(schedule.getRemarks());
-                    dto.setPanelSize(schedule.getPanelSize());
+                    dto.setPanelSize(schedule.getPanelSize().toString());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -81,15 +85,34 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
     @Override
     public CourseSchedule addSchedule(CreateCourseScheduleRequest request) {
+        // Validate course exists
         CourseMaster course = courseRepo.findById(request.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Invalid Course ID"));
+                .orElseThrow(() -> new RuntimeException("Invalid Course ID: Course not found"));
 
+        // Validate date range
+        LocalDate startDate = LocalDate.parse(request.getStartDate());
+        LocalDate endDate = LocalDate.parse(request.getEndDate());
+
+        if (startDate.isAfter(endDate)) {
+            throw new RuntimeException("Start date cannot be after end date");
+        }
+
+        // Check personnel strength
+        long personnelCounts = personnelRepository.count();
+        if (personnelCounts < Integer.parseInt(request.getCourseStrength())) {
+            throw new RuntimeException(
+                    String.format("Insufficient personnel strength. Available: %d, Required: %s",
+                            personnelCounts, request.getCourseStrength())
+            );
+        }
+
+        // Create and save schedule
         CourseSchedule schedule = new CourseSchedule();
         schedule.setCourse(course);
         schedule.setYear(request.getYear());
         schedule.setBatchNumber(request.getBatchNumber());
-        schedule.setStartDate(LocalDate.parse(request.getStartDate()));
-        schedule.setEndDate(LocalDate.parse(request.getEndDate()));
+        schedule.setStartDate(startDate);
+        schedule.setEndDate(endDate);
         schedule.setCourseStrength(request.getCourseStrength());
         schedule.setVenue(request.getVenue());
         schedule.setRemarks(request.getRemarks());
@@ -134,7 +157,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         }
 
         // Panel size logic
-        int panelSize = courseStrength + BUFFER_SIZE;
+        long panelSize = personnelRepository.count();
 
         // DTO response
         Step2PanelStrengthDTO dto = new Step2PanelStrengthDTO();
@@ -142,7 +165,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
         dto.setScheduleId(scheduleId);
         dto.setCourseStrength(strengthStr); // STRING
         dto.setBuffer(BUFFER_SIZE);
-        dto.setPanelSize(panelSize);
+        dto.setPanelSize(Integer.parseInt(String.valueOf(panelSize)));
 
         return dto;
     }

@@ -117,7 +117,15 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
             COALESCE(p.city, '-') AS city,
             COALESCE(p.state, '-') AS state,
             COALESCE(p.place_of_birth, '-') AS placeOfBirth,
-            
+            (
+                            SELECT TO_CHAR(pd.tos_updated_date, 'YYYY-MM-DD')
+                            FROM posting_details pd
+                            WHERE pd.personnel_id = p.id\s
+                                AND pd.tos_updated_date IS NOT NULL
+                            ORDER BY pd.from_date DESC
+                            LIMIT 1
+                        ) AS tosDate,
+                    
             -- Unit with area_type
             (
                 SELECT jsonb_build_object('unit_name', os.name, 'area_type', COALESCE(os.area_type, '-'))

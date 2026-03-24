@@ -1250,44 +1250,79 @@ public class PersonnelServiceImpl implements PersonnelService {
                                             CriteriaBuilder cb, List<String> commands) {
         Subquery<Long> subquery = query.subquery(Long.class);
         Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
-        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
-        Join<OrbatStructure, Corps> corpsJoin = orbatJoin.join("corps");
-        Join<Corps, Command> commandJoin = corpsJoin.join("command");
+        Root<OrbatStructure> orbatRoot = subquery.from(OrbatStructure.class);
 
-        subquery.select(postingRoot.get("personnel").get("id"))
-                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
-                        cb.lower(commandJoin.get("commandName")).in(
-                                commands.stream().map(String::toLowerCase).collect(Collectors.toList())));
+        // Join if orbat_id exists and matches
+        Predicate orbatJoinPredicate = cb.equal(postingRoot.get("orbatId"), orbatRoot.get("id"));
+
+        // Filter formation_type = 'Command'
+        Predicate formationTypePredicate = cb.equal(orbatRoot.get("formationType"), "Command");
+
+        // Filter by command names (using orbat_structure name)
+        Predicate commandNamePredicate = cb.lower(orbatRoot.get("name")).in(
+                commands.stream().map(String::toLowerCase).collect(Collectors.toList())
+        );
+
+        // Link to Personnel
+        Predicate personnelLinkPredicate = cb.equal(postingRoot.get("personnelId"), root.get("id"));
+
+        subquery.select(postingRoot.get("personnelId"))
+                .where(cb.and(personnelLinkPredicate, orbatJoinPredicate,
+                        formationTypePredicate, commandNamePredicate));
 
         return cb.exists(subquery);
     }
 
     private Predicate buildCorpsPredicate(Root<Personnel> root, CriteriaQuery<?> query,
                                           CriteriaBuilder cb, List<String> corps) {
+        if (corps == null || corps.isEmpty()) {
+            return cb.conjunction();
+        }
+
         Subquery<Long> subquery = query.subquery(Long.class);
         Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
-        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
-        Join<OrbatStructure, Corps> corpsJoin = orbatJoin.join("corps");
 
-        subquery.select(postingRoot.get("personnel").get("id"))
-                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
-                        cb.lower(corpsJoin.get("corpsName")).in(
-                                corps.stream().map(String::toLowerCase).collect(Collectors.toList())));
+        // Filter by corps names (case insensitive)
+        Predicate corpsNamePredicate = cb.lower(postingRoot.get("corps")).in(
+                corps.stream().map(String::toLowerCase).collect(Collectors.toList())
+        );
+
+        // Link to Personnel
+        Predicate personnelLinkPredicate = cb.equal(postingRoot.get("personnelId"), root.get("id"));
+
+        subquery.select(postingRoot.get("personnelId"))
+                .where(cb.and(personnelLinkPredicate, corpsNamePredicate));
 
         return cb.exists(subquery);
     }
 
     private Predicate buildDivisionPredicate(Root<Personnel> root, CriteriaQuery<?> query,
                                              CriteriaBuilder cb, List<String> divisions) {
+        if (divisions == null || divisions.isEmpty()) {
+            return cb.conjunction();
+        }
+
         Subquery<Long> subquery = query.subquery(Long.class);
         Root<PostingDetails> postingRoot = subquery.from(PostingDetails.class);
-        Join<PostingDetails, OrbatStructure> orbatJoin = postingRoot.join("orbatStructure");
-        Join<OrbatStructure, Division> divisionJoin = orbatJoin.join("division");
+        Root<OrbatStructure> orbatRoot = subquery.from(OrbatStructure.class);
 
-        subquery.select(postingRoot.get("personnel").get("id"))
-                .where(cb.equal(postingRoot.get("personnel").get("id"), root.get("id")),
-                        cb.lower(divisionJoin.get("divisionName")).in(
-                                divisions.stream().map(String::toLowerCase).collect(Collectors.toList())));
+        // Join condition using orbat_id
+        Predicate orbatJoinPredicate = cb.equal(postingRoot.get("orbatId"), orbatRoot.get("id"));
+
+        // Filter where formation_type is 'Division'
+        Predicate formationTypePredicate = cb.equal(orbatRoot.get("formationType"), "Division");
+
+        // Filter by division names (case insensitive) using name column
+        Predicate divisionNamePredicate = cb.lower(orbatRoot.get("name")).in(
+                divisions.stream().map(String::toLowerCase).collect(Collectors.toList())
+        );
+
+        // Link to Personnel
+        Predicate personnelLinkPredicate = cb.equal(postingRoot.get("personnelId"), root.get("id"));
+
+        subquery.select(postingRoot.get("personnelId"))
+                .where(cb.and(personnelLinkPredicate, orbatJoinPredicate,
+                        formationTypePredicate, divisionNamePredicate));
 
         return cb.exists(subquery);
     }
@@ -1439,6 +1474,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         dto.setCity(asString(row[idx++]));
         dto.setState(asString(row[idx++]));
         dto.setPlaceOfBirth(asString(row[idx++]));
+        dto.setTosDate(asString(row[idx++]));
 
         // Unit (JSONB)
         Object unitObj = row[idx++];

@@ -11,6 +11,6 @@ public class CoursePanelStatusUpdateRequest {
     @Data
     public static class StatusUpdate {
         private Long personnelId;
-        private String attendanceStatus; // "Retain" or "Reserve"
+        private String attendanceStatus; // "Detailed" or "Reserve"
     }
 }

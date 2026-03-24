@@ -639,6 +639,18 @@
             color: #1b4332;
         }
 
+        .status-btn.detailed-btn.active {
+            border-color: #3b82f6 !important;
+            background: #dbeafe !important;
+            color: #3b82f6 !important;
+        }
+
+        .status-btn.detailed-btn:hover {
+            background: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            transform: translateY(-1px);
+        }
+
         .table-scroll-wrapper {
             max-height: 420px;
             overflow-y: auto;
@@ -1281,7 +1293,7 @@
                                         <th>Date of Birth</th>
                                         <th>Religion</th>
                                         <th>Marital Status</th>
-                                        <th>Medical Category</th>
+                                        <th>Medical Code</th>
                                         <th>Mobile</th>
                                         <th>Email</th>
                                         <th>City</th>
@@ -1686,7 +1698,7 @@
                                 <th>Rank</th>
                                 <th>Unit</th>
                                 <th>Command</th>
-                                <th>Medical</th>
+                                <th>Medical Code</th>
                                 <th>DOB</th>
                                 <th>Commission</th>
                                 <th>Mobile</th>
@@ -2854,7 +2866,7 @@ document.head.appendChild(style);
                 <td>${o.rank || '—'}</td>
                 <td>${o.unit || '—'}</td>
                 <td>${o.command || '—'}</td>
-                <td>${o.medicalCategory || '—'}</td>
+                <td>${o.medicalCode || '—'}</td>
                 <td>${formatDate(o.dateOfBirth)}</td>
                 <td>${formatDate(o.dateOfCommission)}</td>
                 <td>${o.mobileNumber || o.mobile || '—'}</td>
@@ -3106,84 +3118,161 @@ document.head.appendChild(style);
         officers.forEach((o, index) => {
             const personnelId = o.id || o.personnelId;
             const isSelected = selectedSet.has(personnelId);
-            const isAttending = attendingSet.has(personnelId);
-            // Get status from statusMap, default to 'Reserve'
             const status = statusMap.get(personnelId) || 'Reserve';
 
             const row = document.createElement("tr");
 
-            row.innerHTML = `
-            <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${personnelId}" class="officer-checkbox"></td>
-            <td>${index + 1}</td>
-            <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <div>
-                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
-                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
-                    </div>
+            // Create all cells with consistent structure
+            const cellCheckbox = document.createElement("td");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = isSelected;
+            checkbox.className = "officer-checkbox";
+            checkbox.dataset.personnelid = personnelId;
+            cellCheckbox.appendChild(checkbox);
+            row.appendChild(cellCheckbox);
+
+            // Serial Number
+            const cellSerNo = document.createElement("td");
+            cellSerNo.textContent = index + 1;
+            row.appendChild(cellSerNo);
+
+            // Officer Info
+            const cellOfficer = document.createElement("td");
+            cellOfficer.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px">
+                <div>
+                    <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                    <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
                 </div>
-            </td>
-            <td>${o.rank || "-"}</td>
-            <td>${o.unit || "-"}</td>
-            <td>${o.command || "-"}</td>
-            <td>${formatDate(o.dateOfCommission)}</td>
-            <td>${formatDate(o.dateOfSeniority)}</td>
-            <td>${formatDate(o.dateOfBirth)}</td>
-            <td>${o.religion || "-"}</td>
-            <td>${o.maritalStatus || "-"}</td>
-            <td>${o.medicalCategory || "-"}</td>
-            <td>${o.mobileNumber || o.mobile || "-"}</td>
-            <td>${o.emailAddress || o.email || "-"}</td>
-            <td>${o.city || "-"}</td>
-            <td>${o.state || "-"}</td>
-            <td>
-                <div class="status-toggle" style="display: flex; gap: 8px;">
-                    <button class="status-btn retain-btn ${status === 'Retain' ? 'active' : ''}"
-                            data-personnelid="${personnelId}"
-                            data-status="Retain"
-                            style="padding: 6px 12px;
-                                   border: 2px solid ${status === 'Retain' ? '#10b981' : '#d1d5db'};
-                                   background: ${status === 'Retain' ? '#d1fae5' : 'white'};
-                                   color: ${status === 'Retain' ? '#10b981' : '#6b7280'};
-                                   border-radius: 6px;
-                                   font-weight: 600;
-                                   font-size: 12px;
-                                   cursor: pointer;
-                                   transition: all 0.2s;">
-                        Retain
-                    </button>
-                    <button class="status-btn reserve-btn ${status === 'Reserve' ? 'active' : ''}"
-                            data-personnelid="${personnelId}"
-                            data-status="Reserve"
-                            style="padding: 6px 12px;
-                                   border: 2px solid ${status === 'Reserve' ? '#f59e0b' : '#d1d5db'};
-                                   background: ${status === 'Reserve' ? '#fef3c7' : 'white'};
-                                   color: ${status === 'Reserve' ? '#f59e0b' : '#6b7280'};
-                                   border-radius: 6px;
-                                   font-weight: 600;
-                                   font-size: 12px;
-                                   cursor: pointer;
-                                   transition: all 0.2s;">
-                        Reserve
-                    </button>
-                </div>
-            </td>
-            <td>
-                <button class="btn btn-danger remove-officer-btn" data-personnelid="${personnelId}" data-name="${o.fullName || o.name}" style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                    🗑️ Remove
-                </button>
-            </td>
+            </div>
         `;
+            row.appendChild(cellOfficer);
+
+            // Rank
+            const cellRank = document.createElement("td");
+            cellRank.textContent = o.rank || "-";
+            row.appendChild(cellRank);
+
+            // Unit
+            const cellUnit = document.createElement("td");
+            cellUnit.textContent = o.unit || "-";
+            row.appendChild(cellUnit);
+
+            // Command
+            const cellCommand = document.createElement("td");
+            cellCommand.textContent = o.command || "-";
+            row.appendChild(cellCommand);
+
+            // Date of Commission
+            const cellDoc = document.createElement("td");
+            cellDoc.textContent = formatDate(o.dateOfCommission);
+            row.appendChild(cellDoc);
+
+            // Date of Seniority
+            const cellDos = document.createElement("td");
+            cellDos.textContent = formatDate(o.dateOfSeniority);
+            row.appendChild(cellDos);
+
+            // Date of Birth
+            const cellDob = document.createElement("td");
+            cellDob.textContent = formatDate(o.dateOfBirth);
+            row.appendChild(cellDob);
+
+            // Religion
+            const cellReligion = document.createElement("td");
+            cellReligion.textContent = o.religion || "-";
+            row.appendChild(cellReligion);
+
+            // Marital Status
+            const cellMarital = document.createElement("td");
+            cellMarital.textContent = o.maritalStatus || "-";
+            row.appendChild(cellMarital);
+
+            // Medical Code
+            const cellMedical = document.createElement("td");
+            cellMedical.textContent = o.medicalCode || "-";
+            row.appendChild(cellMedical);
+
+            // Mobile
+            const cellMobile = document.createElement("td");
+            cellMobile.textContent = o.mobileNumber || o.mobile || "-";
+            row.appendChild(cellMobile);
+
+            // Email
+            const cellEmail = document.createElement("td");
+            cellEmail.textContent = o.emailAddress || o.email || "-";
+            row.appendChild(cellEmail);
+
+            // City
+            const cellCity = document.createElement("td");
+            cellCity.textContent = o.city || "-";
+            row.appendChild(cellCity);
+
+            // State
+            const cellState = document.createElement("td");
+            cellState.textContent = o.state || "-";
+            row.appendChild(cellState);
+
+            // Course Panel Status (with buttons)
+            const cellStatus = document.createElement("td");
+            cellStatus.style.whiteSpace = "nowrap";
+            cellStatus.innerHTML = `
+            <div class="status-toggle" style="display: flex; gap: 8px;">
+                <button class="status-btn detailed-btn ${status === 'Detailed' ? 'active' : ''}"
+                        data-personnelid="${personnelId}"
+                        data-status="Detailed"
+                        style="padding: 6px 12px;
+                               border: 2px solid ${status === 'Detailed' ? '#3b82f6' : '#d1d5db'};
+                               background: ${status === 'Detailed' ? '#dbeafe' : 'white'};
+                               color: ${status === 'Detailed' ? '#3b82f6' : '#6b7280'};
+                               border-radius: 6px;
+                               font-weight: 600;
+                               font-size: 12px;
+                               cursor: pointer;
+                               transition: all 0.2s;
+                               min-width: 70px;">
+                    Detailed
+                </button>
+                <button class="status-btn reserve-btn ${status === 'Reserve' ? 'active' : ''}"
+                        data-personnelid="${personnelId}"
+                        data-status="Reserve"
+                        style="padding: 6px 12px;
+                               border: 2px solid ${status === 'Reserve' ? '#f59e0b' : '#d1d5db'};
+                               background: ${status === 'Reserve' ? '#fef3c7' : 'white'};
+                               color: ${status === 'Reserve' ? '#f59e0b' : '#6b7280'};
+                               border-radius: 6px;
+                               font-weight: 600;
+                               font-size: 12px;
+                               cursor: pointer;
+                               transition: all 0.2s;
+                               min-width: 70px;">
+                    Reserve
+                </button>
+            </div>
+        `;
+            row.appendChild(cellStatus);
+
+            // Action (Remove button)
+            const cellAction = document.createElement("td");
+            cellAction.innerHTML = `
+            <button class="btn btn-danger remove-officer-btn"
+                    data-personnelid="${personnelId}"
+                    data-name="${o.fullName || o.name}"
+                    style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap;">
+                🗑️ Remove
+            </button>
+        `;
+            row.appendChild(cellAction);
 
             tbody.appendChild(row);
 
-            // Add event listener for checkbox
-            const checkbox = row.querySelector('.officer-checkbox');
-            checkbox.addEventListener('change', function () {
+            // Add event listeners
+            const checkboxElem = row.querySelector('.officer-checkbox');
+            checkboxElem.addEventListener('change', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (this.checked) {
                     selectedSet.add(personnelId);
-                    // Initialize status to 'Reserve' if not already set
                     if (!statusMap.has(personnelId)) {
                         statusMap.set(personnelId, 'Reserve');
                     }
@@ -3193,32 +3282,26 @@ document.head.appendChild(style);
                 }
                 document.getElementById('selectedCount').innerText = selectedSet.size;
                 updatePanelSummary();
-
-                // Update toggle button styles when checkbox changes
                 updateToggleStyles(personnelId);
             });
 
-            // Add event listeners for status toggle buttons
-            const retainBtn = row.querySelector('.retain-btn');
+            const detailedBtn = row.querySelector('.detailed-btn');
             const reserveBtn = row.querySelector('.reserve-btn');
 
-            retainBtn.addEventListener('click', function () {
+            detailedBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (!selectedSet.has(personnelId)) {
-                    // Auto-select the officer if not already selected
                     selectedSet.add(personnelId);
                     const checkbox = row.querySelector('.officer-checkbox');
                     if (checkbox) checkbox.checked = true;
                     document.getElementById('selectedCount').innerText = selectedSet.size;
                 }
 
-                // Set status to Retain
-                statusMap.set(personnelId, 'Retain');
+                statusMap.set(personnelId, 'Detailed');
 
-                // Update button styles
-                this.style.border = '2px solid #10b981';
-                this.style.background = '#d1fae5';
-                this.style.color = '#10b981';
+                this.style.border = '2px solid #3b82f6';
+                this.style.background = '#dbeafe';
+                this.style.color = '#3b82f6';
 
                 reserveBtn.style.border = '2px solid #d1d5db';
                 reserveBtn.style.background = 'white';
@@ -3227,34 +3310,30 @@ document.head.appendChild(style);
                 updatePanelSummary();
             });
 
-            reserveBtn.addEventListener('click', function () {
+            reserveBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (!selectedSet.has(personnelId)) {
-                    // Auto-select the officer if not already selected
                     selectedSet.add(personnelId);
                     const checkbox = row.querySelector('.officer-checkbox');
                     if (checkbox) checkbox.checked = true;
                     document.getElementById('selectedCount').innerText = selectedSet.size;
                 }
 
-                // Set status to Reserve
                 statusMap.set(personnelId, 'Reserve');
 
-                // Update button styles
                 this.style.border = '2px solid #f59e0b';
                 this.style.background = '#fef3c7';
                 this.style.color = '#f59e0b';
 
-                retainBtn.style.border = '2px solid #d1d5db';
-                retainBtn.style.background = 'white';
-                retainBtn.style.color = '#6b7280';
+                detailedBtn.style.border = '2px solid #d1d5db';
+                detailedBtn.style.background = 'white';
+                detailedBtn.style.color = '#6b7280';
 
                 updatePanelSummary();
             });
 
-            // Add remove button event listener
             const removeBtn = row.querySelector('.remove-officer-btn');
-            removeBtn.addEventListener('click', function () {
+            removeBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 const officerName = this.dataset.name;
                 removeOfficer(personnelId, officerName);
@@ -3266,17 +3345,17 @@ document.head.appendChild(style);
 
     // Helper function to update toggle button styles based on status
     function updateToggleStyles(personnelId) {
-        const row = document.querySelector(`.retain-btn[data-personnelid="${personnelId}"]`)?.closest('tr');
+        const row = document.querySelector(`.detailed-btn[data-personnelid="${personnelId}"]`)?.closest('tr');
         if (!row) return;
 
-        const retainBtn = row.querySelector('.retain-btn');
+        const detailedBtn = row.querySelector('.detailed-btn');
         const reserveBtn = row.querySelector('.reserve-btn');
         const currentStatus = statusMap.get(personnelId);
 
-        if (currentStatus === 'Retain') {
-            retainBtn.style.border = '2px solid #10b981';
-            retainBtn.style.background = '#d1fae5';
-            retainBtn.style.color = '#10b981';
+        if (currentStatus === 'Detailed') {
+            detailedBtn.style.border = '2px solid #3b82f6';
+            detailedBtn.style.background = '#dbeafe';
+            detailedBtn.style.color = '#3b82f6';
             reserveBtn.style.border = '2px solid #d1d5db';
             reserveBtn.style.background = 'white';
             reserveBtn.style.color = '#6b7280';
@@ -3284,9 +3363,9 @@ document.head.appendChild(style);
             reserveBtn.style.border = '2px solid #f59e0b';
             reserveBtn.style.background = '#fef3c7';
             reserveBtn.style.color = '#f59e0b';
-            retainBtn.style.border = '2px solid #d1d5db';
-            retainBtn.style.background = 'white';
-            retainBtn.style.color = '#6b7280';
+            detailedBtn.style.border = '2px solid #d1d5db';
+            detailedBtn.style.background = 'white';
+            detailedBtn.style.color = '#6b7280';
         }
     }
 
@@ -3580,7 +3659,7 @@ document.head.appendChild(style);
             <td>${formatDate(o.dateOfBirth)}</td>
             <td>${o.religion || "-"}</td>
             <td>${o.maritalStatus || "-"}</td>
-            <td>${o.medicalCategory || "-"}</td>
+            <td>${o.medicalCode || "-"}</td>
             <td>${o.mobileNumber || o.mobile || "-"}</td>
             <td>${o.emailAddress || o.email || "-"}</td>
             <td>${o.city || "-"}</td>

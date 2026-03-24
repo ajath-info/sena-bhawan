@@ -38,7 +38,7 @@ public class CoursePanelStatusController {
                 String newStatus = update.getAttendanceStatus();
                 
                 // Validate status
-                if (!newStatus.equalsIgnoreCase("Retain") && !newStatus.equalsIgnoreCase("Reserve")) {
+                if (!newStatus.equalsIgnoreCase("Detailed") && !newStatus.equalsIgnoreCase("Reserve")) {
                     errors.add("Invalid status for personnelId " + personnelId + ": " + newStatus);
                     continue;
                 }
@@ -81,8 +81,8 @@ public class CoursePanelStatusController {
         
         try {
             // Validate status
-            if (!status.equalsIgnoreCase("Retain") && !status.equalsIgnoreCase("Reserve")) {
-                return ResponseEntity.badRequest().body("Invalid status. Must be 'Retain' or 'Reserve'");
+            if (!status.equalsIgnoreCase("Detailed") && !status.equalsIgnoreCase("Reserve")) {
+                return ResponseEntity.badRequest().body("Invalid status. Must be 'Detailed' or 'Reserve'");
             }
             
             // Find the nomination
