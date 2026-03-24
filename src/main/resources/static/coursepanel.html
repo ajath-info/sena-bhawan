@@ -1183,16 +1183,36 @@
                     </div>
 
                     <!-- Filter Button -->
+                    <!-- Filter Button Section -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div>
+                        <div style="display: flex; gap: 12px;">
                             <button class="btn btn-primary" onclick="openFilterPopup()"
                                     style="display: flex; align-items: center; gap: 8px;">
                                 <span>🔍</span>
                                 Open Advanced Filters
                             </button>
+                            <button class="btn btn-success" onclick="toggleCourseDropdown()"
+                                    style="display: flex; align-items: center; gap: 8px;">
+                                <span>➕</span>
+                                Add Course
+                            </button>
                         </div>
-                        <div class="badge badge-info" id="activeFilterCount" style="font-size: 13px;">0 filters
-                            applied
+                        <div class="badge badge-info" id="activeFilterCount" style="font-size: 13px;">0 filters applied</div>
+                    </div>
+
+
+                    <!-- Course Dropdown (hidden by default) -->
+                    <div id="courseDropdown" style="display: none; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <label class="form-label" style="margin-bottom: 0;">Select Course to Add</label>
+                            <button onclick="closeCourseDropdown()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280;">&times;</button>
+                        </div>
+                        <select id="courseToAddSelect" class="form-select" style="margin-bottom: 12px;">
+                            <option value="">-- Select Course --</option>
+                        </select>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="closeCourseDropdown()">Cancel</button>
+                            <button class="btn btn-primary" onclick="addSelectedCourse()">Add to Panel</button>
                         </div>
                     </div>
 
@@ -2145,7 +2165,7 @@ document.head.appendChild(style);
                     console.log("Filter request:", filterRequest);
 
                     // Call filter API with eligibility criteria
-                    const filterResponse = await fetch('http://localhost:6060/api/personnel/filter', {
+                    const filterResponse = await fetch('http://localhost:6060/api/personnel/filter?cpg=1', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -2158,7 +2178,7 @@ document.head.appendChild(style);
                         console.log("Filter result:", filterResult);
 
                         // Update officers array with filtered data
-                        officers = filterResult.data || [];
+                        officers = Array.isArray(filterResult) ? filterResult : (filterResult.data || []);
 
                         // Clear previous selections
                         selectedSet.clear();
@@ -2704,7 +2724,7 @@ document.head.appendChild(style);
             const filterRequest = buildAdvancedFilterRequest();
             console.log("Applying filters with request:", filterRequest);
 
-            const response = await fetch('http://localhost:6060/api/personnel/filter', {
+            const response = await fetch('http://localhost:6060/api/personnel/filter?cpg=1', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2714,7 +2734,10 @@ document.head.appendChild(style);
 
             if (response.ok) {
                 const data = await response.json();
-                filterResults = data.data || [];
+                // Change this line:
+                // filterResults = data.data || [];
+                // To:
+                filterResults = Array.isArray(data) ? data : (data.data || []);
 
                 // Render the filter results table in popup
                 renderFilterResultsTable();
@@ -2723,9 +2746,6 @@ document.head.appendChild(style);
                 updateFilterCount();
 
                 console.log('Filter results:', filterResults.length, 'officers found');
-
-                // DON'T automatically add all filtered officers to main table
-                // Only show them in the popup for selection
             }
         } catch (error) {
             console.error('Error applying filters:', error);
@@ -2775,7 +2795,10 @@ document.head.appendChild(style);
     function renderFilterResultsTable() {
         const tbody = document.getElementById('filterResultsBody');
 
-        if (!filterResults || filterResults.length === 0) {
+        // Make sure filterResults is an array
+        const results = Array.isArray(filterResults) ? filterResults : [];
+
+        if (results.length === 0) {
             tbody.innerHTML = `
             <tr>
                 <td colspan="10" style="text-align: center; padding: 40px;">
@@ -2794,7 +2817,7 @@ document.head.appendChild(style);
         );
 
         let html = '';
-        filterResults.forEach((o, index) => {
+        results.forEach((o, index) => {
             const personnelId = o.personnelId || o.id;
             const armyNo = o.armyNo;
 
@@ -3037,9 +3060,7 @@ document.head.appendChild(style);
     // OFFICER TABLE FUNCTIONS
     // ===============================
     function loadOfficers() {
-        // This function is now modified to use the filter API instead of the panel/officers API
-        // But we'll keep it for initial load or fallback
-        fetch("http://localhost:6060/api/personnel/filter", {
+        fetch("http://localhost:6060/api/personnel/filter?cpg=1", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -3048,7 +3069,11 @@ document.head.appendChild(style);
         })
             .then(res => res.json())
             .then(data => {
-                officers = Array.isArray(data.data) ? data.data : [];
+                // Change this line:
+                // officers = Array.isArray(data.data) ? data.data : [];
+                // To:
+                officers = Array.isArray(data) ? data : (data.data || []);
+
                 document.getElementById("totalEligible").innerText = officers.length;
                 renderOfficerTable();
                 updatePanelSummary();
@@ -3827,6 +3852,176 @@ document.head.appendChild(style);
         officers = [];
         renderOfficerTable();
     });
+
+
+    // ===============================
+    // COURSE DROPDOWN FUNCTIONS
+    // ===============================
+
+    // Toggle course dropdown visibility
+    function toggleCourseDropdown() {
+        const dropdown = document.getElementById('courseDropdown');
+        if (dropdown.style.display === 'none') {
+            dropdown.style.display = 'block';
+            loadCoursesForDropdown();
+        } else {
+            dropdown.style.display = 'none';
+        }
+    }
+
+    // Close course dropdown
+    function closeCourseDropdown() {
+        document.getElementById('courseDropdown').style.display = 'none';
+    }
+
+    // Load courses into dropdown
+    async function loadCoursesForDropdown() {
+        const select = document.getElementById('courseToAddSelect');
+
+        try {
+            select.innerHTML = '<option value="">Loading courses...</option>';
+
+            const response = await fetch('http://localhost:6060/api/course');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const courses = await response.json();
+
+            select.innerHTML = '<option value="">-- Select Course --</option>';
+
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.srno;
+                option.textContent = course.courseName;
+                option.dataset.courseName = course.courseName;
+                option.dataset.duration = course.duration;
+                option.dataset.location = course.location;
+                select.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error('Error loading courses:', error);
+            select.innerHTML = '<option value="">Error loading courses</option>';
+            showToast('Failed to load courses', 'error');
+        }
+    }
+
+    // Add selected course to panel
+    async function addSelectedCourse() {
+        const select = document.getElementById('courseToAddSelect');
+        const selectedOption = select.options[select.selectedIndex];
+        const courseSrno = select.value;
+
+        if (!courseSrno) {
+            showToast('Please select a course first', 'error');
+            return;
+        }
+
+        const courseName = selectedOption.dataset.courseName;
+
+        // Confirm with user
+        if (!confirm(`Are you sure you want to add "${courseName}" to the panel?`)) {
+            return;
+        }
+
+        try {
+            showLoading(true);
+
+            // Get current scheduleId
+            const scheduleId = sessionStorage.getItem('scheduleId');
+
+            if (!scheduleId) {
+                showToast('Please select a course schedule first', 'error');
+                return;
+            }
+
+            // Call API to add course to panel
+            const response = await fetch('http://localhost:6060/api/course-panel/add-course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    scheduleId: parseInt(scheduleId),
+                    courseSrno: parseInt(courseSrno)
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                showToast(`Course "${courseName}" added successfully!`, 'success');
+
+                // Close dropdown
+                closeCourseDropdown();
+
+                // Refresh eligible officers if needed
+                refreshEligibleOfficers();
+
+            } else {
+                const errorText = await response.text();
+                showToast(`Failed to add course: ${errorText}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Error adding course:', error);
+            showToast('Error adding course to panel', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Refresh eligible officers after adding course
+    async function refreshEligibleOfficers() {
+        const scheduleId = sessionStorage.getItem('scheduleId');
+        const courseSelect = document.getElementById('courseSelect');
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const courseId = selectedOption?.dataset.courseId;
+
+        if (scheduleId && courseId) {
+            try {
+                // Fetch eligibility criteria with updated course
+                const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/course/${courseId}`);
+
+                if (eligibilityResponse.ok) {
+                    const eligibilityData = await eligibilityResponse.json();
+                    const filterRequest = transformEligibilityToFilter(eligibilityData);
+
+                    const filterResponse = await fetch('http://localhost:6060/api/personnel/filter?cpg=1', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(filterRequest)
+                    });
+
+                    if (filterResponse.ok) {
+                        const filterResult = await filterResponse.json();
+                        officers = Array.isArray(filterResult) ? filterResult : (filterResult.data || []);
+
+                        // Clear previous selections
+                        selectedSet.clear();
+                        statusMap.clear();
+
+                        // Update UI
+                        document.getElementById("totalEligible").innerText = officers.length;
+                        document.getElementById("selectedCount").innerText = "0";
+
+                        // Render the table with filtered officers
+                        renderOfficerTable();
+
+                        // Update panel summary
+                        updatePanelSummary();
+
+                        showToast(`Found ${officers.length} eligible officers`, 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing officers:', error);
+            }
+        }
+    }
 </script>
 </body>
 </html>

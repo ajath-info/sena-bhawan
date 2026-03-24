@@ -1001,6 +1001,43 @@ public class PersonnelServiceImpl implements PersonnelService {
 //    }
 
 
+//    @Transactional(readOnly = true)
+//    public Page<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter, int cpg) {
+//        try {
+//            // Set defaults
+//            if (filter.page < 0) filter.page = 0;
+//            if (filter.size <= 0) filter.size = 1000;
+//
+//            // Build specification for filters
+//            Specification<Personnel> spec = buildSpecification(filter);
+//
+//            // Get paginated personnel IDs using Specification
+//            Pageable pageable = PageRequest.of(filter.page, filter.size, Sort.by(Sort.Direction.DESC, "id"));
+//            Page<Personnel> personnelPage = personnelRepository.findAll(spec, pageable);
+//
+//            // Get IDs
+//            List<Long> ids = personnelPage.getContent().stream()
+//                    .map(Personnel::getId)
+//                    .collect(Collectors.toList());
+//
+//            // Fetch detailed data with native query
+//            List<PersonnelListDTO> dtos = new ArrayList<>();
+//            if (!ids.isEmpty()) {
+//                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByIds(ids);
+//                dtos = results.stream()
+//                        .map(this::mapToPersonnelListDTO)
+//                        .collect(Collectors.toList());
+//            }
+//
+//            return new PageImpl<>(dtos, pageable, personnelPage.getTotalElements());
+//
+//        } catch (Exception e) {
+//            log.error("Error filtering personnel: {}", e.getMessage(), e);
+//            throw new RuntimeException("Error filtering personnel: " + e.getMessage());
+//        }
+//    }
+
+    // Keep your existing method for paginated results
     @Transactional(readOnly = true)
     public Page<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter) {
         try {
@@ -1034,6 +1071,38 @@ public class PersonnelServiceImpl implements PersonnelService {
         } catch (Exception e) {
             log.error("Error filtering personnel: {}", e.getMessage(), e);
             throw new RuntimeException("Error filtering personnel: " + e.getMessage());
+        }
+    }
+
+    // New method for all records without pagination
+    @Transactional(readOnly = true)
+    public List<PersonnelListDTO> filterAllPersonnel(PersonnelFilterRequest filter) {
+        try {
+            // Build specification for filters
+            Specification<Personnel> spec = buildSpecification(filter);
+
+            // Fetch ALL records without pagination
+            List<Personnel> allPersonnel = personnelRepository.findAll(spec);
+
+            // Get IDs from all records
+            List<Long> ids = allPersonnel.stream()
+                    .map(Personnel::getId)
+                    .collect(Collectors.toList());
+
+            // Fetch detailed data with native query
+            List<PersonnelListDTO> dtos = new ArrayList<>();
+            if (!ids.isEmpty()) {
+                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByIds(ids);
+                dtos = results.stream()
+                        .map(this::mapToPersonnelListDTO)
+                        .collect(Collectors.toList());
+            }
+
+            return dtos;
+
+        } catch (Exception e) {
+            log.error("Error filtering all personnel: {}", e.getMessage(), e);
+            throw new RuntimeException("Error filtering all personnel: " + e.getMessage());
         }
     }
 

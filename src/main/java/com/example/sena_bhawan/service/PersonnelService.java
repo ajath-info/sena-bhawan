@@ -57,6 +57,7 @@ public interface PersonnelService {
 
 //    List<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
     Page<PersonnelListDTO> filterPersonnel(PersonnelFilterRequest filter);
+    List<PersonnelListDTO> filterAllPersonnel(PersonnelFilterRequest filter);
 
     OfficerSummaryDTO getOfficerSummaryByUnit(Long unitId);
 

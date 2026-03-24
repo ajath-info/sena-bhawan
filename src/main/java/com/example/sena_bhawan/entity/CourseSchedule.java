@@ -46,6 +46,6 @@ public class CourseSchedule {
     private String remarks;
 
     @Column(name = "panel_size")
-    private String panelSize;
+    private Integer panelSize;
 
 }

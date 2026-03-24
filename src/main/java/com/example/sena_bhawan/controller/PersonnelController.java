@@ -369,9 +369,16 @@ public class PersonnelController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<Page<PersonnelListDTO>> filterPersonnel(@RequestBody PersonnelFilterRequest filter) {
-        Page<PersonnelListDTO> result = personnelService.filterPersonnel(filter);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<?> filterPersonnel(@RequestBody PersonnelFilterRequest filter, @RequestParam(defaultValue = "0") int cpg) {
+        if (cpg == 1) {
+            // Return direct list when cpg=1
+            List<PersonnelListDTO> result = personnelService.filterAllPersonnel(filter);
+            return ResponseEntity.ok(result);
+        } else {
+            // Return paginated response when cpg=0
+            Page<PersonnelListDTO> result = personnelService.filterPersonnel(filter);
+            return ResponseEntity.ok(result);
+        }
     }
 
 //    @GetMapping("/{id}")
