@@ -19,7 +19,7 @@ public class CourseEligibilityDTO {
     private List<Long> postingTypeIds;
     private List<Long> minCourseGrading;     // Dropdown IDs for COURSE_GRADE
     private List<Long> educationalQualifications; // Dropdown IDs for CIVIL_QUALIFICATION
-    private List<Long> medicalCategories;     // Dropdown IDs for MEDICAL
+    private List<String> medicalCategories;     // Dropdown IDs for MEDICAL
     private List<Long> establishmentTypes;    // Dropdown IDs for ESTABLISHMENT
     private List<String> remarks;
     private String additionalRemarks;

@@ -3,8 +3,11 @@ package com.example.sena_bhawan.repository;
 import com.example.sena_bhawan.entity.CoursePanelNomination;
 import com.example.sena_bhawan.projection.AttendanceStatusProjection;
 import com.example.sena_bhawan.projection.OngoingCoursesProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,4 +50,26 @@ public interface CoursePanelRepository
             "FROM CoursePanelNomination cpn " +
             "GROUP BY cpn.attendanceStatus")
     List<AttendanceStatusProjection> getAttendanceStatusCounts();
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE CoursePanelNomination cpn SET cpn.grade = :grade, cpn.instructorAward = :instructorAward, cpn.gradeRemarks = :remarks, cpn.gradeStatus = :gradeStatus WHERE cpn.scheduleId = :scheduleId AND cpn.personnelId = :personnelId")
+    int updateGradeDetails(@Param("scheduleId") Long scheduleId,
+                           @Param("personnelId") Long personnelId,
+                           @Param("grade") String grade,
+                           @Param("instructorAward") Boolean instructorAward,
+                           @Param("remarks") String remarks,
+                           @Param("gradeStatus") String gradeStatus);
+
+    @Query("SELECT COUNT(cpn) FROM CoursePanelNomination cpn WHERE cpn.scheduleId = :scheduleId")
+    int countByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT cpn FROM CoursePanelNomination cpn " +
+            "WHERE cpn.scheduleId = :scheduleId AND cpn.gradeStatus = 'Pending'")
+    List<CoursePanelNomination> findPendingGradesByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT CASE WHEN COUNT(cpn) = 0 THEN true " +
+            "ELSE COUNT(CASE WHEN cpn.gradeStatus = 'Pending' THEN 1 END) = 0 END " +
+            "FROM CoursePanelNomination cpn WHERE cpn.scheduleId = :scheduleId")
+    boolean isAllGraded(@Param("scheduleId") Long scheduleId);
 }

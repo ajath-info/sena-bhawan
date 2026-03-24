@@ -157,4 +157,12 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
     @Query("SELECT COUNT(p) FROM PostingDetails p WHERE p.orbatId = :orbatId AND p.status = 'UNDER_POSTING'")
     long countCurrentPersonnelInUnit(@Param("orbatId") Long orbatId);
 
+    @Query("SELECT pd FROM PostingDetails pd WHERE pd.personnelId = :personnelId AND pd.toDate IS NULL")
+    Optional<PostingDetails> findCurrentPostingByPersonnelId(@Param("personnelId") Long personnelId);
+
+    @Query("SELECT pd FROM PostingDetails pd WHERE pd.personnelId = :personnelId AND " +
+            "((pd.tosUpdatedDate IS NULL AND pd.status = 'UNDER_POSTING') OR " +
+            "(pd.tosUpdatedDate IS NOT NULL AND pd.status = 'POSTED'))")
+    Optional<PostingDetails> findActivePostingByPersonnelId(@Param("personnelId") Long personnelId);
+
     }

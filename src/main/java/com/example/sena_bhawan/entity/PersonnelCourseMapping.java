@@ -7,10 +7,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "course_unit_mapping",
+@Table(name = "personnel_course_mapping",
        uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "unit_id"}))
 @Data
-public class CourseUnitMapping {
+public class PersonnelCourseMapping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,8 @@ public class CourseUnitMapping {
     @JoinColumn(name = "course_id", nullable = false)
     private CourseMaster course;
 
-    @ManyToOne
-    @JoinColumn(name = "unit_id", nullable = false)
-    private UnitMaster unit;
+    @JoinColumn(name = "medical_code", nullable = false)
+    private String medicalCode;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

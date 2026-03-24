@@ -1,13 +1,11 @@
 package com.example.sena_bhawan.controller;
 
-import com.example.sena_bhawan.dto.CourseScheduleSummaryResponse;
+import com.example.sena_bhawan.dto.*;
 //import com.example.sena_bhawan.dto.CourseStep1Dto;
-import com.example.sena_bhawan.dto.CourseStep1DTO;
-import com.example.sena_bhawan.dto.CreateCourseScheduleRequest;
-import com.example.sena_bhawan.dto.Step2PanelStrengthDTO;
 import com.example.sena_bhawan.entity.CourseSchedule;
 import com.example.sena_bhawan.service.CourseScheduleService;
 //import com.example.sena_bhawan.service.impl.CourseScheduleServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/courseschedule")
 @CrossOrigin("*")
+@Slf4j
 public class CourseScheduleController {
 
     @Autowired
@@ -24,6 +23,13 @@ public class CourseScheduleController {
     private final CourseScheduleService service;
     @Autowired
     private CourseScheduleService courseScheduleService;
+
+    @GetMapping("/batches/{courseId}")
+    public ResponseEntity<List<CourseScheduleDto>> getBatchesByCourse(@PathVariable Long courseId) {
+        log.info("Fetching batches for course ID: {}", courseId);
+        List<CourseScheduleDto> batches = courseScheduleService.getBatchesByCourseId(courseId);
+        return ResponseEntity.ok(batches);
+    }
 
     public CourseScheduleController(CourseScheduleService service) {
         this.service = service;

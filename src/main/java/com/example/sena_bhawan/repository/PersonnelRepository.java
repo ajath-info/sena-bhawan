@@ -29,8 +29,8 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     """)
     List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term);
 
-//    @Query("SELECT distinct medicalCategory FROM Personnel")
-//    List<String> getMedicalCategory();
+    @Query("SELECT distinct medicalCode FROM Personnel")
+    List<String> getMedicalCode();
 
     @Query("SELECT p.rank AS rank, COUNT(p) AS count " +
             "FROM Personnel p GROUP BY p.rank")
@@ -203,6 +203,9 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
         ORDER BY p.id DESC
         """, nativeQuery = true)
     List<Object[]> findPersonnelWithDetailsByIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT p FROM Personnel p WHERE p.id IN :personnelIds")
+    List<Personnel> findAllByIdIn(@Param("personnelIds") List<Long> personnelIds);
 
 }
 

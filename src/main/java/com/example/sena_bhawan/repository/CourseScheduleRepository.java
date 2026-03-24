@@ -11,11 +11,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, Long> {
 
     List<CourseSchedule> findByCourse_Srno(Integer srno);
+
+    @Query("SELECT cs FROM CourseSchedule cs WHERE cs.course.srno = :courseId ORDER BY cs.startDate DESC")
+    List<CourseSchedule> findByCourseId(@Param("courseId") Integer courseId);
 
     @Query("""
         SELECT cs FROM CourseSchedule cs
@@ -35,6 +39,9 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Query("SELECT COUNT(c) FROM CourseSchedule c " +
             "WHERE :currentDate BETWEEN c.startDate AND c.endDate")
     long countOngoingCourses(@Param("currentDate") LocalDate currentDate);
+
+    @Query("SELECT cs FROM CourseSchedule cs LEFT JOIN FETCH cs.course WHERE cs.scheduleId = :scheduleId")
+    Optional<CourseSchedule> findByIdWithCourse(@Param("scheduleId") Long scheduleId);
 }
 
 
