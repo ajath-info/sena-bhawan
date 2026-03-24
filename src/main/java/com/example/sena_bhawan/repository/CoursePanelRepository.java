@@ -28,6 +28,9 @@ public interface CoursePanelRepository
 
     List<CoursePanelNomination> findByScheduleId(Long scheduleId);
 
+    @Query(value = "SELECT * FROM course_panel_nomination WHERE schedule_id = :scheduleId AND attendance_status = 'Detailed'", nativeQuery = true)
+    List<CoursePanelNomination> findByScheduleIdWithDetailedStatus(@Param("scheduleId") Long scheduleId);
+
     @Query(value = "SELECT cm.course_name as courseName, COUNT(cpn.id) as officerCount " +
             "FROM course_panel_nomination cpn " +
             "JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id " +
@@ -72,4 +75,12 @@ public interface CoursePanelRepository
             "ELSE COUNT(CASE WHEN cpn.gradeStatus = 'Pending' THEN 1 END) = 0 END " +
             "FROM CoursePanelNomination cpn WHERE cpn.scheduleId = :scheduleId")
     boolean isAllGraded(@Param("scheduleId") Long scheduleId);
+//
+//    // For course history with schedule and course details
+//    @Query("SELECT n FROM CoursePanelNomination n " +
+//            "LEFT JOIN FETCH n.schedule s " +
+//            "LEFT JOIN FETCH s.course c " +
+//            "WHERE n.personnelId = :personnelId " +
+//            "ORDER BY s.startDate DESC")
+//    List<CoursePanelNomination> findCompletedCoursesWithDetailsByPersonnelId(@Param("personnelId") Long personnelId);
 }

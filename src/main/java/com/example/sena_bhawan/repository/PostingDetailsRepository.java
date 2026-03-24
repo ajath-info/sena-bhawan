@@ -165,4 +165,6 @@ public interface PostingDetailsRepository extends JpaRepository<PostingDetails, 
             "(pd.tosUpdatedDate IS NOT NULL AND pd.status = 'POSTED'))")
     Optional<PostingDetails> findActivePostingByPersonnelId(@Param("personnelId") Long personnelId);
 
+    List<PostingDetails> findByFormationTypeAndUnitName(String formationType, String unitName);
+
     }

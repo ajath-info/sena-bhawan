@@ -36,4 +36,7 @@ public class Command {
 
     @Column(name = "hq_id")
     private Long hqId;
+
+    @Column(name = "command_code")
+    private String commandCode;
 }
