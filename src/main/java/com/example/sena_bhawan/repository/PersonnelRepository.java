@@ -204,5 +204,8 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
         """, nativeQuery = true)
     List<Object[]> findPersonnelWithDetailsByIds(@Param("ids") List<Long> ids);
 
+    @Query("SELECT p FROM Personnel p WHERE p.id IN :personnelIds")
+    List<Personnel> findAllByIdIn(@Param("personnelIds") List<Long> personnelIds);
+
 }
 

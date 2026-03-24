@@ -1,10 +1,7 @@
 package com.example.sena_bhawan.service;
 
-import com.example.sena_bhawan.dto.CourseScheduleSummaryResponse;
+import com.example.sena_bhawan.dto.*;
 //import com.example.sena_bhawan.dto.CourseStep1Dto;
-import com.example.sena_bhawan.dto.CourseStep1DTO;
-import com.example.sena_bhawan.dto.CreateCourseScheduleRequest;
-import com.example.sena_bhawan.dto.Step2PanelStrengthDTO;
 import com.example.sena_bhawan.entity.CourseSchedule;
 
 import java.util.List;
@@ -13,6 +10,7 @@ public interface CourseScheduleService {
 
     CourseSchedule addSchedule(CreateCourseScheduleRequest request);
 
+    List<CourseScheduleDto> getBatchesByCourseId(Long courseId);
 
     List<CourseSchedule> getAllSchedules();
 

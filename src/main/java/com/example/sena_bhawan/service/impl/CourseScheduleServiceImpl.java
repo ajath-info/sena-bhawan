@@ -6,6 +6,7 @@ import com.example.sena_bhawan.entity.CourseSchedule;
 import com.example.sena_bhawan.repository.CourseMasterRepository;
 import com.example.sena_bhawan.repository.CourseScheduleRepository;
 import com.example.sena_bhawan.service.CourseScheduleService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 
     @Autowired
     private CourseScheduleRepository scheduleRepo;
+
 
     private static final int BUFFER_SIZE = 10;
 
@@ -37,7 +39,35 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
     }
 
 
+    @Override
+    @Transactional
+    public List<CourseScheduleDto> getBatchesByCourseId(Long courseId) {
+        // 1. Verify course exists
+        CourseMaster course = courseRepo.findById(courseId.intValue())
+                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
 
+        // 2. Fetch all schedules for this course
+        List<CourseSchedule> schedules = scheduleRepository.findByCourseId(courseId.intValue());
+
+        // 3. Convert to DTO (raw data only)
+        return schedules.stream()
+                .map(schedule -> {
+                    CourseScheduleDto dto = new CourseScheduleDto();
+                    dto.setScheduleId(schedule.getScheduleId());
+                    dto.setCourseId(course.getSrno().longValue());
+                    dto.setCourseName(course.getCourseName());
+                    dto.setYear(schedule.getYear());
+                    dto.setBatchNumber(schedule.getBatchNumber());
+                    dto.setStartDate(schedule.getStartDate().toString());
+                    dto.setEndDate(schedule.getEndDate().toString());
+                    dto.setCourseStrength(schedule.getCourseStrength());
+                    dto.setVenue(schedule.getVenue());
+                    dto.setRemarks(schedule.getRemarks());
+                    dto.setPanelSize(schedule.getPanelSize());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 
 //    @Autowired
