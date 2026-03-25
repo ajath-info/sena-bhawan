@@ -44,6 +44,5 @@ public class PersonnelListDTO {
     private Integer coursesTrainingYr;
     private Integer coursesInUnit;
     private String postingDueMonths;
-    private String tosStart;
-    private String tosEnd;
+    private String tosDate;
 }

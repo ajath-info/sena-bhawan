@@ -117,7 +117,9 @@ public class FormationServiceImpl implements FormationService {
 
         Command saved = commandRepository.save(command);
 
-        String commandCode = saved.getCommandId() == null ? null : saved.getCommandId().toString();
+        String commandCode = generateCode(saved.getCommandId(), "Command");
+        saved.setCommandCode(commandCode);
+        commandRepository.save(saved);
 
         saveOrbatEntry(dto.getHqId(), commandCode, null, null, null, null,
                 "Command", dto.getName(), dto.getLocation(), dto.getSusNo(), dto.getPinNo(),dto.getAreaType(), dto.getUnitType()
@@ -278,6 +280,7 @@ public class FormationServiceImpl implements FormationService {
 
         switch (formationType) {
 
+            case "Command": return String.format("%01d", id);
             case "Corps":
             case "Division":
             case "Brigade":

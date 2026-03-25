@@ -286,27 +286,6 @@
             background-color: #f9fafb;
         }
 
-        /* Column widths */
-        .history-table th:nth-child(1),
-        .history-table td:nth-child(1) {
-            width: 15%;
-        }
-
-        .history-table th:nth-child(2),
-        .history-table td:nth-child(2) {
-            width: 45%;
-        }
-
-        .history-table th:nth-child(3),
-        .history-table td:nth-child(3) {
-            width: 20%;
-        }
-
-        .history-table th:nth-child(4),
-        .history-table td:nth-child(4) {
-            width: 20%;
-        }
-
         .remark-type-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -346,6 +325,12 @@
             padding: 20px;
             color: #6b7280;
         }
+
+        .no-data {
+            text-align: center;
+            color: #6b7280;
+            padding: 20px;
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -354,7 +339,7 @@
 
 <div class="container">
     <script src="sidebar.js"></script>
-    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <!-- SIDEBAR CONTAINER -->
     <aside class="sidebar" id="sidebarContainer">
         <div style="color: white; padding: 20px; text-align: center;">
             Loading menu...
@@ -408,20 +393,20 @@
                     <div class="selected">SELECTED</div>
                 </div>
 
-                <!-- IDENTITY -->
+                <!-- IDENTITY & SERVICE -->
                 <div class="section">
                     <div class="section-title">Identity & Service Dates</div>
                     <div class="info-grid">
                         <div class="info-item"><span>Date of Birth</span><strong id="dob"></strong></div>
                         <div class="info-item"><span>Date of Commission</span><strong id="doc"></strong></div>
                         <div class="info-item"><span>Date of Seniority</span><strong id="dos"></strong></div>
-                        <div class="info-item"><span>Last Rank (Substantive)</span><strong>N/A</strong></div>
+                        <div class="info-item"><span>Last Rank (Substantive)</span><strong id="lastRank">N/A</strong></div>
                         <div class="info-item"><span>PAN</span><strong id="pan"></strong></div>
                         <div class="info-item"><span>Aadhaar</span><strong id="aadhaar"></strong></div>
                     </div>
                 </div>
 
-                <!-- POSTING -->
+                <!-- POSTING HISTORY -->
                 <div class="section">
                     <div class="section-title">Posting History</div>
                     <table class="table" id="postingTable">
@@ -438,7 +423,7 @@
                     </table>
                 </div>
 
-                <!-- COURSES -->
+                <!-- COURSES COMPLETED -->
                 <div class="section">
                     <div class="section-title">Courses Completed</div>
                     <table class="table" id="courseTable">
@@ -448,7 +433,6 @@
                             <th>Grading</th>
                             <th>From</th>
                             <th>To</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -463,7 +447,6 @@
                             <th>Award Name</th>
                             <th>Award Date</th>
                             <th>Citation</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -479,7 +462,6 @@
                             <th>Institution</th>
                             <th>Year</th>
                             <th>Grade</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -492,16 +474,15 @@
                         <thead>
                         <tr>
                             <th>Qualification</th>
-                            <th>Issuing Authority</th>
+                            <th>Authority Number</th>
                             <th>Year</th>
                             <th>Validity</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- FAMILY -->
+                <!-- FAMILY DETAILS -->
                 <div class="section">
                     <div class="section-title">Family Details</div>
                     <table class="table" id="familyTable">
@@ -510,19 +491,18 @@
                             <th>Name</th>
                             <th>Relationship</th>
                             <th>Contact</th>
-                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- DISCIPLINE -->
+                <!-- DISCIPLINE & MEDICAL -->
                 <div class="section">
                     <div class="section-title">Discipline & Medical</div>
                     <div class="info-grid">
                         <div class="info-item"><span>Discipline Case</span><strong id="disciplineCase"></strong></div>
-                        <div class="info-item"><span>Restrictions</span><strong>N/A</strong></div>
-                        <div class="info-item"><span>Vigilance Status</span><strong>N/A</strong></div>
+                        <div class="info-item"><span>Restrictions</span><strong id="restrictions">N/A</strong></div>
+                        <div class="info-item"><span>Vigilance Status</span><strong id="vigilanceStatus">N/A</strong></div>
                         <div class="info-item"><span>Medical Category</span><strong id="medCat"></strong></div>
                         <div class="info-item"><span>School / Institute</span><strong id="institute"></strong></div>
                         <div class="info-item"><span>Degree</span><strong id="degree"></strong></div>
@@ -550,6 +530,16 @@
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_HISTORY_API = `${BASE_URL}/api/remarks/history`;
 
+    // New APIs
+    const IDENTITY_API = `${BASE_URL}/api/personnel`;
+    const POSTING_API = `${BASE_URL}/api/personnel`;
+    const COURSES_API = `${BASE_URL}/api/personnel`;
+    const DECORATIONS_API = `${BASE_URL}/api/personnel`;
+    const QUALIFICATIONS_API = `${BASE_URL}/api/personnel`;
+    const ADDITIONAL_QUALIFICATIONS_API = `${BASE_URL}/api/personnel`;
+    const FAMILY_API = `${BASE_URL}/api/personnel`;
+    const DISCIPLINE_MEDICAL_API = `${BASE_URL}/api/personnel`;
+
     // ==================== DOM ELEMENTS ====================
     const searchInput = document.getElementById('personnelSearch');
     const searchResults = document.getElementById('searchResults');
@@ -572,8 +562,7 @@
                         <th>Remarks</th>
                         <th>Course Name</th>
                         <th>Date & Time</th>
-                    </tr>
-                </thead>
+                    </thead>
                 <tbody id="historyTableBody">
                 </tbody>
             </table>
@@ -640,7 +629,6 @@
         let html = '';
 
         historyData.forEach(record => {
-            // Format date
             const date = new Date(record.createdAt);
             const formattedDate = date.toLocaleString('en-IN', {
                 day: '2-digit',
@@ -651,10 +639,7 @@
                 hour12: true
             });
 
-            // Course name with fallback to '-'
             const courseName = record.courseName && record.courseName !== '' ? record.courseName : '-';
-
-            // Remark type with badge
             const remarkTypeClass = `remark-type-${record.remarkType}`;
 
             html += `
@@ -672,7 +657,6 @@
         tbody.innerHTML = html;
     }
 
-    // Helper function to escape HTML
     function escapeHtml(text) {
         if (!text) return text;
         const div = document.createElement('div');
@@ -692,7 +676,6 @@
             if (searchTerm.length < 4) {
                 searchResults.style.display = "none";
                 selectedPersonnelInfo.style.display = "none";
-                // Show empty history table
                 historyContainer.innerHTML = getHistoryTableHTML();
                 const tbody = document.getElementById('historyTableBody');
                 if (tbody) {
@@ -773,31 +756,56 @@
             <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
         `;
 
-        // Load all data for selected personnel including remarks history
+        // Load all data using new APIs
         loadAllData(personnelId);
         loadRemarksHistory(personnelId);
     };
 
-    // ==================== CLICK OUTSIDE ====================
     document.addEventListener("click", (e) => {
         if (searchInput && !searchInput.contains(e.target) && searchResults && !searchResults.contains(e.target)) {
             searchResults.style.display = "none";
         }
     });
 
-    /* ===== LOAD ALL 3 APIs ===== */
+    /* ===== LOAD ALL NEW APIS ===== */
     async function loadAllData(id) {
         try {
-            const p1 = await fetch(`http://localhost:6060/api/personnel/${id}`);
-            const personnel = await p1.json();
+            // 1. Identity & Service Details
+            const identityResponse = await fetch(`${IDENTITY_API}/${id}/identity-service`);
+            const identityData = await identityResponse.json();
 
-            const p2 = await fetch(`http://localhost:6060/personnel-full-details/${id}`);
-            const fullDetails = await p2.json();
+            // 2. Posting History
+            const postingResponse = await fetch(`${POSTING_API}/${id}/paramount/posting-history`);
+            const postingData = await postingResponse.json();
 
-            const p3 = await fetch(`http://localhost:6060/api/personnelinformation/${id}`);
-            const info = await p3.json();
+            // 3. Courses Completed
+            const coursesResponse = await fetch(`${COURSES_API}/${id}/courses-completed`);
+            const coursesData = await coursesResponse.json();
 
-            fillCard(personnel, fullDetails, info);
+            // 4. Decorations
+            const decorationsResponse = await fetch(`${DECORATIONS_API}/${id}/decorations`);
+            const decorationsData = await decorationsResponse.json();
+
+            // 5. Qualifications
+            const qualificationsResponse = await fetch(`${QUALIFICATIONS_API}/${id}/qualifications`);
+            const qualificationsData = await qualificationsResponse.json();
+
+            // 6. Additional Qualifications
+            const addQualResponse = await fetch(`${ADDITIONAL_QUALIFICATIONS_API}/${id}/additional-qualifications`);
+            const addQualData = await addQualResponse.json();
+
+            // 7. Family Members
+            const familyResponse = await fetch(`${FAMILY_API}/${id}/family-members`);
+            const familyData = await familyResponse.json();
+
+            // 8. Discipline & Medical
+            const disciplineResponse = await fetch(`${DISCIPLINE_MEDICAL_API}/${id}/discipline-medical`);
+            const disciplineData = await disciplineResponse.json();
+
+            // Fill the card with all data
+            fillCard(identityData, postingData, coursesData, decorationsData,
+                     qualificationsData, addQualData, familyData, disciplineData);
+
         } catch (error) {
             console.error('Error loading data:', error);
             alert('Error loading personnel data');
@@ -805,124 +813,144 @@
     }
 
     /* ===== FILL THE PARAMOUNT CARD ===== */
-    function fillCard(p, fd, info) {
+    function fillCard(identity, postingHistory, courses, decorations, qualifications, additionalQuals, familyMembers, disciplineMedical) {
 
         document.getElementById("pdfContent").style.display = "block";
         document.getElementById("pdfBtn").style.display = "inline-block";
 
-        document.getElementById("name").innerText = p.fullName;
+        // Header Section
+        document.getElementById("name").innerText = identity.fullName || 'N/A';
         document.getElementById("rankArmyMobile").innerHTML =
-            `${p.rank} | ${p.armyNo}<br>Mobile: ${p.mobileNumber || 'N/A'}`;
+            `${identity.rank || 'N/A'} | ${identity.armyNo || 'N/A'}<br>Mobile: ${identity.mobileNumber || 'N/A'}`;
 
-        document.getElementById("photo").src =
-            p.officerImage ? `http://localhost:6060/${p.officerImage}` : "https://via.placeholder.com/150";
+        document.getElementById("photo").src = identity.officerImage ?
+            `http://localhost:6060/${identity.officerImage}` : "https://via.placeholder.com/150";
 
-        document.getElementById("dob").innerText = p.dateOfBirth || 'N/A';
-        document.getElementById("doc").innerText = p.dateOfCommission || 'N/A';
-        document.getElementById("dos").innerText = p.dateOfSeniority || 'N/A';
-        document.getElementById("pan").innerText = p.panCard || 'N/A';
-        document.getElementById("aadhaar").innerText = p.aadhaarNumber || 'N/A';
-        document.getElementById("medCat").innerText = p.medicalCategory || 'N/A';
-
-        const disc = Array.isArray(info) ? info.find(i => i.caseType?.toLowerCase() === "disciplinary") : null;
-        document.getElementById("disciplineCase").innerText = disc ? disc.caseType : "N/A";
+        // Identity & Service Section
+        document.getElementById("dob").innerText = identity.dateOfBirth || 'N/A';
+        document.getElementById("doc").innerText = identity.dateOfCommission || 'N/A';
+        document.getElementById("dos").innerText = identity.dateOfSeniority || 'N/A';
+        document.getElementById("lastRank").innerText = identity.lastRank || 'N/A';
+        document.getElementById("pan").innerText = identity.panCard || 'N/A';
+        document.getElementById("aadhaar").innerText = identity.aadhaarNumber || 'N/A';
 
         // Posting History
         const postingBody = document.querySelector("#postingTable tbody");
         postingBody.innerHTML = "";
-        if (fd.postingDetails && fd.postingDetails.length > 0) {
-            fd.postingDetails.forEach(post => {
+        if (postingHistory && postingHistory.length > 0) {
+            postingHistory.forEach(post => {
                 postingBody.innerHTML += `
                     <tr>
                         <td>${post.unitName || 'N/A'}</td>
                         <td>${post.command || 'N/A'}</td>
-                        <td>N/A</td>
-                        <td>${post.fromDate || 'N/A'}</td>
+                        <td>${post.typeOfUnit || 'N/A'}</td>
+                        <td>${post.takenOnStrength || 'N/A'}</td>
                         <td>${post.appointment || 'N/A'}</td>
                         <td>${post.duration || 'N/A'}</td>
-                    </tr>`;
+                    </tr>
+                `;
             });
+        } else {
+            postingBody.innerHTML = '<tr><td colspan="6" class="no-data">No posting history found</td></tr>';
         }
 
-        // Courses
+        // Courses Completed
         const courseBody = document.querySelector("#courseTable tbody");
         courseBody.innerHTML = "";
-        if (fd.courseDetails && fd.courseDetails.length > 0) {
-            fd.courseDetails.forEach(c => {
+        if (courses && courses.length > 0) {
+            courses.forEach(c => {
                 courseBody.innerHTML += `
                     <tr>
                         <td>${c.courseName || 'N/A'}</td>
                         <td>${c.grading || 'N/A'}</td>
                         <td>${c.fromDate || 'N/A'}</td>
                         <td>${c.toDate || 'N/A'}</td>
-                    </tr>`;
+                    </tr>
+                `;
             });
+        } else {
+            courseBody.innerHTML = '<tr><td colspan="4" class="no-data">No courses completed found</td></tr>';
         }
 
         // Decorations
         const decorBody = document.querySelector("#decorTable tbody");
         decorBody.innerHTML = "";
-        if (p.decorations && p.decorations.length > 0) {
-            p.decorations.forEach(d => {
+        if (decorations && decorations.length > 0) {
+            decorations.forEach(d => {
                 decorBody.innerHTML += `
                     <tr>
-                        <td>${d.decorationName || 'N/A'}</td>
+                        <td>${d.awardName || 'N/A'}</td>
                         <td>${d.awardDate || 'N/A'}</td>
                         <td>${d.citation || 'N/A'}</td>
-                    </tr>`;
+                    </tr>
+                `;
             });
+        } else {
+            decorBody.innerHTML = '<tr><td colspan="3" class="no-data">No decorations found</td></tr>';
         }
 
         // Qualifications
         const qualBody = document.querySelector("#qualTable tbody");
         qualBody.innerHTML = "";
-        if (p.qualifications && p.qualifications.length > 0) {
-            p.qualifications.forEach(q => {
+        if (qualifications && qualifications.length > 0) {
+            qualifications.forEach(q => {
                 qualBody.innerHTML += `
                     <tr>
                         <td>${q.qualification || 'N/A'}</td>
                         <td>${q.institution || 'N/A'}</td>
-                        <td>${q.yearOfCompletion || 'N/A'}</td>
-                        <td>${q.gradePercentage || 'N/A'}</td>
-                    </tr>`;
+                        <td>${q.year || 'N/A'}</td>
+                        <td>${q.grade || 'N/A'}</td>
+                    </tr>
+                `;
             });
+        } else {
+            qualBody.innerHTML = '<tr><td colspan="4" class="no-data">No qualifications found</td></tr>';
         }
 
         // Additional Qualifications
-        const addQ = document.querySelector("#addQualTable tbody");
-        addQ.innerHTML = "";
-        if (p.additionalQualifications && p.additionalQualifications.length > 0) {
-            p.additionalQualifications.forEach(a => {
-                addQ.innerHTML += `
+        const addQualBody = document.querySelector("#addQualTable tbody");
+        addQualBody.innerHTML = "";
+        if (additionalQuals && additionalQuals.length > 0) {
+            additionalQuals.forEach(aq => {
+                addQualBody.innerHTML += `
                     <tr>
-                        <td>${a.qualification || 'N/A'}</td>
-                        <td>${a.issuingAuthority || 'N/A'}</td>
-                        <td>${a.year || 'N/A'}</td>
-                        <td>${a.validity || 'N/A'}</td>
-                    </tr>`;
+                        <td>${aq.qualification || 'N/A'}</td>
+                        <td>${aq.issuingAuthority || 'N/A'}</td>
+                        <td>${aq.year || 'N/A'}</td>
+                        <td>${aq.validity || 'N/A'}</td>
+                    </tr>
+                `;
             });
+        } else {
+            addQualBody.innerHTML = '<tr><td colspan="4" class="no-data">No additional qualifications found</td></tr>';
         }
 
-        // Family
-        const famBody = document.querySelector("#familyTable tbody");
-        famBody.innerHTML = "";
-        if (p.familyMembers && p.familyMembers.length > 0) {
-            p.familyMembers.forEach(f => {
-                famBody.innerHTML += `
+        // Family Members
+        const familyBody = document.querySelector("#familyTable tbody");
+        familyBody.innerHTML = "";
+        if (familyMembers && familyMembers.length > 0) {
+            familyMembers.forEach(f => {
+                familyBody.innerHTML += `
                     <tr>
                         <td>${f.name || 'N/A'}</td>
                         <td>${f.relationship || 'N/A'}</td>
-                        <td>${f.contactNumber || 'N/A'}</td>
-                    </tr>`;
+                        <td>${f.contact || 'N/A'}</td>
+                    </tr>
+                `;
             });
+        } else {
+            familyBody.innerHTML = '<tr><td colspan="3" class="no-data">No family members found</td></tr>';
         }
 
-        const firstQual = p.qualifications && p.qualifications[0];
-        document.getElementById("institute").innerText = firstQual ? firstQual.institution : "N/A";
-        document.getElementById("degree").innerText = firstQual ? firstQual.qualification : "N/A";
-        document.getElementById("courseQual").innerText = firstQual ? firstQual.qualification : "N/A";
-
-        document.getElementById("homeStation").innerText = p.city || 'N/A';
+        // Discipline & Medical
+        document.getElementById("disciplineCase").innerText = disciplineMedical.disciplineCase || 'N/A';
+        document.getElementById("restrictions").innerText = disciplineMedical.restrictions || 'N/A';
+        document.getElementById("vigilanceStatus").innerText = disciplineMedical.vigilanceStatus || 'N/A';
+        document.getElementById("medCat").innerText = disciplineMedical.medicalCategory || 'N/A';
+        document.getElementById("institute").innerText = disciplineMedical.schoolInstitute || 'N/A';
+        document.getElementById("degree").innerText = disciplineMedical.degree || 'N/A';
+        document.getElementById("courseQual").innerText = disciplineMedical.course || 'N/A';
+        document.getElementById("homeStation").innerText = disciplineMedical.homeStation || 'N/A';
     }
 
     /* ===== PDF EXPORT ===== */
@@ -943,7 +971,6 @@
     const autoId = params.get("id");
 
     if (autoId) {
-        // Set the input to loading state
         if (searchInput) searchInput.value = "Loading...";
         loadAllData(autoId);
         loadRemarksHistory(autoId);

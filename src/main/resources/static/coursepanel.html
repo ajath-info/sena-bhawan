@@ -44,6 +44,93 @@
             align-items: center;
             gap: 12px;
         }
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pipeline-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            cursor: default;
+        }
+
+        .pipeline-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            border: 3px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #6b7280;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pipeline-step.completed .pipeline-circle {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .pipeline-step.active .pipeline-circle {
+            background: #1b4332;
+            border-color: #1b4332;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(27,67,50,0.15);
+            animation: pulsePipeline 2s infinite;
+        }
+
+        @keyframes pulsePipeline {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(27,67,50,0.15); }
+            50%       { box-shadow: 0 0 0 8px rgba(27,67,50,0.08); }
+        }
+
+        .pipeline-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .pipeline-step.completed .pipeline-label { color: #10b981; }
+        .pipeline-step.active   .pipeline-label { color: #1b4332; }
+
+        .pipeline-connector {
+            flex: 1;
+            height: 3px;
+            background: #e5e7eb;
+            transition: background 0.3s;
+            margin-bottom: 20px; /* align with circle centers */
+            min-width: 20px;
+        }
+
+        .pipeline-connector.done { background: #10b981; }
+
+        .pipeline-status-badge {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            display: inline-block;
+        }
+
         .logo-icon {
             width: 32px;
             height: 32px;
@@ -62,6 +149,75 @@
         .logo-text p {
             font-size: 11px;
             color: #52b788;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .pipeline-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .pipeline-box {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 2px solid #d1d5db;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .pipeline-step.completed .pipeline-box {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .pipeline-step.active .pipeline-box {
+            background: #1b4332;
+            border-color: #1b4332;
+            color: white;
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.2);
+            animation: pulsePipeline 2s infinite;
+        }
+
+        @keyframes pulsePipeline {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(27,67,50,0.2); }
+            50%       { box-shadow: 0 0 0 6px rgba(27,67,50,0.08); }
+        }
+
+        .pipeline-connector {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            min-width: 16px;
+            transition: background 0.3s;
+        }
+
+        .pipeline-connector.done { background: #10b981; }
+
+        .pipeline-status-badge {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            display: inline-block;
         }
         .menu-icon {
             width: 24px;
@@ -639,6 +795,18 @@
             color: #1b4332;
         }
 
+        .status-btn.detailed-btn.active {
+            border-color: #3b82f6 !important;
+            background: #dbeafe !important;
+            color: #3b82f6 !important;
+        }
+
+        .status-btn.detailed-btn:hover {
+            background: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            transform: translateY(-1px);
+        }
+
         .table-scroll-wrapper {
             max-height: 420px;
             overflow-y: auto;
@@ -1166,13 +1334,6 @@
                             <button class="strength-btn" id="increasePanel">+</button>
                         </div>
                     </div>
-
-                    <div class="info-box">
-                        <strong>💡 Logic:</strong>
-                        <p id="logicText">
-                            Panel size = Course strength + Buffer (10)
-                        </p>
-                    </div>
                 </div>
 
                 <!-- Step 3: Apply Filters -->
@@ -1281,7 +1442,7 @@
                                         <th>Date of Birth</th>
                                         <th>Religion</th>
                                         <th>Marital Status</th>
-                                        <th>Medical Category</th>
+                                        <th>Medical Code</th>
                                         <th>Mobile</th>
                                         <th>Email</th>
                                         <th>City</th>
@@ -1339,36 +1500,23 @@
 
                     <div style="margin-top: 25px">
                         <div class="section-title">
-                            <span>🔍 Send Panel</span>
+                            <span>📤 Send Panel for Approval</span>
                         </div>
-                        <div class="filter-grid">
-                            <div style="margin-top: 24px">
-                                <div class="form-group">
-                                    <label class="form-label">Send To</label>
-                                    <select class="form-select" id="sendToRole">
-                                        <option value="">-- Select Role --</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group"></div>
-                                <div class="form-group"></div>
-                                <div class="form-group"></div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Remarks</label>
-                                    <textarea
-                                            name="remarks"
-                                            rows="3"
-                                            class="form-textarea"
-                                            id="approvalRemark"
-                                            placeholder="Panel forwarded for approval"
-                                    ></textarea>
-                                </div>
-                                <div style="margin-top: 24px">
-                                    <button class="footer-btn success" id="sendToApproval">
-                                        Send for Approval
-                                    </button>
-                                </div>
+                        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 600px;">
+                            <div class="form-group">
+                                <label class="form-label">Remarks</label>
+                                <textarea
+                                        name="remarks"
+                                        rows="3"
+                                        class="form-textarea"
+                                        id="approvalRemark"
+                                        placeholder="Panel forwarded for approval"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <button class="footer-btn success" id="sendToApproval">
+                                    ✅ Send for Approval
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1379,6 +1527,15 @@
                     <div class="section-title">
                         <span>🔍 Step 5: Generate Letter</span>
                         <span class="badge badge-info">Active</span>
+                    </div>
+
+                    <div class="section-card" style="margin-top: 24px;">
+                        <div class="section-title">
+                            <span>📊 Approval Pipeline</span>
+                        </div>
+                        <div id="pipelineFlow"
+                             style="display:flex; gap:0; flex-wrap:wrap; align-items:center; padding: 8px 0;">
+                        </div>
                     </div>
 
                     <!-- Add Download PDF Button -->
@@ -1686,7 +1843,7 @@
                                 <th>Rank</th>
                                 <th>Unit</th>
                                 <th>Command</th>
-                                <th>Medical</th>
+                                <th>Medical Code</th>
                                 <th>DOB</th>
                                 <th>Commission</th>
                                 <th>Mobile</th>
@@ -1874,9 +2031,9 @@ document.head.appendChild(style);
         }
 
         if (currentStep === 5) {
-            // Get same selected officers for step 5, preserving serial numbers
             step5Officers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
             loadStep5Panel(step5Officers);
+            setTimeout(renderPipeline, 50);
         }
 
         prevNav.classList.toggle('active', currentStep > 1);
@@ -2854,7 +3011,7 @@ document.head.appendChild(style);
                 <td>${o.rank || '—'}</td>
                 <td>${o.unit || '—'}</td>
                 <td>${o.command || '—'}</td>
-                <td>${o.medicalCategory || '—'}</td>
+                <td>${o.medicalCode || '—'}</td>
                 <td>${formatDate(o.dateOfBirth)}</td>
                 <td>${formatDate(o.dateOfCommission)}</td>
                 <td>${o.mobileNumber || o.mobile || '—'}</td>
@@ -3106,84 +3263,161 @@ document.head.appendChild(style);
         officers.forEach((o, index) => {
             const personnelId = o.id || o.personnelId;
             const isSelected = selectedSet.has(personnelId);
-            const isAttending = attendingSet.has(personnelId);
-            // Get status from statusMap, default to 'Reserve'
             const status = statusMap.get(personnelId) || 'Reserve';
 
             const row = document.createElement("tr");
 
-            row.innerHTML = `
-            <td><input type="checkbox" ${isSelected ? "checked" : ""} data-personnelid="${personnelId}" class="officer-checkbox"></td>
-            <td>${index + 1}</td>
-            <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <div>
-                        <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
-                        <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
-                    </div>
+            // Create all cells with consistent structure
+            const cellCheckbox = document.createElement("td");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = isSelected;
+            checkbox.className = "officer-checkbox";
+            checkbox.dataset.personnelid = personnelId;
+            cellCheckbox.appendChild(checkbox);
+            row.appendChild(cellCheckbox);
+
+            // Serial Number
+            const cellSerNo = document.createElement("td");
+            cellSerNo.textContent = index + 1;
+            row.appendChild(cellSerNo);
+
+            // Officer Info
+            const cellOfficer = document.createElement("td");
+            cellOfficer.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px">
+                <div>
+                    <div style="font-weight:600">${o.fullName || o.name || "-"}</div>
+                    <div style="font-size:12px;color:#6b7280">${o.armyNo || "-"}</div>
                 </div>
-            </td>
-            <td>${o.rank || "-"}</td>
-            <td>${o.unit || "-"}</td>
-            <td>${o.command || "-"}</td>
-            <td>${formatDate(o.dateOfCommission)}</td>
-            <td>${formatDate(o.dateOfSeniority)}</td>
-            <td>${formatDate(o.dateOfBirth)}</td>
-            <td>${o.religion || "-"}</td>
-            <td>${o.maritalStatus || "-"}</td>
-            <td>${o.medicalCategory || "-"}</td>
-            <td>${o.mobileNumber || o.mobile || "-"}</td>
-            <td>${o.emailAddress || o.email || "-"}</td>
-            <td>${o.city || "-"}</td>
-            <td>${o.state || "-"}</td>
-            <td>
-                <div class="status-toggle" style="display: flex; gap: 8px;">
-                    <button class="status-btn retain-btn ${status === 'Retain' ? 'active' : ''}"
-                            data-personnelid="${personnelId}"
-                            data-status="Retain"
-                            style="padding: 6px 12px;
-                                   border: 2px solid ${status === 'Retain' ? '#10b981' : '#d1d5db'};
-                                   background: ${status === 'Retain' ? '#d1fae5' : 'white'};
-                                   color: ${status === 'Retain' ? '#10b981' : '#6b7280'};
-                                   border-radius: 6px;
-                                   font-weight: 600;
-                                   font-size: 12px;
-                                   cursor: pointer;
-                                   transition: all 0.2s;">
-                        Retain
-                    </button>
-                    <button class="status-btn reserve-btn ${status === 'Reserve' ? 'active' : ''}"
-                            data-personnelid="${personnelId}"
-                            data-status="Reserve"
-                            style="padding: 6px 12px;
-                                   border: 2px solid ${status === 'Reserve' ? '#f59e0b' : '#d1d5db'};
-                                   background: ${status === 'Reserve' ? '#fef3c7' : 'white'};
-                                   color: ${status === 'Reserve' ? '#f59e0b' : '#6b7280'};
-                                   border-radius: 6px;
-                                   font-weight: 600;
-                                   font-size: 12px;
-                                   cursor: pointer;
-                                   transition: all 0.2s;">
-                        Reserve
-                    </button>
-                </div>
-            </td>
-            <td>
-                <button class="btn btn-danger remove-officer-btn" data-personnelid="${personnelId}" data-name="${o.fullName || o.name}" style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                    🗑️ Remove
-                </button>
-            </td>
+            </div>
         `;
+            row.appendChild(cellOfficer);
+
+            // Rank
+            const cellRank = document.createElement("td");
+            cellRank.textContent = o.rank || "-";
+            row.appendChild(cellRank);
+
+            // Unit
+            const cellUnit = document.createElement("td");
+            cellUnit.textContent = o.unit || "-";
+            row.appendChild(cellUnit);
+
+            // Command
+            const cellCommand = document.createElement("td");
+            cellCommand.textContent = o.command || "-";
+            row.appendChild(cellCommand);
+
+            // Date of Commission
+            const cellDoc = document.createElement("td");
+            cellDoc.textContent = formatDate(o.dateOfCommission);
+            row.appendChild(cellDoc);
+
+            // Date of Seniority
+            const cellDos = document.createElement("td");
+            cellDos.textContent = formatDate(o.dateOfSeniority);
+            row.appendChild(cellDos);
+
+            // Date of Birth
+            const cellDob = document.createElement("td");
+            cellDob.textContent = formatDate(o.dateOfBirth);
+            row.appendChild(cellDob);
+
+            // Religion
+            const cellReligion = document.createElement("td");
+            cellReligion.textContent = o.religion || "-";
+            row.appendChild(cellReligion);
+
+            // Marital Status
+            const cellMarital = document.createElement("td");
+            cellMarital.textContent = o.maritalStatus || "-";
+            row.appendChild(cellMarital);
+
+            // Medical Code
+            const cellMedical = document.createElement("td");
+            cellMedical.textContent = o.medicalCode || "-";
+            row.appendChild(cellMedical);
+
+            // Mobile
+            const cellMobile = document.createElement("td");
+            cellMobile.textContent = o.mobileNumber || o.mobile || "-";
+            row.appendChild(cellMobile);
+
+            // Email
+            const cellEmail = document.createElement("td");
+            cellEmail.textContent = o.emailAddress || o.email || "-";
+            row.appendChild(cellEmail);
+
+            // City
+            const cellCity = document.createElement("td");
+            cellCity.textContent = o.city || "-";
+            row.appendChild(cellCity);
+
+            // State
+            const cellState = document.createElement("td");
+            cellState.textContent = o.state || "-";
+            row.appendChild(cellState);
+
+            // Course Panel Status (with buttons)
+            const cellStatus = document.createElement("td");
+            cellStatus.style.whiteSpace = "nowrap";
+            cellStatus.innerHTML = `
+            <div class="status-toggle" style="display: flex; gap: 8px;">
+                <button class="status-btn detailed-btn ${status === 'Detailed' ? 'active' : ''}"
+                        data-personnelid="${personnelId}"
+                        data-status="Detailed"
+                        style="padding: 6px 12px;
+                               border: 2px solid ${status === 'Detailed' ? '#3b82f6' : '#d1d5db'};
+                               background: ${status === 'Detailed' ? '#dbeafe' : 'white'};
+                               color: ${status === 'Detailed' ? '#3b82f6' : '#6b7280'};
+                               border-radius: 6px;
+                               font-weight: 600;
+                               font-size: 12px;
+                               cursor: pointer;
+                               transition: all 0.2s;
+                               min-width: 70px;">
+                    Detailed
+                </button>
+                <button class="status-btn reserve-btn ${status === 'Reserve' ? 'active' : ''}"
+                        data-personnelid="${personnelId}"
+                        data-status="Reserve"
+                        style="padding: 6px 12px;
+                               border: 2px solid ${status === 'Reserve' ? '#f59e0b' : '#d1d5db'};
+                               background: ${status === 'Reserve' ? '#fef3c7' : 'white'};
+                               color: ${status === 'Reserve' ? '#f59e0b' : '#6b7280'};
+                               border-radius: 6px;
+                               font-weight: 600;
+                               font-size: 12px;
+                               cursor: pointer;
+                               transition: all 0.2s;
+                               min-width: 70px;">
+                    Reserve
+                </button>
+            </div>
+        `;
+            row.appendChild(cellStatus);
+
+            // Action (Remove button)
+            const cellAction = document.createElement("td");
+            cellAction.innerHTML = `
+            <button class="btn btn-danger remove-officer-btn"
+                    data-personnelid="${personnelId}"
+                    data-name="${o.fullName || o.name}"
+                    style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap;">
+                🗑️ Remove
+            </button>
+        `;
+            row.appendChild(cellAction);
 
             tbody.appendChild(row);
 
-            // Add event listener for checkbox
-            const checkbox = row.querySelector('.officer-checkbox');
-            checkbox.addEventListener('change', function () {
+            // Add event listeners
+            const checkboxElem = row.querySelector('.officer-checkbox');
+            checkboxElem.addEventListener('change', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (this.checked) {
                     selectedSet.add(personnelId);
-                    // Initialize status to 'Reserve' if not already set
                     if (!statusMap.has(personnelId)) {
                         statusMap.set(personnelId, 'Reserve');
                     }
@@ -3193,32 +3427,26 @@ document.head.appendChild(style);
                 }
                 document.getElementById('selectedCount').innerText = selectedSet.size;
                 updatePanelSummary();
-
-                // Update toggle button styles when checkbox changes
                 updateToggleStyles(personnelId);
             });
 
-            // Add event listeners for status toggle buttons
-            const retainBtn = row.querySelector('.retain-btn');
+            const detailedBtn = row.querySelector('.detailed-btn');
             const reserveBtn = row.querySelector('.reserve-btn');
 
-            retainBtn.addEventListener('click', function () {
+            detailedBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (!selectedSet.has(personnelId)) {
-                    // Auto-select the officer if not already selected
                     selectedSet.add(personnelId);
                     const checkbox = row.querySelector('.officer-checkbox');
                     if (checkbox) checkbox.checked = true;
                     document.getElementById('selectedCount').innerText = selectedSet.size;
                 }
 
-                // Set status to Retain
-                statusMap.set(personnelId, 'Retain');
+                statusMap.set(personnelId, 'Detailed');
 
-                // Update button styles
-                this.style.border = '2px solid #10b981';
-                this.style.background = '#d1fae5';
-                this.style.color = '#10b981';
+                this.style.border = '2px solid #3b82f6';
+                this.style.background = '#dbeafe';
+                this.style.color = '#3b82f6';
 
                 reserveBtn.style.border = '2px solid #d1d5db';
                 reserveBtn.style.background = 'white';
@@ -3227,34 +3455,30 @@ document.head.appendChild(style);
                 updatePanelSummary();
             });
 
-            reserveBtn.addEventListener('click', function () {
+            reserveBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 if (!selectedSet.has(personnelId)) {
-                    // Auto-select the officer if not already selected
                     selectedSet.add(personnelId);
                     const checkbox = row.querySelector('.officer-checkbox');
                     if (checkbox) checkbox.checked = true;
                     document.getElementById('selectedCount').innerText = selectedSet.size;
                 }
 
-                // Set status to Reserve
                 statusMap.set(personnelId, 'Reserve');
 
-                // Update button styles
                 this.style.border = '2px solid #f59e0b';
                 this.style.background = '#fef3c7';
                 this.style.color = '#f59e0b';
 
-                retainBtn.style.border = '2px solid #d1d5db';
-                retainBtn.style.background = 'white';
-                retainBtn.style.color = '#6b7280';
+                detailedBtn.style.border = '2px solid #d1d5db';
+                detailedBtn.style.background = 'white';
+                detailedBtn.style.color = '#6b7280';
 
                 updatePanelSummary();
             });
 
-            // Add remove button event listener
             const removeBtn = row.querySelector('.remove-officer-btn');
-            removeBtn.addEventListener('click', function () {
+            removeBtn.addEventListener('click', function() {
                 const personnelId = parseInt(this.dataset.personnelid);
                 const officerName = this.dataset.name;
                 removeOfficer(personnelId, officerName);
@@ -3262,21 +3486,75 @@ document.head.appendChild(style);
         });
 
         document.getElementById('selectedCount').innerText = selectedSet.size;
+
+        // Inject grade columns for any courses already added
+        if (addedGradeCourses.length > 0) {
+            // Re-add headers if missing
+            const headerRow = document.querySelector('#officerTableBody')
+                ?.closest('table')?.querySelector('thead tr');
+
+            addedGradeCourses.forEach(courseName => {
+                // Add header if not present
+                if (headerRow) {
+                    const alreadyHasHeader = Array.from(headerRow.cells)
+                        .some(th => th.dataset.gradeFor === courseName);
+                    if (!alreadyHasHeader) {
+                        const actionTh = headerRow.cells[headerRow.cells.length - 1];
+                        const gradeTh = document.createElement('th');
+                        gradeTh.textContent = `Grade (${courseName})`;
+                        gradeTh.dataset.gradeFor = courseName;
+                        headerRow.insertBefore(gradeTh, actionTh);
+                    }
+                }
+
+                // Add grade cell to each body row
+                const tbody = document.getElementById('officerTableBody');
+                if (tbody) {
+                    Array.from(tbody.rows).forEach(row => {
+                        if (row.cells.length <= 2) return;
+                        const alreadyHasCell = Array.from(row.cells)
+                            .some(td => td.dataset.gradeFor === courseName);
+                        if (!alreadyHasCell) {
+                            const grade = getRandomGrade();
+                            const colors = getGradeColor(grade);
+                            const actionCell = row.cells[row.cells.length - 1];
+                            const gradeTd = document.createElement('td');
+                            gradeTd.dataset.gradeFor = courseName;
+                            gradeTd.innerHTML = `
+                            <span style="
+                                display: inline-block;
+                                padding: 4px 10px;
+                                border-radius: 12px;
+                                font-size: 12px;
+                                font-weight: 700;
+                                background: ${colors.bg};
+                                color: ${colors.color};
+                                border: 1px solid ${colors.border};
+                                min-width: 36px;
+                                text-align: center;
+                            ">${grade}</span>
+                        `;
+                            row.insertBefore(gradeTd, actionCell);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     // Helper function to update toggle button styles based on status
     function updateToggleStyles(personnelId) {
-        const row = document.querySelector(`.retain-btn[data-personnelid="${personnelId}"]`)?.closest('tr');
+        const row = document.querySelector(`.detailed-btn[data-personnelid="${personnelId}"]`)?.closest('tr');
         if (!row) return;
 
-        const retainBtn = row.querySelector('.retain-btn');
+        const detailedBtn = row.querySelector('.detailed-btn');
         const reserveBtn = row.querySelector('.reserve-btn');
         const currentStatus = statusMap.get(personnelId);
 
-        if (currentStatus === 'Retain') {
-            retainBtn.style.border = '2px solid #10b981';
-            retainBtn.style.background = '#d1fae5';
-            retainBtn.style.color = '#10b981';
+        if (currentStatus === 'Detailed') {
+            detailedBtn.style.border = '2px solid #3b82f6';
+            detailedBtn.style.background = '#dbeafe';
+            detailedBtn.style.color = '#3b82f6';
             reserveBtn.style.border = '2px solid #d1d5db';
             reserveBtn.style.background = 'white';
             reserveBtn.style.color = '#6b7280';
@@ -3284,9 +3562,9 @@ document.head.appendChild(style);
             reserveBtn.style.border = '2px solid #f59e0b';
             reserveBtn.style.background = '#fef3c7';
             reserveBtn.style.color = '#f59e0b';
-            retainBtn.style.border = '2px solid #d1d5db';
-            retainBtn.style.background = 'white';
-            retainBtn.style.color = '#6b7280';
+            detailedBtn.style.border = '2px solid #d1d5db';
+            detailedBtn.style.background = 'white';
+            detailedBtn.style.color = '#6b7280';
         }
     }
 
@@ -3580,7 +3858,7 @@ document.head.appendChild(style);
             <td>${formatDate(o.dateOfBirth)}</td>
             <td>${o.religion || "-"}</td>
             <td>${o.maritalStatus || "-"}</td>
-            <td>${o.medicalCategory || "-"}</td>
+            <td>${o.medicalCode || "-"}</td>
             <td>${o.mobileNumber || o.mobile || "-"}</td>
             <td>${o.emailAddress || o.email || "-"}</td>
             <td>${o.city || "-"}</td>
@@ -3743,67 +4021,142 @@ document.head.appendChild(style);
     // ===============================
     // SEND FOR APPROVAL (UPDATED)
     // ===============================
-    document.getElementById("sendToApproval")?.addEventListener("click", () => {
+    document.getElementById("sendToApproval")?.addEventListener("click", async () => {
         const scheduleId = sessionStorage.getItem("scheduleId");
-        const roleId = document.getElementById("sendToRole")?.value;
-        const remark = document.getElementById("approvalRemark")?.value || "";
+        const remark    = document.getElementById("approvalRemark")?.value || "";
 
         if (!scheduleId) {
-            alert("Schedule ID missing. Please select course first.");
+            showToast("Schedule ID missing. Please select course first.", "error");
             return;
         }
 
-        if (!roleId) {
-            alert("Please select a role to send approval.");
+        // Build nominations list from selectedSet + serialNumberMap
+        const nominations = Array.from(selectedSet).map(personnelId => ({
+            personnelId: personnelId,
+            serialNumber: serialNumberMap.get(personnelId) || null
+        }));
+
+        if (nominations.length === 0) {
+            showToast("No officers selected. Please select officers in Step 3.", "error");
             return;
         }
 
         const payload = {
-            scheduleId: parseInt(scheduleId),
-            roleId: parseInt(roleId),
-            status: "pending",
-            remark: remark.trim()
+            scheduleId:  parseInt(scheduleId),
+            remarks:     remark.trim(),
+            nominations: nominations
         };
 
-        // Show loading state
-        const sendBtn = document.getElementById("sendToApproval");
-        const originalText = sendBtn.textContent;
+        const sendBtn    = document.getElementById("sendToApproval");
+        const origText   = sendBtn.textContent;
         sendBtn.textContent = "Sending...";
         sendBtn.disabled = true;
 
-        fetch("http://localhost:6060/api/course-schedule-role-status", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to send for approval");
-                return res.json();
-            })
-            .then(data => {
-                // Set flag that panel has been sent for approval
-                sessionStorage.setItem("panelSentForApproval", "true");
-
-                // Show success message with option to go to next step
-                if (confirm("Panel sent for approval successfully! Would you like to proceed to Step 5?")) {
-                    currentStep = 5;
-                    renderStep();
-                }
-
-                showToast("Panel sent for approval successfully", "success");
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Error while sending for approval.");
-            })
-            .finally(() => {
-                sendBtn.textContent = originalText;
-                sendBtn.disabled = false;
+        try {
+            const response = await fetch("http://localhost:6060/api/course-panel/send-for-approval", {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify(payload)
             });
+
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(err || "Failed to send for approval");
+            }
+
+            const data = await response.json();
+
+            // Store batch info in sessionStorage
+            sessionStorage.setItem("panelSentForApproval", "true");
+            sessionStorage.setItem("batchId", data.batchId);
+            sessionStorage.setItem("currentPipelineStep", data.movementId.toString());
+
+            showToast(data.message || "Panel sent for approval!", "success");
+
+            if (confirm("Panel sent for approval successfully! Proceed to Step 5?")) {
+                currentStep = 5;
+                renderStep();
+            }
+
+        } catch (error) {
+            console.error(error);
+            showToast("Error: " + error.message, "error");
+        } finally {
+            sendBtn.textContent = origText;
+            sendBtn.disabled    = false;
+        }
     });
 
+    // ===============================
+    // PIPELINE SYSTEM
+    // ===============================
+    const pipelineStages = [
+        { label: "Clerk"     },
+        { label: "G1"        },
+        { label: "Colonel"   },
+        { label: "Brigadier" },
+        { label: "ADG"       },
+        { label: "DG"        }
+    ];
+
+    function renderPipeline() {
+        const container = document.getElementById("pipelineFlow");
+        if (!container) return;
+
+        // movementId from API is 1-based and maps directly to stage index
+        // movementId=1 → Clerk (index 0), movementId=2 → G1 (index 1), etc.
+        const rawMovementId = parseInt(sessionStorage.getItem("currentPipelineStep") ?? "-1");
+        // currentPipelineStep stores movementId from API response, convert to 0-based index
+        const current = rawMovementId >= 1 ? rawMovementId - 1 : -1;
+
+        container.innerHTML = "";
+
+        pipelineStages.forEach((stage, index) => {
+            // Connector line between boxes
+            if (index > 0) {
+                const connector = document.createElement("div");
+                connector.className = "pipeline-connector" + (index <= current ? " done" : "");
+                container.appendChild(connector);
+            }
+
+            const stepDiv = document.createElement("div");
+            stepDiv.className = "pipeline-step";
+            if (index < current)  stepDiv.classList.add("completed");
+            if (index === current) stepDiv.classList.add("active");
+
+            stepDiv.innerHTML = `
+            <div class="pipeline-node">
+                <div class="pipeline-box">${index < current ? "✓ " : ""}${stage.label}</div>
+            </div>
+        `;
+
+            container.appendChild(stepDiv);
+        });
+
+        // Status badge below pipeline
+        const existingBadge = container.parentElement.querySelector(".pipeline-status-badge");
+        if (existingBadge) existingBadge.remove();
+
+        const batchId    = sessionStorage.getItem("batchId");
+        const badge      = document.createElement("div");
+        badge.className  = "pipeline-status-badge";
+
+        if (batchId && current >= 0) {
+            const stageName = current < pipelineStages.length
+                ? pipelineStages[current].label
+                : "Complete";
+            badge.textContent = `Batch #${batchId}  ·  Currently with: ${stageName}`;
+        } else {
+            badge.style.background   = "#fef3c7";
+            badge.style.borderColor  = "#fcd34d";
+            badge.style.color        = "#92400e";
+            badge.textContent        = "Panel not yet submitted for approval";
+        }
+
+        container.parentElement.appendChild(badge);
+    }
+
+    const _originalRenderStep = renderStep;
     // ===============================
     // LOAD SEND TO ROLES
     // ===============================
@@ -3909,7 +4262,7 @@ document.head.appendChild(style);
     }
 
     // Add selected course to panel
-    async function addSelectedCourse() {
+    function addSelectedCourse() {
         const select = document.getElementById('courseToAddSelect');
         const selectedOption = select.options[select.selectedIndex];
         const courseSrno = select.value;
@@ -3919,57 +4272,88 @@ document.head.appendChild(style);
             return;
         }
 
-        const courseName = selectedOption.dataset.courseName;
+        const courseName = selectedOption.dataset.courseName || selectedOption.textContent;
 
-        // Confirm with user
-        if (!confirm(`Are you sure you want to add "${courseName}" to the panel?`)) {
+        // Add Grade column to the officer table if not already added
+        addGradeColumnToTable(courseName);
+
+        closeCourseDropdown();
+        showToast(`Grade column added for "${courseName}"`, 'success');
+    }
+
+    // Track which courses have been added as grade columns
+    let addedGradeCourses = [];
+    const GRADES = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D'];
+
+    function getRandomGrade() {
+        return GRADES[Math.floor(Math.random() * GRADES.length)];
+    }
+
+    function getGradeColor(grade) {
+        const colors = {
+            'A+': { bg: '#d1fae5', color: '#065f46', border: '#10b981' },
+            'A':  { bg: '#dbeafe', color: '#1e40af', border: '#3b82f6' },
+            'B+': { bg: '#ede9fe', color: '#4c1d95', border: '#7c3aed' },
+            'B':  { bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+            'C+': { bg: '#ffedd5', color: '#9a3412', border: '#f97316' },
+            'C':  { bg: '#fee2e2', color: '#991b1b', border: '#ef4444' },
+            'D':  { bg: '#f3f4f6', color: '#374151', border: '#9ca3af' }
+        };
+        return colors[grade] || colors['D'];
+    }
+
+    function addGradeColumnToTable(courseName) {
+        // Avoid duplicate columns for same course
+        if (addedGradeCourses.includes(courseName)) {
+            showToast(`Grade column for "${courseName}" already exists`, 'info');
             return;
         }
+        addedGradeCourses.push(courseName);
 
-        try {
-            showLoading(true);
-
-            // Get current scheduleId
-            const scheduleId = sessionStorage.getItem('scheduleId');
-
-            if (!scheduleId) {
-                showToast('Please select a course schedule first', 'error');
-                return;
-            }
-
-            // Call API to add course to panel
-            const response = await fetch('http://localhost:6060/api/course-panel/add-course', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    scheduleId: parseInt(scheduleId),
-                    courseSrno: parseInt(courseSrno)
-                })
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                showToast(`Course "${courseName}" added successfully!`, 'success');
-
-                // Close dropdown
-                closeCourseDropdown();
-
-                // Refresh eligible officers if needed
-                refreshEligibleOfficers();
-
-            } else {
-                const errorText = await response.text();
-                showToast(`Failed to add course: ${errorText}`, 'error');
-            }
-
-        } catch (error) {
-            console.error('Error adding course:', error);
-            showToast('Error adding course to panel', 'error');
-        } finally {
-            showLoading(false);
+        // 1. Add header to Step 3 table
+        const step3Header = document.querySelector('#officerTableBody')
+            ?.closest('table')?.querySelector('thead tr');
+        if (step3Header) {
+            // Insert before the last two columns (Course Panel Status, Action)
+            const actionTh = step3Header.cells[step3Header.cells.length - 1];
+            const gradeTh = document.createElement('th');
+            gradeTh.textContent = `Grade (${courseName})`;
+            gradeTh.dataset.gradeFor = courseName;
+            step3Header.insertBefore(gradeTh, actionTh);
         }
+
+        // 2. Add grade cell to every existing row in Step 3
+        const tbody = document.getElementById('officerTableBody');
+        if (tbody) {
+            Array.from(tbody.rows).forEach(row => {
+                // Skip empty state row
+                if (row.cells.length <= 2) return;
+
+                const grade = getRandomGrade();
+                const colors = getGradeColor(grade);
+                const actionCell = row.cells[row.cells.length - 1];
+                const gradeTd = document.createElement('td');
+                gradeTd.dataset.gradeFor = courseName;
+                gradeTd.innerHTML = `
+                <span style="
+                    display: inline-block;
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    background: ${colors.bg};
+                    color: ${colors.color};
+                    border: 1px solid ${colors.border};
+                    min-width: 36px;
+                    text-align: center;
+                ">${grade}</span>
+            `;
+                row.insertBefore(gradeTd, actionCell);
+            });
+        }
+
+        // Re-render so future rows also get grade columns
+        renderOfficerTable();
     }
 
     // Refresh eligible officers after adding course

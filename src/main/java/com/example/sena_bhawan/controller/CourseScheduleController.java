@@ -7,6 +7,7 @@ import com.example.sena_bhawan.service.CourseScheduleService;
 //import com.example.sena_bhawan.service.impl.CourseScheduleServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +37,35 @@ public class CourseScheduleController {
     }
 
     @PostMapping("/add")
-    public CourseSchedule addSchedule(@RequestBody CreateCourseScheduleRequest request) {
+    public ResponseEntity<BaseApiResponse<CourseSchedule>> addSchedule(@RequestBody CreateCourseScheduleRequest request) {
         System.out.println("Received payload: " + request);
-        return scheduleService.addSchedule(request);
+
+        try {
+            // Validate required fields
+            if (request.getCourseId() == null || request.getYear() == null ||
+                    request.getStartDate() == null || request.getEndDate() == null) {
+                return ResponseEntity.badRequest()
+                        .body(BaseApiResponse.badRequest("All required fields must be filled"));
+            }
+
+            CourseSchedule schedule = scheduleService.addSchedule(request);
+
+            if (schedule == null) {
+                return ResponseEntity.badRequest()
+                        .body(BaseApiResponse.badRequest("Insufficient personnel strength. Cannot create schedule."));
+            }
+
+            return ResponseEntity.ok(BaseApiResponse.success(schedule, "Course schedule saved successfully"));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(BaseApiResponse.badRequest(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(BaseApiResponse.internalError("An error occurred while saving the schedule"));
+        }
     }
+
     @GetMapping("/ping")
     public String ping() {
         return "SERVICE INJECTED SUCCESSFULLY";

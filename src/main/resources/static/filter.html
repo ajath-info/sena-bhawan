@@ -1116,16 +1116,6 @@
           </div>
 
           <div class="filter-group">
-            <label class="filter-label">TOS From</label>
-            <input type="date" class="filter-input" id="tosFrom">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">TOS To</label>
-            <input type="date" class="filter-input" id="tosTo">
-          </div>
-
-          <div class="filter-group">
             <label class="filter-label">NOT on Course From</label>
             <input type="date" class="filter-input" id="courseFrom">
           </div>
@@ -1180,8 +1170,7 @@
                   <th>Division</th>
                   <th>Est Type</th>
                   <th>Medical</th>
-                  <th>TOS From</th>
-                  <th>TOS To</th>
+                  <th>TOS Date</th>
                   <th>Course</th>
                   <th>Civil Qual</th>
                   <th>Sports</th>
@@ -1538,9 +1527,9 @@
     return {
       rank: getSelectValue('rankFilter'),
       medicalCategory: getSelectValue('medicalFilter'),
-      command: getSelectValue('commandFilter'), // Stores command names (not IDs)
-      corps: getSelectValue('corpsFilter'), // Stores corps names (not IDs)
-      division: getSelectValue('divisionFilter'), // Stores division names (not IDs)
+      command: getSelectValue('commandFilter'),
+      corps: getSelectValue('corpsFilter'),
+      division: getSelectValue('divisionFilter'),
       establishmentType: getSelectValue('estFilter'),
       areaType: getSelectValue('areaTypeFilter'),
       civilQualification: getSelectValue('civilFilter'),
@@ -1556,8 +1545,7 @@
       docTo: getDateValue('docTo'),
       dosFrom: getDateValue('dosFrom'),
       dosTo: getDateValue('dosTo'),
-      tosFrom: getDateValue('tosFrom'),
-      tosTo: getDateValue('tosTo'),
+      // Removed tosFrom and tosTo
       courseFrom: getDateValue('courseFrom'),
       courseTo: getDateValue('courseTo'),
       search: getInputValue('globalSearch')
@@ -1633,16 +1621,16 @@
 
     if (!officers || officers.length === 0) {
       tbody.innerHTML = `
-      <tr>
-        <td colspan="21" style="text-align: center; padding: 60px 40px;">
-          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
-            <div style="font-size: 48px;">🔍</div>
-            <div style="font-size: 18px; font-weight: 600; color: #1e293b;">No officers found</div>
-            <div style="color: #6b7280; font-size: 14px;">Try adjusting your filters</div>
-          </div>
-        </td>
-      </tr>
-    `;
+     <tr>
+      <td colspan="20" style="text-align: center; padding: 60px 40px;">  <!-- Changed colspan from 21 to 20 -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+          <div style="font-size: 48px;">🔍</div>
+          <div style="font-size: 18px; font-weight: 600; color: #1e293b;">No officers found</div>
+          <div style="color: #6b7280; font-size: 14px;">Try adjusting your filters</div>
+        </div>
+       </td>
+     </tr>
+   `;
       document.getElementById('unitStrength').innerText = 'Unit Strength: 0';
       return;
     }
@@ -1653,6 +1641,7 @@
       const dob = o.dateOfBirth ? new Date(o.dateOfBirth).toLocaleDateString('en-GB') : '—';
       const doc = o.dateOfCommission ? new Date(o.dateOfCommission).toLocaleDateString('en-GB') : '—';
       const dos = o.dateOfSeniority ? new Date(o.dateOfSeniority).toLocaleDateString('en-GB') : '—';
+      const tosDate = o.tosDate ? new Date(o.tosDate).toLocaleDateString('en-GB') : '—';  // Added TOS Date formatting
 
       // Use actual fields from API response
       const courseName = o.course || '—';
@@ -1662,35 +1651,34 @@
       const postingDue = o.postingDueMonths !== null && o.postingDueMonths !== undefined ? o.postingDueMonths : '—';
 
       html += `
-      <tr>
-        <td>${o.armyNo || '—'}</td>
-        <td><span class="badge badge-info">${o.rank || '—'}</span></td>
-        <td>${o.fullName || '—'}</td>
-        <td>${dob}</td>
-        <td>${doc}</td>
-        <td>${dos}</td>
-        <td>${o.unit || '—'}</td>
-        <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
-        <td>${o.corps || '—'}</td>
-        <td>${o.division || '—'}</td>
-        <td>${o.establishmentType || '—'}</td>
-        <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
-        <td>${o.tosStart || '—'}</td>
-        <td>${o.tosEnd || '—'}</td>
-        <td>${courseName}</td>
-        <td>${civilQual}</td>
-        <td>${sports}</td>
-        <td>${o.placeOfBirth || '—'}</td>
-        <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
-        <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
-        <td>
-          <div class="action-icons">
-            <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
-            <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
-          </div>
-        </td>
-      </tr>
-    `;
+     <tr>
+      <td>${o.armyNo || '—'}</td>
+      <td><span class="badge badge-info">${o.rank || '—'}</span></td>
+      <td>${o.fullName || '—'}</td>
+      <td>${dob}</td>
+      <td>${doc}</td>
+      <td>${dos}</td>
+      <td>${o.unit || '—'}</td>
+      <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
+      <td>${o.corps || '—'}</td>
+      <td>${o.division || '—'}</td>
+      <td>${o.establishmentType || '—'}</td>
+      <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
+      <td>${tosDate}</td>  <!-- Changed from TOS From/TOS To to single TOS Date -->
+      <td>${courseName}</td>
+      <td>${civilQual}</td>
+      <td>${sports}</td>
+      <td>${o.placeOfBirth || '—'}</td>
+      <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
+      <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
+      <td>
+        <div class="action-icons">
+          <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
+          <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
+        </div>
+      </td>
+     </tr>
+   `;
     });
 
     tbody.innerHTML = html;
@@ -1702,15 +1690,15 @@
     const tbody = document.getElementById('tableBody');
     if (loading) {
       tbody.innerHTML = `
-      <tr>
-        <td colspan="21" style="text-align: center; padding: 60px 40px;">
-          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
-            <div class="loading-spinner"></div>
-            <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
-          </div>
-        </td>
-      </tr>
-    `;
+     <tr>
+      <td colspan="20" style="text-align: center; padding: 60px 40px;">  <!-- Changed colspan from 21 to 20 -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+          <div class="loading-spinner"></div>
+          <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
+        </div>
+       </td>
+     </tr>
+   `;
     }
   }
 
@@ -1844,8 +1832,7 @@
     document.getElementById('docTo').value = '';
     document.getElementById('dosFrom').value = '';
     document.getElementById('dosTo').value = '';
-    document.getElementById('tosFrom').value = '';
-    document.getElementById('tosTo').value = '';
+    // Removed tosFrom and tosTo
     document.getElementById('courseFrom').value = '';
     document.getElementById('courseTo').value = '';
     document.getElementById('pobFilter').value = '';

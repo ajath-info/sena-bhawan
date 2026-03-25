@@ -532,6 +532,39 @@
           text-transform: uppercase;
           font-weight: 600;
         }
+
+        /* Add to your existing styles */
+        .form-input.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .form-input.success {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .date-error {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Optional: Add tooltip style for date validation */
+        .date-hint {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -589,16 +622,14 @@
                             />
                         </div>
                         <div class="form-group">
-                            <label class="form-label"
-                            >From Date <span class="required">*</span></label
-                            >
-                            <input id="fromDate" type="date" class="form-input" value="" />
+                            <label class="form-label">From Date <span class="required">*</span></label>
+                            <input id="fromDate" type="date" class="form-input" />
+                            <small class="date-hint">Course start date</small>
                         </div>
                         <div class="form-group">
-                            <label class="form-label"
-                            >To Date <span class="required">*</span></label
-                            >
-                            <input id="toDate" type="date" class="form-input" value="" />
+                            <label class="form-label">To Date <span class="required">*</span></label>
+                            <input id="toDate" type="date" class="form-input" />
+                            <small class="date-hint">Must be after From Date</small>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Course Strength</label>
@@ -683,58 +714,175 @@
 
 <script>
     document.getElementById("saveScheduleBtn").addEventListener("click", async () => {
+        const courseSelect = document.getElementById("courseSelect");
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
 
-      const courseSelect = document.getElementById("courseSelect");
+        const payload = {
+            courseId: Number(courseSelect.value),
+            year: document.getElementById("yearSelect").value,
+            batchNumber: document.getElementById("batchNumber").value.trim(),
+            startDate: fromDate,
+            endDate: toDate,
+            courseStrength: document.getElementById("courseStrength").value,
+            venue: document.getElementById("venue").value.trim(),
+            remarks: document.getElementById("remarks").value.trim()
+        };
 
-      const payload = {
-        courseId: Number(courseSelect.value),               // ✔ matches DTO
-        year: document.getElementById("yearSelect").value, // ✔ matches DTO
-        batchNumber: document.getElementById("batchNumber").value.trim(),
-        startDate: document.getElementById("fromDate").value,  // ✔ matches DTO
-        endDate: document.getElementById("toDate").value,      // ✔ matches DTO
-        courseStrength: document.getElementById("courseStrength").value,
-        venue: document.getElementById("venue").value.trim(),
-        remarks: document.getElementById("remarks").value.trim()
-      };
+        console.log("Sending payload:", payload);
 
-      console.log("Sending payload:", payload);
-
-      // Basic validation
-      if (!payload.courseId || !payload.year || !payload.startDate || !payload.endDate) {
-        alert("Please fill all required fields");
-        return;
-      }
-
-      if (payload.startDate > payload.endDate) {
-        alert("From Date cannot be after To Date");
-        return;
-      }
-
-      /* ================= API CALL ================= */
-      try {
-        const response = await fetch(
-          "http://localhost:6060/api/courseschedule/add",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to save schedule");
+        // Basic validation
+        if (!payload.courseId || !payload.year || !payload.startDate || !payload.endDate) {
+            alert("Please fill all required fields");
+            return;
         }
 
-        const result = await response.json();
-        console.log("Schedule saved:", result);
+        // Enhanced date validation
+        if (payload.startDate > payload.endDate) {
+            alert("❌ From Date cannot be after To Date. Please correct the dates.");
+            showDateError("From Date cannot be after To Date");
+            return;
+        }
 
-        alert("Course schedule saved successfully");
+        if (!payload.courseStrength || payload.courseStrength <= 0) {
+            alert("Please enter a valid course strength");
+            return;
+        }
 
-      } catch (error) {
-        console.error(error);
-        alert("Error saving course schedule");
-      }
+        // Disable button to prevent double submission
+        const saveButton = document.getElementById("saveScheduleBtn");
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<span>⏳</span> Saving...';
+
+        try {
+            const response = await fetch(
+                "http://localhost:6060/api/courseschedule/add",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                // Handle error response
+                const errorMessage = result.message || "Failed to save schedule";
+                throw new Error(errorMessage);
+            }
+
+            console.log("Schedule saved:", result.data);
+
+            // Show success message with better UI
+            alert("✅ " + result.message);
+
+            // Optionally reset form
+            resetForm();
+            hideDateError(); // Clear any date errors
+
+        } catch (error) {
+            console.error("Error:", error);
+
+            // Show user-friendly error message
+            let errorMessage = error.message;
+            if (errorMessage.includes("Insufficient personnel strength")) {
+                errorMessage = "❌ " + errorMessage;
+            } else if (errorMessage.includes("start date") || errorMessage.includes("end date")) {
+                errorMessage = "❌ " + errorMessage;
+            } else {
+                errorMessage = "❌ Error saving course schedule: " + errorMessage;
+            }
+
+            alert(errorMessage);
+
+        } finally {
+            // Re-enable button
+            saveButton.disabled = false;
+            saveButton.innerHTML = '<span>💾</span> Save Schedule';
+        }
     });
+
+    function resetForm() {
+        // Optional: Clear form after successful save
+        document.getElementById("courseSelect").value = "";
+        document.getElementById("yearSelect").value = "2026";
+        document.getElementById("batchNumber").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+        document.getElementById("courseStrength").value = "";
+        document.getElementById("venue").value = "";
+        document.getElementById("remarks").value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCourses();
+        setupDateValidation();
+    });
+
+    function setupDateValidation() {
+        const fromDateInput = document.getElementById("fromDate");
+        const toDateInput = document.getElementById("toDate");
+
+        // Validate when From Date changes
+        fromDateInput.addEventListener("change", function() {
+            validateDates();
+        });
+
+        // Validate when To Date changes
+        toDateInput.addEventListener("change", function() {
+            validateDates();
+        });
+    }
+
+    function validateDates() {
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+
+        if (fromDate && toDate) {
+            if (fromDate > toDate) {
+                showDateError("From Date cannot be after To Date");
+                return false;
+            } else {
+                hideDateError();
+                return true;
+            }
+        }
+        return true;
+    }
+
+    function showDateError(message) {
+        // Remove existing error if any
+        hideDateError();
+
+        // Create error message element
+        const errorDiv = document.createElement("div");
+        errorDiv.id = "dateError";
+        errorDiv.className = "date-error";
+        errorDiv.style.color = "#ef4444";
+        errorDiv.style.fontSize = "12px";
+        errorDiv.style.marginTop = "4px";
+        errorDiv.style.fontWeight = "500";
+        errorDiv.textContent = "⚠️ " + message;
+
+        // Add error after To Date field
+        const toDateGroup = document.getElementById("toDate").closest(".form-group");
+        toDateGroup.appendChild(errorDiv);
+
+        // Add red border to both date fields
+        document.getElementById("fromDate").style.borderColor = "#ef4444";
+        document.getElementById("toDate").style.borderColor = "#ef4444";
+    }
+
+    function hideDateError() {
+        const errorElement = document.getElementById("dateError");
+        if (errorElement) {
+            errorElement.remove();
+        }
+        // Reset border colors
+        document.getElementById("fromDate").style.borderColor = "#d1d5db";
+        document.getElementById("toDate").style.borderColor = "#d1d5db";
+    }
 </script>
 
 </html>

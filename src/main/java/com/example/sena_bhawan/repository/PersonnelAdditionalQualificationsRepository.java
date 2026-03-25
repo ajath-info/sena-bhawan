@@ -11,4 +11,7 @@ import java.util.List;
 public interface PersonnelAdditionalQualificationsRepository extends JpaRepository<PersonnelAdditionalQualifications, Long> {
     @Query("SELECT DISTINCT qualification FROM PersonnelAdditionalQualifications")
     List<String> additionalQualificationList();
+
+    List<PersonnelAdditionalQualifications> findByPersonnelId(Long personnelId);
+
 }
