@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,41 +30,59 @@ public class CoursePanelStatusController {
         try {
             Long scheduleId = request.getScheduleId();
             List<CoursePanelStatusUpdateRequest.StatusUpdate> updates = request.getStatusUpdates();
-            
+
             List<CoursePanelNomination> updatedNominations = new ArrayList<>();
             List<String> errors = new ArrayList<>();
-            
+            int createdCount = 0;
+
             for (CoursePanelStatusUpdateRequest.StatusUpdate update : updates) {
                 Long personnelId = update.getPersonnelId();
                 String newStatus = update.getAttendanceStatus();
-                
+
                 // Validate status
                 if (!newStatus.equalsIgnoreCase("Detailed") && !newStatus.equalsIgnoreCase("Reserve")) {
                     errors.add("Invalid status for personnelId " + personnelId + ": " + newStatus);
                     continue;
                 }
-                
-                // Find the nomination
-                Optional<CoursePanelNomination> optionalNomination = 
-                    coursePanelRepository.findByScheduleIdAndPersonnelId(scheduleId, personnelId);
-                
+
+                // Find existing or create new
+                Optional<CoursePanelNomination> optionalNomination =
+                        coursePanelRepository.findByScheduleIdAndPersonnelId(scheduleId, personnelId);
+
+                CoursePanelNomination nomination;
+
                 if (optionalNomination.isPresent()) {
-                    CoursePanelNomination nomination = optionalNomination.get();
+                    // UPDATE existing
+                    nomination = optionalNomination.get();
                     nomination.setAttendanceStatus(newStatus);
-                    updatedNominations.add(coursePanelRepository.save(nomination));
+                    nomination.setUpdatedAt(LocalDateTime.now());
                 } else {
-                    errors.add("Nomination not found for scheduleId: " + scheduleId + ", personnelId: " + personnelId);
+                    // CREATE new nomination
+                    nomination = CoursePanelNomination.builder()
+                            .scheduleId(scheduleId)
+                            .personnelId(personnelId)
+                            .attendanceStatus(newStatus)
+                            .status("ACTIVE")
+                            .createdAt(LocalDateTime.now())
+                            .updatedAt(LocalDateTime.now())
+                            .build();
+                    createdCount++;
                 }
+
+                updatedNominations.add(coursePanelRepository.save(nomination));
             }
-            
+
             if (!errors.isEmpty()) {
                 return ResponseEntity.badRequest().body(new StatusUpdateResponse(
-                    "Partial success", updatedNominations.size(), errors));
+                        "Partial success", updatedNominations.size(), errors));
             }
-            
-            return ResponseEntity.ok(new StatusUpdateResponse(
-                "All statuses updated successfully", updatedNominations.size(), errors));
-            
+
+            String message = createdCount > 0
+                    ? "Updated " + (updatedNominations.size() - createdCount) + ", created " + createdCount
+                    : "All statuses updated successfully";
+
+            return ResponseEntity.ok(new StatusUpdateResponse(message, updatedNominations.size(), errors));
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error updating status: " + e.getMessage());
         }

@@ -150,6 +150,75 @@
             font-size: 11px;
             color: #52b788;
         }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .pipeline-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .pipeline-box {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 2px solid #d1d5db;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .pipeline-step.completed .pipeline-box {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .pipeline-step.active .pipeline-box {
+            background: #1b4332;
+            border-color: #1b4332;
+            color: white;
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.2);
+            animation: pulsePipeline 2s infinite;
+        }
+
+        @keyframes pulsePipeline {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(27,67,50,0.2); }
+            50%       { box-shadow: 0 0 0 6px rgba(27,67,50,0.08); }
+        }
+
+        .pipeline-connector {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            min-width: 16px;
+            transition: background 0.3s;
+        }
+
+        .pipeline-connector.done { background: #10b981; }
+
+        .pipeline-status-badge {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            display: inline-block;
+        }
         .menu-icon {
             width: 24px;
             height: 24px;
@@ -3417,6 +3486,60 @@ document.head.appendChild(style);
         });
 
         document.getElementById('selectedCount').innerText = selectedSet.size;
+
+        // Inject grade columns for any courses already added
+        if (addedGradeCourses.length > 0) {
+            // Re-add headers if missing
+            const headerRow = document.querySelector('#officerTableBody')
+                ?.closest('table')?.querySelector('thead tr');
+
+            addedGradeCourses.forEach(courseName => {
+                // Add header if not present
+                if (headerRow) {
+                    const alreadyHasHeader = Array.from(headerRow.cells)
+                        .some(th => th.dataset.gradeFor === courseName);
+                    if (!alreadyHasHeader) {
+                        const actionTh = headerRow.cells[headerRow.cells.length - 1];
+                        const gradeTh = document.createElement('th');
+                        gradeTh.textContent = `Grade (${courseName})`;
+                        gradeTh.dataset.gradeFor = courseName;
+                        headerRow.insertBefore(gradeTh, actionTh);
+                    }
+                }
+
+                // Add grade cell to each body row
+                const tbody = document.getElementById('officerTableBody');
+                if (tbody) {
+                    Array.from(tbody.rows).forEach(row => {
+                        if (row.cells.length <= 2) return;
+                        const alreadyHasCell = Array.from(row.cells)
+                            .some(td => td.dataset.gradeFor === courseName);
+                        if (!alreadyHasCell) {
+                            const grade = getRandomGrade();
+                            const colors = getGradeColor(grade);
+                            const actionCell = row.cells[row.cells.length - 1];
+                            const gradeTd = document.createElement('td');
+                            gradeTd.dataset.gradeFor = courseName;
+                            gradeTd.innerHTML = `
+                            <span style="
+                                display: inline-block;
+                                padding: 4px 10px;
+                                border-radius: 12px;
+                                font-size: 12px;
+                                font-weight: 700;
+                                background: ${colors.bg};
+                                color: ${colors.color};
+                                border: 1px solid ${colors.border};
+                                min-width: 36px;
+                                text-align: center;
+                            ">${grade}</span>
+                        `;
+                            row.insertBefore(gradeTd, actionCell);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     // Helper function to update toggle button styles based on status
@@ -3946,7 +4069,7 @@ document.head.appendChild(style);
             // Store batch info in sessionStorage
             sessionStorage.setItem("panelSentForApproval", "true");
             sessionStorage.setItem("batchId", data.batchId);
-            sessionStorage.setItem("currentPipelineStep", "0"); // Clerk is step 0
+            sessionStorage.setItem("currentPipelineStep", data.movementId.toString());
 
             showToast(data.message || "Panel sent for approval!", "success");
 
@@ -3968,25 +4091,28 @@ document.head.appendChild(style);
     // PIPELINE SYSTEM
     // ===============================
     const pipelineStages = [
-        { label: "Clerk",     icon: "📝" },
-        { label: "G1",        icon: "👤" },
-        { label: "Colonel",   icon: "⭐" },
-        { label: "Brigadier", icon: "🎖️" },
-        { label: "ADG",       icon: "🏅" },
-        { label: "DG",        icon: "🏆" }
+        { label: "Clerk"     },
+        { label: "G1"        },
+        { label: "Colonel"   },
+        { label: "Brigadier" },
+        { label: "ADG"       },
+        { label: "DG"        }
     ];
 
     function renderPipeline() {
         const container = document.getElementById("pipelineFlow");
         if (!container) return;
 
-        // Read current step from sessionStorage (set when panel is sent)
-        const current = parseInt(sessionStorage.getItem("currentPipelineStep") ?? "-1");
+        // movementId from API is 1-based and maps directly to stage index
+        // movementId=1 → Clerk (index 0), movementId=2 → G1 (index 1), etc.
+        const rawMovementId = parseInt(sessionStorage.getItem("currentPipelineStep") ?? "-1");
+        // currentPipelineStep stores movementId from API response, convert to 0-based index
+        const current = rawMovementId >= 1 ? rawMovementId - 1 : -1;
 
         container.innerHTML = "";
 
         pipelineStages.forEach((stage, index) => {
-            // Connector before each stage except the first
+            // Connector line between boxes
             if (index > 0) {
                 const connector = document.createElement("div");
                 connector.className = "pipeline-connector" + (index <= current ? " done" : "");
@@ -4000,36 +4126,34 @@ document.head.appendChild(style);
 
             stepDiv.innerHTML = `
             <div class="pipeline-node">
-                <div class="pipeline-circle">${index < current ? "✓" : stage.icon}</div>
-                <div class="pipeline-label">${stage.label}</div>
+                <div class="pipeline-box">${index < current ? "✓ " : ""}${stage.label}</div>
             </div>
         `;
 
             container.appendChild(stepDiv);
         });
 
-        // Status text below pipeline
+        // Status badge below pipeline
         const existingBadge = container.parentElement.querySelector(".pipeline-status-badge");
         if (existingBadge) existingBadge.remove();
 
-        const batchId = sessionStorage.getItem("batchId");
+        const batchId    = sessionStorage.getItem("batchId");
+        const badge      = document.createElement("div");
+        badge.className  = "pipeline-status-badge";
+
         if (batchId && current >= 0) {
-            const badge = document.createElement("div");
-            badge.className = "pipeline-status-badge";
             const stageName = current < pipelineStages.length
                 ? pipelineStages[current].label
                 : "Complete";
-            badge.textContent = `Batch #${batchId} · Currently with: ${stageName}`;
-            container.parentElement.appendChild(badge);
+            badge.textContent = `Batch #${batchId}  ·  Currently with: ${stageName}`;
         } else {
-            const badge = document.createElement("div");
-            badge.className = "pipeline-status-badge";
-            badge.style.background = "#fef3c7";
-            badge.style.borderColor = "#fcd34d";
-            badge.style.color = "#92400e";
-            badge.textContent = "Panel not yet submitted for approval";
-            container.parentElement.appendChild(badge);
+            badge.style.background   = "#fef3c7";
+            badge.style.borderColor  = "#fcd34d";
+            badge.style.color        = "#92400e";
+            badge.textContent        = "Panel not yet submitted for approval";
         }
+
+        container.parentElement.appendChild(badge);
     }
 
     const _originalRenderStep = renderStep;
@@ -4138,7 +4262,7 @@ document.head.appendChild(style);
     }
 
     // Add selected course to panel
-    async function addSelectedCourse() {
+    function addSelectedCourse() {
         const select = document.getElementById('courseToAddSelect');
         const selectedOption = select.options[select.selectedIndex];
         const courseSrno = select.value;
@@ -4148,57 +4272,88 @@ document.head.appendChild(style);
             return;
         }
 
-        const courseName = selectedOption.dataset.courseName;
+        const courseName = selectedOption.dataset.courseName || selectedOption.textContent;
 
-        // Confirm with user
-        if (!confirm(`Are you sure you want to add "${courseName}" to the panel?`)) {
+        // Add Grade column to the officer table if not already added
+        addGradeColumnToTable(courseName);
+
+        closeCourseDropdown();
+        showToast(`Grade column added for "${courseName}"`, 'success');
+    }
+
+    // Track which courses have been added as grade columns
+    let addedGradeCourses = [];
+    const GRADES = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D'];
+
+    function getRandomGrade() {
+        return GRADES[Math.floor(Math.random() * GRADES.length)];
+    }
+
+    function getGradeColor(grade) {
+        const colors = {
+            'A+': { bg: '#d1fae5', color: '#065f46', border: '#10b981' },
+            'A':  { bg: '#dbeafe', color: '#1e40af', border: '#3b82f6' },
+            'B+': { bg: '#ede9fe', color: '#4c1d95', border: '#7c3aed' },
+            'B':  { bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+            'C+': { bg: '#ffedd5', color: '#9a3412', border: '#f97316' },
+            'C':  { bg: '#fee2e2', color: '#991b1b', border: '#ef4444' },
+            'D':  { bg: '#f3f4f6', color: '#374151', border: '#9ca3af' }
+        };
+        return colors[grade] || colors['D'];
+    }
+
+    function addGradeColumnToTable(courseName) {
+        // Avoid duplicate columns for same course
+        if (addedGradeCourses.includes(courseName)) {
+            showToast(`Grade column for "${courseName}" already exists`, 'info');
             return;
         }
+        addedGradeCourses.push(courseName);
 
-        try {
-            showLoading(true);
-
-            // Get current scheduleId
-            const scheduleId = sessionStorage.getItem('scheduleId');
-
-            if (!scheduleId) {
-                showToast('Please select a course schedule first', 'error');
-                return;
-            }
-
-            // Call API to add course to panel
-            const response = await fetch('http://localhost:6060/api/course-panel/add-course', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    scheduleId: parseInt(scheduleId),
-                    courseSrno: parseInt(courseSrno)
-                })
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                showToast(`Course "${courseName}" added successfully!`, 'success');
-
-                // Close dropdown
-                closeCourseDropdown();
-
-                // Refresh eligible officers if needed
-                refreshEligibleOfficers();
-
-            } else {
-                const errorText = await response.text();
-                showToast(`Failed to add course: ${errorText}`, 'error');
-            }
-
-        } catch (error) {
-            console.error('Error adding course:', error);
-            showToast('Error adding course to panel', 'error');
-        } finally {
-            showLoading(false);
+        // 1. Add header to Step 3 table
+        const step3Header = document.querySelector('#officerTableBody')
+            ?.closest('table')?.querySelector('thead tr');
+        if (step3Header) {
+            // Insert before the last two columns (Course Panel Status, Action)
+            const actionTh = step3Header.cells[step3Header.cells.length - 1];
+            const gradeTh = document.createElement('th');
+            gradeTh.textContent = `Grade (${courseName})`;
+            gradeTh.dataset.gradeFor = courseName;
+            step3Header.insertBefore(gradeTh, actionTh);
         }
+
+        // 2. Add grade cell to every existing row in Step 3
+        const tbody = document.getElementById('officerTableBody');
+        if (tbody) {
+            Array.from(tbody.rows).forEach(row => {
+                // Skip empty state row
+                if (row.cells.length <= 2) return;
+
+                const grade = getRandomGrade();
+                const colors = getGradeColor(grade);
+                const actionCell = row.cells[row.cells.length - 1];
+                const gradeTd = document.createElement('td');
+                gradeTd.dataset.gradeFor = courseName;
+                gradeTd.innerHTML = `
+                <span style="
+                    display: inline-block;
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    background: ${colors.bg};
+                    color: ${colors.color};
+                    border: 1px solid ${colors.border};
+                    min-width: 36px;
+                    text-align: center;
+                ">${grade}</span>
+            `;
+                row.insertBefore(gradeTd, actionCell);
+            });
+        }
+
+        // Re-render so future rows also get grade columns
+        renderOfficerTable();
     }
 
     // Refresh eligible officers after adding course
