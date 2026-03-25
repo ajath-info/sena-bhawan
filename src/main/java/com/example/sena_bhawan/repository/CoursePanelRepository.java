@@ -83,4 +83,11 @@ public interface CoursePanelRepository
 //            "WHERE n.personnelId = :personnelId " +
 //            "ORDER BY s.startDate DESC")
 //    List<CoursePanelNomination> findCompletedCoursesWithDetailsByPersonnelId(@Param("personnelId") Long personnelId);
+
+    List<CoursePanelNomination> findByBatchId(Long batchId);
+    int countByBatchId(Long batchId);
+
+    boolean existsByBatchIdAndPersonnelId(Long batchId, Long personnelId);
+
+    CoursePanelNomination findByBatchIdAndPersonnelId(Long batchId, Long personnelId);
 }

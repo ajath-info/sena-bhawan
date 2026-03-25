@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(
         name = "course_panel_nomination",
@@ -46,4 +48,32 @@ public class CoursePanelNomination {
 
     @Column(name = "grade_status", length = 20)
     private String gradeStatus; // Graded / Pending
+
+    @Column(name = "status", length = 20)
+    private String status; // Values: ACTIVE, REMOVED, REPLACED, CONFIRMED
+
+    // Audit columns
+    @Column(name = "created_at")
+    private LocalDateTime createdAt; // Timestamp when record was created
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt; // Timestamp when record was last updated
+
+    @Column(name = "created_by")
+    private Long createdBy; // User ID who created the record
+
+    @Column(name = "serial_number")
+    private Long serialNumber; // User ID who created the record
+
+    @Column(name = "updated_by")
+    private Long updatedBy; // User ID who last updated the record
+
+    @Column(name = "batch_id")
+    private Long batchId; // Foreign key reference to course_panel_batch table
+
+    // Relationships (optional - for JPA)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id", insertable = false, updatable = false)
+    private CoursePanelBatch batch; // Reference to parent batch
+
 }

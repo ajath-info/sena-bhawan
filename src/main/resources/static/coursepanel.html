@@ -44,6 +44,93 @@
             align-items: center;
             gap: 12px;
         }
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pipeline-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            cursor: default;
+        }
+
+        .pipeline-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            border: 3px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #6b7280;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pipeline-step.completed .pipeline-circle {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .pipeline-step.active .pipeline-circle {
+            background: #1b4332;
+            border-color: #1b4332;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(27,67,50,0.15);
+            animation: pulsePipeline 2s infinite;
+        }
+
+        @keyframes pulsePipeline {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(27,67,50,0.15); }
+            50%       { box-shadow: 0 0 0 8px rgba(27,67,50,0.08); }
+        }
+
+        .pipeline-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .pipeline-step.completed .pipeline-label { color: #10b981; }
+        .pipeline-step.active   .pipeline-label { color: #1b4332; }
+
+        .pipeline-connector {
+            flex: 1;
+            height: 3px;
+            background: #e5e7eb;
+            transition: background 0.3s;
+            margin-bottom: 20px; /* align with circle centers */
+            min-width: 20px;
+        }
+
+        .pipeline-connector.done { background: #10b981; }
+
+        .pipeline-status-badge {
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            display: inline-block;
+        }
+
         .logo-icon {
             width: 32px;
             height: 32px;
@@ -1178,13 +1265,6 @@
                             <button class="strength-btn" id="increasePanel">+</button>
                         </div>
                     </div>
-
-                    <div class="info-box">
-                        <strong>💡 Logic:</strong>
-                        <p id="logicText">
-                            Panel size = Course strength + Buffer (10)
-                        </p>
-                    </div>
                 </div>
 
                 <!-- Step 3: Apply Filters -->
@@ -1351,36 +1431,23 @@
 
                     <div style="margin-top: 25px">
                         <div class="section-title">
-                            <span>🔍 Send Panel</span>
+                            <span>📤 Send Panel for Approval</span>
                         </div>
-                        <div class="filter-grid">
-                            <div style="margin-top: 24px">
-                                <div class="form-group">
-                                    <label class="form-label">Send To</label>
-                                    <select class="form-select" id="sendToRole">
-                                        <option value="">-- Select Role --</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group"></div>
-                                <div class="form-group"></div>
-                                <div class="form-group"></div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Remarks</label>
-                                    <textarea
-                                            name="remarks"
-                                            rows="3"
-                                            class="form-textarea"
-                                            id="approvalRemark"
-                                            placeholder="Panel forwarded for approval"
-                                    ></textarea>
-                                </div>
-                                <div style="margin-top: 24px">
-                                    <button class="footer-btn success" id="sendToApproval">
-                                        Send for Approval
-                                    </button>
-                                </div>
+                        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 600px;">
+                            <div class="form-group">
+                                <label class="form-label">Remarks</label>
+                                <textarea
+                                        name="remarks"
+                                        rows="3"
+                                        class="form-textarea"
+                                        id="approvalRemark"
+                                        placeholder="Panel forwarded for approval"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <button class="footer-btn success" id="sendToApproval">
+                                    ✅ Send for Approval
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1391,6 +1458,15 @@
                     <div class="section-title">
                         <span>🔍 Step 5: Generate Letter</span>
                         <span class="badge badge-info">Active</span>
+                    </div>
+
+                    <div class="section-card" style="margin-top: 24px;">
+                        <div class="section-title">
+                            <span>📊 Approval Pipeline</span>
+                        </div>
+                        <div id="pipelineFlow"
+                             style="display:flex; gap:0; flex-wrap:wrap; align-items:center; padding: 8px 0;">
+                        </div>
                     </div>
 
                     <!-- Add Download PDF Button -->
@@ -1886,9 +1962,9 @@ document.head.appendChild(style);
         }
 
         if (currentStep === 5) {
-            // Get same selected officers for step 5, preserving serial numbers
             step5Officers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
             loadStep5Panel(step5Officers);
+            setTimeout(renderPipeline, 50);
         }
 
         prevNav.classList.toggle('active', currentStep > 1);
@@ -3822,67 +3898,141 @@ document.head.appendChild(style);
     // ===============================
     // SEND FOR APPROVAL (UPDATED)
     // ===============================
-    document.getElementById("sendToApproval")?.addEventListener("click", () => {
+    document.getElementById("sendToApproval")?.addEventListener("click", async () => {
         const scheduleId = sessionStorage.getItem("scheduleId");
-        const roleId = document.getElementById("sendToRole")?.value;
-        const remark = document.getElementById("approvalRemark")?.value || "";
+        const remark    = document.getElementById("approvalRemark")?.value || "";
 
         if (!scheduleId) {
-            alert("Schedule ID missing. Please select course first.");
+            showToast("Schedule ID missing. Please select course first.", "error");
             return;
         }
 
-        if (!roleId) {
-            alert("Please select a role to send approval.");
+        // Build nominations list from selectedSet + serialNumberMap
+        const nominations = Array.from(selectedSet).map(personnelId => ({
+            personnelId: personnelId,
+            serialNumber: serialNumberMap.get(personnelId) || null
+        }));
+
+        if (nominations.length === 0) {
+            showToast("No officers selected. Please select officers in Step 3.", "error");
             return;
         }
 
         const payload = {
-            scheduleId: parseInt(scheduleId),
-            roleId: parseInt(roleId),
-            status: "pending",
-            remark: remark.trim()
+            scheduleId:  parseInt(scheduleId),
+            remarks:     remark.trim(),
+            nominations: nominations
         };
 
-        // Show loading state
-        const sendBtn = document.getElementById("sendToApproval");
-        const originalText = sendBtn.textContent;
+        const sendBtn    = document.getElementById("sendToApproval");
+        const origText   = sendBtn.textContent;
         sendBtn.textContent = "Sending...";
         sendBtn.disabled = true;
 
-        fetch("http://localhost:6060/api/course-schedule-role-status", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to send for approval");
-                return res.json();
-            })
-            .then(data => {
-                // Set flag that panel has been sent for approval
-                sessionStorage.setItem("panelSentForApproval", "true");
-
-                // Show success message with option to go to next step
-                if (confirm("Panel sent for approval successfully! Would you like to proceed to Step 5?")) {
-                    currentStep = 5;
-                    renderStep();
-                }
-
-                showToast("Panel sent for approval successfully", "success");
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Error while sending for approval.");
-            })
-            .finally(() => {
-                sendBtn.textContent = originalText;
-                sendBtn.disabled = false;
+        try {
+            const response = await fetch("http://localhost:6060/api/course-panel/send-for-approval", {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify(payload)
             });
+
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(err || "Failed to send for approval");
+            }
+
+            const data = await response.json();
+
+            // Store batch info in sessionStorage
+            sessionStorage.setItem("panelSentForApproval", "true");
+            sessionStorage.setItem("batchId", data.batchId);
+            sessionStorage.setItem("currentPipelineStep", "0"); // Clerk is step 0
+
+            showToast(data.message || "Panel sent for approval!", "success");
+
+            if (confirm("Panel sent for approval successfully! Proceed to Step 5?")) {
+                currentStep = 5;
+                renderStep();
+            }
+
+        } catch (error) {
+            console.error(error);
+            showToast("Error: " + error.message, "error");
+        } finally {
+            sendBtn.textContent = origText;
+            sendBtn.disabled    = false;
+        }
     });
 
+    // ===============================
+    // PIPELINE SYSTEM
+    // ===============================
+    const pipelineStages = [
+        { label: "Clerk",     icon: "📝" },
+        { label: "G1",        icon: "👤" },
+        { label: "Colonel",   icon: "⭐" },
+        { label: "Brigadier", icon: "🎖️" },
+        { label: "ADG",       icon: "🏅" },
+        { label: "DG",        icon: "🏆" }
+    ];
+
+    function renderPipeline() {
+        const container = document.getElementById("pipelineFlow");
+        if (!container) return;
+
+        // Read current step from sessionStorage (set when panel is sent)
+        const current = parseInt(sessionStorage.getItem("currentPipelineStep") ?? "-1");
+
+        container.innerHTML = "";
+
+        pipelineStages.forEach((stage, index) => {
+            // Connector before each stage except the first
+            if (index > 0) {
+                const connector = document.createElement("div");
+                connector.className = "pipeline-connector" + (index <= current ? " done" : "");
+                container.appendChild(connector);
+            }
+
+            const stepDiv = document.createElement("div");
+            stepDiv.className = "pipeline-step";
+            if (index < current)  stepDiv.classList.add("completed");
+            if (index === current) stepDiv.classList.add("active");
+
+            stepDiv.innerHTML = `
+            <div class="pipeline-node">
+                <div class="pipeline-circle">${index < current ? "✓" : stage.icon}</div>
+                <div class="pipeline-label">${stage.label}</div>
+            </div>
+        `;
+
+            container.appendChild(stepDiv);
+        });
+
+        // Status text below pipeline
+        const existingBadge = container.parentElement.querySelector(".pipeline-status-badge");
+        if (existingBadge) existingBadge.remove();
+
+        const batchId = sessionStorage.getItem("batchId");
+        if (batchId && current >= 0) {
+            const badge = document.createElement("div");
+            badge.className = "pipeline-status-badge";
+            const stageName = current < pipelineStages.length
+                ? pipelineStages[current].label
+                : "Complete";
+            badge.textContent = `Batch #${batchId} · Currently with: ${stageName}`;
+            container.parentElement.appendChild(badge);
+        } else {
+            const badge = document.createElement("div");
+            badge.className = "pipeline-status-badge";
+            badge.style.background = "#fef3c7";
+            badge.style.borderColor = "#fcd34d";
+            badge.style.color = "#92400e";
+            badge.textContent = "Panel not yet submitted for approval";
+            container.parentElement.appendChild(badge);
+        }
+    }
+
+    const _originalRenderStep = renderStep;
     // ===============================
     // LOAD SEND TO ROLES
     // ===============================
