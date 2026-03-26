@@ -25,6 +25,8 @@ public class PersonnelAdditionalQualifications {
     private String location;
     private String part2OrderNo;
     private LocalDate createdAt;
+    private Integer year;
+    private LocalDate validity;
 
     @ManyToOne
     @JoinColumn(name = "personnel_id")
