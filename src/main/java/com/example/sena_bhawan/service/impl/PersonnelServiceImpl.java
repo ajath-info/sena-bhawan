@@ -1501,7 +1501,22 @@ public class PersonnelServiceImpl implements PersonnelService {
         dto.setCivilQual(asString(row[idx++]));
         dto.setSports(asString(row[idx++]));
 
+        // NEW: Course statistics
+        dto.setTotalCoursesOverall(asInteger(row[idx++]));
+        dto.setTotalCoursesCurrentYear(asInteger(row[idx++]));
+        dto.setTotalCoursesCurrentUnit(asInteger(row[idx++]));
+
         return dto;
+    }
+
+    // Add this helper method for Integer conversion
+    private Integer asInteger(Object obj) {
+        if (obj == null) return 0;
+        try {
+            return Integer.parseInt(obj.toString());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private String asString(Object obj) {

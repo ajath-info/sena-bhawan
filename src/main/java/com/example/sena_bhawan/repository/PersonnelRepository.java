@@ -101,7 +101,7 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     boolean existsByArmyNo(String armyNo);
 
     @Query(value = """
-        SELECT 
+        SELECT
             p.id AS id,
             p.army_no AS armyNo,
             p.rank AS rank,
@@ -125,41 +125,41 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
                             ORDER BY pd.from_date DESC
                             LIMIT 1
                         ) AS tosDate,
-                    
+        
             -- Unit with area_type
             (
                 SELECT jsonb_build_object('unit_name', os.name, 'area_type', COALESCE(os.area_type, '-'))
                 FROM posting_details pd
                 INNER JOIN orbat_structure os ON pd.orbat_id = os.id
-                WHERE pd.personnel_id = p.id 
+                WHERE pd.personnel_id = p.id
                     AND LOWER(pd.formation_type) = 'unit'
                 ORDER BY pd.from_date DESC
                 LIMIT 1
             ) AS unit,
-            
+        
             -- Division
             (
                 SELECT td.division_name
                 FROM posting_details pd
                 INNER JOIN orbat_structure os ON pd.orbat_id = os.id
                 INNER JOIN tb_division td ON os.division_code = td.div_code
-                WHERE pd.personnel_id = p.id 
+                WHERE pd.personnel_id = p.id
                     AND LOWER(pd.formation_type) = 'unit'
                 ORDER BY pd.from_date DESC
                 LIMIT 1
             ) AS division,
-            
+        
             -- Establishment Type
             (
                 SELECT fe.establishment_type
                 FROM posting_details pd
                 INNER JOIN formation_establishment fe ON pd.orbat_id = fe.orbat_id
-                WHERE pd.personnel_id = p.id 
+                WHERE pd.personnel_id = p.id
                     AND LOWER(pd.formation_type) = 'unit'
                 ORDER BY pd.from_date DESC
                 LIMIT 1
             ) AS establishmentType,
-            
+        
             -- Command
             (
                 SELECT tc.command_name
@@ -167,45 +167,73 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
                 INNER JOIN orbat_structure os ON pd.orbat_id = os.id
                 INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
                 INNER JOIN tb_command tc ON tcor.command_id = tc.command_id
-                WHERE pd.personnel_id = p.id 
+                WHERE pd.personnel_id = p.id
                 ORDER BY pd.from_date DESC
                 LIMIT 1
             ) AS command,
-            
+        
             -- Corps
             (
                 SELECT tcor.corps_name
                 FROM posting_details pd
                 INNER JOIN orbat_structure os ON pd.orbat_id = os.id
                 INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
-                WHERE pd.personnel_id = p.id 
+                WHERE pd.personnel_id = p.id
                 ORDER BY pd.from_date DESC
                 LIMIT 1
             ) AS corps,
-            
+        
             -- Courses Completed
             (
                 SELECT STRING_AGG(DISTINCT cm.course_name, ', ')
                 FROM course_panel_nomination cpn
                 INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
                 INNER JOIN course_master cm ON cs.course_id = cm.srno
-                WHERE cpn.personnel_id = p.id 
+                WHERE cpn.personnel_id = p.id
             ) AS course,
-            
+        
             -- Civil Qualifications
             (
                 SELECT STRING_AGG(DISTINCT pq.qualification, ', ')
                 FROM personnel_qualifications pq
                 WHERE pq.personnel_id = p.id
             ) AS civilQual,
-            
+        
             -- Sports
             (
                 SELECT STRING_AGG(DISTINCT ps.sport_name || ' (' || ps.level || ')', ', ')
                 FROM personnel_sports ps
                 WHERE ps.personnel_id = p.id
-            ) AS sports
-            
+            ) AS sports,
+        
+            -- TOTAL COURSES DONE OVERALL
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                WHERE cpn.personnel_id = p.id
+            ) AS totalCoursesOverall,
+
+            -- TOTAL COURSES DONE IN CURRENT YEAR
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                WHERE cpn.personnel_id = p.id
+                    AND EXTRACT(YEAR FROM cs.start_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            ) AS totalCoursesCurrentYear,
+
+            -- TOTAL COURSES DONE IN CURRENT UNIT
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN posting_details pd ON cpn.personnel_id = pd.personnel_id
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE cpn.personnel_id = p.id
+                    AND LOWER(os.formation_type) = 'unit'
+                    AND pd.to_date IS NULL  -- Current posting
+            ) AS totalCoursesCurrentUnit
+        
         FROM personnel p
         WHERE p.id IN (:ids)
         ORDER BY p.id DESC

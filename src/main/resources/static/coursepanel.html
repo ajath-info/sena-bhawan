@@ -1447,6 +1447,9 @@
                                         <th>Email</th>
                                         <th>City</th>
                                         <th>State</th>
+                                        <th>Courses (Unit)</th>
+                                        <th>Courses (Year)</th>
+                                        <th>Courses (Overall)</th>
                                         <th>Course Panel Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -3358,6 +3361,24 @@ document.head.appendChild(style);
             const cellState = document.createElement("td");
             cellState.textContent = o.state || "-";
             row.appendChild(cellState);
+
+            // Courses in Current Unit
+            const cellCoursesUnit = document.createElement("td");
+            cellCoursesUnit.style.textAlign = "center";
+            cellCoursesUnit.innerHTML = `<span style="font-weight:600;color:#1b4332;">${o.totalCoursesCurrentUnit ?? 0}</span>`;
+            row.appendChild(cellCoursesUnit);
+
+            // Courses in Current Year
+            const cellCoursesYear = document.createElement("td");
+            cellCoursesYear.style.textAlign = "center";
+            cellCoursesYear.innerHTML = `<span style="font-weight:600;color:#1b4332;">${o.totalCoursesCurrentYear ?? 0}</span>`;
+            row.appendChild(cellCoursesYear);
+
+            // Courses Overall
+            const cellCoursesOverall = document.createElement("td");
+            cellCoursesOverall.style.textAlign = "center";
+            cellCoursesOverall.innerHTML = `<span style="font-weight:600;color:#1b4332;">${o.totalCoursesOverall ?? 0}</span>`;
+            row.appendChild(cellCoursesOverall);
 
             // Course Panel Status (with buttons)
             const cellStatus = document.createElement("td");
