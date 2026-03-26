@@ -16,5 +16,8 @@ public class RoleMaster {
 
     @Column(name = "name")
     private String roleName;
+
+    @Column(name = "hierarchy_order")
+    private Integer hierarchyOrder;
 }
 
