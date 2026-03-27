@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>G1 Dashboard - Approval</title>
+
+    <link rel="stylesheet" href="sidebar.css">
+    <script src="sidebar.js"></script>
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            margin:0;
+            background:#f1f3f5;
+        }
+
+        .container {
+            display:flex;
+            height:100vh;
+        }
+
+        .main-content {
+            flex:1;
+            padding:20px;
+            overflow-y: auto;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1b4332;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tabs */
+        .tabs {
+            display:flex;
+            gap:10px;
+            margin-bottom:20px;
+        }
+
+        .tab {
+            padding:10px 20px;
+            border-radius:8px;
+            background:#e5e7eb;
+            cursor:pointer;
+            font-weight:600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background:#d1d5db;
+        }
+
+        .tab.active {
+            background:#1b4332;
+            color:white;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Panel Cards */
+        .panel-card {
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:10px;
+            border-left:5px solid #1b4332;
+            cursor:pointer;
+            transition: all 0.2s;
+        }
+
+        .panel-card:hover {
+            background:#f9fafb;
+            transform: translateX(5px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .panel-id {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .panel-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Table */
+        .table-scroll {
+            max-height:500px;
+            overflow:auto;
+            border:1px solid #ddd;
+            border-radius:10px;
+            background:white;
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            min-width:1200px;
+        }
+
+        th {
+            background:#f9fafb;
+            position:sticky;
+            top:0;
+            z-index: 10;
+        }
+
+        th, td {
+            padding:10px;
+            border-bottom:1px solid #ddd;
+            text-align: left;
+        }
+
+        /* Buttons */
+        .btn {
+            padding:10px 20px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            margin-right:10px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-success {
+            background:#10b981;
+            color:white;
+        }
+
+        .btn-success:hover {
+            background:#059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background:#dc2626;
+            color:white;
+        }
+
+        .btn-danger:hover {
+            background:#b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background:#6b7280;
+            color:white;
+        }
+
+        .btn-secondary:hover {
+            background:#4b5563;
+            transform: translateY(-1px);
+        }
+
+        .remark-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .page-btn.active {
+            background: #1b4332;
+            color: white;
+            border-color: #1b4332;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .table-scroll {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <aside class="sidebar" id="sidebarContainer"></aside>
+
+    <div class="main-content">
+
+        <h2>📋 G1 Approval Dashboard</h2>
+
+        <!-- Movement and Role Info -->
+        <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Current Role:</strong> <span id="currentRole">G1</span>
+                    <span style="margin-left: 20px;"><strong>Movement ID:</strong> <span id="currentMovementId">1</span></span>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="changeMovement()">Change Movement</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="loadTab('pending', this)">Pending <span id="pendingCount" class="badge badge-pending">0</span></div>
+            <div class="tab" onclick="loadTab('approved', this)">Approved <span id="approvedCount" class="badge badge-approved">0</span></div>
+            <div class="tab" onclick="loadTab('rejected', this)">Rejected <span id="rejectedCount" class="badge badge-rejected">0</span></div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none;">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Panel List -->
+        <div id="panelList"></div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="pagination"></div>
+
+        <!-- Panel Details Modal -->
+        <div id="panelDetails" style="display:none; background: white; border-radius: 10px; margin-top: 20px; padding: 20px;">
+
+            <h3>Panel Details (Full Data)</h3>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Ser</th>
+                        <th>Officer</th>
+                        <th>Rank</th>
+                        <th>Unit</th>
+                        <th>Command</th>
+                        <th>Date of Commission</th>
+                        <th>Date of Seniority</th>
+                        <th>Date of Birth</th>
+                        <th>Religion</th>
+                        <th>Marital Status</th>
+                        <th>Medical</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>City</th>
+                        <th>State</th>
+                    </tr>
+                    </thead>
+                    <tbody id="panelTableBody"></tbody>
+                </table>
+            </div>
+
+            <br>
+
+            <textarea id="remark" class="remark-input" placeholder="Enter remark..." rows="3"></textarea>
+
+            <br><br>
+
+            <div id="actionButtons">
+                <button class="btn btn-success" onclick="forwardPanel()">Forward to Colonel</button>
+                <button class="btn btn-danger" onclick="rejectPanel()">Send Back</button>
+            </div>
+            <button class="btn btn-secondary" onclick="closePanel()">Close</button>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    // API Configuration
+    const API_BASE_URL = 'http://localhost:8080/api'; // Update with your actual API URL
+    let currentMovementId = 1;
+    let currentRole = 'G1';
+    let currentTab = 'pending';
+    let currentPage = 0;
+    let pageSize = 10;
+    let totalPages = 0;
+    let currentPanel = null;
+    let panelsData = null;
+
+    // ===============================
+    // LOAD PANELS FROM API
+    // ===============================
+    async function loadPanels() {
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/panel-approval/role-wise?movementId=${currentMovementId}&role=${currentRole}&page=${currentPage}&size=${pageSize}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            panelsData = data;
+
+            // Update counts
+            document.getElementById('pendingCount').textContent = data.pendingPanels?.length || 0;
+            document.getElementById('approvedCount').textContent = data.approvedPanels?.length || 0;
+            document.getElementById('rejectedCount').textContent = data.rejectedPanels?.length || 0;
+
+            // Render current tab
+            renderPanelList(currentTab, data);
+
+            // Render pagination
+            if (data.pagination) {
+                renderPagination(data.pagination);
+                totalPages = data.pagination.totalPages;
+            }
+
+        } catch (error) {
+            console.error('Error loading panels:', error);
+            document.getElementById('panelList').innerHTML =
+                '<p style="color: red;">Error loading panels. Please check your connection and API endpoint.</p>';
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===============================
+    // RENDER PANEL LIST
+    // ===============================
+    function renderPanelList(tab, data) {
+        const list = document.getElementById("panelList");
+        list.innerHTML = "";
+
+        let panels = [];
+        if (tab === 'pending') panels = data.pendingPanels || [];
+        else if (tab === 'approved') panels = data.approvedPanels || [];
+        else panels = data.rejectedPanels || [];
+
+        if(panels.length === 0){
+            list.innerHTML = "<p>No records found</p>";
+            return;
+        }
+
+        panels.forEach(panel => {
+            const div = document.createElement("div");
+            div.className = "panel-card";
+            div.innerHTML = `
+            <div class="panel-header">
+                <span class="panel-id">Panel ID: ${panel.batchId}</span>
+                <span class="panel-meta">Schedule ID: ${panel.scheduleId} | Movement: ${panel.movementId}</span>
+            </div>
+            <div style="font-size: 14px; color: #6b7280;">
+                Total Nominations: ${panel.totalNominations} |
+                Created: ${new Date(panel.createdAt).toLocaleDateString()}
+                ${panel.remarks ? `<br>Remarks: ${panel.remarks}` : ''}
+            </div>
+        `;
+            div.onclick = () => openPanel(panel);
+            list.appendChild(div);
+        });
+    }
+
+    // ===============================
+    // OPEN PANEL DETAILS
+    // ===============================
+    async function openPanel(panel) {
+        currentPanel = panel;
+
+        showLoading(true);
+
+        try {
+            // Fetch complete panel details including officers
+            const url = `${API_BASE_URL}/panel-approval/${panel.batchId}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const panelDetails = await response.json();
+            renderPanelDetails(panelDetails);
+
+            // Show/hide action buttons based on status
+            const actionButtons = document.getElementById('actionButtons');
+            if (panel.status === 'PENDING_APPROVAL') {
+                actionButtons.style.display = 'block';
+            } else {
+                actionButtons.style.display = 'none';
+            }
+
+            document.getElementById("panelDetails").style.display = "block";
+
+        } catch (error) {
+            console.error('Error loading panel details:', error);
+            alert('Error loading panel details');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===============================
+    // RENDER PANEL DETAILS
+    // ===============================
+    function renderPanelDetails(panel) {
+        const tbody = document.getElementById("panelTableBody");
+        tbody.innerHTML = "";
+
+        if (!panel.officers || panel.officers.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='15'>No officers found</td></tr>";
+            return;
+        }
+
+        panel.officers.forEach((o, i) => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>
+                ${o.name}<br>
+                <small style="color: #6b7280;">${o.armyNo || 'N/A'}</small>
+                ${o.serialNumber ? `<br><small style="color: #059669;">Serial: ${o.serialNumber}</small>` : ''}
+            </td>
+            <td>${o.rank || 'N/A'}</td>
+            <td>${o.unit || 'N/A'}</td>
+            <td>${o.command || 'N/A'}</td>
+            <td>${o.dateOfCommission || 'N/A'}</td>
+            <td>${o.dateOfSeniority || 'N/A'}</td>
+            <td>${o.dateOfBirth || 'N/A'}</td>
+            <td>${o.religion || 'N/A'}</td>
+            <td>${o.maritalStatus || 'N/A'}</td>
+            <td>${o.medicalCategory || 'N/A'}</td>
+            <td>${o.mobile || 'N/A'}</td>
+            <td>${o.email || 'N/A'}</td>
+            <td>${o.city || 'N/A'}</td>
+            <td>${o.state || 'N/A'}</td>
+        `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ===============================
+    // APPROVAL ACTIONS
+    // ===============================
+    async function forwardPanel() {
+        const remark = document.getElementById("remark").value;
+
+        if (!confirm('Are you sure you want to forward this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/approve`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    approverId: 1, // TODO: Get from session
+                    remarks: remark
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel forwarded successfully');
+
+            // Reload panels
+            await loadPanels();
+            closePanel();
+
+        } catch (error) {
+            console.error('Error forwarding panel:', error);
+            alert('Error forwarding panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function rejectPanel() {
+        const remark = document.getElementById("remark").value;
+
+        if (!confirm('Are you sure you want to send back this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/reject`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rejecterId: 1, // TODO: Get from session
+                    rejectMovementId: currentMovementId + 1,
+                    remarks: remark
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel sent back successfully');
+
+            // Reload panels
+            await loadPanels();
+            closePanel();
+
+        } catch (error) {
+            console.error('Error rejecting panel:', error);
+            alert('Error rejecting panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===============================
+    // UTILITY FUNCTIONS
+    // ===============================
+    function showLoading(show) {
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    function renderPagination(pagination) {
+        const container = document.getElementById('paginationContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (pagination.totalPages <= 1) return;
+
+        // Previous button
+        if (pagination.currentPage > 0) {
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Previous';
+            prevBtn.className = 'page-btn';
+            prevBtn.onclick = () => goToPage(pagination.currentPage - 1);
+            container.appendChild(prevBtn);
+        }
+
+        // Page numbers
+        for (let i = 0; i < pagination.totalPages; i++) {
+            if (i === pagination.currentPage) {
+                const activeBtn = document.createElement('button');
+                activeBtn.textContent = i + 1;
+                activeBtn.className = 'page-btn active';
+                activeBtn.disabled = true;
+                container.appendChild(activeBtn);
+            } else if (Math.abs(i - pagination.currentPage) <= 2) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i + 1;
+                pageBtn.className = 'page-btn';
+                pageBtn.onclick = () => goToPage(i);
+                container.appendChild(pageBtn);
+            } else if (i === 0 || i === pagination.totalPages - 1) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i + 1;
+                pageBtn.className = 'page-btn';
+                pageBtn.onclick = () => goToPage(i);
+                container.appendChild(pageBtn);
+            } else if (i === pagination.currentPage - 3 || i === pagination.currentPage + 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.padding = '8px';
+                container.appendChild(ellipsis);
+            }
+        }
+
+        // Next button
+        if (pagination.currentPage < pagination.totalPages - 1) {
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next';
+            nextBtn.className = 'page-btn';
+            nextBtn.onclick = () => goToPage(pagination.currentPage + 1);
+            container.appendChild(nextBtn);
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        loadPanels();
+    }
+
+    function loadTab(type, el) {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        el.classList.add("active");
+
+        currentTab = type;
+        currentPage = 0;
+        loadPanels();
+    }
+
+    function closePanel() {
+        document.getElementById("panelDetails").style.display = "none";
+        document.getElementById("remark").value = "";
+    }
+
+    function changeMovement() {
+        const newMovement = prompt('Enter Movement ID (1 for G1, 2 for Colonel, 3+ for others):', currentMovementId);
+        if (newMovement && !isNaN(newMovement)) {
+            currentMovementId = parseInt(newMovement);
+
+            // Update role based on movement
+            if (currentMovementId === 1) currentRole = 'G1';
+            else if (currentMovementId === 2) currentRole = 'COLONEL';
+            else currentRole = 'GENERAL';
+
+            document.getElementById('currentMovementId').textContent = currentMovementId;
+            document.getElementById('currentRole').textContent = currentRole;
+
+            // Reset to first page and reload
+            currentPage = 0;
+            loadPanels();
+        }
+    }
+
+    // ===============================
+    // INITIALIZATION
+    // ===============================
+    // Set movement and role based on actual user session (you can fetch from backend)
+    document.getElementById('currentMovementId').textContent = currentMovementId;
+    document.getElementById('currentRole').textContent = currentRole;
+
+    // Load initial panels
+    loadPanels();
+
+</script>
+
+</body>
+</html>
