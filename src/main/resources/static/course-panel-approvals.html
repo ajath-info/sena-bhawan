@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>G1 Dashboard - Approval</title>
+    <title>Course Approval Dashboard</title>
 
     <link rel="stylesheet" href="sidebar.css">
     <script src="sidebar.js"></script>
@@ -64,6 +64,16 @@
         .tab.active {
             background:#1b4332;
             color:white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
         }
 
         /* Badge */
@@ -292,7 +302,7 @@
 
     <div class="main-content">
 
-        <h2>📋 G1 Approval Dashboard</h2>
+        <h2>📋 <span id="dashboardUsername">Loading...</span> Approval Dashboard</h2>
 
         <div class="tabs">
             <div class="tab" data-status="PENDING_APPROVAL" onclick="loadTab('PENDING_APPROVAL', this)">
@@ -304,6 +314,17 @@
             <div class="tab" data-status="REJECTED" onclick="loadTab('REJECTED', this)">
                 Rejected
             </div>
+        </div>
+
+        <!-- Page Size Selector -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <label for="pageSizeSelect" style="font-size: 14px; color: #6b7280;">Show:</label>
+            <select id="pageSizeSelect" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer;" onchange="changePageSize()">
+                <option value="5">5 per page</option>
+                <option value="10" selected>10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+            </select>
         </div>
 
         <!-- Loading Indicator -->
@@ -318,45 +339,6 @@
 
         <!-- Pagination -->
         <div id="paginationContainer" class="pagination"></div>
-
-        <!-- Panel Details Modal -->
-        <div id="panelDetails" style="display:none; background: white; border-radius: 10px; margin-top: 20px; padding: 20px;">
-
-            <h3>Panel Details - Personnel List</h3>
-
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Ser</th>
-                        <th>Army No</th>
-                        <th>Rank</th>
-                        <th>Full Name</th>
-                        <th>City</th>
-                        <th>District</th>
-                        <th>Mobile</th>
-                        <th>Email</th>
-                    </tr>
-                    </thead>
-                    <tbody id="panelTableBody">
-                    <tr><td colspan="8">Select a panel to view personnel</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <br>
-
-            <textarea id="remark" class="remark-input" placeholder="Enter remark..." rows="3"></textarea>
-
-            <br><br>
-
-            <div id="actionButtons">
-                <button class="btn btn-success" onclick="forwardPanel()">Forward</button>
-                <button class="btn btn-danger" onclick="rejectPanel()">Send Back</button>
-            </div>
-            <button class="btn btn-secondary" onclick="closePanel()">Close</button>
-
-        </div>
 
         <!-- Modal Overlay -->
         <div id="modalOverlay" style="display:none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
@@ -451,7 +433,7 @@
         // Generate table rows
         let tableRows = '';
         if (!personnelList || personnelList.length === 0) {
-            tableRows = '做什么<td colspan="8" style="text-align: center;">No personnel found</td></tr>';
+            tableRows = '<td colspan="8" style="text-align: center;">No personnel found</td>';
         } else {
             personnelList.forEach((person, index) => {
                 tableRows += `
@@ -470,6 +452,9 @@
         }
 
         const courseTitle = `${panel.courseName || 'N/A'} - Batch: ${panel.batchNumber || 'N/A'} (${panel.year || 'N/A'})`;
+
+        // Only show action buttons if we're in PENDING_APPROVAL tab
+        const showActionButtons = (currentStatus === 'PENDING_APPROVAL');
 
         modalContent.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -521,19 +506,23 @@
             </table>
         </div>
 
-        ${panel.status === 'PENDING_APPROVAL' ? `
+        ${showActionButtons ? `
             <div style="margin-top: 20px;">
-                <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Send Back, Optional for Forward):</label>
+                <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back, Optional for Forward):</label>
                 <textarea id="modalRemark" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
             </div>
 
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
                 <button class="btn btn-success" onclick="forwardPanelModal()">Forward</button>
-                <button class="btn btn-danger" onclick="rejectPanelModal()">Send Back</button>
+                <button class="btn btn-danger" onclick="rejectPanelModal()">Reject</button>
+                <button class="btn btn-warning" onclick="sendBackPanelModal()" style="background: #f59e0b; color: white;">Send Back</button>
                 <button class="btn btn-secondary" onclick="closeModal()">Close</button>
             </div>
         ` : `
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
+                <div style="padding: 10px; background: #f3f4f6; border-radius: 6px; color: #6b7280; text-align: center; width: 100%;">
+                    ${panel.status === 'APPROVED' ? '✓ Approved' : panel.status === 'REJECTED' ? '✗ Rejected' : 'Pending'}
+                </div>
                 <button class="btn btn-secondary" onclick="closeModal()">Close</button>
             </div>
         `}
@@ -561,13 +550,14 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    approverId: user?.userId || 1,
+                    userId: user?.userId || 1,
                     remarks: remark
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to forward');
             }
 
             const result = await response.json();
@@ -578,13 +568,69 @@
 
         } catch (error) {
             console.error('Error forwarding panel:', error);
-            alert('Error forwarding panel. Please try again.');
+            alert(error.message || 'Error forwarding panel. Please try again.');
         } finally {
             showLoading(false);
         }
     }
 
+    function updateDashboardTitle() {
+        const user = getCurrentUser();
+        const usernameSpan = document.getElementById('dashboardUsername');
+        if (user && user.username) {
+            usernameSpan.textContent = user.username;
+        } else {
+            usernameSpan.textContent = 'User';
+        }
+    }
+
     async function rejectPanelModal() {
+        const remark = document.getElementById('modalRemark').value;
+        const user = getCurrentUser();
+
+        if (!remark.trim()) {
+            alert('Please enter remarks before rejecting');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to reject this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/reject`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user?.userId || 1,
+                    remarks: remark,
+                    rejectMovementId: currentPanel.movementId
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to reject');
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel rejected successfully');
+
+            closeModal();
+            await loadPanels();
+
+        } catch (error) {
+            console.error('Error rejecting panel:', error);
+            alert(error.message || 'Error rejecting panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function sendBackPanelModal() {
         const remark = document.getElementById('modalRemark').value;
         const user = getCurrentUser();
 
@@ -598,21 +644,21 @@
         showLoading(true);
 
         try {
-            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/reject`;
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/send-back`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    rejecterId: user?.userId || 1,
-                    rejectMovementId: currentMovementId + 1,
+                    userId: user?.userId || 1,
                     remarks: remark
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to send back');
             }
 
             const result = await response.json();
@@ -622,8 +668,8 @@
             await loadPanels();
 
         } catch (error) {
-            console.error('Error rejecting panel:', error);
-            alert('Error rejecting panel. Please try again.');
+            console.error('Error sending back panel:', error);
+            alert(error.message || 'Error sending back panel. Please try again.');
         } finally {
             showLoading(false);
         }
@@ -691,6 +737,27 @@
 
             const data = await response.json();
 
+            // After getting data, update page size selector to match current pageSize
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            if (pageSizeSelect && pageSizeSelect.value != pageSize) {
+                pageSizeSelect.value = pageSize;
+            }
+
+            // Remove existing showing info if any
+            const existingInfo = document.querySelector('.showing-info');
+            if (existingInfo) existingInfo.remove();
+
+            // Show total count info
+            const totalCount = data.totalCount || 0;
+            const showingText = document.createElement('div');
+            showingText.style.cssText = 'font-size: 14px; color: #6b7280; margin-bottom: 10px;';
+            showingText.textContent = `Showing ${data.data?.length || 0} of ${totalCount} records`;
+            showingText.className = 'showing-info';
+
+            // Insert before panelList
+            const panelListDiv = document.getElementById('panelList');
+            panelListDiv.parentNode.insertBefore(showingText, panelListDiv);
+
             // The data structure is { data: [...], totalCount, currentPage, pageSize, totalPages }
             renderPanelList(data.data || []);
 
@@ -739,443 +806,6 @@
         }
     }
 
-
-    // ===============================
-    // OPEN PERSONNEL POPUP WINDOW
-    // ===============================
-    function openPersonnelPopup(panel, personnelList) {
-        // Create popup window
-        const popup = window.open('', '_blank', 'width=1200,height=600,scrollbars=yes,resizable=yes');
-
-        if (!popup) {
-            alert('Please allow popups for this website');
-            return;
-        }
-
-        const user = getCurrentUser();
-        const userId = user?.userId || 1;
-
-        // Generate table rows
-        let tableRows = '';
-        if (!personnelList || personnelList.length === 0) {
-            tableRows = '<tr><td colspan="8" style="text-align: center;">No personnel found</td></tr>';
-        } else {
-            personnelList.forEach((person, index) => {
-                tableRows += `
-                <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${index + 1}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.armyNo || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.rank || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.fullName || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.city || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.district || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.mobileNumber || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.emailAddress || 'N/A'}</td>
-                </tr>
-            `;
-            });
-        }
-
-        // Create popup content - Fix the template literal issues
-        popup.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Panel Details - Batch #${panel.batchId}</title>
-            <style>
-                body {
-                    font-family: 'Inter', sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    background: #f1f3f5;
-                }
-                .container {
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    background: white;
-                    border-radius: 10px;
-                    padding: 20px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-                h2 {
-                    color: #1b4332;
-                    margin-top: 0;
-                }
-                .batch-info {
-                    background: #f9fafb;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                    gap: 10px;
-                }
-                .info-item {
-                    display: flex;
-                    align-items: baseline;
-                    gap: 10px;
-                }
-                .info-label {
-                    font-weight: 600;
-                    color: #4b5563;
-                    min-width: 120px;
-                }
-                .info-value {
-                    color: #1f2937;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                }
-                th {
-                    background: #f3f4f6;
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #374151;
-                    border-bottom: 2px solid #e5e7eb;
-                    position: sticky;
-                    top: 0;
-                }
-                td {
-                    padding: 10px;
-                    border-bottom: 1px solid #e5e7eb;
-                }
-                .action-buttons {
-                    margin-top: 20px;
-                    padding-top: 20px;
-                    border-top: 1px solid #e5e7eb;
-                    display: flex;
-                    gap: 10px;
-                }
-                .btn {
-                    padding: 10px 20px;
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    font-size: 14px;
-                    transition: all 0.2s;
-                }
-                .btn-success {
-                    background: #10b981;
-                    color: white;
-                }
-                .btn-success:hover {
-                    background: #059669;
-                }
-                .btn-danger {
-                    background: #dc2626;
-                    color: white;
-                }
-                .btn-danger:hover {
-                    background: #b91c1c;
-                }
-                .btn-secondary {
-                    background: #6b7280;
-                    color: white;
-                }
-                .btn-secondary:hover {
-                    background: #4b5563;
-                }
-                .remark-section {
-                    margin-top: 20px;
-                }
-                textarea {
-                    width: 100%;
-                    padding: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    font-family: inherit;
-                    resize: vertical;
-                }
-                .status-badge {
-                    display: inline-block;
-                    padding: 4px 12px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    font-weight: 600;
-                }
-                .status-pending {
-                    background: #fef3c7;
-                    color: #d97706;
-                }
-                .status-approved {
-                    background: #d1fae5;
-                    color: #059669;
-                }
-                .status-rejected {
-                    background: #fee2e2;
-                    color: #dc2626;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h2>Panel Details - Batch #${panel.batchId}</h2>
-
-                <div class="batch-info">
-                    <div class="info-item">
-                        <span class="info-label">Schedule ID:</span>
-                        <span class="info-value">${panel.scheduleId}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Movement ID:</span>
-                        <span class="info-value">${panel.movementId}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status:</span>
-                        <span class="info-value"><span class="status-badge status-${panel.status.toLowerCase().replace('_', '-')}">${panel.status}</span></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Course Name:</span>
-                        <span class="info-value">${panel.courseName || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Batch Number:</span>
-                        <span class="info-value">${panel.batchNumber || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Year:</span>
-                        <span class="info-value">${panel.year || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Duration:</span>
-                        <span class="info-value">${panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A'} to ${panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Venue:</span>
-                        <span class="info-value">${panel.venue || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Total Nominations:</span>
-                        <span class="info-value">${panel.totalNominations || 0}</span>
-                    </div>
-                </div>
-
-                <h3>Personnel List</h3>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ser</th>
-                                <th>Army No</th>
-                                <th>Rank</th>
-                                <th>Full Name</th>
-                                <th>City</th>
-                                <th>District</th>
-                                <th>Mobile</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
-
-                ${panel.status === 'PENDING_APPROVAL' ? `
-                    <div class="remark-section">
-                        <label for="remark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Optional for Forward, Required for Send Back):</label>
-                        <textarea id="remark" rows="3" placeholder="Enter remarks..."></textarea>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-success" onclick="forwardPanel()">Forward</button>
-                        <button class="btn btn-danger" onclick="rejectPanel()">Send Back</button>
-                        <button class="btn btn-secondary" onclick="window.close()">Close</button>
-                    </div>
-                ` : `
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" onclick="window.close()">Close</button>
-                    </div>
-                `}
-            </div>
-
-            <script>
-                const API_BASE_URL = '${API_BASE_URL}';
-                const batchId = ${panel.batchId};
-                const movementId = ${currentMovementId};
-                const userId = ${userId};
-
-                async function forwardPanel() {
-                    const remark = document.getElementById('remark').value;
-
-                    if (!confirm('Are you sure you want to forward this panel?')) return;
-
-                    try {
-                        const response = await fetch(API_BASE_URL + '/batches/' + batchId + '/approve', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                approverId: userId,
-                                remarks: remark
-                            })
-                        });
-
-                        if (!response.ok) throw new Error('Failed to forward');
-
-                        alert('Panel forwarded successfully');
-                        if (window.opener) window.opener.location.reload();
-                        window.close();
-                    } catch (error) {
-                        console.error('Error forwarding panel:', error);
-                        alert('Error forwarding panel');
-                    }
-                }
-
-                async function rejectPanel() {
-                    const remark = document.getElementById('remark').value;
-
-                    if (!remark.trim()) {
-                        alert('Please enter remarks before sending back');
-                        return;
-                    }
-
-                    if (!confirm('Are you sure you want to send back this panel?')) return;
-
-                    try {
-                        const response = await fetch(API_BASE_URL + '/batches/' + batchId + '/reject', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                rejecterId: userId,
-                                rejectMovementId: movementId + 1,
-                                remarks: remark
-                            })
-                        });
-
-                        if (!response.ok) throw new Error('Failed to reject');
-
-                        alert('Panel sent back successfully');
-                        if (window.opener) window.opener.location.reload();
-                        window.close();
-                    } catch (error) {
-                        console.error('Error rejecting panel:', error);
-                        alert('Error rejecting panel');
-                    }
-                }
-            <\/script>
-        </body>
-        </html>
-    `);
-
-        popup.document.close();
-    }
-
-    // ===============================
-    // RENDER PERSONNEL TABLE
-    // ===============================
-    function renderPersonnelTable(personnelList) {
-        const tbody = document.getElementById("panelTableBody");
-        tbody.innerHTML = "";
-
-        if (!personnelList || personnelList.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='6'>No personnel found</td></tr>";
-            return;
-        }
-
-        personnelList.forEach((person, index) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${person.armyNo || 'N/A'}</td>
-            <td>${person.rank || 'N/A'}</td>
-            <td>${person.fullName || 'N/A'}</td>
-            <td>${person.city || 'N/A'}</td>
-            <td>${person.district || 'N/A'}</td>
-            <td>${person.mobileNumber || 'N/A'}</td>
-            <td>${person.emailAddress || 'N/A'}</td>
-        `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // ===============================
-    // APPROVAL ACTIONS
-    // ===============================
-    async function forwardPanel() {
-        const remark = document.getElementById("remark").value;
-        const user = getCurrentUser();
-
-        if (!confirm('Are you sure you want to forward this panel?')) return;
-
-        showLoading(true);
-
-        try {
-            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/approve`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    approverId: user?.userId || 1,
-                    remarks: remark
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            alert(result.message || 'Panel forwarded successfully');
-
-            // Reload panels
-            await loadPanels();
-            closePanel();
-
-        } catch (error) {
-            console.error('Error forwarding panel:', error);
-            alert('Error forwarding panel. Please try again.');
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    async function rejectPanel() {
-        const remark = document.getElementById("remark").value;
-        const user = getCurrentUser();
-
-        if (!confirm('Are you sure you want to send back this panel?')) return;
-
-        showLoading(true);
-
-        try {
-            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/reject`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    rejecterId: user?.userId || 1,
-                    rejectMovementId: currentMovementId + 1,
-                    remarks: remark
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            alert(result.message || 'Panel sent back successfully');
-
-            // Reload panels
-            await loadPanels();
-            closePanel();
-
-        } catch (error) {
-            console.error('Error rejecting panel:', error);
-            alert('Error rejecting panel. Please try again.');
-        } finally {
-            showLoading(false);
-        }
-    }
-
     // ===============================
     // UTILITY FUNCTIONS
     // ===============================
@@ -1196,37 +826,29 @@
 
         // Previous button
         const prevBtn = document.createElement('button');
-        prevBtn.textContent = 'Previous';
+        prevBtn.textContent = '← Previous';
         prevBtn.className = 'page-btn';
         prevBtn.disabled = currentPageNum === 0;
         prevBtn.onclick = () => goToPage(currentPageNum - 1);
         container.appendChild(prevBtn);
 
-        // Page numbers
+        // Page numbers (show all pages)
         for (let i = 0; i < totalPagesNum; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i + 1;
+            pageBtn.className = 'page-btn';
             if (i === currentPageNum) {
-                const activeBtn = document.createElement('button');
-                activeBtn.textContent = i + 1;
-                activeBtn.className = 'page-btn active';
-                activeBtn.disabled = true;
-                container.appendChild(activeBtn);
-            } else if (Math.abs(i - currentPageNum) <= 2 || i === 0 || i === totalPagesNum - 1) {
-                const pageBtn = document.createElement('button');
-                pageBtn.textContent = i + 1;
-                pageBtn.className = 'page-btn';
+                pageBtn.classList.add('active');
+                pageBtn.disabled = true;
+            } else {
                 pageBtn.onclick = () => goToPage(i);
-                container.appendChild(pageBtn);
-            } else if (i === currentPageNum - 3 || i === currentPageNum + 3) {
-                const ellipsis = document.createElement('span');
-                ellipsis.textContent = '...';
-                ellipsis.style.padding = '8px';
-                container.appendChild(ellipsis);
             }
+            container.appendChild(pageBtn);
         }
 
         // Next button
         const nextBtn = document.createElement('button');
-        nextBtn.textContent = 'Next';
+        nextBtn.textContent = 'Next →';
         nextBtn.className = 'page-btn';
         nextBtn.disabled = currentPageNum === totalPagesNum - 1;
         nextBtn.onclick = () => goToPage(currentPageNum + 1);
@@ -1247,11 +869,6 @@
         loadPanels();
     }
 
-    function closePanel() {
-        document.getElementById("panelDetails").style.display = "none";
-        document.getElementById("remark").value = "";
-    }
-
     // ===============================
     // INITIALIZATION
     // ===============================
@@ -1263,6 +880,9 @@
     } else {
         // Display user info for debugging
         displayUserInfo();
+
+        // Update dashboard title with username
+        updateDashboardTitle();
 
         // Set movement ID from user data
         if (initializeMovementId()) {
@@ -1293,6 +913,13 @@
         return false;
     }
 
+    function changePageSize() {
+        const select = document.getElementById('pageSizeSelect');
+        pageSize = parseInt(select.value);
+        currentPage = 0;
+        loadPanels();
+    }
+
     // Add this function to debug user data
     function displayUserInfo() {
         const user = getCurrentUser();
@@ -1319,6 +946,16 @@
                 mainContent.insertBefore(userInfoDiv, firstChild.nextSibling);
             }
         }
+    }
+
+    // Add click outside modal to close
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) {
+        modalOverlay.onclick = function(event) {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        };
     }
 
 </script>

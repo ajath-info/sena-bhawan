@@ -25,7 +25,7 @@ public class SendForApprovalService {
     private final CoursePanelBatchRepository batchRepository;
     private final CoursePanelRepository nominationRepository;
 
-    private static final Long FIXED_MOVEMENT_ID = 2L;
+    private static final Long FIXED_MOVEMENT_ID = 1L;
 
     public SendForApprovalResponse sendForApproval(SendForApprovalRequest request) {
 

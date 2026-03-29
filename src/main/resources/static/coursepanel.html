@@ -1532,15 +1532,6 @@
                         <span class="badge badge-info">Active</span>
                     </div>
 
-                    <div class="section-card" style="margin-top: 24px;">
-                        <div class="section-title">
-                            <span>📊 Approval Pipeline</span>
-                        </div>
-                        <div id="pipelineFlow"
-                             style="display:flex; gap:0; flex-wrap:wrap; align-items:center; padding: 8px 0;">
-                        </div>
-                    </div>
-
                     <!-- Add Download PDF Button -->
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
                         <button class="btn btn-success" onclick="generatePanelPDF()" style="display: flex; align-items: center; gap: 8px; padding: 12px 24px;">
@@ -2036,7 +2027,6 @@ document.head.appendChild(style);
         if (currentStep === 5) {
             step5Officers = officers.filter(o => selectedSet.has(o.id || o.personnelId));
             loadStep5Panel(step5Officers);
-            setTimeout(renderPipeline, 50);
         }
 
         prevNav.classList.toggle('active', currentStep > 1);
@@ -2971,9 +2961,9 @@ document.head.appendChild(style);
             return;
         }
 
-        // Create a Set of army numbers from the main table for quick lookup
-        const mainTableArmyNos = new Set(
-            officers.map(o => o.armyNo).filter(Boolean)
+        // Create a Set of personnel IDs from the main table for quick lookup
+        const mainTablePersonnelIds = new Set(
+            officers.map(o => o.personnelId || o.id).filter(Boolean)
         );
 
         let html = '';
@@ -2981,31 +2971,29 @@ document.head.appendChild(style);
             const personnelId = o.personnelId || o.id;
             const armyNo = o.armyNo;
 
-            // Check if this officer is already in the main table (based on armyNo)
-            const isInMainTable = mainTableArmyNos.has(armyNo);
+            // Check if this officer is already in the main table
+            const isInMainTable = mainTablePersonnelIds.has(personnelId);
 
             // Check if this officer is selected (only applicable if not disabled)
             const isSelected = selectedSet.has(personnelId) && !isInMainTable;
 
             // Add disabled class and styling for rows that are in main table
             const rowClass = isInMainTable ? 'disabled-row' : '';
-            const disabledAttr = isInMainTable ? 'disabled' : '';
             const checkboxDisabled = isInMainTable ? 'disabled' : '';
 
             // Style for disabled rows
             const rowStyle = isInMainTable ? 'opacity: 0.6; background-color: #f5f5f5;' : '';
 
             html += `
-            <tr class="${rowClass}" style="${rowStyle}" data-armyno="${armyNo}" data-personnelid="${personnelId}">
+            <tr class="${rowClass}" style="${rowStyle}" data-personnelid="${personnelId}" data-armyno="${armyNo}">
                 <td>
                     <input type="checkbox"
                            class="result-checkbox"
                            data-personnelid="${personnelId}"
                            data-armyno="${armyNo}"
                            ${isSelected ? 'checked' : ''}
-                           ${checkboxDisabled}
-                           ${disabledAttr}>
-                    ${isInMainTable ? '<span style="margin-left: 5px; color: #666;" title="Already in panel">✓</span>' : ''}
+                           ${checkboxDisabled}>
+                    ${isInMainTable ? '<span style="margin-left: 5px; color: #15803d; font-size: 11px;" title="Already in panel">✓ Already in panel</span>' : ''}
                 </td>
                 <td>${armyNo || '—'}</td>
                 <td>
@@ -3030,33 +3018,67 @@ document.head.appendChild(style);
                 const personnelId = parseInt(this.dataset.personnelid);
                 const armyNo = this.dataset.armyno;
 
+                // Find the officer data from filterResults
+                const officerData = filterResults.find(o => (o.personnelId || o.id) === personnelId);
+
                 if (this.checked) {
                     // Add to selected set
                     selectedSet.add(personnelId);
+
+                    // Initialize status for this officer if not already set
+                    if (!statusMap.has(personnelId)) {
+                        statusMap.set(personnelId, 'Reserve');
+                    }
+
+                    // Add to officers array if not already present
+                    const existsInOfficers = officers.some(o => (o.personnelId || o.id) === personnelId);
+                    if (!existsInOfficers && officerData) {
+                        officers.push(officerData);
+                    }
+
+                    // Show toast notification
+                    showToast(`${officerData?.fullName || officerData?.name || 'Officer'} added to panel`, 'success');
                 } else {
                     // Remove from selected set
                     selectedSet.delete(personnelId);
 
-                    // Also remove from main table if they exist there
-                    const officerIndex = officers.findIndex(o => o.armyNo === armyNo);
+                    // Remove from status map
+                    statusMap.delete(personnelId);
+
+                    // Remove from officers array
+                    const officerIndex = officers.findIndex(o => (o.personnelId || o.id) === personnelId);
                     if (officerIndex !== -1) {
-                        // Remove from officers array
+                        const removedOfficer = officers[officerIndex];
                         officers.splice(officerIndex, 1);
-
-                        // Re-render the main table
-                        renderOfficerTable();
-
-                        // Update counts
-                        document.getElementById('selectedCount').innerText = selectedSet.size;
-                        document.getElementById('totalEligible').innerText = officers.length;
-
-                        // Update panel summary
-                        updatePanelSummary();
+                        showToast(`${removedOfficer?.fullName || removedOfficer?.name || 'Officer'} removed from panel`, 'info');
                     }
+
+                    // Also remove from serialNumberMap
+                    serialNumberMap.delete(personnelId);
                 }
 
+                // Update UI
                 document.getElementById('selectedCount').innerText = selectedSet.size;
+                document.getElementById('totalEligible').innerText = officers.length;
+
+                // Re-render the main table
+                renderOfficerTable();
+
+                // Update panel summary
+                updatePanelSummary();
+
+                // Update the filter results table to reflect current selection state
+                // But don't re-fetch data, just update the checkbox state visually
+                updateFilterResultsCheckboxState();
             });
+        });
+    }
+
+    // Helper function to update filter results checkbox states without re-rendering
+    function updateFilterResultsCheckboxState() {
+        document.querySelectorAll('.result-checkbox:not([disabled])').forEach(checkbox => {
+            const personnelId = parseInt(checkbox.dataset.personnelid);
+            checkbox.checked = selectedSet.has(personnelId);
         });
     }
 
@@ -3090,7 +3112,6 @@ document.head.appendChild(style);
 
         // Get the current officers in the main table
         const currentOfficerIds = new Set(officers.map(o => o.personnelId || o.id));
-        const currentArmyNos = new Set(officers.map(o => o.armyNo).filter(Boolean));
 
         // Find which selected officers are NOT already in the main table
         const newOfficers = selectedOfficersData.filter(o =>
@@ -3100,22 +3121,31 @@ document.head.appendChild(style);
         // Add new officers to the main officers array
         if (newOfficers.length > 0) {
             officers = [...officers, ...newOfficers];
+
+            // Add to selectedSet and initialize status
+            newOfficers.forEach(o => {
+                const personnelId = o.personnelId || o.id;
+                selectedSet.add(personnelId);
+                if (!statusMap.has(personnelId)) {
+                    statusMap.set(personnelId, 'Reserve');
+                }
+            });
         }
 
         // Remove officers that were unchecked
         if (uncheckedFromPopup.length > 0) {
-            const armyNosToRemove = new Set(uncheckedFromPopup.map(u => u.armyNo));
-            officers = officers.filter(o => !armyNosToRemove.has(o.armyNo));
+            const idsToRemove = new Set(uncheckedFromPopup.map(u => u.id));
 
-            // Also remove from selectedSet and serial number map
+            // Remove from officers array
+            officers = officers.filter(o => !idsToRemove.has(o.personnelId || o.id));
+
+            // Remove from selectedSet and status map
             uncheckedFromPopup.forEach(u => {
                 selectedSet.delete(u.id);
+                statusMap.delete(u.id);
                 serialNumberMap.delete(u.id);
             });
         }
-
-        // Add all selected IDs to the selectedSet (including existing ones)
-        selectedFromPopup.forEach(s => selectedSet.add(s.id));
 
         // Re-render the main table
         renderOfficerTable();

@@ -20,19 +20,52 @@ public interface CoursePanelBatchRepository extends JpaRepository<CoursePanelBat
             Pageable pageable);
 
     @Query("SELECT cpb FROM CoursePanelBatch cpb " +
-            "WHERE :movementId BETWEEN 1 AND cpb.movementId + 1 " +
-            "AND cpb.status = :status " +
+            "WHERE cpb.movementId + 1 = :movementId " +
+            "AND cpb.status = 'PENDING_APPROVAL' " +
+            "AND cpb.batchStatus = true " +
             "ORDER BY cpb.createdAt DESC")
-    Page<CoursePanelBatch> findByMovementIdLessThanEqualAndStatus(
+    Page<CoursePanelBatch> findByMovementIdLessThanEqualAndStatusPending(
             @Param("movementId") Long movementId,
-            @Param("status") String status,
+            Pageable pageable);
+
+    @Query("SELECT cpb FROM CoursePanelBatch cpb " +
+            "WHERE cpb.movementId >= :movementId " +
+            "AND (cpb.status = 'APPROVED' OR cpb.status = 'PENDING_APPROVAL') " +
+            "AND cpb.batchStatus = true " +
+            "ORDER BY cpb.createdAt DESC")
+    Page<CoursePanelBatch> findByMovementIdLessThanEqualAndStatusApprove(
+            @Param("movementId") Long movementId,
+            Pageable pageable);
+
+    @Query("SELECT cpb FROM CoursePanelBatch cpb " +
+            "WHERE cpb.movementId >= :movementId " +
+            "AND cpb.status = 'REJECTED' " +
+            "AND cpb.batchStatus = true " +
+            "ORDER BY cpb.createdAt DESC")
+    Page<CoursePanelBatch> findByMovementIdLessThanEqualAndStatusRejected(
+            @Param("movementId") Long movementId,
             Pageable pageable);
 
     @Query("SELECT COUNT(cpb) FROM CoursePanelBatch cpb " +
             "WHERE cpb.movementId <= :movementId " +
+            "AND cpb.batchStatus = true " +
             "AND cpb.status = :status")
     long countByMovementIdLessThanEqualAndStatus(
             @Param("movementId") Long movementId,
             @Param("status") String status);
+
+    @Query("SELECT cpb FROM CoursePanelBatch cpb " +
+            "WHERE cpb.batchStatus = true " +
+            "ORDER BY cpb.createdAt DESC")
+    Page<CoursePanelBatch> findAllActiveBatches(Pageable pageable);
+
+    // Fetch all batches by status (no movement filter)
+    @Query("SELECT cpb FROM CoursePanelBatch cpb " +
+            "WHERE cpb.status = :status " +
+            "AND cpb.batchStatus = true " +
+            "ORDER BY cpb.createdAt DESC")
+    Page<CoursePanelBatch> findByStatus(
+            @Param("status") String status,
+            Pageable pageable);
 
 }

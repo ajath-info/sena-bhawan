@@ -213,10 +213,17 @@ public class CoursePanelBatchService {
 
         // Create pageable
         Pageable pageable = PageRequest.of(page, size);
+        Page<CoursePanelBatch> batchPage;
 
-        // Fetch batches
-        Page<CoursePanelBatch> batchPage = batchRepository.findByMovementIdLessThanEqualAndStatus(
-                movementId, status, pageable);
+        // Different logic based on status
+        if ("PENDING_APPROVAL".equals(status)) {
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusPending(movementId, pageable);
+        } else if ("APPROVED".equals(status)) {
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusApprove(movementId, pageable);
+        } else {
+            // REJECTED
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusRejected(movementId, pageable);
+        }
 
         // Convert to DTOs with schedule and course details
         List<PanelBatchListDTO> dtos = batchPage.getContent().stream()
@@ -309,4 +316,39 @@ public class CoursePanelBatchService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public PanelBatchListResponse getAllPanelBatchesByStatus(
+            String status,
+            int page,
+            int size) {
+
+        // Validate inputs
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status cannot be empty");
+        }
+
+        if (!isValidStatus(status)) {
+            throw new IllegalArgumentException("Invalid status. Must be PENDING_APPROVAL, APPROVED, or REJECTED");
+        }
+
+        // Create pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Fetch batches by status only (no movement filter)
+        Page<CoursePanelBatch> batchPage = batchRepository.findByStatus(status, pageable);
+
+        // Convert to DTOs with schedule and course details
+        List<PanelBatchListDTO> dtos = batchPage.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return PanelBatchListResponse.builder()
+                .data(dtos)
+                .totalCount(batchPage.getTotalElements())
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(batchPage.getTotalPages())
+                .build();
+    }
+
 }

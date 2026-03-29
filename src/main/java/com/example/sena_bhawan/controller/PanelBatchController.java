@@ -43,4 +43,16 @@ public class PanelBatchController {
         List<PersonnelDataDTO> personnel = panelBatchService.getPersonnelByBatchId(batchId);
         return ResponseEntity.ok(personnel);
     }
+
+    // New endpoint without movement filter (for course approval status page)
+    @GetMapping("/status/{status}")
+    public ResponseEntity<PanelBatchListResponse> getAllPanelBatchesByStatus(
+            @PathVariable String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PanelBatchListResponse response = panelBatchService.getAllPanelBatchesByStatus(
+                status, page, size);
+        return ResponseEntity.ok(response);
+    }
 }

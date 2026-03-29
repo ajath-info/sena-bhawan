@@ -18,4 +18,7 @@ public class Role {
 
     @Column(name = "sub_title")
     private String subTitle;
+
+    @Column(name = "hierarchy_order")
+    private Integer hierarchyOrder;
 }
