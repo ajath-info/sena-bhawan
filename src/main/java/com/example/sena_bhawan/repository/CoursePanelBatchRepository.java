@@ -12,15 +12,6 @@ import java.util.Optional;
 
 public interface CoursePanelBatchRepository extends JpaRepository<CoursePanelBatch, Long> {
     List<CoursePanelBatch> findByScheduleId(Long scheduleId);
-    Optional<CoursePanelBatch> findFirstByScheduleIdOrderByCreatedAtDesc(Long scheduleId);
-
-
-    List<CoursePanelBatch> findByScheduleIdOrderByCreatedAtDesc(Long scheduleId);
-
-
-    List<CoursePanelBatch> findByScheduleIdAndBatchStatusTrue(Long scheduleId);
-
-    List<CoursePanelBatch> findByScheduleIdAndStatus(Long scheduleId, String status);
 
     // New methods for role-wise filtering
     Page<CoursePanelBatch> findByMovementIdAndStatusIn(
@@ -28,15 +19,20 @@ public interface CoursePanelBatchRepository extends JpaRepository<CoursePanelBat
             List<String> statuses,
             Pageable pageable);
 
-    Page<CoursePanelBatch> findByMovementIdAndStatusInAndBatchStatus(
-            Long movementId,
-            List<String> statuses,
-            Boolean batchStatus,
+    @Query("SELECT cpb FROM CoursePanelBatch cpb " +
+            "WHERE :movementId BETWEEN 1 AND cpb.movementId + 1 " +
+            "AND cpb.status = :status " +
+            "ORDER BY cpb.createdAt DESC")
+    Page<CoursePanelBatch> findByMovementIdLessThanEqualAndStatus(
+            @Param("movementId") Long movementId,
+            @Param("status") String status,
             Pageable pageable);
 
-    @Query("SELECT b FROM CoursePanelBatch b WHERE b.movementId = :movementId AND b.status IN :statuses ORDER BY b.createdAt DESC")
-    Page<CoursePanelBatch> findPanelsByMovementAndStatuses(
+    @Query("SELECT COUNT(cpb) FROM CoursePanelBatch cpb " +
+            "WHERE cpb.movementId <= :movementId " +
+            "AND cpb.status = :status")
+    long countByMovementIdLessThanEqualAndStatus(
             @Param("movementId") Long movementId,
-            @Param("statuses") List<String> statuses,
-            Pageable pageable);
+            @Param("status") String status);
+
 }

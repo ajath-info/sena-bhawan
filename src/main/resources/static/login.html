@@ -251,6 +251,9 @@
                 // 🔥 IMPORTANT: Clear ANY existing data before setting new
                 sessionStorage.clear();
 
+                // Clear localStorage data for previous user
+                localStorage.removeItem('userData'); // Remove old user data
+
                 // Clear any cached sidebar data for previous user
                 const keysToRemove = [];
                 for (let i = 0; i < localStorage.length; i++) {
@@ -261,7 +264,17 @@
                 }
                 keysToRemove.forEach(key => localStorage.removeItem(key));
 
-                // Save NEW token + user details
+                // Save NEW user data to localStorage (including roleId)
+                const userData = {
+                  token: body.token,
+                  userId: body.userId,
+                  username: body.username,
+                  appointment: body.appointment,
+                  roleId: body.roleId  // Save roleId in localStorage
+                };
+                localStorage.setItem("userData", JSON.stringify(userData));
+
+                // Keep sessionStorage for existing functionality
                 sessionStorage.setItem("token", body.token);
                 sessionStorage.setItem("userId", body.userId);
                 sessionStorage.setItem("username", body.username);

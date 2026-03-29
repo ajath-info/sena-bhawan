@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
         user.setSosNo(req.getSosNo());
 //        user.setUnitName(req.getUnitName());
 
-        userRoleRepo.findByUserId(userId)
-                .forEach(userRoleRepo::delete);
+//        userRoleRepo.findByUserId(userId)
+//                .forEach(userRoleRepo::delete);
 
         for (Long roleId : req.getRoleIds()) {
             userRoleRepo.save(new UserRoleInfo(null, userId, roleId));

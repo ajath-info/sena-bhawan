@@ -10,4 +10,5 @@ public class LoginResponse {
     private String username;
     private String appointment;
     private String token;
+    private Long roleId;
 }

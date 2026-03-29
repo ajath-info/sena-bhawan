@@ -262,7 +262,23 @@
 
         /* ------------------------ LOGOUT ------------------------ */
         function logout() {
+            // Clear sessionStorage
             sessionStorage.clear();
+
+            // Clear localStorage user data
+            localStorage.removeItem('userData');
+
+            // Clear any sidebar cached data
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sidebar_')) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+
+            // Redirect to login page
             window.location.replace("/login.html");
         }
 
