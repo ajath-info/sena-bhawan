@@ -41,12 +41,12 @@ public interface CoursePanelRepository
             "GROUP BY cm.course_name", nativeQuery = true)
     List<OngoingCoursesProjection> getCurrentOngoingCoursesWithCounts();
 
-    @Query(value = "SELECT cm.course_name as courseName, COUNT(cpn.id) as officerCount " +
+    @Query(value = "SELECT cm.course_name as courseName, cpn.status as status, COUNT(cpn.id) as officerCount " +
             "FROM course_panel_nomination cpn, course_schedule cs, course_master cm " +
             "WHERE cpn.schedule_id = cs.schedule_id " +
             "AND cs.course_id = cm.srno " +
-            "AND cpn.attendance_status = 'ATTENDING' " +
-            "GROUP BY cm.course_name", nativeQuery = true)
+            "AND cpn.status IN ('CONFIRMED', 'PENDING_APPROVAL', 'REJECTED') " +
+            "GROUP BY cm.course_name, cpn.status", nativeQuery = true)
     List<OngoingCoursesProjection> getOngoingCoursesWithCountsAlternative();
 
     @Query("SELECT cpn.attendanceStatus as attendanceStatus, COUNT(cpn) as count " +

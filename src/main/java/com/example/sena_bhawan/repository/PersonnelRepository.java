@@ -21,6 +21,9 @@ import java.util.Optional;
 @Repository
 public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
 
+    // Count by exact rank match
+    long countByRank(String rank);
+
     @Query("""
     SELECT DISTINCT p
     FROM Personnel p

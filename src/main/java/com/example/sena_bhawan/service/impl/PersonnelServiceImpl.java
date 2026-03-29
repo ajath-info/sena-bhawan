@@ -84,23 +84,10 @@ public class PersonnelServiceImpl implements PersonnelService {
     }
 
     // STATIC labels in EXACT order as frontend
-    private final List<String> STATIC_RANK_LABELS = Arrays.asList(
-            "Lt", "Capt", "Maj", "Lt Col", "Col"
-    );
-
-    // STATIC labels in EXACT order as frontend
     private final List<String> STATIC_AGE_LABELS = Arrays.asList(
             "<30", "31-35", "36-40", "41-45", "46-50", "50+"
     );
 
-    // Mapping of static labels to search terms
-    private final Map<String, List<String>> RANK_SEARCH_TERMS = Map.of(
-            "Lt", Arrays.asList("lt", "lieutenant"),
-            "Capt", Arrays.asList("capt", "captain"),
-            "Maj", Arrays.asList("maj", "major"),
-            "Lt Col", Arrays.asList("lt col", "lieutenant col", "lt colonel", "lieutenant colonel"),
-            "Col", Arrays.asList("col", "colonel")
-    );
     private final OrbatStructureRepository orbatStructureRepository;
 
     @Override
@@ -159,10 +146,35 @@ public class PersonnelServiceImpl implements PersonnelService {
 //                .build();
 //    }
 
-    @Override
+    // EXACT rank labels in your specified order
+    private final List<String> STATIC_RANK_LABELS = Arrays.asList(
+            "Lieutenant",
+            "Captain",
+            "Major",
+            "Lieutenant Colonel",
+            "Colonel",
+            "Brigadier",
+            "Major General",
+            "Lieutenant General",
+            "General"
+    );
+
+    // Direct mapping to exact rank strings (no search variations needed)
+    private final Map<String, String> RANK_MAPPING = Map.of(
+            "Lieutenant", "Lieutenant",
+            "Captain", "Captain",
+            "Major", "Major",
+            "Lieutenant Colonel", "Lieutenant Colonel",
+            "Colonel", "Colonel",
+            "Brigadier", "Brigadier",
+            "Major General", "Major General",
+            "Lieutenant General", "Lieutenant General",
+            "General", "General"
+    );
+
     public RankStrengthResponse getOfficerStrengthByRank() {
         List<Integer> data = STATIC_RANK_LABELS.stream()
-                .map(this::getCountForRank)
+                .map(rank -> getCountForExactRank(rank))
                 .map(Long::intValue)
                 .toList();
 
@@ -174,17 +186,9 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
-    private long getCountForRank(String rankLabel) {
-        List<String> searchTerms = RANK_SEARCH_TERMS.get(rankLabel);
-
-        if (searchTerms == null || searchTerms.isEmpty()) {
-            return personnelRepository.countByExactRank(rankLabel);
-        }
-
-        // Sum counts for all variations of this rank
-        return searchTerms.stream()
-                .mapToLong(term -> personnelRepository.countByRankContaining(term))
-                .sum();
+    private long getCountForExactRank(String rank) {
+        // Count personnel with exact rank match
+        return personnelRepository.countByRank(rank);
     }
 
     @Override

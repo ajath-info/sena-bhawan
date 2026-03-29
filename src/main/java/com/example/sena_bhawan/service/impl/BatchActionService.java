@@ -109,9 +109,9 @@ public class BatchActionService {
 
         // Update batch
         batch.setStatus("REJECTED");
-        batch.setBatchStatus(false); // Deactivate
-        batch.setRejectMovementId(request.getRejectMovementId() != null ? 
-                                 request.getRejectMovementId() : batch.getMovementId());
+        batch.setMovementId(request.getRejectMovementId()+1);
+        batch.setRejectMovementId(request.getRejectMovementId() != null ?
+                                 request.getRejectMovementId()+1 : batch.getMovementId()+1);
         
         if (request.getRemarks() != null && !request.getRemarks().trim().isEmpty()) {
             batch.setRemarks(request.getRemarks());

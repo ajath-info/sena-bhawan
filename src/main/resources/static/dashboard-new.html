@@ -373,9 +373,6 @@
         <h2>Dashboard</h2>
         <p>Welcome back, Admin</p>
       </div>
-      <div class="header-right">
-        <input placeholder="Search personnel, units..." />
-      </div>
     </div>
 
     <div class="content-area">
@@ -428,32 +425,35 @@
         fetch('http://localhost:6060/api/personnel/officer-strength')
                 .then(response => response.json())
                 .then(data => {
+                  console.log('Rank data received:', data); // Debug log
+
                   // Calculate total for percentages
                   const total = data.data.reduce((sum, count) => sum + count, 0);
 
-                  // Create distribution HTML using only API labels and data
+                  // Create distribution HTML using exact rank names
                   const distributionHtml = data.labels.map((label, index) => {
                     const count = data.data[index];
                     const percentage = total > 0 ? Math.round((count * 100) / total) : 0;
 
                     return `
-                        <div class="rank-row">
-                          <div class="rank-label">
+                    <div class="rank-row">
+                        <div class="rank-label">
                             <span>${label}</span>
-                            <span>${count.toLocaleString()}</span>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar" style="width:${percentage}%"></div>
-                          </div>
+                            <span>${count.toLocaleString()} (${percentage}%)</span>
                         </div>
-                      `;
+                        <div class="progress">
+                            <div class="progress-bar" style="width:${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
                   }).join('');
 
                   document.getElementById('rankDistribution').innerHTML = distributionHtml;
                 })
                 .catch(error => {
                   console.error('Error loading distribution:', error);
-                  document.getElementById('rankDistribution').innerHTML = '<p style="color: red; padding: 10px;">Failed to load distribution data</p>';
+                  document.getElementById('rankDistribution').innerHTML =
+                          '<p style="color: red; padding: 10px;">Failed to load distribution data</p>';
                 });
       </script>
 
@@ -465,8 +465,10 @@
           <script>
             (async function() {
               try {
-                const response = await fetch('/api/personnel/officer-strength');
+                const response = await fetch('http://localhost:6060/api/personnel/officer-strength');
                 const chartData = await response.json();
+
+                console.log('Chart data:', chartData); // Debug log
 
                 new Chart(document.getElementById('rankStrengthChart'), {
                   type: 'bar',
@@ -480,13 +482,50 @@
                     }]
                   },
                   options: {
-                    plugins: { legend: { display: false } },
-                    onClick: (e, el) => el.length && alert('Open officer list'),
-                    scales: { y: { beginAtZero: true } }
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                      legend: { display: false },
+                      tooltip: {
+                        callbacks: {
+                          label: function(context) {
+                            return context.raw.toLocaleString() + ' Officers';
+                          }
+                        }
+                      }
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: 'Number of Officers'
+                        }
+                      },
+                      x: {
+                        ticks: {
+                          rotation: 45,
+                          autoSkip: true,
+                          maxRotation: 45,
+                          minRotation: 45
+                        }
+                      }
+                    },
+                    onClick: (e, el) => {
+                      if(el.length) {
+                        const index = el[0].index;
+                        const rank = chartData.labels[index];
+                        alert(`Showing details for ${rank}`);
+                      }
+                    }
                   }
                 });
               } catch (error) {
-                console.error('Error:', error);
+                console.error('Error loading rank chart:', error);
+                document.getElementById('rankStrengthChart').insertAdjacentHTML(
+                        'afterend',
+                        '<p style="color: #dc2626; padding: 10px; text-align: center;">⚠️ Failed to load rank strength data</p>'
+                );
               }
             })();
           </script>
@@ -553,23 +592,41 @@
           <div class="chart-title">Medical Category Distribution</div>
           <canvas id="medicalChart"></canvas>
           <script>
-            fetch('http://localhost:6060/api/personnel/medical-distribution')
-                    .then(response => response.json())
-                    .then(data => {
-                      new Chart(document.getElementById('medicalChart'), {
-                        type: 'doughnut',
-                        data: {
-                          labels: data.labels,
-                          datasets: [{
-                            data: data.data,
-                            backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
-                          }]
-                        },
-                        options: {
-                          plugins: { legend: { position: 'bottom' } }
-                        }
-                      });
-                    });
+            // fetch('http://localhost:6060/api/personnel/medical-distribution')
+            //         .then(response => response.json())
+            //         .then(data => {
+            //           new Chart(document.getElementById('medicalChart'), {
+            //             type: 'doughnut',
+            //             data: {
+            //               labels: data.labels,
+            //               datasets: [{
+            //                 data: data.data,
+            //                 backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
+            //               }]
+            //             },
+            //             options: {
+            //               plugins: { legend: { position: 'bottom' } }
+            //             }
+            //           });
+            //         });
+            const medicalStaticData = {
+              labels: ['SHAPE-1', 'SHAPE-2', 'SHAPE-3', 'SHAPE-4', 'SHAPE-5'],
+              data: [4, 8, 2, 1, 5]
+            };
+
+            new Chart(document.getElementById('medicalChart'), {
+              type: 'doughnut',
+              data: {
+                labels: medicalStaticData.labels,
+                datasets: [{
+                  data: medicalStaticData.data,
+                  backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
+                }]
+              },
+              options: {
+                plugins: { legend: { position: 'bottom' } }
+              }
+            });
           </script>
         </div>
       </div>
@@ -616,6 +673,26 @@
           <div class="chart-title">Ongoing Courses – Officer Strength</div>
           <canvas id="ongoingCourseChart"></canvas>
           <script>
+            // fetch('http://localhost:6060/api/course-panel/ongoing-strength')
+            //         .then(response => response.json())
+            //         .then(data => {
+            //           new Chart(document.getElementById('ongoingCourseChart'), {
+            //             type: 'bar',
+            //             data: {
+            //               labels: data.labels,
+            //               datasets: [{
+            //                 label: 'Officer Strength',
+            //                 data: data.data,
+            //                 backgroundColor: ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#74c69d'],
+            //                 borderRadius: 8
+            //               }]
+            //             },
+            //             options: {
+            //               plugins: { legend: { display: false } },
+            //               scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Officers' } } }
+            //             }
+            //           });
+            //         });
             fetch('http://localhost:6060/api/course-panel/ongoing-strength')
                     .then(response => response.json())
                     .then(data => {
@@ -623,16 +700,38 @@
                         type: 'bar',
                         data: {
                           labels: data.labels,
-                          datasets: [{
-                            label: 'Officer Strength',
-                            data: data.data,
-                            backgroundColor: ['#1b4332', '#2d6a4f', '#40916c', '#52b788', '#74c69d'],
-                            borderRadius: 8
-                          }]
+                          datasets: [
+                            {
+                              label: 'Confirmed',
+                              data: data.confirmed,
+                              backgroundColor: '#16a34a',
+                              borderRadius: 6
+                            },
+                            {
+                              label: 'Pending Approval',
+                              data: data.pending,
+                              backgroundColor: '#facc15',
+                              borderRadius: 6
+                            },
+                            {
+                              label: 'Rejected',
+                              data: data.rejected,
+                              backgroundColor: '#dc2626',
+                              borderRadius: 6
+                            }
+                          ]
                         },
                         options: {
-                          plugins: { legend: { display: false } },
-                          scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Officers' } } }
+                          plugins: {
+                            legend: { position: 'bottom' }
+                          },
+                          scales: {
+                            x: { stacked: false },
+                            y: {
+                              beginAtZero: true,
+                              title: { display: true, text: 'Number of Officers' }
+                            }
+                          }
                         }
                       });
                     });

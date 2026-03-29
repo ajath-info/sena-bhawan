@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RankStrengthResponse {
-    private List<String> labels;  // STATIC: ['Lt', 'Capt', 'Maj', 'Lt Col', 'Col']
-    private List<Integer> data;   // DYNAMIC: [820, 2100, 1850, 960, 420]
+    private List<String> labels;
+    private List<Integer> data;
     private String chartType;
     private String title;
 }
