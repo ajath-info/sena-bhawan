@@ -6,6 +6,8 @@
   <title>Master Filter & Search - ARMY HRMS</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -952,10 +954,6 @@
         <button class="btn btn-secondary" onclick="exportResults()" id="exportBtn">
           <span>📊</span>
           Export Results
-        </button>
-        <button class="btn btn-primary" onclick="generateLetter()" id="generateBtn">
-          <span>📧</span>
-          Generate Letter
         </button>
       </div>
     </header>
@@ -2259,10 +2257,196 @@
     window.location.href = `/personnel-edit.html?id=${id}`;
   }
 
-  function exportResults() {
-    const filterRequest = buildFilterRequest();
-    const queryParams = new URLSearchParams(filterRequest).toString();
-    window.location.href = `${API_BASE_URL}/export?${queryParams}`;
+  async function exportResults() {
+    try {
+      const exportBtn = document.getElementById('exportBtn');
+      exportBtn.disabled = true;
+      exportBtn.innerHTML = '<span>⏳</span> Exporting...';
+
+      // Build filter request WITHOUT pagination to get ALL records
+      const filterRequest = buildFilterRequest();
+      const exportRequest = {
+        ...filterRequest,
+        page: 0,
+        size: 99999
+      };
+
+      const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(exportRequest)
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch export data');
+
+      const result = await response.json();
+      const officers = result.content || [];
+
+      if (officers.length === 0) {
+        showToast('No records to export', 'warning');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-GB');
+      const timeStr = today.toLocaleTimeString();
+
+      // ── Header bar ──
+      doc.setFillColor(27, 67, 50);
+      doc.rect(0, 0, 297, 20, 'F');
+
+      doc.setFontSize(14);
+      doc.setTextColor(255, 183, 3);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ARMY HRMS — Personnel Export Report', 148, 13, { align: 'center' });
+
+      // ── Sub-header ──
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated: ${dateStr} ${timeStr}`, 14, 26);
+      doc.text(`Total Records: ${officers.length}`, 148, 26, { align: 'center' });
+      doc.text('CONFIDENTIAL — FOR OFFICIAL USE ONLY', 283, 26, { align: 'right' });
+
+      // ── Table ──
+      const columns = [
+        { header: 'Army No',     dataKey: 'armyNo' },
+        { header: 'Rank',        dataKey: 'rank' },
+        { header: 'Name',        dataKey: 'fullName' },
+        { header: 'DOB',         dataKey: 'dateOfBirth' },
+        { header: 'Commission',  dataKey: 'dateOfCommission' },
+        { header: 'Seniority',   dataKey: 'dateOfSeniority' },
+        { header: 'Unit',        dataKey: 'unit' },
+        { header: 'Command',     dataKey: 'command' },
+        { header: 'Corps',       dataKey: 'corps' },
+        { header: 'Division',    dataKey: 'division' },
+        { header: 'Est Type',    dataKey: 'establishmentType' },
+        { header: 'Medical',     dataKey: 'medicalCode' },
+        { header: 'TOS Date',    dataKey: 'tosDate' },
+        { header: 'Course',      dataKey: 'course' },
+        { header: 'Civil Qual',  dataKey: 'civilQual' },
+        { header: 'Sports',      dataKey: 'sports' },
+        { header: 'POB',         dataKey: 'placeOfBirth' },
+        { header: 'Area Type',   dataKey: 'areaType' },
+        { header: 'Post Due',    dataKey: 'postingDueMonths' },
+        { header: 'State',       dataKey: 'state' },
+        { header: 'Mobile',      dataKey: 'mobileNumber' },
+      ];
+
+      const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+
+      const rows = officers.map(o => ({
+        armyNo:            o.armyNo || '—',
+        rank:              o.rank || '—',
+        fullName:          o.fullName || '—',
+        dateOfBirth:       formatDate(o.dateOfBirth),
+        dateOfCommission:  formatDate(o.dateOfCommission),
+        dateOfSeniority:   formatDate(o.dateOfSeniority),
+        unit:              o.unit || '—',
+        command:           o.command || '—',
+        corps:             o.corps || '—',
+        division:          o.division || '—',
+        establishmentType: o.establishmentType || '—',
+        medicalCode:       o.medicalCode || '—',
+        tosDate:           formatDate(o.tosDate),
+        course:            o.course || '—',
+        civilQual:         o.civilQual || '—',
+        sports:            o.sports || '—',
+        placeOfBirth:      o.placeOfBirth || '—',
+        areaType:          o.areaType || '—',
+        postingDueMonths:  o.postingDueMonths != null ? o.postingDueMonths + ' M' : '—',
+        state:             o.state || '—',
+        mobileNumber:      o.mobileNumber || '—',
+      }));
+
+      doc.autoTable({
+        columns,
+        body: rows,
+        startY: 30,
+        margin: { left: 5, right: 5 },
+        styles: {
+          fontSize: 6.5,
+          cellPadding: 2.5,
+          overflow: 'linebreak',
+          valign: 'middle',
+          lineColor: [229, 231, 235],
+          lineWidth: 0.3,
+        },
+        headStyles: {
+          fillColor: [27, 67, 50],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 7,
+          halign: 'center',
+        },
+        alternateRowStyles: {
+          fillColor: [245, 250, 247],
+        },
+        bodyStyles: {
+          textColor: [31, 41, 55],
+        },
+        columnStyles: {
+          0:  { cellWidth: 16 },  // Army No
+          1:  { cellWidth: 12 },  // Rank
+          2:  { cellWidth: 22 },  // Name
+          3:  { cellWidth: 14 },  // DOB
+          4:  { cellWidth: 14 },  // Commission
+          5:  { cellWidth: 14 },  // Seniority
+          6:  { cellWidth: 20 },  // Unit
+          7:  { cellWidth: 16 },  // Command
+          8:  { cellWidth: 18 },  // Corps
+          9:  { cellWidth: 18 },  // Division
+          10: { cellWidth: 10 },  // Est Type
+          11: { cellWidth: 16 },  // Medical
+          12: { cellWidth: 14 },  // TOS Date
+          13: { cellWidth: 18 },  // Course
+          14: { cellWidth: 14 },  // Civil Qual
+          15: { cellWidth: 10 },  // Sports
+          16: { cellWidth: 12 },  // POB
+          17: { cellWidth: 12 },  // Area Type
+          18: { cellWidth: 10 },  // Post Due
+          19: { cellWidth: 12 },  // State
+          20: { cellWidth: 14 },  // Mobile
+        },
+        didDrawPage: function (data) {
+          // Footer on every page
+          const pageCount = doc.internal.getNumberOfPages();
+          doc.setFontSize(7);
+          doc.setTextColor(150, 150, 150);
+          doc.text(
+                  `Page ${data.pageNumber} of ${pageCount}`,
+                  148, 208, { align: 'center' }
+          );
+          doc.text('ARMY HRMS — CONFIDENTIAL', 14, 208);
+          doc.text(dateStr, 283, 208, { align: 'right' });
+
+          // Footer line
+          doc.setDrawColor(27, 67, 50);
+          doc.setLineWidth(0.5);
+          doc.line(5, 205, 292, 205);
+        }
+      });
+
+      const filename = `ARMY_HRMS_Personnel_${today.toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
+
+      showToast(`Exported ${officers.length} records to PDF`, 'success');
+
+    } catch (error) {
+      console.error('Export error:', error);
+      showToast('Export failed: ' + error.message, 'error');
+    } finally {
+      const exportBtn = document.getElementById('exportBtn');
+      exportBtn.disabled = false;
+      exportBtn.innerHTML = '<span>📊</span> Export Results';
+    }
   }
 
   function generateLetter() {

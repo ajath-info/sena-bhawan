@@ -1,14 +1,13 @@
 package com.example.sena_bhawan.service;
 
-import com.example.sena_bhawan.dto.CoursePanelBatchResponse;
-import com.example.sena_bhawan.dto.CreateCoursePanelBatchRequest;
-import com.example.sena_bhawan.dto.UpdateCoursePanelBatchRequest;
-import com.example.sena_bhawan.entity.CoursePanelBatch;
-import com.example.sena_bhawan.entity.CoursePanelNomination;
-import com.example.sena_bhawan.repository.CoursePanelBatchRepository;
-import com.example.sena_bhawan.repository.CoursePanelRepository;
+import com.example.sena_bhawan.dto.*;
+import com.example.sena_bhawan.entity.*;
+import com.example.sena_bhawan.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +23,9 @@ public class CoursePanelBatchService {
 
     private final CoursePanelBatchRepository batchRepository;
     private final CoursePanelRepository nominationRepository;
+    private final CourseScheduleRepository scheduleRepository;
+    private final CourseMasterRepository courseMasterRepository;
+    private final PersonnelRepository personnelRepository;
 
     /**
      * Create a new batch and persist all nominations linked to it.
@@ -193,4 +195,160 @@ public class CoursePanelBatchService {
                 .nominations(summaries)
                 .build();
     }
+
+    public PanelBatchListResponse getPanelBatchesByMovementAndStatus(
+            Long movementId,
+            String status,
+            int page,
+            int size) {
+
+        // Validate inputs
+        if (movementId == null || movementId < 1) {
+            throw new IllegalArgumentException("Invalid movement ID");
+        }
+
+        if (!isValidStatus(status)) {
+            throw new IllegalArgumentException("Invalid status. Must be PENDING_APPROVAL, APPROVED, or REJECTED");
+        }
+
+        // Create pageable
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CoursePanelBatch> batchPage;
+
+        // Different logic based on status
+        if ("PENDING_APPROVAL".equals(status)) {
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusPending(movementId, pageable);
+        } else if ("APPROVED".equals(status)) {
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusApprove(movementId, pageable);
+        } else {
+            // REJECTED
+            batchPage = batchRepository.findByMovementIdLessThanEqualAndStatusRejected(movementId, pageable);
+        }
+
+        // Convert to DTOs with schedule and course details
+        List<PanelBatchListDTO> dtos = batchPage.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return PanelBatchListResponse.builder()
+                .data(dtos)
+                .totalCount(batchPage.getTotalElements())
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(batchPage.getTotalPages())
+                .build();
+    }
+
+    private PanelBatchListDTO convertToDTO(CoursePanelBatch batch) {
+        PanelBatchListDTO.PanelBatchListDTOBuilder builder = PanelBatchListDTO.builder()
+                .batchId(batch.getId())
+                .scheduleId(batch.getScheduleId())
+                .movementId(batch.getMovementId())
+                .status(batch.getStatus())
+                .totalNominations(batch.getTotalNominations())
+                .remarks(batch.getRemarks())
+                .batchStatus(batch.getBatchStatus())
+                .rejectMovementId(batch.getRejectMovementId())
+                .createdAt(batch.getCreatedAt())
+                .updatedAt(batch.getUpdatedAt());
+
+        // Fetch schedule details
+        CourseSchedule schedule = scheduleRepository.findById(batch.getScheduleId()).orElse(null);
+        if (schedule != null) {
+            builder.courseId(schedule.getCourse().getSrno())
+                    .year(schedule.getYear())
+                    .batchNumber(schedule.getBatchNumber())
+                    .startDate(schedule.getStartDate())
+                    .endDate(schedule.getEndDate())
+                    .venue(schedule.getVenue())
+                    .courseStrength(schedule.getCourseStrength())
+                    .panelSize(schedule.getPanelSize());
+
+            // Fetch course details
+            courseMasterRepository.findById(schedule.getCourse().getSrno()).ifPresent(course -> builder.courseName(course.getCourseName()));
+        }
+
+        return builder.build();
+    }
+
+    private boolean isValidStatus(String status) {
+        return (
+                "PENDING_APPROVAL".equals(status) ||
+                        "APPROVED".equals(status) ||
+                        "REJECTED".equals(status)
+        );
+    }
+
+    public long getCountByMovementAndStatus(Long movementId, String status) {
+        return batchRepository.countByMovementIdLessThanEqualAndStatus(movementId, status);
+    }
+
+    public List<PersonnelDataDTO> getPersonnelByBatchId(Long batchId) {
+        // First check if batch exists and is active
+        CoursePanelBatch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new RuntimeException("Batch not found"));
+
+        if (!Boolean.TRUE.equals(batch.getBatchStatus())) {
+            throw new IllegalStateException("Cannot view inactive batch");
+        }
+
+        // Get nominations for this batch
+        List<CoursePanelNomination> nominations = nominationRepository.findByBatchId(batchId);
+
+        // Get personnel IDs
+        List<Long> personnelIds = nominations.stream()
+                .map(CoursePanelNomination::getPersonnelId)
+                .collect(Collectors.toList());
+
+        // Fetch personnel details
+        List<Personnel> personnelList = personnelRepository.findAllById(personnelIds);
+
+        // Convert to DTO
+        return personnelList.stream()
+                .map(personnel -> PersonnelDataDTO.builder()
+                        .armyNo(personnel.getArmyNo())
+                        .rank(personnel.getRank())
+                        .fullName(personnel.getFullName())
+                        .city(personnel.getCity())
+                        .district(personnel.getDistrict())
+                        .mobileNumber(personnel.getMobileNumber())
+                        .emailAddress(personnel.getEmailAddress())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public PanelBatchListResponse getAllPanelBatchesByStatus(
+            String status,
+            int page,
+            int size) {
+
+        // Validate inputs
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status cannot be empty");
+        }
+
+        if (!isValidStatus(status)) {
+            throw new IllegalArgumentException("Invalid status. Must be PENDING_APPROVAL, APPROVED, or REJECTED");
+        }
+
+        // Create pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Fetch batches by status only (no movement filter)
+        Page<CoursePanelBatch> batchPage = batchRepository.findByStatus(status, pageable);
+
+        // Convert to DTOs with schedule and course details
+        List<PanelBatchListDTO> dtos = batchPage.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return PanelBatchListResponse.builder()
+                .data(dtos)
+                .totalCount(batchPage.getTotalElements())
+                .currentPage(page)
+                .pageSize(size)
+                .totalPages(batchPage.getTotalPages())
+                .build();
+    }
+
 }

@@ -5,7 +5,7 @@
     <title>Paramount Card | ARMY HRMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -16,67 +16,62 @@
         html, body { height: 100%; overflow: hidden; }
 
         body {
-          font-family: "Inter", sans-serif;
-          background: #f1f3f5;
-          color: #1f2937;
+            font-family: "Inter", sans-serif;
+            background: #f1f3f5;
+            color: #1f2937;
         }
 
         .container {
-          display: flex;
-          height: 100vh;
-          overflow: hidden;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* MAIN CONTENT */
         .main-content {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .header {
-          background: white;
-          border-bottom: 1px solid #e5e7eb;
-          padding: 16px 24px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 20px;
         }
 
         .header h2 {
-          font-size: 22px;
-          font-weight: 700;
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .header p {
-          font-size: 13px;
-          color: #6b7280;
-          margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
         }
 
         .content-area {
-          flex: 1;
-          overflow-y: auto;
-          padding: 24px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
         }
 
-        /* ================= SEARCH STYLES ================= */
         .selector-area {
-          max-width: 900px;
-          margin: auto;
-          background: #ffffff;
-          padding: 20px;
-          border-radius: 12px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-          margin-bottom: 20px;
+            max-width: 900px;
+            margin: auto;
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
         }
 
         .selector-area label {
-          font-weight: 600;
-          font-size: 15px;
-          display: block;
-          margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 6px;
         }
 
         .search-container {
@@ -86,18 +81,11 @@
 
         #personnelSearch {
             width: 100%;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             border: 1px solid #cbd5e1;
             font-family: "Inter", sans-serif;
-            font-size: 15px;
-            box-sizing: border-box;
-        }
-
-        #personnelSearch:focus {
-            outline: none;
-            border-color: #1b4332;
-            box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.1);
+            font-size: 13px;
         }
 
         .recommendation-dropdown {
@@ -107,15 +95,15 @@
             right: 0;
             background: white;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 6px;
             max-height: 200px;
             overflow-y: auto;
             z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .recommendation-item {
-            padding: 10px 12px;
+            padding: 8px 12px;
             cursor: pointer;
             border-bottom: 1px solid #f3f4f6;
         }
@@ -130,206 +118,342 @@
         }
 
         .recommendation-loading {
-            padding: 10px 12px;
+            padding: 8px 12px;
             text-align: center;
             color: #6b7280;
         }
 
         #selectedPersonnelInfo {
-            margin-top: 10px;
-            padding: 8px;
+            margin-top: 8px;
+            padding: 6px 10px;
             background: #e8f0fe;
             border-radius: 5px;
             display: none;
             border-left: 3px solid #1b4332;
+            font-size: 12px;
         }
 
         .download-btn {
-          background:#1b4332;
-          color:white;
-          padding:10px 18px;
-          border-radius:8px;
-          cursor:pointer;
-          border:none;
-          font-size:14px;
-          margin-bottom:20px;
-          display:none;
-          float: right;
+            background: #1b4332;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            float: right;
         }
 
+        /* View Mode Styles */
         .page {
-          max-width: 900px;
-          margin: auto;
-          background: #ffffff;
-          border-radius: 14px;
-          padding: 32px 36px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-          display:none;
-          clear: both;
+            max-width: 900px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: none;
+            clear: both;
         }
 
         .header-card {
-          display:flex;
-          align-items:center;
-          justify-content:space-between;
-          margin-bottom:28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
         }
 
         .header-left {
-          display:flex;
-          align-items:center;
-          gap:18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .profile-photo {
-          width:88px;
-          height:88px;
-          border-radius:12px;
-          object-fit:cover;
-          border:2px solid #1b4332;
-          background:#e5e7eb;
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #1b4332;
+            background: #e5e7eb;
+        }
+
+        .profile-name {
+            flex: 1;
+        }
+
+        .rank-army {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1b4332;
+            margin-bottom: 4px;
+        }
+
+        .name-with-decorations {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 4px;
         }
 
         .profile-name h1 {
-          font-size:24px;
-          font-weight:700;
-          margin-bottom:4px;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            color: #1f2937;
         }
 
-        .profile-name .meta {
-          font-size:14px;
-          color:#6b7280;
+        .decoration-bracket {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1b4332;
+        }
+
+        .meta {
+            font-size: 11px;
+            color: #6b7280;
         }
 
         .selected {
-          font-size:12px;
-          font-weight:600;
-          color:#1b4332;
-          border:1px solid #1b4332;
-          padding:4px 10px;
-          border-radius:20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #1b4332;
+            border: 1px solid #1b4332;
+            padding: 3px 8px;
+            border-radius: 15px;
         }
 
         .section {
-          margin-top:26px;
+            margin-top: 20px;
         }
 
         .section-title {
-          display:flex;
-          align-items:center;
-          gap:10px;
-          font-size:16px;
-          font-weight:700;
-          color:#1b4332;
-          border-bottom:2px solid #e5e7eb;
-          padding-bottom:8px;
-          margin-bottom:14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1b4332;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .info-grid {
-          display:grid;
-          grid-template-columns:repeat(3,1fr);
-          gap:14px 24px;
-          font-size:13px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px 20px;
+            font-size: 12px;
         }
 
-        .info-item span { color:#6b7280; display:block; font-size:12px; }
-        .info-item strong { font-weight:600; }
+        .info-item span {
+            color: #6b7280;
+            display: block;
+            font-size: 10px;
+        }
+
+        .info-item strong {
+            font-weight: 600;
+            font-size: 12px;
+        }
 
         .table {
-          width:100%;
-          border-collapse:collapse;
-          margin-top:10px;
-          font-size:13px;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 11px;
         }
 
         .table th {
-          text-align:left;
-          background:#f9fafb;
-          border:1px solid #e5e7eb;
-          padding:10px;
-          font-weight:700;
+            text-align: left;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 10px;
         }
 
         .table td {
-          border:1px solid #e5e7eb;
-          padding:10px;
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            font-size: 10px;
         }
 
-        /* History section styles */
         .history-section {
-            margin-top: 26px;
+            margin-top: 20px;
         }
 
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 8px;
+            font-size: 10px;
         }
 
         .history-table th,
         .history-table td {
             border: 1px solid #e5e7eb;
-            padding: 10px;
+            padding: 6px 8px;
             text-align: left;
-            vertical-align: top;
         }
 
         .history-table th {
             background-color: #f9fafb;
             font-weight: 700;
-            color: #1f2937;
-        }
-
-        .history-table tr:hover {
-            background-color: #f9fafb;
+            font-size: 10px;
         }
 
         .remark-type-badge {
             display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
             font-weight: 600;
-            white-space: nowrap;
         }
 
-        .remark-type-General {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-
-        .remark-type-Volunteer {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .remark-type-NotDetail {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .remark-type-Continuing {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-
-        .remark-type-TakenOff {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
+        .remark-type-General { background-color: #e9ecef; color: #495057; }
+        .remark-type-Volunteer { background-color: #d4edda; color: #155724; }
+        .remark-type-NotDetail { background-color: #fff3cd; color: #856404; }
+        .remark-type-Continuing { background-color: #cce5ff; color: #004085; }
+        .remark-type-TakenOff { background-color: #f8d7da; color: #721c24; }
 
         .history-loading {
             text-align: center;
-            padding: 20px;
+            padding: 12px;
             color: #6b7280;
         }
 
         .no-data {
             text-align: center;
             color: #6b7280;
-            padding: 20px;
+            padding: 12px;
+            font-size: 10px;
+        }
+
+        .grading-pending {
+            color: #f59e0b;
+            font-weight: 500;
+        }
+
+        .grading-pass {
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        /* Print/PDF Compact Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .selector-area, .download-btn, .header, .sidebar, #selectedPersonnelInfo {
+                display: none !important;
+            }
+
+            .page {
+                box-shadow: none;
+                padding: 0.1in;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .header-card {
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+            }
+
+            .profile-photo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .profile-name h1 {
+                font-size: 16px;
+            }
+
+            .rank-army {
+                font-size: 10px;
+            }
+
+            .decoration-bracket {
+                font-size: 12px;
+            }
+
+            .section {
+                margin-top: 8px;
+            }
+
+            .section-title {
+                font-size: 11px;
+                padding-bottom: 3px;
+                margin-bottom: 5px;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px 12px;
+                font-size: 9px;
+            }
+
+            .info-item span {
+                font-size: 7px;
+            }
+
+            .info-item strong {
+                font-size: 8px;
+            }
+
+            .table {
+                font-size: 8px;
+            }
+
+            .table th {
+                padding: 3px 4px;
+                font-size: 7px;
+            }
+
+            .table td {
+                padding: 3px 4px;
+                font-size: 7px;
+            }
+
+            .history-table {
+                font-size: 7px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 3px 4px;
+                font-size: 7px;
+            }
+
+            .remark-type-badge {
+                padding: 1px 3px;
+                font-size: 6px;
+            }
+
+            .no-data {
+                padding: 6px;
+                font-size: 8px;
+            }
+
+            .section, .history-section {
+                page-break-inside: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+
+            .header-card {
+                page-break-after: avoid;
+            }
         }
     </style>
     <link rel="stylesheet" href="sidebar.css">
@@ -339,17 +463,11 @@
 
 <div class="container">
     <script src="sidebar.js"></script>
-    <!-- SIDEBAR CONTAINER -->
     <aside class="sidebar" id="sidebarContainer">
-        <div style="color: white; padding: 20px; text-align: center;">
-            Loading menu...
-        </div>
+        <div style="color: white; padding: 20px; text-align: center;">Loading menu...</div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
     <main class="main-content">
-
-        <!-- TOP HEADER -->
         <div class="header">
             <div>
                 <h2>Paramount Card</h2>
@@ -357,19 +475,11 @@
             </div>
         </div>
 
-        <!-- BODY CONTENT -->
         <div class="content-area">
-
-            <!-- SEARCH INPUT -->
             <div class="selector-area">
                 <label>Select Officer</label>
                 <div class="search-container">
-                    <input
-                            type="text"
-                            id="personnelSearch"
-                            placeholder="Search by Army Number (min 4 characters)..."
-                            autocomplete="off"
-                    >
+                    <input type="text" id="personnelSearch" placeholder="Search by Army Number (min 4 characters)..." autocomplete="off">
                     <div id="searchResults" class="recommendation-dropdown" style="display: none;"></div>
                 </div>
                 <div id="selectedPersonnelInfo"></div>
@@ -378,35 +488,34 @@
 
             <button class="download-btn" id="pdfBtn" onclick="downloadPDF()">Download PDF</button>
 
-            <!-- PARAMOUNT CARD -->
             <div class="page" id="pdfContent">
-
-                <!-- HEADER CARD -->
                 <div class="header-card">
                     <div class="header-left">
                         <img id="photo" src="" class="profile-photo" />
                         <div class="profile-name">
-                            <h1 id="name"></h1>
-                            <div class="meta" id="rankArmyMobile"></div>
+                            <div class="rank-army" id="rankArmyNo"></div>
+                            <div class="name-with-decorations">
+                                <h1 id="name"></h1>
+                                <span class="decoration-bracket" id="decorationInitials"></span>
+                            </div>
+                            <div class="meta" id="mobileNumber"></div>
                         </div>
                     </div>
                     <div class="selected">SELECTED</div>
                 </div>
 
-                <!-- IDENTITY & SERVICE -->
                 <div class="section">
                     <div class="section-title">Identity & Service Dates</div>
                     <div class="info-grid">
                         <div class="info-item"><span>Date of Birth</span><strong id="dob"></strong></div>
                         <div class="info-item"><span>Date of Commission</span><strong id="doc"></strong></div>
                         <div class="info-item"><span>Date of Seniority</span><strong id="dos"></strong></div>
-                        <div class="info-item"><span>Last Rank (Substantive)</span><strong id="lastRank">N/A</strong></div>
+                        <div class="info-item"><span>Last Rank (Substantive)</span><strong id="lastRank"></strong></div>
                         <div class="info-item"><span>PAN</span><strong id="pan"></strong></div>
                         <div class="info-item"><span>Aadhaar</span><strong id="aadhaar"></strong></div>
                     </div>
                 </div>
 
-                <!-- POSTING HISTORY -->
                 <div class="section">
                     <div class="section-title">Posting History</div>
                     <table class="table" id="postingTable">
@@ -418,12 +527,12 @@
                             <th>Taken on Strength</th>
                             <th>Appointment</th>
                             <th>Total Time Served</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- COURSES COMPLETED -->
                 <div class="section">
                     <div class="section-title">Courses Completed</div>
                     <table class="table" id="courseTable">
@@ -433,12 +542,12 @@
                             <th>Grading</th>
                             <th>From</th>
                             <th>To</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- DECORATIONS -->
                 <div class="section">
                     <div class="section-title">Decorations</div>
                     <table class="table" id="decorTable">
@@ -447,12 +556,12 @@
                             <th>Award Name</th>
                             <th>Award Date</th>
                             <th>Citation</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- QUALIFICATIONS -->
                 <div class="section">
                     <div class="section-title">Qualifications</div>
                     <table class="table" id="qualTable">
@@ -462,12 +571,12 @@
                             <th>Institution</th>
                             <th>Year</th>
                             <th>Grade</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- ADDITIONAL QUALIFICATIONS -->
                 <div class="section">
                     <div class="section-title">Additional Qualifications</div>
                     <table class="table" id="addQualTable">
@@ -477,12 +586,12 @@
                             <th>Authority Number</th>
                             <th>Year</th>
                             <th>Validity</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- FAMILY DETAILS -->
                 <div class="section">
                     <div class="section-title">Family Details</div>
                     <table class="table" id="familyTable">
@@ -491,18 +600,18 @@
                             <th>Name</th>
                             <th>Relationship</th>
                             <th>Contact</th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <!-- DISCIPLINE & MEDICAL -->
                 <div class="section">
                     <div class="section-title">Discipline & Medical</div>
                     <div class="info-grid">
                         <div class="info-item"><span>Discipline Case</span><strong id="disciplineCase"></strong></div>
-                        <div class="info-item"><span>Restrictions</span><strong id="restrictions">N/A</strong></div>
-                        <div class="info-item"><span>Vigilance Status</span><strong id="vigilanceStatus">N/A</strong></div>
+                        <div class="info-item"><span>Restrictions</span><strong id="restrictions"></strong></div>
+                        <div class="info-item"><span>Vigilance Status</span><strong id="vigilanceStatus"></strong></div>
                         <div class="info-item"><span>Medical Category</span><strong id="medCat"></strong></div>
                         <div class="info-item"><span>School / Institute</span><strong id="institute"></strong></div>
                         <div class="info-item"><span>Degree</span><strong id="degree"></strong></div>
@@ -511,17 +620,13 @@
                     </div>
                 </div>
 
-                <!-- COURSE REMARKS HISTORY SECTION -->
                 <div class="history-section">
                     <div class="section-title">Course Remarks History</div>
                     <div id="historyContainer"></div>
                 </div>
-
             </div>
         </div>
-
     </main>
-
 </div>
 
 <script>
@@ -529,8 +634,6 @@
     const BASE_URL = "http://localhost:6060";
     const SEARCH_API = `${BASE_URL}/api/personnel/search`;
     const REMARKS_HISTORY_API = `${BASE_URL}/api/remarks/history`;
-
-    // New APIs
     const IDENTITY_API = `${BASE_URL}/api/personnel`;
     const POSTING_API = `${BASE_URL}/api/personnel`;
     const COURSES_API = `${BASE_URL}/api/personnel`;
@@ -547,12 +650,12 @@
     const selectedPersonnelId = document.getElementById('selectedPersonnelId');
     const historyContainer = document.getElementById('historyContainer');
 
-    // ==================== STATE ====================
+    let currentArmyNo = null;
     let selectedPersonnel = null;
     let searchTimeout = null;
     let abortController = null;
 
-    // ==================== DISPLAY HISTORY TABLE WITH HEADERS ====================
+    // ==================== HISTORY FUNCTIONS ====================
     function getHistoryTableHTML() {
         return `
             <table class="history-table">
@@ -562,14 +665,13 @@
                         <th>Remarks</th>
                         <th>Course Name</th>
                         <th>Date & Time</th>
-                    </thead>
-                <tbody id="historyTableBody">
-                </tbody>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody"></tbody>
             </table>
         `;
     }
 
-    // ==================== LOAD REMARKS HISTORY ====================
     async function loadRemarksHistory(personnelId) {
         if (!personnelId) {
             historyContainer.innerHTML = getHistoryTableHTML();
@@ -591,14 +693,11 @@
 
             const response = await fetch(`${REMARKS_HISTORY_API}/${personnelId}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const result = await response.json();
@@ -612,7 +711,6 @@
                     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No remarks history found for this personnel</td></tr>';
                 }
             }
-
         } catch (error) {
             console.error('❌ Error loading remarks history:', error);
             const tbody = document.getElementById('historyTableBody');
@@ -627,7 +725,6 @@
         if (!tbody) return;
 
         let html = '';
-
         historyData.forEach(record => {
             const date = new Date(record.createdAt);
             const formattedDate = date.toLocaleString('en-IN', {
@@ -644,16 +741,13 @@
 
             html += `
                 <tr>
-                    <td>
-                        <span class="remark-type-badge ${remarkTypeClass}">${escapeHtml(record.remarkType)}</span>
-                    </td>
+                    <td><span class="remark-type-badge ${remarkTypeClass}">${escapeHtml(record.remarkType)}</span></td>
                     <td>${escapeHtml(record.generalRemarks || '-')}</td>
                     <td>${escapeHtml(courseName)}</td>
                     <td style="white-space: nowrap;">${formattedDate}</td>
                 </tr>
             `;
         });
-
         tbody.innerHTML = html;
     }
 
@@ -664,7 +758,7 @@
         return div.innerHTML;
     }
 
-    // ==================== SEARCH FUNCTION ====================
+    // ==================== SEARCH FUNCTIONS ====================
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
             const searchTerm = e.target.value.trim();
@@ -728,19 +822,19 @@
             html += `
                 <div class="recommendation-item" onclick="selectPersonnel(${person.id}, '${person.armyNo}', '${person.fullName}', '${person.rank || ''}')">
                     <div class="army-no">${person.armyNo}</div>
-                    <div style="font-size: 12px; color: #4b5563;">${person.fullName} ${person.rank ? '- ' + person.rank : ''}</div>
+                    <div style="font-size: 11px; color: #4b5563;">${person.fullName} ${person.rank ? '- ' + person.rank : ''}</div>
                 </div>
             `;
         });
         searchResults.innerHTML = html;
     }
 
-    // ==================== SELECT PERSONNEL ====================
     window.selectPersonnel = function(personnelId, armyNo, fullName, rank) {
         console.log('✅ Selected:', {personnelId, armyNo, fullName, rank});
 
         searchInput.value = `${fullName} (${armyNo})`;
         selectedPersonnelId.value = personnelId;
+        currentArmyNo = armyNo;
 
         selectedPersonnel = {
             id: Number(personnelId),
@@ -756,7 +850,6 @@
             <strong>Selected:</strong> ${fullName} (${armyNo}) ${rank ? '- ' + rank : ''}
         `;
 
-        // Load all data using new APIs
         loadAllData(personnelId);
         loadRemarksHistory(personnelId);
     };
@@ -767,66 +860,71 @@
         }
     });
 
-    /* ===== LOAD ALL NEW APIS ===== */
+    // ==================== HELPER FUNCTIONS ====================
+    function generateDecorationInitials(awardName) {
+        if (!awardName) return '';
+        const words = awardName.trim().split(/\s+/);
+        let initials = '';
+        for (let word of words) {
+            if (word.length > 0) {
+                initials += word.charAt(0).toUpperCase();
+            }
+        }
+        return initials;
+    }
+
+    // ==================== LOAD ALL DATA ====================
     async function loadAllData(id) {
         try {
-            // 1. Identity & Service Details
-            const identityResponse = await fetch(`${IDENTITY_API}/${id}/identity-service`);
-            const identityData = await identityResponse.json();
+            const [identityRes, postingRes, coursesRes, decorationsRes, qualificationsRes, addQualRes, familyRes, disciplineRes] = await Promise.all([
+                fetch(`${IDENTITY_API}/${id}/identity-service`),
+                fetch(`${POSTING_API}/${id}/paramount/posting-history`),
+                fetch(`${COURSES_API}/${id}/courses-completed`),
+                fetch(`${DECORATIONS_API}/${id}/decorations`),
+                fetch(`${QUALIFICATIONS_API}/${id}/qualifications`),
+                fetch(`${ADDITIONAL_QUALIFICATIONS_API}/${id}/additional-qualifications`),
+                fetch(`${FAMILY_API}/${id}/family-members`),
+                fetch(`${DISCIPLINE_MEDICAL_API}/${id}/discipline-medical`)
+            ]);
 
-            // 2. Posting History
-            const postingResponse = await fetch(`${POSTING_API}/${id}/paramount/posting-history`);
-            const postingData = await postingResponse.json();
+            const identityData = await identityRes.json();
+            const postingData = await postingRes.json();
+            const coursesData = await coursesRes.json();
+            const decorationsData = await decorationsRes.json();
+            const qualificationsData = await qualificationsRes.json();
+            const addQualData = await addQualRes.json();
+            const familyData = await familyRes.json();
+            const disciplineData = await disciplineRes.json();
 
-            // 3. Courses Completed
-            const coursesResponse = await fetch(`${COURSES_API}/${id}/courses-completed`);
-            const coursesData = await coursesResponse.json();
-
-            // 4. Decorations
-            const decorationsResponse = await fetch(`${DECORATIONS_API}/${id}/decorations`);
-            const decorationsData = await decorationsResponse.json();
-
-            // 5. Qualifications
-            const qualificationsResponse = await fetch(`${QUALIFICATIONS_API}/${id}/qualifications`);
-            const qualificationsData = await qualificationsResponse.json();
-
-            // 6. Additional Qualifications
-            const addQualResponse = await fetch(`${ADDITIONAL_QUALIFICATIONS_API}/${id}/additional-qualifications`);
-            const addQualData = await addQualResponse.json();
-
-            // 7. Family Members
-            const familyResponse = await fetch(`${FAMILY_API}/${id}/family-members`);
-            const familyData = await familyResponse.json();
-
-            // 8. Discipline & Medical
-            const disciplineResponse = await fetch(`${DISCIPLINE_MEDICAL_API}/${id}/discipline-medical`);
-            const disciplineData = await disciplineResponse.json();
-
-            // Fill the card with all data
             fillCard(identityData, postingData, coursesData, decorationsData,
                      qualificationsData, addQualData, familyData, disciplineData);
-
         } catch (error) {
             console.error('Error loading data:', error);
             alert('Error loading personnel data');
         }
     }
 
-    /* ===== FILL THE PARAMOUNT CARD ===== */
+    // ==================== FILL CARD ====================
     function fillCard(identity, postingHistory, courses, decorations, qualifications, additionalQuals, familyMembers, disciplineMedical) {
-
         document.getElementById("pdfContent").style.display = "block";
         document.getElementById("pdfBtn").style.display = "inline-block";
 
         // Header Section
+        document.getElementById("rankArmyNo").innerHTML = `${identity.rank || 'N/A'} | ${identity.armyNo || 'N/A'}`;
         document.getElementById("name").innerText = identity.fullName || 'N/A';
-        document.getElementById("rankArmyMobile").innerHTML =
-            `${identity.rank || 'N/A'} | ${identity.armyNo || 'N/A'}<br>Mobile: ${identity.mobileNumber || 'N/A'}`;
+        document.getElementById("mobileNumber").innerHTML = `Mobile: ${identity.mobileNumber || 'N/A'}`;
 
-        document.getElementById("photo").src = identity.officerImage ?
-            `http://localhost:6060/${identity.officerImage}` : "https://via.placeholder.com/150";
+        if (decorations && decorations.length > 0) {
+            const decorationInitials = decorations.map(d => generateDecorationInitials(d.awardName)).filter(i => i.length > 0);
+            const uniqueInitials = [...new Set(decorationInitials)];
+            document.getElementById("decorationInitials").innerHTML = uniqueInitials.length > 0 ? `(${uniqueInitials.join(', ')})` : '';
+        } else {
+            document.getElementById("decorationInitials").innerHTML = '';
+        }
 
-        // Identity & Service Section
+        document.getElementById("photo").src = identity.officerImage ? `http://localhost:6060/${identity.officerImage}` : "https://via.placeholder.com/80";
+
+        // Identity & Service
         document.getElementById("dob").innerText = identity.dateOfBirth || 'N/A';
         document.getElementById("doc").innerText = identity.dateOfCommission || 'N/A';
         document.getElementById("dos").innerText = identity.dateOfSeniority || 'N/A';
@@ -859,10 +957,12 @@
         courseBody.innerHTML = "";
         if (courses && courses.length > 0) {
             courses.forEach(c => {
+                const grading = (!c.grading || c.grading === 'null' || c.grading === 'Pending') ? 'Pending' : c.grading;
+                const gradingClass = grading === 'Pending' ? 'grading-pending' : 'grading-pass';
                 courseBody.innerHTML += `
                     <tr>
                         <td>${c.courseName || 'N/A'}</td>
-                        <td>${c.grading || 'N/A'}</td>
+                        <td class="${gradingClass}">${grading}</td>
                         <td>${c.fromDate || 'N/A'}</td>
                         <td>${c.toDate || 'N/A'}</td>
                     </tr>
@@ -953,20 +1053,23 @@
         document.getElementById("homeStation").innerText = disciplineMedical.homeStation || 'N/A';
     }
 
-    /* ===== PDF EXPORT ===== */
+    // ==================== PDF EXPORT with Army Number ====================
     function downloadPDF() {
         const element = document.getElementById("pdfContent");
+        const armyNo = currentArmyNo || document.getElementById("rankArmyNo").innerText.split('|')[1]?.trim() || 'unknown';
+        const cleanArmyNo = armyNo.replace(/\s+/g, '_').replace(/\//g, '-');
+
         const opt = {
-            margin: 0.4,
-            filename: "Paramount_Card.pdf",
-            image: { type: "jpeg", quality: 1 },
-            html2canvas: { scale: 2 },
+            margin: [0.2, 0.2, 0.2, 0.2],
+            filename: `Paramount_Card_${cleanArmyNo}.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2, letterRendering: true },
             jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
         };
-        html2pdf().from(element).set(opt).save();
+        html2pdf().set(opt).from(element).save();
     }
 
-    /* ===== AUTO DOWNLOAD FROM URL PARAM ===== */
+    // ==================== AUTO DOWNLOAD ====================
     const params = new URLSearchParams(window.location.search);
     const autoId = params.get("id");
 
@@ -974,22 +1077,20 @@
         if (searchInput) searchInput.value = "Loading...";
         loadAllData(autoId);
         loadRemarksHistory(autoId);
-
         setTimeout(() => {
             downloadPDF();
-        }, 1200);
+        }, 1500);
     }
 
-    // Initialize history table on page load
+    // ==================== INITIALIZE ====================
     function initializeHistoryTable() {
         historyContainer.innerHTML = getHistoryTableHTML();
         const tbody = document.getElementById('historyTableBody');
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history<th>th';
         }
     }
 
-    // ==================== SIDEBAR LOADER ====================
     async function loadSidebar() {
         try {
             if (typeof window.loadSidebar === 'function') {
@@ -998,7 +1099,6 @@
                 const response = await fetch('/session.html');
                 const html = await response.text();
                 document.getElementById('sidebarContainer').innerHTML = html;
-
                 const logoutBtn = document.querySelector("#sidebarContainer #logoutBtn");
                 if (logoutBtn) {
                     logoutBtn.addEventListener("click", () => {
@@ -1012,7 +1112,6 @@
         }
     }
 
-    // Load sidebar and initialize when page loads
     document.addEventListener("DOMContentLoaded", function() {
         console.log('✅ DOM loaded');
         loadSidebar();

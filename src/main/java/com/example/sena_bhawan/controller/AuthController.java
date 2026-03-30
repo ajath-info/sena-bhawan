@@ -2,7 +2,11 @@ package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.LoginRequest;
 import com.example.sena_bhawan.dto.LoginResponse;
+import com.example.sena_bhawan.entity.Role;
 import com.example.sena_bhawan.entity.UserMaster;
+import com.example.sena_bhawan.entity.UserRoleInfo;
+import com.example.sena_bhawan.repository.RoleRepository;
+import com.example.sena_bhawan.repository.UserRoleInfoRepository;
 import com.example.sena_bhawan.service.AdminService;
 import com.example.sena_bhawan.util.JwtUtil;
 
@@ -13,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api")
 public class AuthController {
@@ -22,6 +29,11 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserRoleInfoRepository userRoleInfoRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> login(
@@ -37,18 +49,23 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getUserId());
 
+        UserRoleInfo roleIds = userRoleInfoRepository.findByUserId(user.getUserId());
+        Role role = roleRepository.findById(roleIds.getRoleId()).orElseThrow();
+
         HttpSession session = request.getSession(true);
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("username", user.getUsername());
         session.setAttribute("appointment", user.getAppointment());
         session.setAttribute("token", token);
+        session.setAttribute("roleId", role.getHierarchyOrder());
 
         return ResponseEntity.ok(
                 new LoginResponse(
                         user.getUserId(),
                         user.getUsername(),
                         user.getAppointment(),
-                        token
+                        token,
+                        role.getHierarchyOrder()
                 )
         );
     }

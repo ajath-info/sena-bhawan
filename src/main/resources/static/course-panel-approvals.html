@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Approval Dashboard</title>
+
+    <link rel="stylesheet" href="sidebar.css">
+    <script src="sidebar.js"></script>
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            margin:0;
+            background:#f1f3f5;
+        }
+
+        .container {
+            display:flex;
+            height:100vh;
+        }
+
+        .main-content {
+            flex:1;
+            padding:20px;
+            overflow-y: auto;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1b4332;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tabs */
+        .tabs {
+            display:flex;
+            gap:10px;
+            margin-bottom:20px;
+        }
+
+        .tab {
+            padding:10px 20px;
+            border-radius:8px;
+            background:#e5e7eb;
+            cursor:pointer;
+            font-weight:600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background:#d1d5db;
+        }
+
+        .tab.active {
+            background:#1b4332;
+            color:white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Panel Cards */
+        .panel-card {
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:10px;
+            border-left:5px solid #1b4332;
+            cursor:pointer;
+            transition: all 0.2s;
+        }
+
+        .panel-card:hover {
+            background:#f9fafb;
+            transform: translateX(5px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel-id {
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .panel-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        /* Panel Cards - Active/Inactive Colors */
+        .panel-card.active-batch {
+            background: white;
+            border-left-color: #10b981;
+        }
+
+        .panel-card.inactive-batch {
+            background: #fee2e2;
+            border-left-color: #dc2626;
+            opacity: 0.8;
+        }
+
+        .panel-card.inactive-batch:hover {
+            background: #fecaca;
+            transform: translateX(5px);
+        }
+
+        .course-details {
+            font-size: 14px;
+            color: #374151;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: #1b4332;
+        }
+
+        /* Table */
+        .table-scroll {
+            max-height:500px;
+            overflow:auto;
+            border:1px solid #ddd;
+            border-radius:10px;
+            background:white;
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            min-width:800px;
+        }
+
+        th {
+            background:#f9fafb;
+            position:sticky;
+            top:0;
+            z-index: 10;
+        }
+
+        th, td {
+            padding:10px;
+            border-bottom:1px solid #ddd;
+            text-align: left;
+        }
+
+        /* Buttons */
+        .btn {
+            padding:10px 20px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            margin-right:10px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-success {
+            background:#10b981;
+            color:white;
+        }
+
+        .btn-success:hover {
+            background:#059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background:#dc2626;
+            color:white;
+        }
+
+        .btn-danger:hover {
+            background:#b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background:#6b7280;
+            color:white;
+        }
+
+        .btn-secondary:hover {
+            background:#4b5563;
+            transform: translateY(-1px);
+        }
+
+        .remark-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .page-btn.active {
+            background: #1b4332;
+            color: white;
+            border-color: #1b4332;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .table-scroll {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <aside class="sidebar" id="sidebarContainer"></aside>
+
+    <div class="main-content">
+
+        <h2>📋 <span id="dashboardUsername">Loading...</span> Approval Dashboard</h2>
+
+        <div class="tabs">
+            <div class="tab" data-status="PENDING_APPROVAL" onclick="loadTab('PENDING_APPROVAL', this)">
+                Pending
+            </div>
+            <div class="tab" data-status="APPROVED" onclick="loadTab('APPROVED', this)">
+                Approved
+            </div>
+            <div class="tab" data-status="REJECTED" onclick="loadTab('REJECTED', this)">
+                Rejected
+            </div>
+        </div>
+
+        <!-- Page Size Selector -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <label for="pageSizeSelect" style="font-size: 14px; color: #6b7280;">Show:</label>
+            <select id="pageSizeSelect" style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer;" onchange="changePageSize()">
+                <option value="5">5 per page</option>
+                <option value="10" selected>10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+            </select>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none;">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Panel List -->
+        <div id="panelList">
+            <p>Loading panels...</p>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="pagination"></div>
+
+        <!-- Modal Overlay -->
+        <div id="modalOverlay" style="display:none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div id="modalContent" style="background: white; border-radius: 10px; width: 90%; max-width: 1400px; max-height: 90%; overflow-y: auto; padding: 20px; margin: 20px;">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+
+    // API Configuration
+    const API_BASE_URL = 'http://localhost:6060/api';
+    let currentMovementId = null;
+    let currentStatus = 'PENDING_APPROVAL';
+    let currentPage = 0;
+    let pageSize = 10;
+    let totalPages = 0;
+    let currentPanel = null;
+
+    function renderPanelList(panels) {
+        const list = document.getElementById("panelList");
+        list.innerHTML = "";
+
+        if (!panels || panels.length === 0) {
+            list.innerHTML = "<p>No records found</p>";
+            return;
+        }
+
+        // Sort panels: active (true) first, then inactive (false)
+        const sortedPanels = [...panels].sort((a, b) => {
+            if (a.batchStatus === b.batchStatus) return 0;
+            return a.batchStatus ? -1 : 1;
+        });
+
+        sortedPanels.forEach(panel => {
+            const div = document.createElement("div");
+            div.className = "panel-card";
+
+            // Add different classes based on batch status
+            if (panel.batchStatus) {
+                div.classList.add("active-batch");
+                div.style.cursor = "pointer";
+                div.onclick = () => openPanel(panel);
+            } else {
+                div.classList.add("inactive-batch");
+                div.style.cursor = "default";
+                // No onclick for inactive batches
+            }
+
+            // Format dates
+            const startDate = panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A';
+            const endDate = panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A';
+            const createdDate = panel.createdAt ? new Date(panel.createdAt).toLocaleDateString() : 'N/A';
+
+            // Create course title
+            const courseTitle = `${panel.courseName || 'N/A'} - Batch: ${panel.batchNumber || 'N/A'} (${panel.year || 'N/A'})`;
+
+            div.innerHTML = `
+            <div class="course-details">
+                <div style="font-size: 16px; font-weight: 600; color: #1b4332; margin-bottom: 8px;">
+                    ${courseTitle}
+                </div>
+                <div style="margin-top: 5px; font-size: 13px;">
+                    📅 ${startDate} to ${endDate} | 📍 ${panel.venue || 'N/A'}
+                </div>
+                <div style="margin-top: 5px; font-size: 13px; color: #6b7280;">
+                    Total Nominations: ${panel.totalNominations || 0} |
+                    Movement ID: ${panel.movementId} |
+                    Created: ${createdDate}
+                </div>
+                ${panel.remarks ? `<div style="margin-top: 5px; font-size: 12px; color: #6b7280;">📝 ${panel.remarks}</div>` : ''}
+            </div>
+        `;
+
+            list.appendChild(div);
+        });
+    }
+
+    // ===============================
+    // SHOW MODAL WITH PERSONNEL DATA
+    // ===============================
+    function showModal(panel, personnelList) {
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const user = getCurrentUser();
+        const userId = user?.userId || 1;
+
+        // Generate table rows
+        let tableRows = '';
+        if (!personnelList || personnelList.length === 0) {
+            tableRows = '<td colspan="8" style="text-align: center;">No personnel found</td>';
+        } else {
+            personnelList.forEach((person, index) => {
+                tableRows += `
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${index + 1}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.armyNo || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.rank || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.fullName || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.city || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.district || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.mobileNumber || 'N/A'}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.emailAddress || 'N/A'}</td>
+                </tr>
+            `;
+            });
+        }
+
+        const courseTitle = `${panel.courseName || 'N/A'} - Batch: ${panel.batchNumber || 'N/A'} (${panel.year || 'N/A'})`;
+
+        // Only show action buttons if we're in PENDING_APPROVAL tab
+        const showActionButtons = (currentStatus === 'PENDING_APPROVAL');
+
+        modalContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #1b4332; margin: 0;">${courseTitle}</h2>
+            <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+            <div class="info-item" style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Movement ID:</span>
+                <span style="color: #1f2937;">${panel.movementId}</span>
+            </div>
+            <div class="info-item" style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Status:</span>
+                <span class="status-badge status-${panel.status.toLowerCase().replace('_', '-')}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: ${panel.status === 'PENDING_APPROVAL' ? '#fef3c7' : panel.status === 'APPROVED' ? '#d1fae5' : '#fee2e2'}; color: ${panel.status === 'PENDING_APPROVAL' ? '#d97706' : panel.status === 'APPROVED' ? '#059669' : '#dc2626'};">${panel.status}</span>
+            </div>
+            <div class="info-item" style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Venue:</span>
+                <span style="color: #1f2937;">${panel.venue || 'N/A'}</span>
+            </div>
+            <div class="info-item" style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Duration:</span>
+                <span style="color: #1f2937;">${panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A'} to ${panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A'}</span>
+            </div>
+            <div class="info-item" style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Total Nominations:</span>
+                <span style="color: #1f2937;">${panel.totalNominations || 0}</span>
+            </div>
+        </div>
+
+        <h3>Personnel List</h3>
+        <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f3f4f6; position: sticky; top: 0;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Ser</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Army No</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Rank</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Full Name</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">City</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">District</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Mobile</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+
+        ${showActionButtons ? `
+            <div style="margin-top: 20px;">
+                <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back, Optional for Forward):</label>
+                <textarea id="modalRemark" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
+                <button class="btn btn-success" onclick="forwardPanelModal()">Forward</button>
+                <button class="btn btn-danger" onclick="rejectPanelModal()">Reject</button>
+                <button class="btn btn-warning" onclick="sendBackPanelModal()" style="background: #f59e0b; color: white;">Send Back</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        ` : `
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
+                <div style="padding: 10px; background: #f3f4f6; border-radius: 6px; color: #6b7280; text-align: center; width: 100%;">
+                    ${panel.status === 'APPROVED' ? '✓ Approved' : panel.status === 'REJECTED' ? '✗ Rejected' : 'Pending'}
+                </div>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        `}
+    `;
+
+        modalOverlay.style.display = 'flex';
+    }
+
+    // ===============================
+    // MODAL ACTION FUNCTIONS
+    // ===============================
+    async function forwardPanelModal() {
+        const remark = document.getElementById('modalRemark').value;
+        const user = getCurrentUser();
+
+        if (!confirm('Are you sure you want to forward this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/approve`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user?.userId || 1,
+                    remarks: remark
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to forward');
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel forwarded successfully');
+
+            closeModal();
+            await loadPanels();
+
+        } catch (error) {
+            console.error('Error forwarding panel:', error);
+            alert(error.message || 'Error forwarding panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function updateDashboardTitle() {
+        const user = getCurrentUser();
+        const usernameSpan = document.getElementById('dashboardUsername');
+        if (user && user.username) {
+            usernameSpan.textContent = user.username;
+        } else {
+            usernameSpan.textContent = 'User';
+        }
+    }
+
+    async function rejectPanelModal() {
+        const remark = document.getElementById('modalRemark').value;
+        const user = getCurrentUser();
+
+        if (!remark.trim()) {
+            alert('Please enter remarks before rejecting');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to reject this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/reject`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user?.userId || 1,
+                    remarks: remark,
+                    rejectMovementId: currentPanel.movementId
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to reject');
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel rejected successfully');
+
+            closeModal();
+            await loadPanels();
+
+        } catch (error) {
+            console.error('Error rejecting panel:', error);
+            alert(error.message || 'Error rejecting panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function sendBackPanelModal() {
+        const remark = document.getElementById('modalRemark').value;
+        const user = getCurrentUser();
+
+        if (!remark.trim()) {
+            alert('Please enter remarks before sending back');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to send back this panel?')) return;
+
+        showLoading(true);
+
+        try {
+            const url = `${API_BASE_URL}/batches/${currentPanel.batchId}/send-back`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user?.userId || 1,
+                    remarks: remark
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to send back');
+            }
+
+            const result = await response.json();
+            alert(result.message || 'Panel sent back successfully');
+
+            closeModal();
+            await loadPanels();
+
+        } catch (error) {
+            console.error('Error sending back panel:', error);
+            alert(error.message || 'Error sending back panel. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function closeModal() {
+        const modalOverlay = document.getElementById('modalOverlay');
+        modalOverlay.style.display = 'none';
+        const remarkTextarea = document.getElementById('modalRemark');
+        if (remarkTextarea) {
+            remarkTextarea.value = '';
+        }
+    }
+
+    // ===============================
+    // GET USER DATA FROM LOCAL STORAGE
+    // ===============================
+    function getUserData() {
+        try {
+            const userDataStr = localStorage.getItem("userData");
+            if (userDataStr) {
+                return JSON.parse(userDataStr);
+            }
+            return null;
+        } catch (error) {
+            console.error("Error parsing user data:", error);
+            return null;
+        }
+    }
+
+    function getCurrentUser() {
+        const userData = getUserData();
+        if (userData) {
+            return {
+                userId: userData.userId,
+                username: userData.username,
+                roleId: userData.roleId,
+                appointment: userData.appointment,
+                token: userData.token
+            };
+        }
+        return null;
+    }
+
+
+    // ===============================
+    // LOAD PANELS FROM API
+    // ===============================
+    async function loadPanels() {
+        if (!currentMovementId) {
+            console.error('No movement ID found');
+            return;
+        }
+
+        showLoading(true);
+
+        try {
+            // Change this URL construction
+            const url = `${API_BASE_URL}/panel-batches/movement/${currentMovementId}/status/${currentStatus}?page=${currentPage}&size=${pageSize}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // After getting data, update page size selector to match current pageSize
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            if (pageSizeSelect && pageSizeSelect.value != pageSize) {
+                pageSizeSelect.value = pageSize;
+            }
+
+            // Remove existing showing info if any
+            const existingInfo = document.querySelector('.showing-info');
+            if (existingInfo) existingInfo.remove();
+
+            // Show total count info
+            const totalCount = data.totalCount || 0;
+            const showingText = document.createElement('div');
+            showingText.style.cssText = 'font-size: 14px; color: #6b7280; margin-bottom: 10px;';
+            showingText.textContent = `Showing ${data.data?.length || 0} of ${totalCount} records`;
+            showingText.className = 'showing-info';
+
+            // Insert before panelList
+            const panelListDiv = document.getElementById('panelList');
+            panelListDiv.parentNode.insertBefore(showingText, panelListDiv);
+
+            // The data structure is { data: [...], totalCount, currentPage, pageSize, totalPages }
+            renderPanelList(data.data || []);
+
+            // Render pagination using the correct properties
+            if (data.totalPages !== undefined) {
+                renderPagination(data.currentPage, data.totalPages);
+                totalPages = data.totalPages;
+            }
+
+        } catch (error) {
+            console.error('Error loading panels:', error);
+            document.getElementById('panelList').innerHTML =
+                '<p style="color: red;">Error loading panels. Please check your connection.</p>';
+        } finally {
+            showLoading(false);
+        }
+    }
+
+
+    // ===============================
+    // OPEN PANEL DETAILS - Opens in new page/popup
+    // ===============================
+    async function openPanel(panel) {
+        currentPanel = panel;
+        showLoading(true);
+
+        try {
+            // Fetch personnel details for this batch
+            const url = `${API_BASE_URL}/panel-batches/${panel.batchId}/personnel`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const personnelData = await response.json();
+
+            // Show modal with personnel data
+            showModal(panel, personnelData);
+
+        } catch (error) {
+            console.error('Error loading personnel details:', error);
+            alert('Error loading personnel details. Please try again.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===============================
+    // UTILITY FUNCTIONS
+    // ===============================
+    function showLoading(show) {
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    function renderPagination(currentPageNum, totalPagesNum) {
+        const container = document.getElementById('paginationContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (totalPagesNum <= 1) return;
+
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '← Previous';
+        prevBtn.className = 'page-btn';
+        prevBtn.disabled = currentPageNum === 0;
+        prevBtn.onclick = () => goToPage(currentPageNum - 1);
+        container.appendChild(prevBtn);
+
+        // Page numbers (show all pages)
+        for (let i = 0; i < totalPagesNum; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i + 1;
+            pageBtn.className = 'page-btn';
+            if (i === currentPageNum) {
+                pageBtn.classList.add('active');
+                pageBtn.disabled = true;
+            } else {
+                pageBtn.onclick = () => goToPage(i);
+            }
+            container.appendChild(pageBtn);
+        }
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next →';
+        nextBtn.className = 'page-btn';
+        nextBtn.disabled = currentPageNum === totalPagesNum - 1;
+        nextBtn.onclick = () => goToPage(currentPageNum + 1);
+        container.appendChild(nextBtn);
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        loadPanels();
+    }
+
+    function loadTab(status, el) {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        el.classList.add("active");
+
+        currentStatus = status; // This should be 'PENDING_APPROVAL', 'APPROVED', or 'REJECTED'
+        currentPage = 0;
+        loadPanels();
+    }
+
+    // ===============================
+    // INITIALIZATION
+    // ===============================
+    // Check if user is logged in
+    const userData = getUserData();
+    if (!userData) {
+        alert('Please login first');
+        window.location.href = '/login.html';
+    } else {
+        // Display user info for debugging
+        displayUserInfo();
+
+        // Update dashboard title with username
+        updateDashboardTitle();
+
+        // Set movement ID from user data
+        if (initializeMovementId()) {
+            // Set active tab to PENDING_APPROVAL
+            const activeTab = document.querySelector('.tab[data-status="PENDING_APPROVAL"]');
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            // Set current status
+            currentStatus = 'PENDING_APPROVAL';
+            // Load initial panels
+            loadPanels();
+        } else {
+            console.error('Failed to initialize movement ID');
+            document.getElementById('panelList').innerHTML =
+                '<p style="color: red;">Error: Unable to get movement ID from user data</p>';
+        }
+    }
+
+    function initializeMovementId() {
+        const user = getCurrentUser();
+        if (user && user.roleId) {
+            currentMovementId = user.roleId;
+            console.log('Movement ID set to:', currentMovementId);
+            return true;
+        }
+        console.error('No roleId found in user data');
+        return false;
+    }
+
+    function changePageSize() {
+        const select = document.getElementById('pageSizeSelect');
+        pageSize = parseInt(select.value);
+        currentPage = 0;
+        loadPanels();
+    }
+
+    // Add this function to debug user data
+    function displayUserInfo() {
+        const user = getCurrentUser();
+        if (user) {
+            console.log('User Info:', {
+                userId: user.userId,
+                username: user.username,
+                roleId: user.roleId,
+                appointment: user.appointment
+            });
+
+            // Optionally display on page
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.style.cssText = 'background: #e5e7eb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;';
+            userInfoDiv.innerHTML = `
+            <strong>Logged in as:</strong> ${user.username} |
+            <strong>Role ID:</strong> ${user.roleId} |
+            <strong>Appointment:</strong> ${user.appointment}
+        `;
+
+            const mainContent = document.querySelector('.main-content');
+            const firstChild = mainContent.firstChild;
+            if (firstChild) {
+                mainContent.insertBefore(userInfoDiv, firstChild.nextSibling);
+            }
+        }
+    }
+
+    // Add click outside modal to close
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) {
+        modalOverlay.onclick = function(event) {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        };
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,26 +1,34 @@
-// (function checkAuth() {
-//
-//     const token = sessionStorage.getItem("token");
-//
-//     // If token missing → force redirect to login
-//     if (!token || token === "" || token === "null") {
-//         sessionStorage.clear();      // clear anything leftover
-//         window.location.replace("/login.html");  // replace() prevents going back
-//     }
-//
-// })();
-//
-//
-
 (function checkAuth() {
 
     /* ===============================
-       AUTH CHECK
+       AUTH CHECK - Check both storages
     ================================ */
-    const token = sessionStorage.getItem("token");
+    let token = sessionStorage.getItem("token");
 
+    // If token not in sessionStorage, try to get from localStorage
+    if (!token || token === "" || token === "null") {
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+            try {
+                const parsedData = JSON.parse(userData);
+                token = parsedData.token;
+                // Sync to sessionStorage for existing functionality
+                if (token) {
+                    sessionStorage.setItem("token", token);
+                    sessionStorage.setItem("userId", parsedData.userId);
+                    sessionStorage.setItem("username", parsedData.username);
+                    sessionStorage.setItem("appointment", parsedData.appointment);
+                }
+            } catch(e) {
+                console.error("Error parsing userData:", e);
+            }
+        }
+    }
+
+    // If still no token → force redirect to login
     if (!token || token === "" || token === "null") {
         sessionStorage.clear();
+        localStorage.removeItem("userData"); // Clear localStorage too
         window.location.replace("/login.html");
         return;
     }
@@ -97,10 +105,22 @@
     }
 
     /* ===============================
-       LOGOUT
+       LOGOUT - Clear both storages
     ================================ */
     function logout() {
         sessionStorage.clear();
+        localStorage.removeItem("userData"); // Clear localStorage user data
+
+        // Clear any sidebar cached data
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('sidebar_')) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+
         window.location.replace("/login.html");
     }
 

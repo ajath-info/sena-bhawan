@@ -738,6 +738,19 @@
         }
 
         // Enhanced date validation
+        const today = new Date().toISOString().split('T')[0];
+        if (payload.startDate < today) {
+            alert("❌ Start date cannot be in the past. Please select today or a future date.");
+            showDateError("Start date cannot be in the past. Please select today or a future date.");
+            return;
+        }
+
+        if (payload.endDate < today) {
+            alert("❌ End date cannot be in the past. Please select today or a future date.");
+            showDateError("End date cannot be in the past. Please select today or a future date.");
+            return;
+        }
+
         if (payload.startDate > payload.endDate) {
             alert("❌ From Date cannot be after To Date. Please correct the dates.");
             showDateError("From Date cannot be after To Date");
@@ -824,6 +837,11 @@
         const fromDateInput = document.getElementById("fromDate");
         const toDateInput = document.getElementById("toDate");
 
+        // Set min date to today for both date fields
+        const today = new Date().toISOString().split('T')[0];
+        fromDateInput.setAttribute('min', today);
+        toDateInput.setAttribute('min', today);
+
         // Validate when From Date changes
         fromDateInput.addEventListener("change", function() {
             validateDates();
@@ -838,16 +856,35 @@
     function validateDates() {
         const fromDate = document.getElementById("fromDate").value;
         const toDate = document.getElementById("toDate").value;
+        const today = new Date().toISOString().split('T')[0];
 
         if (fromDate && toDate) {
             if (fromDate > toDate) {
                 showDateError("From Date cannot be after To Date");
+                return false;
+            } else if (fromDate < today) {
+                showDateError("Start date cannot be in the past. Please select today or a future date.");
+                return false;
+            } else if (toDate < today) {
+                showDateError("End date cannot be in the past. Please select today or a future date.");
                 return false;
             } else {
                 hideDateError();
                 return true;
             }
         }
+
+        // Individual field validation
+        if (fromDate && fromDate < today) {
+            showDateError("Start date cannot be in the past. Please select today or a future date.");
+            return false;
+        }
+
+        if (toDate && toDate < today) {
+            showDateError("End date cannot be in the past. Please select today or a future date.");
+            return false;
+        }
+
         return true;
     }
 

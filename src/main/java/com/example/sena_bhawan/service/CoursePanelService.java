@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -56,26 +58,19 @@ public class CoursePanelService {
                 .toList();
     }
 
-    public OngoingCoursesResponse getOngoingCoursesStrength() {
-        // Fetch data using single query
-        List<OngoingCoursesProjection> projections =
-                repository.getOngoingCoursesWithCountsAlternative();
+    public Map<String, Map<String, Long>> getOngoingCoursesByStatus() {
+        List<OngoingCoursesProjection> results = repository.getOngoingCoursesWithCountsAlternative();
 
-        // Prepare response lists
-        List<String> labels = new ArrayList<>();
-        List<Integer> data = new ArrayList<>();
+        // Result structure: { "Junior Command Course": { "CONFIRMED": 45, "PENDING_APPROVAL": 12, "REJECTED": 3 }, ... }
+        Map<String, Map<String, Long>> grouped = new LinkedHashMap<>();
 
-        for (OngoingCoursesProjection projection : projections) {
-            labels.add(projection.getCourseName());
-            data.add(projection.getOfficerCount().intValue());
+        for (OngoingCoursesProjection row : results) {
+            grouped
+                    .computeIfAbsent(row.getCourseName(), k -> new LinkedHashMap<>())
+                    .put(row.getStatus(), row.getOfficerCount());
         }
 
-        return OngoingCoursesResponse.builder()
-                .labels(labels)
-                .data(data)
-                .chartType("bar")
-                .title("Ongoing Courses – Officer Strength")
-                .build();
+        return grouped;
     }
 
     public OfficerStatusResponse getOfficerStatusOverview() {

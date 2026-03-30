@@ -47,5 +47,10 @@ public class CoursePanelBatch {
     @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CoursePanelNomination> nominations;
 
+    @Column(name = "reject_movement_id")
+    private Long rejectMovementId;
+
+    @Column(name = "batch_status")
+    private Boolean batchStatus;
 
 }

@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RankStrengthResponse {
-    private List<String> labels;
-    private List<Integer> data;
-    private String chartType;
-    private String title;
+@Builder
+public class BatchActionRequest {
+    private Long userId;
+    private String remarks;
+    private Long rejectMovementId; // Only for reject action
 }
+

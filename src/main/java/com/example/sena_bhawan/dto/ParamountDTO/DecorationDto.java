@@ -15,4 +15,5 @@ public class DecorationDto {
     private String awardName;
     private LocalDate awardDate;
     private String citation;
+    private String initials;
 }

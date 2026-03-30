@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +47,10 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
 
             Personnel p = personnelOpt.get();
 
+            // Get decorations to compute initials
+            List<DecorationDto> decorations = getDecorations(personnelId);
+            String decorationInitials = getDecorationInitials(decorations);
+
             return IdentityAndServiceDto.builder()
                     .armyNo(p.getArmyNo())
                     .rank(p.getRank())
@@ -59,6 +62,9 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                     .panCard(p.getPanCard())
                     .aadhaarNumber(p.getAadhaarNumber())
                     .lastRank(p.getRank())
+                    .mobileNumber(p.getMobileNumber())
+                    .officerImage(p.getOfficerImage())
+                    .decorationInitials(decorationInitials)
                     .build();
 
         } catch (Exception e) {
@@ -131,7 +137,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                             .unitName(posting.getUnitName() != null ? posting.getUnitName() : "N/A")
                             .appointment(posting.getAppointment() != null ? posting.getAppointment() : "N/A")
                             .duration(posting.getDuration() != null ? posting.getDuration() : "N/A")
-                            .takenOnStrength(posting.getFromDate()); // fromDate can be null, DTO will handle
+                            .takenOnStrength(posting.getFromDate());
 
                     // Default values
                     String commandName = "N/A";
@@ -165,7 +171,6 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                 } catch (Exception e) {
                     log.error("Error processing posting record with ID: {} for personnel: {}",
                             posting.getPostingId(), personnelId, e);
-                    // Continue with next posting
                 }
             }
 
@@ -244,22 +249,32 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                     continue;
                 }
 
-                // Get course name from CourseMaster
+                // Get course name from CourseMaster and append batch number
                 String courseName = null;
                 if (schedule.getCourse() != null && schedule.getCourse().getSrno() != null) {
                     CourseMaster courseMaster = courseMasterMap.get(schedule.getCourse().getSrno());
                     if (courseMaster != null) {
                         courseName = courseMaster.getCourseName();
+                        // Append batch number if available
+                        if (schedule.getBatchNumber() != null) {
+                            courseName = courseName + " - " + schedule.getBatchNumber();
+                        }
                     }
+                }
+
+                // Handle grading - if null, set to "Pending"
+                String grading = nomination.getGrade();
+                if (grading == null) {
+                    grading = "Pending";
                 }
 
                 // Build DTO
                 CourseCompletedDto dto = CourseCompletedDto.builder()
                         .nominationId(nomination.getId())
                         .courseName(courseName)
-                        .grading(nomination.getGrade())  // From CoursePanelNomination
-                        .fromDate(schedule.getStartDate())  // From CourseSchedule
-                        .toDate(schedule.getEndDate())  // From CourseSchedule
+                        .grading(grading)
+                        .fromDate(schedule.getStartDate())
+                        .toDate(schedule.getEndDate())
                         .build();
 
                 result.add(dto);
@@ -294,12 +309,18 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
             }
 
             return decorations.stream()
-                    .map(d -> DecorationDto.builder()
-                            .decorationId(d.getId())
-                            .awardName(d.getDecorationName())
-                            .awardDate(d.getAwardDate())
-                            .citation(d.getCitation())
-                            .build())
+                    .map(d -> {
+                        // Generate initials from decoration name
+                        String initials = generateDecorationInitials(d.getDecorationName());
+
+                        return DecorationDto.builder()
+                                .decorationId(d.getId())
+                                .awardName(d.getDecorationName())
+                                .awardDate(d.getAwardDate())
+                                .citation(d.getCitation())
+                                .initials(initials)
+                                .build();
+                    })
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
@@ -349,6 +370,8 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                             .additionalQualificationId(aq.getId())
                             .qualification(aq.getQualification())
                             .issuingAuthority(aq.getAuthorityNo())
+                            .year(aq.getYear())
+                            .validity(aq.getValidity())
                             .build())
                     .collect(Collectors.toList());
 
@@ -396,6 +419,9 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                 medicalCategory = medical.getMedicalCategory();
             }
 
+            // Try to get home station from latest posting
+            String homeStation = getHomeStationFromPostings(personnelId);
+
             return DisciplineAndMedicalDto.builder()
                     .disciplineCase("N/A") // Default as per PDF
                     .restrictions("N/A")
@@ -404,7 +430,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                     .schoolInstitute("N/A")
                     .degree("N/A")
                     .course("N/A")
-                    .homeStation("N/A") // This might come from orbat or posting
+                    .homeStation(homeStation != null ? homeStation : "N/A")
                     .build();
 
         } catch (Exception e) {
@@ -422,4 +448,74 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
         }
     }
 
+    /**
+     * Helper method to generate decoration initials from award name
+     * Example: "Ati Vishisht Seva Medal" -> "AVSM"
+     */
+    private String generateDecorationInitials(String awardName) {
+        if (awardName == null || awardName.trim().isEmpty()) {
+            return "";
+        }
+
+        // Split by space and take first letter of each word
+        String[] words = awardName.trim().split("\\s+");
+        StringBuilder initials = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                initials.append(Character.toUpperCase(word.charAt(0)));
+            }
+        }
+
+        return initials.toString();
+    }
+
+    /**
+     * Helper method to get decoration initials as comma-separated string
+     */
+    private String getDecorationInitials(List<DecorationDto> decorations) {
+        if (CollectionUtils.isEmpty(decorations)) {
+            return "";
+        }
+
+        return decorations.stream()
+                .map(DecorationDto::getInitials)
+                .filter(initials -> initials != null && !initials.isEmpty())
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Helper method to get home station from latest posting
+     */
+    private String getHomeStationFromPostings(Long personnelId) {
+        try {
+            List<PostingDetails> postings = postingDetailsRepository
+                    .findByPersonnelIdOrderByFromDateDesc(personnelId);
+
+            if (CollectionUtils.isEmpty(postings)) {
+                return null;
+            }
+
+            // Get the latest posting
+            PostingDetails latestPosting = postings.get(0);
+
+            // Try to get unit location from ORBAT
+            if (latestPosting.getOrbatId() != null) {
+                Optional<OrbatStructure> orbatOpt = orbatStructureRepository.findById(latestPosting.getOrbatId());
+                if (orbatOpt.isPresent()) {
+                    OrbatStructure orbat = orbatOpt.get();
+                    if (orbat.getLocation() != null && !orbat.getLocation().trim().isEmpty()) {
+                        return orbat.getLocation();
+                    }
+                }
+            }
+
+            // Fallback to unit name if location not found
+            return latestPosting.getUnitName();
+
+        } catch (Exception e) {
+            log.debug("Error getting home station for personnel {}: {}", personnelId, e.getMessage());
+            return null;
+        }
+    }
 }

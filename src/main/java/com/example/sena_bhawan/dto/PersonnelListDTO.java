@@ -45,4 +45,9 @@ public class PersonnelListDTO {
     private Integer coursesInUnit;
     private String postingDueMonths;
     private String tosDate;
+
+    // New course statistics fields
+    private Integer totalCoursesOverall;
+    private Integer totalCoursesCurrentYear;
+    private Integer totalCoursesCurrentUnit;
 }

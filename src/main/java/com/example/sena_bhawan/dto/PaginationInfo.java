@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RankStrengthResponse {
-    private List<String> labels;
-    private List<Integer> data;
-    private String chartType;
-    private String title;
+@Builder
+public class PaginationInfo {
+    private int currentPage;
+    private int pageSize;
+    private long totalElements;
+    private int totalPages;
 }

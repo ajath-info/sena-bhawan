@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,25 +25,28 @@ public class SendForApprovalService {
     private final CoursePanelBatchRepository batchRepository;
     private final CoursePanelRepository nominationRepository;
 
-    private static final Long FIXED_MOVEMENT_ID = 2L;
+    private static final Long FIXED_MOVEMENT_ID = 1L;
 
     public SendForApprovalResponse sendForApproval(SendForApprovalRequest request) {
 
-        // 1. Count existing nominations for this schedule to confirm they exist
         List<CoursePanelNomination> existingNominations =
                 nominationRepository.findByScheduleId(request.getScheduleId());
 
         if (existingNominations.isEmpty()) {
             throw new IllegalStateException(
-                "No nominations found for scheduleId: " + request.getScheduleId()
-                + ". Please save the panel in Step 3 first.");
+                    "No nominations found for scheduleId: " + request.getScheduleId()
+                            + ". Please save the panel in Step 3 first.");
         }
 
-        // 2. Create the batch with movementId always = 1
+        // 3. Deactivate all previous batches for this schedule
+        deactivatePreviousBatches(request.getScheduleId());
+
+        // 4. Create new batch with batch_status = true
         CoursePanelBatch batch = CoursePanelBatch.builder()
                 .scheduleId(request.getScheduleId())
                 .movementId(FIXED_MOVEMENT_ID)
                 .status("PENDING_APPROVAL")
+                .batchStatus(true) // New batch is active
                 .totalNominations(request.getNominations().size())
                 .remarks(request.getRemarks())
                 .createdAt(LocalDateTime.now())
@@ -52,18 +56,17 @@ public class SendForApprovalService {
         batch = batchRepository.save(batch);
         final Long batchId = batch.getId();
 
-        // 3. Update each nomination: set serialNumber + batchId
-        //    Build a quick lookup map: personnelId -> serialNumber from request
+        // 5. Build serial number map
         Map<Long, Long> serialMap = request.getNominations().stream()
                 .filter(item -> item.getSerialNumber() != null)
                 .collect(Collectors.toMap(
                         SendForApprovalRequest.NominationSerialItem::getPersonnelId,
                         SendForApprovalRequest.NominationSerialItem::getSerialNumber,
-                        (a, b) -> a // keep first if duplicate personnelId
+                        (a, b) -> a
                 ));
 
+        // 6. Update nominations with new batchId
         int updatedCount = 0;
-        List<String> warnings = new ArrayList<>();
 
         for (CoursePanelNomination nomination : existingNominations) {
             Long pId = nomination.getPersonnelId();
@@ -71,7 +74,10 @@ public class SendForApprovalService {
             // Update batchId on every nomination for this schedule
             nomination.setBatchId(batchId);
 
-            // Update serial number only if provided in request
+            // Set nomination status to PENDING_APPROVAL
+            nomination.setStatus("PENDING_APPROVAL");
+
+            // Update serial number if provided
             if (serialMap.containsKey(pId)) {
                 nomination.setSerialNumber(serialMap.get(pId));
             }
@@ -81,7 +87,7 @@ public class SendForApprovalService {
             updatedCount++;
         }
 
-        // 4. Update totalNominations with actual count
+        // 7. Update total nominations count
         batch.setTotalNominations(updatedCount);
         batchRepository.save(batch);
 
@@ -92,7 +98,26 @@ public class SendForApprovalService {
                 .status("PENDING_APPROVAL")
                 .totalNominations(updatedCount)
                 .message("Panel submitted for approval. Batch #" + batchId + " created with "
-                         + updatedCount + " nominations.")
+                        + updatedCount + " nominations.")
                 .build();
+    }
+
+    /**
+     * Deactivates all previous batches for a given schedule
+     * Sets batch_status = false for all existing batches
+     */
+    private void deactivatePreviousBatches(Long scheduleId) {
+        List<CoursePanelBatch> existingBatches = batchRepository.findByScheduleId(scheduleId);
+
+        if (!existingBatches.isEmpty()) {
+            for (CoursePanelBatch batch : existingBatches) {
+                // Only update if it's currently active
+                if (Boolean.TRUE.equals(batch.getBatchStatus())) {
+                    batch.setBatchStatus(false);
+                    batch.setUpdatedAt(LocalDateTime.now());
+                    batchRepository.save(batch);
+                }
+            }
+        }
     }
 }
