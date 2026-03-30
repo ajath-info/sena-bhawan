@@ -21,7 +21,8 @@ public class IdentityAndServiceDto {
     private LocalDate dateOfSeniority;
     private String panCard;
     private String aadhaarNumber;
-
-    // Service Section
-    private String lastRank; // Substantive rank
+    private String lastRank;
+    private String mobileNumber;
+    private String officerImage;
+    private String decorationInitials;
 }
