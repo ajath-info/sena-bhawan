@@ -2732,9 +2732,6 @@
         //     }
         // }
 
-        // =======================================================
-        // MODIFIED VALIDATE REQUIRED FIELDS FUNCTION
-        // =======================================================
         function validateRequiredFields() {
             clearAllErrors();
 
@@ -2743,55 +2740,20 @@
                 { id: 'armyNo', name: 'Army No' },
                 { id: 'rank', name: 'Rank' },
                 { id: 'firstName', name: 'First Name' },
-                { id: 'gender', name: 'Gender' },
                 { id: 'dateOfCommission', name: 'Date of Commission' },
                 { id: 'dateOfSeniority', name: 'Date of Seniority' },
                 { id: 'dateOfBirth', name: 'Date of Birth' },
-                { id: 'placeOfBirth', name: 'Place of Birth' },
-                { id: 'religion', name: 'Religion' },
-                { id: 'aadhaarNumber', name: 'Aadhaar Number' },
-                { id: 'panCard', name: 'PAN Card' },
-                { id: 'maritalStatus', name: 'Marital Status' },
-                { id: 'cdaAccountNo', name: 'CDA Account No' },
-                { id: 'permanentAddress', name: 'Permanent Address' },
-                { id: 'city', name: 'City' },
-                { id: 'district', name: 'District' },
-                { id: 'state', name: 'State' },
-                { id: 'pinCode', name: 'PIN Code' },
-                { id: 'mobileNumber', name: 'Mobile Number' },
-                { id: 'emailAddress', name: 'Email Address' }
+                { id: 'gender', name: 'Gender' }
             ];
 
             let isValid = true;
 
-            // Validate image
-            const imageFile = document.getElementById("officerImageFile").files[0];
-            const imageError = document.getElementById("image-error");
-            const uploadBox = document.querySelector('.upload-box');
+            // Image is no longer required - remove image validation
+            // const imageFile = document.getElementById("officerImageFile").files[0];
+            // const imageError = document.getElementById("image-error");
+            // const uploadBox = document.querySelector('.upload-box');
 
-            if (!imageFile) {
-                if (imageError) {
-                    imageError.style.display = "block";
-                    imageError.textContent = "Officer Image is required";
-                }
-                if (uploadBox) uploadBox.style.borderColor = '#dc2626';
-                isValid = false;
-            } else {
-                if (imageError) imageError.style.display = "none";
-                if (uploadBox) uploadBox.style.borderColor = '#d1d5db';
-
-                if (!imageFile.type.match('image.*')) {
-                    alert("Please select a valid image file (JPG/PNG)");
-                    isValid = false;
-                }
-
-                if (imageFile.size > 2 * 1024 * 1024) {
-                    alert("Image size should be less than 2MB");
-                    isValid = false;
-                }
-            }
-
-            // Validate required fields
+            // Validate required fields (only the 8 fields)
             for (let field of requiredFields) {
                 const element = document.getElementById(field.id);
                 if (element && !element.value.trim()) {
@@ -2807,66 +2769,77 @@
                 isValid = false;
             }
 
-            // Validate Last Name for numbers
+            // Validate Last Name for numbers (optional field - only validate if present)
             const lastNameElement = document.getElementById("lastName");
             if (lastNameElement && lastNameElement.value.trim() && /[0-9]/.test(lastNameElement.value)) {
                 showFieldError(lastNameElement, "Last Name cannot contain numbers", "lastName-number-error");
                 isValid = false;
             }
 
-            // Validate Army Number format
-            if (!validateArmyNumber()) {
-                isValid = false;
+            // Validate Army Number format (if present)
+            if (document.getElementById("armyNo").value.trim()) {
+                if (!validateArmyNumber()) {
+                    isValid = false;
+                }
             }
 
-            // Validate date relationships
-            if (!validateDates()) {
-                isValid = false;
+            // Validate date relationships (only if dates are present)
+            if (document.getElementById("dateOfCommission").value &&
+                document.getElementById("dateOfSeniority").value &&
+                document.getElementById("dateOfBirth").value) {
+                if (!validateDates()) {
+                    isValid = false;
+                }
             }
 
-            // Validate family members
+            // Family members validation is optional - skip if no family members
             const familyItems = document.querySelectorAll("#family-container .repeater-item");
-            for (let i = 0; i < familyItems.length; i++) {
-                const item = familyItems[i];
-                const firstNameInput = item.querySelector(".family-first-name");
-                const lastNameInput = item.querySelector(".family-last-name");
-                const relationshipSelect = item.querySelector(".family-relationship");
+            if (familyItems.length > 0) {
+                for (let i = 0; i < familyItems.length; i++) {
+                    const item = familyItems[i];
+                    const firstNameInput = item.querySelector(".family-first-name");
+                    const lastNameInput = item.querySelector(".family-last-name");
+                    const relationshipSelect = item.querySelector(".family-relationship");
 
-                if (!firstNameInput?.value.trim()) {
-                    alert(`Family Member #${i+1}: First name is required`);
-                    firstNameInput?.focus();
-                    isValid = false;
-                    break;
-                }
+                    // Only validate if any family member data is entered
+                    if (firstNameInput?.value.trim() || lastNameInput?.value.trim() || relationshipSelect?.value) {
+                        if (!firstNameInput?.value.trim()) {
+                            alert(`Family Member #${i+1}: First name is required if adding family member`);
+                            firstNameInput?.focus();
+                            isValid = false;
+                            break;
+                        }
 
-                // Check for numbers in family first name
-                if (firstNameInput?.value.trim() && /[0-9]/.test(firstNameInput.value)) {
-                    alert(`Family Member #${i+1}: First name cannot contain numbers`);
-                    firstNameInput?.focus();
-                    isValid = false;
-                    break;
-                }
+                        // Check for numbers in family first name
+                        if (firstNameInput?.value.trim() && /[0-9]/.test(firstNameInput.value)) {
+                            alert(`Family Member #${i+1}: First name cannot contain numbers`);
+                            firstNameInput?.focus();
+                            isValid = false;
+                            break;
+                        }
 
-                if (!lastNameInput?.value.trim()) {
-                    alert(`Family Member #${i+1}: Last name is required`);
-                    lastNameInput?.focus();
-                    isValid = false;
-                    break;
-                }
+                        if (!lastNameInput?.value.trim()) {
+                            alert(`Family Member #${i+1}: Last name is required if adding family member`);
+                            lastNameInput?.focus();
+                            isValid = false;
+                            break;
+                        }
 
-                // Check for numbers in family last name
-                if (lastNameInput?.value.trim() && /[0-9]/.test(lastNameInput.value)) {
-                    alert(`Family Member #${i+1}: Last name cannot contain numbers`);
-                    lastNameInput?.focus();
-                    isValid = false;
-                    break;
-                }
+                        // Check for numbers in family last name
+                        if (lastNameInput?.value.trim() && /[0-9]/.test(lastNameInput.value)) {
+                            alert(`Family Member #${i+1}: Last name cannot contain numbers`);
+                            lastNameInput?.focus();
+                            isValid = false;
+                            break;
+                        }
 
-                if (!relationshipSelect?.value) {
-                    alert(`Family Member #${i+1}: Relationship is required`);
-                    relationshipSelect?.focus();
-                    isValid = false;
-                    break;
+                        if (!relationshipSelect?.value) {
+                            alert(`Family Member #${i+1}: Relationship is required if adding family member`);
+                            relationshipSelect?.focus();
+                            isValid = false;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -3985,7 +3958,7 @@
             <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
                 <!-- First Name - Required -->
                 <div>
-                    <label class="required">First Name</label>
+                    <label>First Name</label>
                     <input type="text" class="family-first-name" placeholder="Enter first name"
                            oninput="formatNameField(this); validateFamilyMember(this.closest('.repeater-item'))"
                            onblur="validateNameField(this, 'First Name')">
@@ -3993,7 +3966,7 @@
 
                 <!-- Last Name - Required -->
                 <div>
-                    <label class="required">Last Name</label>
+                    <label>Last Name</label>
                     <input type="text" class="family-last-name" placeholder="Enter last name"
                            oninput="formatNameField(this); validateFamilyMember(this.closest('.repeater-item'))"
                            onblur="validateNameField(this, 'Last Name')">
@@ -4001,7 +3974,7 @@
 
                 <!-- Relationship - Required -->
                 <div>
-                    <label class="required">Relationship</label>
+                    <label>Relationship</label>
                     <select class="family-relationship" onchange="validateFamilyMember(this.closest('.repeater-item'))">
                         ${relationshipOptions}
                     </select>
@@ -5399,11 +5372,11 @@
                 <div class="upload-box" style="position: relative;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px;">
                         <span>📷 Upload Officer Image</span>
-                        <span style="color: #dc2626; font-weight: bold;">*</span>
+                        <span style="color: #6b7280;">(Optional)</span>
                     </div>
                     JPG / PNG, Max 2MB
                     <br><br>
-                    <input type="file" id="officerImageFile" accept="image/*" onchange="previewImage(this)" required>
+                    <input type="file" id="officerImageFile" accept="image/*" onchange="previewImage(this)">
 
                     <!-- Image Preview Container -->
                     <div id="imagePreviewContainer" style="margin-top: 15px; display: none;">
@@ -5480,7 +5453,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="required">Place of Birth</label>
+                            <label>Place of Birth</label>
                             <input id="placeOfBirth">
                         </div>
                         <div>
@@ -5530,7 +5503,7 @@
                     <div class="section-title">🎖️ Service Details</div>
                     <div class="grid">
                         <div>
-                            <label class="required">NRS (Nearest Railway Station)</label>
+                            <label>NRS (Nearest Railway Station)</label>
                             <div style="position: relative;">
                                 <!-- Button to trigger dropdown -->
                                 <div onclick="toggleDropdown('nrsDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
@@ -5586,7 +5559,7 @@
                         </div>
 
                         <div>
-                            <label class="required">Religion</label>
+                            <label>Religion</label>
                             <select id="religion">
                                 <option value="">Select Religion</option>
                                 <option value="Hindu">Hindu</option>
@@ -5596,17 +5569,17 @@
                             </select>
                         </div>
                         <div>
-                            <label class="required">Aadhaar Number</label>
+                            <label>Aadhaar Number</label>
                             <input id="aadhaarNumber" placeholder="1234 5678 9012">
                             <span class="field-hint">Format: 1234 5678 9012</span>
                         </div>
                         <div>
-                            <label class="required">PAN Card</label>
+                            <label>PAN Card</label>
                             <input id="panCard" placeholder="ABCDE1234F">
                             <span class="field-hint">Format: 5 letters + 4 numbers + 1 letter</span>
                         </div>
                         <div>
-                            <label class="required">Marital Status</label>
+                            <label>Marital Status</label>
                             <select id="maritalStatus">
                                 <option value="">Select Marital Status</option>
                                 <option value="Married">Married</option>
@@ -5617,7 +5590,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="required">CDA Account No</label>
+                            <label>CDA Account No</label>
                             <input id="cdaAccountNo" placeholder="15/102/234180K">
                             <span class="field-hint">Format: 12/345/67890A</span>
                         </div>
@@ -5631,7 +5604,7 @@
 
                     <div class="grid grid-1">
                         <div>
-                            <label class="required">Permanent Address</label>
+                            <label>Permanent Address</label>
                             <textarea id="permanentAddress"></textarea>
                         </div>
                     </div>
@@ -5639,7 +5612,7 @@
                     <div class="grid">
                         <!-- State Dropdown -->
                         <div>
-                            <label class="required">State</label>
+                            <label>State</label>
                             <div style="position: relative;">
                                 <div onclick="toggleDropdown('stateDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                                     <span id="selectedStateDisplay">Select State</span>
@@ -5657,7 +5630,7 @@
 
                         <!-- District Dropdown -->
                         <div>
-                            <label class="required">District</label>
+                            <label>District</label>
                             <div style="position: relative;">
                                 <div onclick="toggleDropdown('districtDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                                     <span id="selectedDistrictDisplay">Select District</span>
@@ -5675,7 +5648,7 @@
 
                         <!-- City Dropdown -->
                         <div>
-                            <label class="required">City</label>
+                            <label>City</label>
                             <div style="position: relative;">
                                 <div onclick="toggleDropdown('cityDropdown')" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; background: white; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                                     <span id="selectedCityDisplay">Select City</span>
@@ -5692,7 +5665,7 @@
                         </div>
 
                         <div>
-                            <label class="required">PIN Code</label>
+                            <label>PIN Code</label>
                             <input id="pinCode">
                         </div>
                     </div>
@@ -5705,7 +5678,7 @@
                     <div class="section-title">📞 Contact Details</div>
                     <div class="grid">
                         <div>
-                            <label class="required">Mobile Number</label>
+                            <label>Mobile Number</label>
                             <input id="mobileNumber" placeholder="9876543210" maxlength="10">
                             <span class="field-hint">10 digits, starting with 6-9</span>
                         </div>
@@ -5715,7 +5688,7 @@
                             <span class="field-hint">Optional, 10 digits starting with 6-9</span>
                         </div>
                         <div>
-                            <label class="required">Email Address</label>
+                            <label>Email Address</label>
                             <input type="email" id="emailAddress" placeholder="name@example.com">
                             <span class="field-hint">Enter a valid email address</span>
                         </div>

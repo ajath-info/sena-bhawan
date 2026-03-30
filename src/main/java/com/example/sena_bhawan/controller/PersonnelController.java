@@ -126,7 +126,7 @@ public class PersonnelController {
     @PostMapping(value = "/add", consumes = "multipart/form-data")
     public ResponseEntity<?> addPersonnel(
             @RequestPart("data") CreatePersonnelRequest request,
-            @RequestPart("image") MultipartFile image
+            @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         Long id = personnelService.createPersonnel(request, image);
 

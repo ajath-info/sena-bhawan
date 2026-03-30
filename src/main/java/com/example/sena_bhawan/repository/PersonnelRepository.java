@@ -239,7 +239,7 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
         
         FROM personnel p
         WHERE p.id IN (:ids)
-        ORDER BY p.id DESC
+        ORDER BY p.date_of_seniority DESC
         """, nativeQuery = true)
     List<Object[]> findPersonnelWithDetailsByIds(@Param("ids") List<Long> ids);
 
