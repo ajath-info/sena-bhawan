@@ -430,24 +430,44 @@
         const user = getCurrentUser();
         const userId = user?.userId || 1;
 
-        // Generate table rows
+        // Generate table rows with ALL fields
         let tableRows = '';
         if (!personnelList || personnelList.length === 0) {
-            tableRows = '<td colspan="8" style="text-align: center;">No personnel found</td>';
+            tableRows = '|<td colspan="20" style="text-align: center;">No personnel found</td>|';
         } else {
             personnelList.forEach((person, index) => {
                 tableRows += `
-                <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${index + 1}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.armyNo || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.rank || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.fullName || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.city || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.district || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.mobileNumber || 'N/A'}</td>
-                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">${person.emailAddress || 'N/A'}</td>
-                </tr>
-            `;
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${index + 1}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.armyNo || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.rank || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.fullName || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.unit || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.command || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.corps || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.division || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.dateOfBirth || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.dateOfCommission || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.dateOfSeniority || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.placeOfBirth || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.religion || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.maritalStatus || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.city || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.district || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.state || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.areaType || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.establishmentType || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.mobileNumber || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.emailAddress || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.civilQual || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.course || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.sports || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.medicalCode || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.totalCoursesOverall || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.totalCoursesCurrentYear || 'N/A'}</td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${person.tosDate || 'N/A'}</td>
+            </tr>
+        `;
             });
         }
 
@@ -457,75 +477,95 @@
         const showActionButtons = (currentStatus === 'PENDING_APPROVAL');
 
         modalContent.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: #1b4332; margin: 0;">${courseTitle}</h2>
-            <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: #1b4332; margin: 0;">${courseTitle}</h2>
+        <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+    </div>
+
+    <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+        <div class="info-item" style="display: flex; gap: 10px;">
+            <span style="font-weight: 600; color: #4b5563;">Movement ID:</span>
+            <span style="color: #1f2937;">${panel.movementId}</span>
+        </div>
+        <div class="info-item" style="display: flex; gap: 10px;">
+            <span style="font-weight: 600; color: #4b5563;">Status:</span>
+            <span class="status-badge status-${panel.status.toLowerCase().replace('_', '-')}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: ${panel.status === 'PENDING_APPROVAL' ? '#fef3c7' : panel.status === 'APPROVED' ? '#d1fae5' : '#fee2e2'}; color: ${panel.status === 'PENDING_APPROVAL' ? '#d97706' : panel.status === 'APPROVED' ? '#059669' : '#dc2626'};">${panel.status}</span>
+        </div>
+        <div class="info-item" style="display: flex; gap: 10px;">
+            <span style="font-weight: 600; color: #4b5563;">Venue:</span>
+            <span style="color: #1f2937;">${panel.venue || 'N/A'}</span>
+        </div>
+        <div class="info-item" style="display: flex; gap: 10px;">
+            <span style="font-weight: 600; color: #4b5563;">Duration:</span>
+            <span style="color: #1f2937;">${panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A'} to ${panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A'}</span>
+        </div>
+        <div class="info-item" style="display: flex; gap: 10px;">
+            <span style="font-weight: 600; color: #4b5563;">Total Nominations:</span>
+            <span style="color: #1f2937;">${panel.totalNominations || 0}</span>
+        </div>
+    </div>
+
+    <h3>Personnel List</h3>
+    <div style="overflow-x: auto; max-height: 500px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1800px;">
+            <thead>
+                <tr style="background: #f3f4f6; position: sticky; top: 0;">
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">#</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Army No</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Rank</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Full Name</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Unit</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Command</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Corps</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Division</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">DOB</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Commission Date</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Seniority Date</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Place of Birth</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Religion</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Marital Status</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">City</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">District</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">State</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Area Type</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Estab Type</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Mobile</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Email</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Civil Qualification</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Courses</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Sports</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Medical Code</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Total Courses</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Courses (Current Year)</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">TOS Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+    </div>
+
+    ${showActionButtons ? `
+        <div style="margin-top: 20px;">
+            <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back, Optional for Forward):</label>
+            <textarea id="modalRemark" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
         </div>
 
-        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
-            <div class="info-item" style="display: flex; gap: 10px;">
-                <span style="font-weight: 600; color: #4b5563;">Movement ID:</span>
-                <span style="color: #1f2937;">${panel.movementId}</span>
-            </div>
-            <div class="info-item" style="display: flex; gap: 10px;">
-                <span style="font-weight: 600; color: #4b5563;">Status:</span>
-                <span class="status-badge status-${panel.status.toLowerCase().replace('_', '-')}" style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: ${panel.status === 'PENDING_APPROVAL' ? '#fef3c7' : panel.status === 'APPROVED' ? '#d1fae5' : '#fee2e2'}; color: ${panel.status === 'PENDING_APPROVAL' ? '#d97706' : panel.status === 'APPROVED' ? '#059669' : '#dc2626'};">${panel.status}</span>
-            </div>
-            <div class="info-item" style="display: flex; gap: 10px;">
-                <span style="font-weight: 600; color: #4b5563;">Venue:</span>
-                <span style="color: #1f2937;">${panel.venue || 'N/A'}</span>
-            </div>
-            <div class="info-item" style="display: flex; gap: 10px;">
-                <span style="font-weight: 600; color: #4b5563;">Duration:</span>
-                <span style="color: #1f2937;">${panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A'} to ${panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A'}</span>
-            </div>
-            <div class="info-item" style="display: flex; gap: 10px;">
-                <span style="font-weight: 600; color: #4b5563;">Total Nominations:</span>
-                <span style="color: #1f2937;">${panel.totalNominations || 0}</span>
-            </div>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
+            <button class="btn btn-success" onclick="forwardPanelModal()">Forward</button>
+            <button class="btn btn-danger" onclick="rejectPanelModal()">Reject</button>
+            <button class="btn btn-warning" onclick="sendBackPanelModal()" style="background: #f59e0b; color: white;">Send Back</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
         </div>
-
-        <h3>Personnel List</h3>
-        <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #f3f4f6; position: sticky; top: 0;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Ser</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Army No</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Rank</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Full Name</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">City</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">District</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Mobile</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
+    ` : `
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
+            <div style="padding: 10px; background: #f3f4f6; border-radius: 6px; color: #6b7280; text-align: center; width: 100%;">
+                ${panel.status === 'APPROVED' ? '✓ Approved' : panel.status === 'REJECTED' ? '✗ Rejected' : 'Pending'}
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
         </div>
-
-        ${showActionButtons ? `
-            <div style="margin-top: 20px;">
-                <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back, Optional for Forward):</label>
-                <textarea id="modalRemark" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
-            </div>
-
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
-                <button class="btn btn-success" onclick="forwardPanelModal()">Forward</button>
-                <button class="btn btn-danger" onclick="rejectPanelModal()">Reject</button>
-                <button class="btn btn-warning" onclick="sendBackPanelModal()" style="background: #f59e0b; color: white;">Send Back</button>
-                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-            </div>
-        ` : `
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
-                <div style="padding: 10px; background: #f3f4f6; border-radius: 6px; color: #6b7280; text-align: center; width: 100%;">
-                    ${panel.status === 'APPROVED' ? '✓ Approved' : panel.status === 'REJECTED' ? '✗ Rejected' : 'Pending'}
-                </div>
-                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-            </div>
-        `}
+    `}
     `;
 
         modalOverlay.style.display = 'flex';

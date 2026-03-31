@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.CourseEligibilityDTO;
+import com.example.sena_bhawan.dto.CourseEligibilityDTOT;
 import com.example.sena_bhawan.service.CourseEligibilityService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,16 @@ public class CourseEligibilityController {
     public ResponseEntity<?> getEligibilityByCourseId(@PathVariable Integer courseId) {
         try {
             CourseEligibilityDTO dto = service.getEligibilityByCourseId(courseId);
+            return ResponseEntity.ok(dto);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/filter/{courseId}")
+    public ResponseEntity<?> getEligibilityByCourseIdFilters(@PathVariable Integer courseId) {
+        try {
+            CourseEligibilityDTOT dto = service.getEligibilityByCourseIdNames(courseId);
             return ResponseEntity.ok(dto);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

@@ -10,4 +10,5 @@ public interface DropdownMasterRepository extends JpaRepository<DropdownMaster,L
     List<DropdownMaster> findByTypeIgnoreCaseAndStatusOrderByIdAsc(String type, Integer status);
     Optional<DropdownMaster> findByTypeAndName(String type, String name);
     Optional<DropdownMaster> findById(Long id);
+    List<DropdownMaster> findByIdIn(List<Long> ids);
 }

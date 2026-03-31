@@ -47,8 +47,8 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
 
             Personnel p = personnelOpt.get();
 
-            // Get decorations to compute initials
-            List<DecorationDto> decorations = getDecorations(personnelId);
+            // CHANGE THIS LINE - Use new method that excludes Commendation Card
+            List<DecorationDto> decorations = getDecorationsForInitials(personnelId);
             String decorationInitials = getDecorationInitials(decorations);
 
             return IdentityAndServiceDto.builder()
@@ -137,7 +137,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
                             .unitName(posting.getUnitName() != null ? posting.getUnitName() : "N/A")
                             .appointment(posting.getAppointment() != null ? posting.getAppointment() : "N/A")
                             .duration(posting.getDuration() != null ? posting.getDuration() : "N/A")
-                            .takenOnStrength(posting.getFromDate());
+                            .takenOnStrength(posting.getTosUpdatedDate());
 
                     // Default values
                     String commandName = "N/A";
@@ -301,6 +301,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
     @Override
     public List<DecorationDto> getDecorations(Long personnelId) {
         try {
+            // NO CHANGE HERE - This still shows ALL decorations including Commendation Card
             List<PersonnelDecorations> decorations = personnelDecorationsRepository
                     .findByPersonnelIdOrderByAwardDateDesc(personnelId);
 
@@ -310,9 +311,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
 
             return decorations.stream()
                     .map(d -> {
-                        // Generate initials from decoration name
                         String initials = generateDecorationInitials(d.getDecorationName());
-
                         return DecorationDto.builder()
                                 .decorationId(d.getId())
                                 .awardName(d.getDecorationName())
@@ -328,6 +327,7 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
             return Collections.emptyList();
         }
     }
+
 
     @Override
     public List<QualificationDto> getQualifications(Long personnelId) {
@@ -468,6 +468,60 @@ public class PersonnelProfileServiceImpl implements PersonnelProfileService {
         }
 
         return initials.toString();
+    }
+
+    // ADD THIS NEW PRIVATE METHOD
+    private List<DecorationDto> getDecorationsForInitials(Long personnelId) {
+        try {
+            // Get ALL decorations from existing method
+            List<PersonnelDecorations> allDecorations = personnelDecorationsRepository
+                    .findByPersonnelIdOrderByAwardDateDesc(personnelId);
+
+            if (CollectionUtils.isEmpty(allDecorations)) {
+                return Collections.emptyList();
+            }
+
+            // Debug logging
+            log.info("Total decorations found: {}", allDecorations.size());
+            for (PersonnelDecorations d : allDecorations) {
+                log.info("Decoration: name={}, category={}", d.getDecorationName(), d.getDecorationCategory());
+            }
+
+            // Filter out Commendation Cards
+            List<PersonnelDecorations> filteredDecorations = allDecorations.stream()
+                    .filter(d -> {
+                        String category = d.getDecorationCategory();
+                        if (category == null) {
+                            return true;
+                        }
+                        // Check if category contains "Commendation" (case insensitive)
+                        boolean isCommendation = category.toLowerCase().contains("commendation");
+                        if (isCommendation) {
+                            log.info("Excluding decoration: {} with category: {}", d.getDecorationName(), category);
+                        }
+                        return !isCommendation;
+                    })
+                    .collect(Collectors.toList());
+
+            log.info("Filtered decorations count: {}", filteredDecorations.size());
+
+            return filteredDecorations.stream()
+                    .map(d -> {
+                        String initials = generateDecorationInitials(d.getDecorationName());
+                        return DecorationDto.builder()
+                                .decorationId(d.getId())
+                                .awardName(d.getDecorationName())
+                                .awardDate(d.getAwardDate())
+                                .citation(d.getCitation())
+                                .initials(initials)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Error fetching decorations for initials for personnel {}: {}", personnelId, e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     /**

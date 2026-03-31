@@ -2,6 +2,7 @@ package com.example.sena_bhawan.controller;
 
 import com.example.sena_bhawan.dto.PanelBatchListResponse;
 import com.example.sena_bhawan.dto.PersonnelDataDTO;
+import com.example.sena_bhawan.dto.PersonnelListDTO;
 import com.example.sena_bhawan.service.CoursePanelBatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,8 @@ public class PanelBatchController {
     }
 
     @GetMapping("/{batchId}/personnel")
-    public ResponseEntity<List<PersonnelDataDTO>> getPersonnelByBatchId(@PathVariable Long batchId) {
-        List<PersonnelDataDTO> personnel = panelBatchService.getPersonnelByBatchId(batchId);
+    public ResponseEntity<List<PersonnelListDTO>> getPersonnelByBatchId(@PathVariable Long batchId) {
+        List<PersonnelListDTO> personnel = panelBatchService.getPersonnelByBatchId(batchId);
         return ResponseEntity.ok(personnel);
     }
 

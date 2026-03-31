@@ -2301,7 +2301,7 @@ document.head.appendChild(style);
                 try {
                     showLoading(true);
                     // Call eligibility API with courseId
-                    const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/course/${courseId}`);
+                    const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/filter/${courseId}`);
 
                     if (!eligibilityResponse.ok) {
                         throw new Error(`Eligibility API failed with status: ${eligibilityResponse.status}`);
@@ -2358,41 +2358,26 @@ document.head.appendChild(style);
     });
 
     // ===============================
-    // TRANSFORM ELIGIBILITY DATA TO FILTER REQUEST
+    // TRANSFORM ELIGIBILITY DATA TO FILTER REQUEST Done
     // ===============================
     function transformEligibilityToFilter(eligibilityData) {
-        // Map rank IDs to rank names (you'll need to maintain this mapping)
-        const rankIdToName = {
-            37: "Major",
-            38: "Lieutenant Colonel",
-            40: "Lieutenant Colonel",
-            41: "Colonel",
-            43: "Brigadier"
-            // Add more mappings as needed
-        };
-
-        // Map medical category IDs to names
-        const medicalIdToName = {
-            21: "S1"
-            // Add more mappings as needed
-        };
-
-        // Map unit IDs to unit names if needed
-        // For now, we'll keep unitIds as is or you can fetch unit names
-
+        // Build the filter request based on the eligibility data structure
         const filterRequest = {
-            rank: (eligibilityData.rankIds || []).map(id => rankIdToName[id] || null).filter(Boolean),
-            medicalCategory: (eligibilityData.medicalCategories || []).map(id => medicalIdToName[id] || null).filter(Boolean),
+            // Basic filters - use arrays as per API spec
+            rank: eligibilityData.rankIds || [],
+            medicalCategory: eligibilityData.medicalCategories || [],
             command: null,
             corps: null,
             division: null,
-            establishmentType: eligibilityData.establishmentTypes || null,
+            establishmentType: eligibilityData.establishmentTypes || [],
             areaType: null,
-            civilQualification: eligibilityData.educationalQualifications || null,
+            civilQualification: eligibilityData.educationalQualifications || [],
             sports: null,
             postingDueMonths: null,
             courseName: null,
             placeOfBirth: null,
+
+            // Date filters - using the fields from eligibility data
             dobGreaterThan: eligibilityData.dobFrom || null,
             docFrom: eligibilityData.commissionDateFrom || null,
             docTo: eligibilityData.commissionDateTo || null,
@@ -2402,13 +2387,32 @@ document.head.appendChild(style);
             tosTo: null,
             courseFrom: null,
             courseTo: null,
+
+            // Search
             search: null,
+
+            // Unit filters
             unitIds: eligibilityData.unitIds || null,
+
+            // Remarks and grading
             remarks: eligibilityData.remarks || null,
-            minCourseGrading: eligibilityData.minCourseGrading || null,
+            minCourseGrading: eligibilityData.minCourseGrading || [],
+
+            // Posting type
             postingTypeIds: eligibilityData.postingTypeIds || null,
+
+            // Additional remarks
             additionalRemarks: eligibilityData.additionalRemarks || null
         };
+
+        // Clean up null values and empty arrays (optional - API might handle null)
+        // Remove any null values to keep payload clean
+        Object.keys(filterRequest).forEach(key => {
+            if (filterRequest[key] === null ||
+                (Array.isArray(filterRequest[key]) && filterRequest[key].length === 0)) {
+                delete filterRequest[key];
+            }
+        });
 
         return filterRequest;
     }
@@ -4417,7 +4421,7 @@ document.head.appendChild(style);
         if (scheduleId && courseId) {
             try {
                 // Fetch eligibility criteria with updated course
-                const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/course/${courseId}`);
+                const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/filter/${courseId}`);
 
                 if (eligibilityResponse.ok) {
                     const eligibilityData = await eligibilityResponse.json();

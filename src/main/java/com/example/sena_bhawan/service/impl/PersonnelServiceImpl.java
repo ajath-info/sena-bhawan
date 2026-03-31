@@ -1078,6 +1078,25 @@ public class PersonnelServiceImpl implements PersonnelService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<PersonnelListDTO> filterAllPersonnelByIds(List<Long> personnelIds) {
+        try {
+            List<PersonnelListDTO> dtos = new ArrayList<>();
+            if (!personnelIds.isEmpty()) {
+                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByPersonnelIds(personnelIds);
+                dtos = results.stream()
+                        .map(this::mapToPersonnelListDTO)
+                        .collect(Collectors.toList());
+            }
+
+            return dtos;
+
+        } catch (Exception e) {
+            log.error("Error filtering all personnel: {}", e.getMessage(), e);
+            throw new RuntimeException("Error filtering all personnel: " + e.getMessage());
+        }
+    }
+
     // New method for all records without pagination
     @Transactional(readOnly = true)
     public List<PersonnelListDTO> filterAllPersonnel(PersonnelFilterRequest filter) {

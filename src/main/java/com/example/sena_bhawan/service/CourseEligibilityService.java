@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.dto.CourseEligibilityDTO;
+import com.example.sena_bhawan.dto.CourseEligibilityDTOT;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -199,6 +200,79 @@ public class CourseEligibilityService {
         // Get establishment type IDs
         List<Long> establishmentTypeIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "ESTABLISHMENT");
         dto.setEstablishmentTypes(establishmentTypeIds);
+
+        // Get remarks (from dropdown_master with type "REMARKS")
+        List<Long> remarkIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "REMARKS");
+        if (!remarkIds.isEmpty()) {
+            List<String> remarks = remarkIds.stream()
+                    .map(id -> dropdownRepository.findById(id)
+                            .map(DropdownMaster::getName)
+                            .orElse(null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            dto.setRemarks(remarks);
+        }
+
+        log.info("Successfully fetched eligibility for course ID: {}", courseId);
+        return dto;
+    }
+
+    // Add this method to CourseEligibilityService
+    public CourseEligibilityDTOT getEligibilityByCourseIdNames(Integer courseId) {
+
+        CourseMaster course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new EntityNotFoundException("Course not found with ID: " + courseId));
+
+        CourseEligibilityMaster eligibility = eligibilityRepository.findByCourse(course);
+        if (eligibility == null) {
+            throw new EntityNotFoundException("Eligibility not found for course ID: " + courseId);
+        }
+
+        CourseEligibilityDTOT dto = new CourseEligibilityDTOT();
+        dto.setCourseId(courseId);
+
+        // Set date filters
+        dto.setCommissionDateFrom(eligibility.getCommissionDateFrom());
+        dto.setCommissionDateTo(eligibility.getCommissionDateTo());
+        dto.setSeniorityDateFrom(eligibility.getSeniorityDateFrom());
+        dto.setSeniorityDateTo(eligibility.getSeniorityDateTo());
+        dto.setDobFrom(eligibility.getDobFrom());
+        dto.setDobTo(eligibility.getDobTo());
+
+        dto.setAdditionalRemarks(eligibility.getAdditionalRemarks());
+
+        // Get rank IDs from dropdown mapping table
+        List<Long> rankIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "RANK");
+        List<String> ranksName = dropdownRepository.findByIdIn(rankIds).stream().map(DropdownMaster::getName).toList();
+        dto.setRankIds(ranksName);
+
+        // Get medical codes from personnel_course_mapping (these are medical codes, not personnel IDs)
+        List<String> medicalCodes = personnelCourseRepository.findMedicalCodesByCourseId(courseId);
+        dto.setMedicalCategories(medicalCodes);
+
+        List<Long> unitTypeId = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "UNIT_TYPE");
+        List<String> unitName = dropdownRepository.findByIdIn(unitTypeId).stream().map(DropdownMaster::getName).toList();
+        dto.setUnitIds(unitName);
+
+        // Get posting type IDs from dropdown mapping
+        List<Long> postingTypeIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "POST_TYPES");
+        List<String> postingTypes = dropdownRepository.findByIdIn(postingTypeIds).stream().map(DropdownMaster::getName).toList();
+        dto.setPostingTypeIds(postingTypes);
+
+        // Get course grading IDs
+        List<Long> minCourseGradingIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "COURSE_GRADE");
+        List<String> minCourseGrading = dropdownRepository.findByIdIn(minCourseGradingIds).stream().map(DropdownMaster::getName).toList();
+        dto.setMinCourseGrading(minCourseGrading);
+
+        // Get educational qualification IDs
+        List<Long> educationalQualificationIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "CIVIL_QUALIFICATIONS");
+        List<String> educationalQualification = dropdownRepository.findByIdIn(educationalQualificationIds).stream().map(DropdownMaster::getName).toList();
+        dto.setEducationalQualifications(educationalQualification);
+
+        // Get establishment type IDs
+        List<Long> establishmentTypeIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "ESTABLISHMENT");
+        List<String> establishmentType = dropdownRepository.findByIdIn(establishmentTypeIds).stream().map(DropdownMaster::getName).toList();
+        dto.setEstablishmentTypes(establishmentType);
 
         // Get remarks (from dropdown_master with type "REMARKS")
         List<Long> remarkIds = dropdownMappingRepository.findDropdownIdsByCourseIdAndType(courseId, "REMARKS");
