@@ -914,10 +914,9 @@
         document.getElementById("name").innerText = identity.fullName || 'N/A';
         document.getElementById("mobileNumber").innerHTML = `Mobile: ${identity.mobileNumber || 'N/A'}`;
 
-        if (decorations && decorations.length > 0) {
-            const decorationInitials = decorations.map(d => generateDecorationInitials(d.awardName)).filter(i => i.length > 0);
-            const uniqueInitials = [...new Set(decorationInitials)];
-            document.getElementById("decorationInitials").innerHTML = uniqueInitials.length > 0 ? `(${uniqueInitials.join(', ')})` : '';
+        // FIXED: Use identity.decorationInitials from backend (already filtered for initials)
+        if (identity.decorationInitials && identity.decorationInitials.trim() !== '') {
+            document.getElementById("decorationInitials").innerHTML = `(${identity.decorationInitials})`;
         } else {
             document.getElementById("decorationInitials").innerHTML = '';
         }
@@ -972,7 +971,7 @@
             courseBody.innerHTML = '<tr><td colspan="4" class="no-data">No courses completed found</td></tr>';
         }
 
-        // Decorations
+        // Decorations Table - This shows ALL decorations (including Commendation Cards)
         const decorBody = document.querySelector("#decorTable tbody");
         decorBody.innerHTML = "";
         if (decorations && decorations.length > 0) {
@@ -1087,7 +1086,7 @@
         historyContainer.innerHTML = getHistoryTableHTML();
         const tbody = document.getElementById('historyTableBody');
         if (tbody) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history<th>th';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Select a personnel to view their remark history</td></tr>';
         }
     }
 
