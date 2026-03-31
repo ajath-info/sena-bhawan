@@ -3,6 +3,7 @@ package com.example.sena_bhawan.service;
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
 import com.example.sena_bhawan.repository.*;
+import com.example.sena_bhawan.service.impl.PersonnelServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class CoursePanelBatchService {
     private final CourseScheduleRepository scheduleRepository;
     private final CourseMasterRepository courseMasterRepository;
     private final PersonnelRepository personnelRepository;
+    private final PersonnelServiceImpl personnelServiceImpl;
 
     /**
      * Create a new batch and persist all nominations linked to it.
@@ -283,7 +285,7 @@ public class CoursePanelBatchService {
         return batchRepository.countByMovementIdLessThanEqualAndStatus(movementId, status);
     }
 
-    public List<PersonnelDataDTO> getPersonnelByBatchId(Long batchId) {
+    public List<PersonnelListDTO> getPersonnelByBatchId(Long batchId) {
         // First check if batch exists and is active
         CoursePanelBatch batch = batchRepository.findById(batchId)
                 .orElseThrow(() -> new RuntimeException("Batch not found"));
@@ -300,21 +302,7 @@ public class CoursePanelBatchService {
                 .map(CoursePanelNomination::getPersonnelId)
                 .collect(Collectors.toList());
 
-        // Fetch personnel details
-        List<Personnel> personnelList = personnelRepository.findAllById(personnelIds);
-
-        // Convert to DTO
-        return personnelList.stream()
-                .map(personnel -> PersonnelDataDTO.builder()
-                        .armyNo(personnel.getArmyNo())
-                        .rank(personnel.getRank())
-                        .fullName(personnel.getFullName())
-                        .city(personnel.getCity())
-                        .district(personnel.getDistrict())
-                        .mobileNumber(personnel.getMobileNumber())
-                        .emailAddress(personnel.getEmailAddress())
-                        .build())
-                .collect(Collectors.toList());
+        return personnelServiceImpl.filterAllPersonnelByIds(personnelIds);
     }
 
     public PanelBatchListResponse getAllPanelBatchesByStatus(
