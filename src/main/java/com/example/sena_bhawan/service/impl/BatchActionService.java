@@ -75,9 +75,40 @@ public class BatchActionService {
                     batchId, originalMovementId, newMovementId);
         }
 
-        // Update remarks if provided
         if (request.getRemarks() != null && !request.getRemarks().trim().isEmpty()) {
-            batch.setRemarks(request.getRemarks());
+            Long roleId = request.getRoleId();
+            String remarkText = request.getRemarks();
+
+            if (roleId != null) {
+                switch (roleId.intValue()) {
+                    case 2:
+                        batch.setRemark2(remarkText);
+                        log.info("Stored remark in remark2 for roleId: {}", roleId);
+                        break;
+                    case 3:
+                        batch.setRemark3(remarkText);
+                        log.info("Stored remark in remark3 for roleId: {}", roleId);
+                        break;
+                    case 4:
+                        batch.setRemark4(remarkText);
+                        log.info("Stored remark in remark4 for roleId: {}", roleId);
+                        break;
+                    case 5:
+                        batch.setRemark5(remarkText);
+                        log.info("Stored remark in remark5 for roleId: {}", roleId);
+                        break;
+                    case 6:
+                        batch.setRemark6(remarkText);
+                        log.info("Stored remark in remark6 for roleId: {}", roleId);
+                        break;
+                    default:
+                        throw new RuntimeException("Invalid request");
+                }
+            } else {
+                // If roleId is null, store in generic remarks
+                batch.setRemarks(remarkText);
+                log.warn("roleId is null, storing remark in generic remarks column");
+            }
         }
 
         batch.setUpdatedAt(LocalDateTime.now());
@@ -111,12 +142,42 @@ public class BatchActionService {
         batch.setStatus("REJECTED");
         batch.setMovementId(request.getRejectMovementId()+1);
         batch.setRejectMovementId(request.getRejectMovementId() != null ?
-                                 request.getRejectMovementId()+1 : batch.getMovementId()+1);
-        
+                request.getRejectMovementId()+1 : batch.getMovementId()+1);
+
         if (request.getRemarks() != null && !request.getRemarks().trim().isEmpty()) {
-            batch.setRemarks(request.getRemarks());
+            Long roleId = request.getRoleId();
+            String remarkText = request.getRemarks();
+
+            if (roleId != null) {
+                switch (roleId.intValue()) {
+                    case 2:
+                        batch.setRemark2(remarkText);
+                        log.info("Stored remark in remark2 for roleId: {} (Rejection)", roleId);
+                        break;
+                    case 3:
+                        batch.setRemark3(remarkText);
+                        log.info("Stored remark in remark3 for roleId: {} (Rejection)", roleId);
+                        break;
+                    case 4:
+                        batch.setRemark4(remarkText);
+                        log.info("Stored remark in remark4 for roleId: {} (Rejection)", roleId);
+                        break;
+                    case 5:
+                        batch.setRemark5(remarkText);
+                        log.info("Stored remark in remark5 for roleId: {} (Rejection)", roleId);
+                        break;
+                    case 6:
+                        batch.setRemark6(remarkText);
+                        log.info("Stored remark in remark6 for roleId: {} (Rejection)", roleId);
+                        break;
+                    default:
+                        throw new RuntimeException("Invalid request: Unsupported roleId");
+                }
+            } else {
+                throw new RuntimeException("Invalid request: roleId is required for rejection");
+            }
         }
-        
+
         batch.setUpdatedAt(LocalDateTime.now());
         batchRepository.save(batch);
 
@@ -162,10 +223,10 @@ public class BatchActionService {
         // Decrease movement ID but not below MIN_MOVEMENT_ID (2)
         Long currentMovementId = batch.getMovementId();
         Long newMovementId = currentMovementId - 1;
-        
+
         if (newMovementId < MIN_MOVEMENT_ID) {
             throw new IllegalStateException(
-                String.format("Cannot send back batch below movement ID %d. Current movement ID: %d", 
+                    String.format("Cannot send back batch below movement ID %d. Current movement ID: %d",
                             MIN_MOVEMENT_ID, currentMovementId));
         }
 
@@ -173,10 +234,41 @@ public class BatchActionService {
         batch.setMovementId(newMovementId);
         batch.setStatus("PENDING_APPROVAL");
         batch.setBatchStatus(true); // Keep active
-        
-        // Store remarks
-        batch.setRemarks(request.getRemarks());
-        
+
+        if (request.getRemarks() != null && !request.getRemarks().trim().isEmpty()) {
+            Long roleId = request.getRoleId();
+            String remarkText = request.getRemarks();
+
+            if (roleId != null) {
+                switch (roleId.intValue()) {
+                    case 2:
+                        batch.setRemark2(remarkText);
+                        log.info("Stored remark in remark2 for roleId: {} (Send Back)", roleId);
+                        break;
+                    case 3:
+                        batch.setRemark3(remarkText);
+                        log.info("Stored remark in remark3 for roleId: {} (Send Back)", roleId);
+                        break;
+                    case 4:
+                        batch.setRemark4(remarkText);
+                        log.info("Stored remark in remark4 for roleId: {} (Send Back)", roleId);
+                        break;
+                    case 5:
+                        batch.setRemark5(remarkText);
+                        log.info("Stored remark in remark5 for roleId: {} (Send Back)", roleId);
+                        break;
+                    case 6:
+                        batch.setRemark6(remarkText);
+                        log.info("Stored remark in remark6 for roleId: {} (Send Back)", roleId);
+                        break;
+                    default:
+                        throw new RuntimeException("Invalid request: Unsupported roleId");
+                }
+            } else {
+                throw new RuntimeException("Invalid request: roleId is required for send back");
+            }
+        }
+
         batch.setUpdatedAt(LocalDateTime.now());
         batchRepository.save(batch);
 
@@ -188,16 +280,16 @@ public class BatchActionService {
             nominationRepository.save(nomination);
         }
 
-        log.info("Batch {} sent back from movement {} to movement {}", 
-                 batchId, currentMovementId, newMovementId);
+        log.info("Batch {} sent back from movement {} to movement {}",
+                batchId, currentMovementId, newMovementId);
 
         return BatchActionResponse.builder()
                 .batchId(batch.getId())
                 .scheduleId(batch.getScheduleId())
                 .movementId(batch.getMovementId())
                 .status("PENDING_APPROVAL")
-                .message(String.format("Batch sent back from movement %d to %d", 
-                                      currentMovementId, newMovementId))
+                .message(String.format("Batch sent back from movement %d to %d",
+                        currentMovementId, newMovementId))
                 .build();
     }
 }

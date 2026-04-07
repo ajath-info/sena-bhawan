@@ -34,4 +34,11 @@ public class PanelBatchListDTO {
     private String venue;
     private String courseStrength;
     private Integer panelSize;
+    private String remark1;
+    private String remark2;
+    private String remark3;
+    private String remark4;
+    private String remark5;
+    private String remark6;
+
 }

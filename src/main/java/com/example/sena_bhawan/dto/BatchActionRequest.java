@@ -13,5 +13,6 @@ public class BatchActionRequest {
     private Long userId;
     private String remarks;
     private Long rejectMovementId; // Only for reject action
+    private Long roleId;
 }
 

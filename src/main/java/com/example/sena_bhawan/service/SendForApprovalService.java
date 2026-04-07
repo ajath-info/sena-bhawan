@@ -29,8 +29,7 @@ public class SendForApprovalService {
 
     public SendForApprovalResponse sendForApproval(SendForApprovalRequest request) {
 
-        List<CoursePanelNomination> existingNominations =
-                nominationRepository.findByScheduleId(request.getScheduleId());
+        List<CoursePanelNomination> existingNominations = nominationRepository.findByScheduleId(request.getScheduleId());
 
         if (existingNominations.isEmpty()) {
             throw new IllegalStateException(
@@ -48,7 +47,7 @@ public class SendForApprovalService {
                 .status("PENDING_APPROVAL")
                 .batchStatus(true) // New batch is active
                 .totalNominations(request.getNominations().size())
-                .remarks(request.getRemarks())
+                .remark1(request.getRemarks())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

@@ -413,12 +413,63 @@
                     Movement ID: ${panel.movementId} |
                     Created: ${createdDate}
                 </div>
-                ${panel.remarks ? `<div style="margin-top: 5px; font-size: 12px; color: #6b7280;">📝 ${panel.remarks}</div>` : ''}
             </div>
         `;
 
             list.appendChild(div);
         });
+    }
+
+    // ===============================
+    // GENERATE REMARKS SECTION
+    // ===============================
+    function generateRemarksSection(panel) {
+        const stages = [
+            { label: "Clerk", remarkKey: "remark1", movementId: 1 },
+            { label: "G1", remarkKey: "remark2", movementId: 2 },
+            { label: "Colonel", remarkKey: "remark3", movementId: 3 },
+            { label: "Brigadier", remarkKey: "remark4", movementId: 4 },
+            { label: "ADG", remarkKey: "remark5", movementId: 5 },
+            { label: "DG", remarkKey: "remark6", movementId: 6 }
+        ];
+
+        let remarksHtml = `
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-top: 20px; margin-bottom: 20px;">
+            <h3 style="margin: 0 0 15px 0; color: #1b4332;">Stage-wise Remarks</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+    `;
+
+        for (const stage of stages) {
+            const remarkValue = panel[stage.remarkKey];
+            const remarkText = (remarkValue && remarkValue.toString().trim() !== "") ? escapeHtmlForRemark(remarkValue) : "—";
+            const isCompleted = panel.movementId >= stage.movementId;
+
+            remarksHtml += `
+                <div style="border-left: 3px solid ${isCompleted ? '#10b981' : '#e5e7eb'}; padding-left: 12px; background: #f9fafb; padding: 10px; border-radius: 6px;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 8px;">
+                        ${stage.label}
+                    </div>
+                    <div style="font-size: 13px; color: #4b5563; word-wrap: break-word; white-space: pre-wrap;">
+                        ${remarkText}
+                    </div>
+                </div>
+        `;
+        }
+
+        remarksHtml += `
+            </div>
+        </div>
+    `;
+
+        return remarksHtml;
+    }
+
+    // Helper function to escape HTML for remarks
+    function escapeHtmlForRemark(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // ===============================
@@ -430,10 +481,13 @@
         const user = getCurrentUser();
         const userId = user?.userId || 1;
 
+        // Generate remarks section
+        const remarksHtml = generateRemarksSection(panel);
+
         // Generate table rows with ALL fields
         let tableRows = '';
         if (!personnelList || personnelList.length === 0) {
-            tableRows = '|<td colspan="20" style="text-align: center;">No personnel found</td>|';
+            tableRows = '<tr><td colspan="28" style="text-align: center;">No personnel found</td></tr>';
         } else {
             personnelList.forEach((person, index) => {
                 tableRows += `
@@ -505,9 +559,11 @@
         </div>
     </div>
 
+    ${remarksHtml}
+
     <h3>Personnel List</h3>
     <div style="overflow-x: auto; max-height: 500px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1800px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 2800px;">
             <thead>
                 <tr style="background: #f3f4f6; position: sticky; top: 0;">
                     <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">#</th>
@@ -538,12 +594,12 @@
                     <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Total Courses</th>
                     <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">Courses (Current Year)</th>
                     <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb;">TOS Date</th>
-                </tr>
+                 </tr>
             </thead>
             <tbody>
                 ${tableRows}
             </tbody>
-        </table>
+         </table>
     </div>
 
     ${showActionButtons ? `
@@ -591,7 +647,8 @@
                 },
                 body: JSON.stringify({
                     userId: user?.userId || 1,
-                    remarks: remark
+                    remarks: remark,
+                    roleId: user?.roleId || 2
                 })
             });
 
@@ -970,21 +1027,6 @@
                 roleId: user.roleId,
                 appointment: user.appointment
             });
-
-            // Optionally display on page
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.style.cssText = 'background: #e5e7eb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;';
-            userInfoDiv.innerHTML = `
-            <strong>Logged in as:</strong> ${user.username} |
-            <strong>Role ID:</strong> ${user.roleId} |
-            <strong>Appointment:</strong> ${user.appointment}
-        `;
-
-            const mainContent = document.querySelector('.main-content');
-            const firstChild = mainContent.firstChild;
-            if (firstChild) {
-                mainContent.insertBefore(userInfoDiv, firstChild.nextSibling);
-            }
         }
     }
 
