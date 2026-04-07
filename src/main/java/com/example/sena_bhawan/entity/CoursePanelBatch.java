@@ -53,4 +53,21 @@ public class CoursePanelBatch {
     @Column(name = "batch_status")
     private Boolean batchStatus;
 
+    @Column(name = "remark_1", columnDefinition = "TEXT")
+    private String remark1;
+
+    @Column(name = "remark_2", columnDefinition = "TEXT")
+    private String remark2;
+
+    @Column(name = "remark_3", columnDefinition = "TEXT")
+    private String remark3;
+
+    @Column(name = "remark_4", columnDefinition = "TEXT")
+    private String remark4;
+
+    @Column(name = "remark_5", columnDefinition = "TEXT")
+    private String remark5;
+
+    @Column(name = "remark_6", columnDefinition = "TEXT")
+    private String remark6;
 }

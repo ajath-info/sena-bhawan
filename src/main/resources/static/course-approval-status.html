@@ -388,6 +388,15 @@
         <!-- Pagination -->
         <div id="paginationContainer" class="pagination"></div>
     </div>
+
+    <!-- Modal -->
+    <div id="personnelModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 1400px;">
+            <div id="modalContent">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -424,6 +433,8 @@
         panels.forEach(panel => {
             const div = document.createElement("div");
             div.className = "panel-card";
+            div.style.cursor = "pointer";
+            div.onclick = () => openPersonnelModal(panel.batchId); // Add click handler with batch ID
 
             const startDate = panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A';
             const endDate = panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A';
@@ -479,7 +490,6 @@
                     Current Stage: ${currentStage} |
                     Created: ${createdDate}
                 </div>
-                ${panel.remarks ? `<div style="margin-top: 5px; font-size: 12px; color: #6b7280;">📝 ${panel.remarks}</div>` : ''}
                 ${pipelineHTML}
             </div>
         `;
@@ -487,6 +497,390 @@
             list.appendChild(div);
         });
     }
+
+    // ===============================
+    // OPEN PERSONNEL MODAL - FIXED VERSION
+    // ===============================
+    // ===============================
+    // OPEN PERSONNEL MODAL - ENHANCED VERSION
+    // ===============================
+    async function openPersonnelModal(batchId) {
+        if (!batchId) {
+            console.error('No batchId provided');
+            alert('Error: Invalid batch ID');
+            return;
+        }
+
+        showLoading(true);
+        const modal = document.getElementById('personnelModal');
+
+        try {
+            // First, fetch batch info from the status endpoint
+            const batchInfoUrl = `${API_BASE_URL}/panel-batches/status/${currentStatus}?page=0&size=100`;
+            const batchInfoResponse = await fetch(batchInfoUrl);
+
+            let batchInfo = null;
+            if (batchInfoResponse.ok) {
+                const batchData = await batchInfoResponse.json();
+                // Find the specific batch
+                batchInfo = batchData.data.find(batch => batch.batchId === batchId);
+            }
+
+            // Then fetch personnel data for this batch
+            const personnelUrl = `${API_BASE_URL}/panel-batches/${batchId}/personnel`;
+            console.log('Fetching personnel from:', personnelUrl);
+
+            const personnelResponse = await fetch(personnelUrl);
+
+            if (!personnelResponse.ok) {
+                throw new Error(`HTTP error! status: ${personnelResponse.status}`);
+            }
+
+            const personnelData = await personnelResponse.json();
+            console.log('Personnel API Response:', personnelData);
+
+            // Check if we got an array
+            if (!Array.isArray(personnelData)) {
+                throw new Error('Invalid personnel data format');
+            }
+
+            // Create panel object combining batch info and personnel
+            const panel = {
+                batchId: batchId,
+                courseName: batchInfo?.courseName || 'Course Information',
+                batchNumber: batchInfo?.batchNumber || 'N/A',
+                year: batchInfo?.year || 'N/A',
+                movementId: batchInfo?.movementId || currentMovementId || 1,
+                status: batchInfo?.status || currentStatus,
+                venue: batchInfo?.venue || 'N/A',
+                startDate: batchInfo?.startDate || null,
+                endDate: batchInfo?.endDate || null,
+                courseStrength: batchInfo?.courseStrength || 'N/A',
+                totalNominations: personnelData.length,
+                remarks: batchInfo?.remarks || '',
+                remark1: batchInfo?.remark1 || null,
+                remark2: batchInfo?.remark2 || null,
+                remark3: batchInfo?.remark3 || null,
+                remark4: batchInfo?.remark4 || null,
+                remark5: batchInfo?.remark5 || null,
+                remark6: batchInfo?.remark6 || null,
+                personnelList: personnelData
+            };
+
+            // Generate modal content
+            const modalContent = generateModalContent(panel);
+            document.getElementById('modalContent').innerHTML = modalContent;
+
+            // Show modal
+            modal.style.display = "flex";
+
+            // Close modal when clicking outside
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            };
+
+        } catch (error) {
+            console.error('Error loading personnel:', error);
+            alert(`Error loading personnel details: ${error.message}`);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ===============================
+    // GENERATE MODAL CONTENT - FIXED VERSION
+    // ===============================
+    function generateModalContent(panel) {
+        const courseTitle = `${panel.courseName || 'N/A'} - Batch: ${panel.batchNumber || 'N/A'} (${panel.year || 'N/A'})`;
+
+        // Generate remarks section
+        const remarksHtml = generateRemarksSection(panel);
+
+        // Generate personnel table rows
+        const tableRows = generatePersonnelTable(panel.personnelList || []);
+
+        return `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #1b4332; margin: 0;">${escapeHtml(courseTitle)}</h2>
+            <button onclick="closeModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">&times;</button>
+        </div>
+
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Course:</span>
+                <span style="color: #1f2937;">${escapeHtml(panel.courseName || 'N/A')}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Batch:</span>
+                <span style="color: #1f2937;">${escapeHtml(panel.batchNumber || 'N/A')} (${escapeHtml(panel.year || 'N/A')})</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Movement ID:</span>
+                <span style="color: #1f2937;">${panel.movementId}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Status:</span>
+                <span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: ${panel.status === 'PENDING_APPROVAL' ? '#fef3c7' : panel.status === 'APPROVED' ? '#d1fae5' : '#fee2e2'}; color: ${panel.status === 'PENDING_APPROVAL' ? '#d97706' : panel.status === 'APPROVED' ? '#059669' : '#dc2626'};">${panel.status}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Venue:</span>
+                <span style="color: #1f2937;">${escapeHtml(panel.venue || 'N/A')}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Duration:</span>
+                <span style="color: #1f2937;">${panel.startDate ? new Date(panel.startDate).toLocaleDateString() : 'N/A'} to ${panel.endDate ? new Date(panel.endDate).toLocaleDateString() : 'N/A'}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Course Strength:</span>
+                <span style="color: #1f2937;">${panel.courseStrength || 'N/A'}</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-weight: 600; color: #4b5563;">Total Nominations:</span>
+                <span style="color: #1f2937;">${panel.totalNominations || 0}</span>
+            </div>
+            ${panel.remarks ? `
+            <div style="display: flex; gap: 10px; grid-column: 1/-1;">
+                <span style="font-weight: 600; color: #4b5563;">Remarks:</span>
+                <span style="color: #1f2937;">${escapeHtml(panel.remarks)}</span>
+            </div>
+            ` : ''}
+        </div>
+
+        ${remarksHtml}
+
+        <h3 style="margin-top: 20px;">Personnel List (${panel.personnelList.length} records)</h3>
+        <div style="overflow-x: auto; max-height: 600px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; position: relative;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11px; min-width: 2800px;">
+                <thead>
+                    <tr style="background: #f3f4f6; position: sticky; top: 0; z-index: 10;">
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">#</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Army No</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Rank</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Full Name</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Unit</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Command</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Corps</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Division</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">DOB</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Commission Date</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Seniority Date</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Place of Birth</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Religion</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Marital Status</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">City</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">District</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">State</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Area Type</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Estab Type</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Mobile</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Email</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Civil Qualification</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Courses</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Sports</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Medical Code</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Total Courses</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">Courses (Current Year)</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 600;">TOS Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px; text-align: right; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+            <button onclick="closeModal()" style="padding: 8px 20px; background: #1b4332; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+        </div>
+    `;
+    }
+
+    // ===============================
+    // GENERATE REMARKS SECTION - FIXED
+    // ===============================
+    function generateRemarksSection(panel) {
+        const stages = [
+            { label: "Clerk", remarkKey: "remark1", movementId: 1 },
+            { label: "G1", remarkKey: "remark2", movementId: 2 },
+            { label: "Colonel", remarkKey: "remark3", movementId: 3 },
+            { label: "Brigadier", remarkKey: "remark4", movementId: 4 },
+            { label: "ADG", remarkKey: "remark5", movementId: 5 },
+            { label: "DG", remarkKey: "remark6", movementId: 6 }
+        ];
+
+        let remarksHtml = `
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-top: 20px;">
+            <h3 style="margin: 0 0 15px 0; color: #1b4332;">Stage-wise Remarks</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+    `;
+
+        for (const stage of stages) {
+            const remarkValue = panel[stage.remarkKey];
+            const remarkText = (remarkValue && remarkValue.toString().trim() !== "") ? escapeHtml(remarkValue) : "—";
+            const isCompleted = panel.movementId >= stage.movementId;
+
+            remarksHtml += `
+                <div style="border-left: 3px solid ${isCompleted ? '#10b981' : '#e5e7eb'}; padding-left: 12px; background: #f9fafb; padding: 10px; border-radius: 6px;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 8px;">
+                        ${stage.label}
+                    </div>
+                    <div style="font-size: 13px; color: #4b5563; word-wrap: break-word;">
+                        ${remarkText}
+                    </div>
+                </div>
+        `;
+        }
+
+        remarksHtml += `
+            </div>
+        </div>
+    `;
+
+        return remarksHtml;
+    }
+
+    // ===============================
+    // GENERATE PERSONNEL TABLE - UPDATED FOR YOUR API FIELDS
+    // ===============================
+    function generatePersonnelTable(personnelList) {
+        if (!personnelList || personnelList.length === 0) {
+            return `<tr><td colspan="28" style="text-align: center; padding: 40px;">No personnel data available for this batch</td></tr>`;
+        }
+
+        let rows = '';
+        personnelList.forEach((person, index) => {
+            rows += `
+            <tr>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.armyNo || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.rank || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.fullName || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.unit || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.command || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.corps || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.division || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.dateOfBirth ? new Date(person.dateOfBirth).toLocaleDateString() : '—'}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.dateOfCommission ? new Date(person.dateOfCommission).toLocaleDateString() : '—'}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.dateOfSeniority ? new Date(person.dateOfSeniority).toLocaleDateString() : '—'}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.placeOfBirth || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.religion || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.maritalStatus || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.city || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.district || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.state || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.areaType || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.establishmentType || person.estabType || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.mobileNumber || person.mobile || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.emailAddress || person.email || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.civilQual || person.civilQualification || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.course || person.courses || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.sports || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${escapeHtml(person.medicalCode || '—')}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.totalCoursesOverall || person.totalCourses || '—'}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.totalCoursesCurrentYear || person.coursesCurrentYear || '—'}</td>
+                <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb;">${person.tosDate ? new Date(person.tosDate).toLocaleDateString() : '—'}</td>
+            </tr>
+        `;
+        });
+        return rows;
+    }
+
+    // Add this to your existing style
+    const additionalStyle = document.createElement('style');
+    additionalStyle.textContent = `
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 98%;
+            max-width: 98%;
+            max-height: 95%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Custom scrollbar for better appearance */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Sticky header styling */
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f3f4f6;
+            z-index: 10;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+    `;
+    document.head.appendChild(additionalStyle);
+
+    // ===============================
+    // HELPER FUNCTION TO ESCAPE HTML
+    // ===============================
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ===============================
+    // CLOSE MODAL - FIXED
+    // ===============================
+    function closeModal() {
+        const modal = document.getElementById('personnelModal');
+        if (modal) {
+            modal.style.display = "none";
+            const modalContent = document.getElementById('modalContent');
+            if (modalContent) {
+                modalContent.innerHTML = "";
+            }
+        }
+    }
+
+    // Add CSS for modal
+    const style = document.createElement('style');
+    style.textContent = `
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90%;
+            overflow-y: auto;
+            padding: 24px;
+        }
+    `;
+    document.head.appendChild(style);
 
     // ===============================
     // GET USER DATA FROM LOCAL STORAGE
