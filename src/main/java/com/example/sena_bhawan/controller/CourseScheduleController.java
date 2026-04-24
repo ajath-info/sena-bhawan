@@ -116,6 +116,11 @@ public class CourseScheduleController {
         return scheduleService.getCourseScheduleSummary(courseId);
     }
 
+    @GetMapping("/course/summary")
+    public List<CourseScheduleSummaryResponse> getAllCoursesScheduleSummary() {
+        return scheduleService.getAllCoursesScheduleSummary();
+    }
+
     @DeleteMapping("/delete/{id}")
     public String deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);

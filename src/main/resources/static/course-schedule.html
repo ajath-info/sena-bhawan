@@ -634,114 +634,286 @@
 
   async function exportToPDF() {
     const srno = courseSelect.value;
-    if (!srno) {
-      alert("Please select a course first!");
-      return;
-    }
 
     try {
-      // Fetch the schedule data again to ensure we have latest data
-      const response = await fetch(`http://localhost:6060/api/courseschedule/course/${srno}/summary`);
-      if (!response.ok) throw new Error("Failed to fetch schedule data");
-
-      const data = await response.json();
-
-      // Create new PDF document
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('landscape');
+      let currentY = 20; // Start Y position
+      const leftMargin = 14;
+      const rightMargin = 14;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const contentWidth = pageWidth - leftMargin - rightMargin;
 
-      // Add title
-      doc.setFontSize(18);
-      doc.setTextColor(27, 67, 50);
-      doc.text(`Course Schedule Report - ${data.courseDetails.courseName}`, 14, 15);
-
-      // Add generation date
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      const currentDate = new Date().toLocaleString();
-      doc.text(`Generated on: ${currentDate}`, 14, 23);
-
-      // Add course details summary
-      doc.setFontSize(11);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Location: ${data.courseDetails.location}`, 14, 32);
-      doc.text(`Duration: ${data.courseDetails.duration} weeks`, 14, 38);
-      doc.text(`Total Batches: ${data.courseCount.totalschedule}`, 14, 44);
-      doc.text(`Current Batches: ${data.courseCount.currentbatch}`, 14, 50);
-      doc.text(`Upcoming Batches: ${data.courseCount.upcoming}`, 14, 56);
-
-      // Prepare table data with separated from/to columns and added strength
-      const tableData = data.courseSchedule.map((schedule, index) => {
-        const startDate = new Date(schedule.startDate).toLocaleDateString('en-GB');
-        const endDate = new Date(schedule.endDate).toLocaleDateString('en-GB');
-
-        // Determine status for remarks
-        let status = "";
-        const today = new Date();
-        const start = new Date(schedule.startDate);
-        const end = new Date(schedule.endDate);
-
-        if (today < start) status = "Upcoming";
-        else if (today > end) status = "Completed";
-        else status = "In Progress";
-
-        return [
-          index + 1,                           // Sr No.
-          data.courseDetails.courseName,       // Course Name
-          schedule.batchNumber || "N/A",       // Batch Number
-          startDate,                           // Schedule From
-          endDate,                             // Schedule To
-          schedule.courseStrength,             // Course Strength
-          status                               // Remark
-        ];
-      });
-
-      // Add table with updated columns
-      doc.autoTable({
-        startY: 65,
-        head: [['Sr No.', 'Course Name', 'Batch No.', 'From', 'To', 'Strength', 'Remark']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: {
-          fillColor: [27, 67, 50],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold'
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245]
-        },
-        margin: { left: 14, right: 14 },
-        columnStyles: {
-          0: { cellWidth: 20 },      // Sr No.
-          1: { cellWidth: 55 },      // Course Name
-          2: { cellWidth: 30 },      // Batch No.
-          3: { cellWidth: 35 },      // From
-          4: { cellWidth: 35 },      // To
-          5: { cellWidth: 25 },      // Strength
-          6: { cellWidth: 35 }       // Remark
+      // Helper function to add new page if needed
+      function checkAndAddPage(requiredSpace) {
+        const pageHeight = doc.internal.pageSize.getHeight();
+        if (currentY + requiredSpace > pageHeight - 20) {
+          doc.addPage();
+          currentY = 20;
+          return true;
         }
-      });
-
-      // Add footer with page numbers
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(9);
-        doc.setTextColor(150, 150, 150);
-        doc.text(
-                `Page ${i} of ${pageCount}`,
-                doc.internal.pageSize.getWidth() - 20,
-                doc.internal.pageSize.getHeight() - 10
-        );
-        doc.text(
-                `ARMY HRMS - Course Schedule Report`,
-                14,
-                doc.internal.pageSize.getHeight() - 10
-        );
+        return false;
       }
 
-      // Save the PDF
-      doc.save(`${data.courseDetails.courseName}_Schedule_Report.pdf`);
+      // If no course is selected, fetch ALL courses data
+      if (!srno) {
+        const response = await fetch("http://localhost:6060/api/courseschedule/course/summary");
+        if (!response.ok) throw new Error("Failed to fetch all courses data");
+
+        const allCoursesData = await response.json();
+
+        if (allCoursesData.length === 0) {
+          alert("No courses found to export!");
+          return;
+        }
+
+        // Add title for all courses report
+        doc.setFontSize(18);
+        doc.setTextColor(27, 67, 50);
+        doc.setFont(undefined, 'bold');
+        doc.text("Complete Course Schedule Report - All Courses", leftMargin, currentY);
+        currentY += 12;
+
+        // Add generation date and total courses
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont(undefined, 'normal');
+        const currentDate = new Date().toLocaleString();
+        doc.text(`Generated on: ${currentDate}`, leftMargin, currentY);
+        currentY += 7;
+        doc.text(`Total Courses: ${allCoursesData.length}`, leftMargin, currentY);
+        currentY += 15;
+
+        // Loop through each course data
+        for (let i = 0; i < allCoursesData.length; i++) {
+          const data = allCoursesData[i];
+
+          // Check if we need a new page before adding course header (minimum 60px space needed)
+          checkAndAddPage(60);
+
+          // Add separator line between courses (except for first course)
+          if (i > 0) {
+            doc.setDrawColor(200, 200, 200);
+            doc.line(leftMargin, currentY - 5, pageWidth - leftMargin, currentY - 5);
+            currentY += 5;
+          }
+
+          // Add course header
+          doc.setFontSize(14);
+          doc.setTextColor(27, 67, 50);
+          doc.setFont(undefined, 'bold');
+          doc.text(`${data.courseDetails.courseName}`, leftMargin, currentY);
+          currentY += 8;
+
+          // Add course details
+          doc.setFontSize(10);
+          doc.setTextColor(100, 100, 100);
+          doc.setFont(undefined, 'normal');
+          doc.text(`Location: ${data.courseDetails.location} | Duration: ${data.courseDetails.duration} Weeks`, leftMargin, currentY);
+          currentY += 6;
+          doc.text(`Total Batches: ${data.courseCount.totalschedule} | Current: ${data.courseCount.currentbatch} | Upcoming: ${data.courseCount.upcoming}`, leftMargin, currentY);
+          currentY += 12;
+
+          // Prepare table data
+          const tableData = data.courseSchedule.map((schedule, index) => {
+            const startDate = new Date(schedule.startDate).toLocaleDateString('en-GB');
+            const endDate = new Date(schedule.endDate).toLocaleDateString('en-GB');
+
+            let status = "";
+            const today = new Date();
+            const start = new Date(schedule.startDate);
+            const end = new Date(schedule.endDate);
+
+            if (today < start) status = "Upcoming";
+            else if (today > end) status = "Completed";
+            else status = "In Progress";
+
+            return [
+              index + 1,
+              schedule.batchNumber || "N/A",
+              startDate,
+              endDate,
+              schedule.courseStrength || "N/A",
+              schedule.venue || "N/A",
+              status
+            ];
+          });
+
+          if (tableData.length > 0) {
+            // Calculate approximate table height based on number of rows
+            const estimatedTableHeight = (tableData.length * 8) + 15; // Rough estimate
+            checkAndAddPage(estimatedTableHeight);
+
+            doc.autoTable({
+              startY: currentY,
+              head: [['Sr No.', 'Batch No.', 'From', 'To', 'Strength', 'Venue', 'Status']],
+              body: tableData,
+              theme: 'striped',
+              headStyles: {
+                fillColor: [27, 67, 50],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                halign: 'center'
+              },
+              bodyStyles: {
+                halign: 'center',
+                valign: 'middle'
+              },
+              alternateRowStyles: {
+                fillColor: [245, 245, 245]
+              },
+              margin: { left: leftMargin, right: rightMargin },
+              columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 30, halign: 'center' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 30, halign: 'center' },
+                4: { cellWidth: 25, halign: 'center' },
+                5: { cellWidth: 45, halign: 'left' },
+                6: { cellWidth: 25, halign: 'center' }
+              },
+              didDrawPage: function(data) {
+                // Add footer on each page
+                const pageCount = doc.internal.getNumberOfPages();
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+                doc.setFontSize(9);
+                doc.setTextColor(150, 150, 150);
+                doc.text(
+                        `Page ${currentPage} of ${pageCount}`,
+                        pageWidth - 20,
+                        doc.internal.pageSize.getHeight() - 10,
+                        { align: 'center' }
+                );
+                doc.text(
+                        `ARMY HRMS - Complete Course Schedule Report`,
+                        leftMargin,
+                        doc.internal.pageSize.getHeight() - 10
+                );
+              }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 10;
+          } else {
+            doc.setFontSize(10);
+            doc.setTextColor(150, 150, 150);
+            doc.text("No schedules available for this course", leftMargin, currentY);
+            currentY += 12;
+          }
+        }
+
+        doc.save(`All_Courses_Schedule_Report.pdf`);
+        alert("All courses report exported successfully!");
+
+      } else {
+        // Course is selected - fetch single course data
+        const response = await fetch(`http://localhost:6060/api/courseschedule/course/${srno}/summary`);
+        if (!response.ok) throw new Error("Failed to fetch schedule data");
+
+        const data = await response.json();
+
+        // Add title
+        doc.setFontSize(18);
+        doc.setTextColor(27, 67, 50);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Course Schedule Report - ${data.courseDetails.courseName}`, leftMargin, currentY);
+        currentY += 12;
+
+        // Add generation date
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.setFont(undefined, 'normal');
+        const currentDate = new Date().toLocaleString();
+        doc.text(`Generated on: ${currentDate}`, leftMargin, currentY);
+        currentY += 8;
+
+        // Add course details summary
+        doc.text(`Location: ${data.courseDetails.location}`, leftMargin, currentY);
+        currentY += 6;
+        doc.text(`Duration: ${data.courseDetails.duration} weeks`, leftMargin, currentY);
+        currentY += 6;
+        doc.text(`Total Batches: ${data.courseCount.totalschedule}`, leftMargin, currentY);
+        currentY += 6;
+        doc.text(`Current Batches: ${data.courseCount.currentbatch}`, leftMargin, currentY);
+        currentY += 6;
+        doc.text(`Upcoming Batches: ${data.courseCount.upcoming}`, leftMargin, currentY);
+        currentY += 15;
+
+        // Prepare table data
+        const tableData = data.courseSchedule.map((schedule, index) => {
+          const startDate = new Date(schedule.startDate).toLocaleDateString('en-GB');
+          const endDate = new Date(schedule.endDate).toLocaleDateString('en-GB');
+
+          let status = "";
+          const today = new Date();
+          const start = new Date(schedule.startDate);
+          const end = new Date(schedule.endDate);
+
+          if (today < start) status = "Upcoming";
+          else if (today > end) status = "Completed";
+          else status = "In Progress";
+
+          return [
+            index + 1,
+            data.courseDetails.courseName,
+            schedule.batchNumber || "N/A",
+            startDate,
+            endDate,
+            schedule.courseStrength || "N/A",
+            status
+          ];
+        });
+
+        doc.autoTable({
+          startY: currentY,
+          head: [['Sr No.', 'Course Name', 'Batch No.', 'From', 'To', 'Strength', 'Remark']],
+          body: tableData,
+          theme: 'striped',
+          headStyles: {
+            fillColor: [27, 67, 50],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          bodyStyles: {
+            halign: 'center',
+            valign: 'middle'
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245]
+          },
+          margin: { left: leftMargin, right: rightMargin },
+          columnStyles: {
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 50, halign: 'left' },
+            2: { cellWidth: 25, halign: 'center' },
+            3: { cellWidth: 30, halign: 'center' },
+            4: { cellWidth: 30, halign: 'center' },
+            5: { cellWidth: 20, halign: 'center' },
+            6: { cellWidth: 30, halign: 'center' }
+          },
+          didDrawPage: function(data) {
+            // Add footer on each page
+            const pageCount = doc.internal.getNumberOfPages();
+            const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+            doc.setFontSize(9);
+            doc.setTextColor(150, 150, 150);
+            doc.text(
+                    `Page ${currentPage} of ${pageCount}`,
+                    pageWidth - 20,
+                    doc.internal.pageSize.getHeight() - 10,
+                    { align: 'center' }
+            );
+            doc.text(
+                    `ARMY HRMS - Course Schedule Report`,
+                    leftMargin,
+                    doc.internal.pageSize.getHeight() - 10
+            );
+          }
+        });
+
+        doc.save(`${data.courseDetails.courseName}_Schedule_Report.pdf`);
+        alert("Course report exported successfully!");
+      }
 
     } catch (error) {
       console.error("Error generating PDF:", error);

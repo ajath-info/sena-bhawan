@@ -25,6 +25,8 @@ public interface CourseScheduleService {
     // NEW: wrapper response with details + counts + list
     CourseScheduleSummaryResponse getCourseScheduleSummary(Integer courseId);
 
+    List<CourseScheduleSummaryResponse> getAllCoursesScheduleSummary();
+
     List<CourseSchedule> getSchedulesByCourseId(Integer courseId);
 
 }

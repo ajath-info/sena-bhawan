@@ -642,8 +642,8 @@
 
                 data.forEach(o => {
                     const opt = document.createElement("option");
-                    opt.value = o.sosNo;            // ✔ correct field
-                    opt.textContent = o.sosNo + " - " + o.name;
+                    opt.value = o.susNo;            // ✔ correct field
+                    opt.textContent = o.susNo + " - " + o.name;
                     dropdown.appendChild(opt);
                 });
             })
@@ -656,7 +656,7 @@ function saveUser() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
   const appointment = document.getElementById("appointment").value;
-  const sosNo = document.getElementById("susDropdown").value;
+  const susNo = document.getElementById("susDropdown").value;
   const name = document.getElementById("name").value.trim();
 
   const roleSelect = document.getElementById("roleDropdown");
@@ -665,7 +665,7 @@ function saveUser() {
   const roleIds = roleId ? [roleId] : [];   // ✅ ARRAY FORMAT
 
   /* ===== validation ===== */
-  if (!username || !password || !appointment || !sosNo || roleIds.length === 0) {
+  if (!username || !password || !appointment || !susNo || roleIds.length === 0) {
     alert("Please fill all required fields and select at least one role");
     return;
   }
@@ -675,7 +675,7 @@ function saveUser() {
     password,
     roleIds,          // ✅ always array
     appointment,
-    sosNo,
+      susNo,
       name
   };
 

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -284,5 +285,66 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
 //        return List.of();
 //    }
 
+    @Override
+    public List<CourseScheduleSummaryResponse> getAllCoursesScheduleSummary() {
+        String currentYear = String.valueOf(Year.now().getValue());
+        List<CourseMaster> allCourses = courseRepo.findAllWithSchedulesForCurrentYear(currentYear);
+
+        LocalDate today = LocalDate.now();
+
+        return allCourses.stream()
+                .map(course -> buildCourseScheduleSummary(course, today))
+                .collect(Collectors.toList());
+    }
+
+    private CourseScheduleSummaryResponse buildCourseScheduleSummary(CourseMaster course, LocalDate today) {
+        List<CourseSchedule> schedules = course.getSchedules();
+
+        // ----- courseDetails -----
+        CourseDetailsDto detailsDto = new CourseDetailsDto();
+        detailsDto.setSrno(course.getSrno());
+        detailsDto.setCourseName(course.getCourseName());
+        detailsDto.setDuration(course.getDuration());
+        detailsDto.setLocation(course.getLocation());
+
+        // ----- courseCount -----
+        long totalSched = schedules.size();
+        long currentBatch = schedules.stream()
+                .filter(s -> !s.getStartDate().isAfter(today) && !s.getEndDate().isBefore(today))
+                .count();
+        long upcoming = schedules.stream()
+                .filter(s -> s.getStartDate().isAfter(today))
+                .count();
+
+        CourseCountDto countDto = new CourseCountDto();
+        countDto.setTotalschedule(totalSched);
+        countDto.setCurrentbatch(currentBatch);
+        countDto.setUpcoming(upcoming);
+
+        // ----- courseSchedule list -----
+        List<CourseScheduleItemDto> itemDtos = schedules.stream()
+                .map(s -> {
+                    CourseScheduleItemDto dto = new CourseScheduleItemDto();
+                    dto.setScheduleId(s.getScheduleId());
+                    dto.setYear(s.getYear());
+                    dto.setBatchNumber(s.getBatchNumber());
+                    dto.setStartDate(s.getStartDate());
+                    dto.setEndDate(s.getEndDate());
+                    dto.setCourseStrength(s.getCourseStrength());
+                    dto.setVenue(s.getVenue());
+                    dto.setRemarks(s.getRemarks());
+                    dto.setCourseId(course.getSrno());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        // ----- wrapper -----
+        CourseScheduleSummaryResponse response = new CourseScheduleSummaryResponse();
+        response.setCourseDetails(detailsDto);
+        response.setCourseCount(countDto);
+        response.setCourseSchedule(itemDtos);
+
+        return response;
+    }
 
 }

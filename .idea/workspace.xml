@@ -4,45 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56467bc9-e42b-474e-b974-c52403961ee4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.js" afterDir="false" />
+    <list default="true" id="56467bc9-e42b-474e-b974-c52403961ee4" name="Changes" comment="e.getMessage removed from all service layer and now finally return the common msg">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/DropdownMasterServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/DropdownMasterServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/Col-PLG-Dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/Col-PLG-Dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/Final view.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/Final view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/Usermmaster.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/user-master.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/add-new-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/add-new-schedule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseScheduleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/controller/CourseScheduleController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/UserMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/entity/UserMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CourseMasterRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/repository/CourseMasterRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseScheduleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/CourseScheduleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/CourseScheduleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/sena_bhawan/service/impl/CourseScheduleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/add-new-user.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/add-new-user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/addcourse.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/addcourse.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/addlocation.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/addlocation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/auth.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/auth.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-eligibility-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-eligibility-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-master.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-posting-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/course-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/course-schedule.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/coursepanel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-new.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-officers.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-officers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/dashboard-training.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/dashboard-training.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/decoration-matser.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/decoration-matser.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/filter.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/filter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/grade-awards.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/grade-awards.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/legal-disciplinary.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/legal-disciplinary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/location-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/location-master.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/orbat.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/orbat.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/paramount.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/paramount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/personnel-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/rank-master.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/remarks.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/remarks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/role-permmissoon.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/role-permission.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/search-personnel.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/search-personnel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/session.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/session.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/sidebar.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/sidebar.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/unit-master.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/user-master.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/user-master.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +27,8 @@
       <list>
         <option value="JavaScript File" />
         <option value="CSS File" />
+        <option value="HTML File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -72,30 +47,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Sena-Bhawan-App.executor": "Debug",
-    "JavaScript Debug.decoration-matser.html.executor": "Run",
-    "Maven.sena-bhawan [install].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.SenaBhawanApplication.executor": "Debug",
-    "git-widget-placeholder": "dev-vipan",
-    "kotlin-language-version-configured": "true",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Sena-Bhawan-App.executor&quot;: &quot;Debug&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JavaScript Debug.decoration-matser.html.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.sena-bhawan [install].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.SenaBhawanApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev-vipan&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/DELL/OneDrive/Desktop/Vipan Dev Branch/sena-bhawan/src/main/resources/static&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\DELL\OneDrive\Desktop\Vipan Dev Branch\sena-bhawan\src\main\resources\static" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="Sena-Bhawan-App" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.example.sena_bhawan.SenaBhawanApplication" />
@@ -122,10 +105,86 @@
       <updated>1772899540202</updated>
       <workItem from="1772899545036" duration="3898000" />
       <workItem from="1772943752210" duration="22268000" />
+      <workItem from="1774836184688" duration="528000" />
+      <workItem from="1774839296400" duration="217000" />
+      <workItem from="1774890081027" duration="667000" />
+      <workItem from="1774918551324" duration="6796000" />
+      <workItem from="1774974501081" duration="3089000" />
+      <workItem from="1775395691973" duration="12579000" />
+      <workItem from="1775492983257" duration="6396000" />
+      <workItem from="1775527486583" duration="1702000" />
+      <workItem from="1776278548938" duration="159000" />
+      <workItem from="1776998023710" duration="11729000" />
     </task>
+    <task id="LOCAL-00001" summary="Final Submission For Merging to main">
+      <option name="closed" value="true" />
+      <created>1774834411804</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1774834411804</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Filters fixed and CPA list show">
+      <option name="closed" value="true" />
+      <created>1774925423343</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1774925423343</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Filters fixed and CPA list show">
+      <option name="closed" value="true" />
+      <created>1774925522923</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1774925522923</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Changes Done">
+      <option name="closed" value="true" />
+      <created>1774985029656</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774985029656</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Course Panel Remark Work is done">
+      <option name="closed" value="true" />
+      <created>1775528764938</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1775528764938</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Changes To Dashboard UI">
+      <option name="closed" value="true" />
+      <created>1776278688300</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776278688300</updated>
+    </task>
+    <task id="LOCAL-00007" summary="e.getMessage removed from all service layer and now finally return the common msg">
+      <option name="closed" value="true" />
+      <created>1777001591795</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1777001591795</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Final Submission For Merging to main" />
+    <MESSAGE value="Filters fixed and CPA list show" />
+    <MESSAGE value="Changes Done" />
+    <MESSAGE value="Course Panel Remark Work is done" />
+    <MESSAGE value="Changes To Dashboard UI" />
+    <MESSAGE value="e.getMessage removed from all service layer and now finally return the common msg" />
+    <option name="LAST_COMMIT_MESSAGE" value="e.getMessage removed from all service layer and now finally return the common msg" />
   </component>
 </project>

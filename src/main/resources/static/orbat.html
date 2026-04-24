@@ -28,46 +28,107 @@
 
         .content { padding:32px; overflow-y:auto; }
 
-        /* FORM */
+        /* FIXED FORM ALIGNMENT - PERFECT SPACING */
         .form-grid {
-          max-width:900px;
-          display:grid;
-          grid-template-columns:repeat(2,1fr);
-          gap:20px;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px 30px;
+            margin-bottom: 20px;
         }
-        .form-group { display:flex; flex-direction:column; gap:6px; }
-        .full { grid-column:1 / -1; }
 
-        label { font-size:14px; font-weight:600; }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            letter-spacing: 0.3px;
+        }
+
+        .required {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
         input, select {
-          padding:12px;
-          border:1px solid #d1d5db;
-          border-radius:8px;
-          font-size:14px;
-          background:white;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            font-family: "Inter", sans-serif;
+            transition: all 0.2s;
         }
+
         input:focus, select:focus {
-          border-color:#1b4332;
-          box-shadow:0 0 0 3px rgba(27,67,50,0.15);
-          outline:none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 3px rgba(27,67,50,0.1);
+            outline: none;
         }
 
-        .actions { margin-top:30px; display:flex; justify-content:flex-end; gap:12px; }
+        /* Static HQ styling */
+        .static-hq-value {
+            background: #f3f4f6;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
         .btn {
-          padding:12px 20px;
-          border-radius:8px;
-          font-size:14px;
-          cursor:pointer;
-          font-weight:600;
-          border:1px solid transparent;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid transparent;
+            font-family: "Inter", sans-serif;
         }
-        .btn-primary { background:#1b4332; color:white; }
-        .btn-primary:disabled { background:#6b7280; cursor:not-allowed; }
-        .btn-secondary { background:white; border:1px solid #d1d5db; color:#374151; }
 
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
+        .btn-primary {
+            background: #1b4332;
+            color: white;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        /* Ensure consistent spacing for hidden elements */
+        [style*="display: none"] {
+            display: none !important;
         }
     </style>
     <link rel="stylesheet" href="sidebar.css">
@@ -75,9 +136,8 @@
 <body>
 
 <div class="container">
-    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
+    <!-- SIDEBAR CONTAINER -->
     <aside class="sidebar" id="sidebarContainer">
-        <!-- Loading indicator (optional) -->
         <div style="color: white; padding: 20px; text-align: center;">
             Loading menu...
         </div>
@@ -92,84 +152,88 @@
 
         <div class="content">
             <div class="form-grid" id="formGrid">
+
                 <!-- ARMY HQ - Static value (1) -->
-                <div class="form-group full">
-                    <label>Army HQ *</label>
-<!--                    <div class="static-value">Army HQ (Default)</div>-->
+                <div class="form-group full-width">
+                    <label>Army HQ <span class="required">*</span></label>
+                    <div class="static-hq-value">Army HQ</div>
                 </div>
 
-                <!-- Formation Type - /api/dropdown/FORMATION_TYPE -->
-                <div class="form-group full">
-                    <label>What do you want to create? *</label>
+                <!-- Formation Type -->
+                <div class="form-group full-width">
+                    <label>What do you want to create? <span class="required">*</span></label>
                     <select id="formationType">
                         <option value="">Select Type</option>
                     </select>
                 </div>
 
-                <!-- Command Dropdown - /api/orbat/commands -->
-                <div class="form-group full" id="commandGroup" style="display: none;">
-                    <label>Select Command *</label>
+                <!-- Command Dropdown -->
+                <div class="form-group full-width" id="commandGroup" style="display: none;">
+                    <label>Select Command <span class="required">*</span></label>
                     <select id="commandId">
                         <option value="">Select Command</option>
                     </select>
                 </div>
 
-                <!-- Corps Dropdown - /api/orbat/corps -->
-                <div class="form-group full" id="corpsGroup" style="display: none;">
-                    <label>Select Corps *</label>
+                <!-- Corps Dropdown -->
+                <div class="form-group full-width" id="corpsGroup" style="display: none;">
+                    <label>Select Corps <span class="required">*</span></label>
                     <select id="corpsId">
                         <option value="">Select Corps</option>
                     </select>
                 </div>
 
-                <!-- Division Dropdown - /api/orbat/divisions -->
-                <div class="form-group full" id="divisionGroup" style="display: none;">
-                    <label>Select Division *</label>
+                <!-- Division Dropdown -->
+                <div class="form-group full-width" id="divisionGroup" style="display: none;">
+                    <label>Select Division <span class="required">*</span></label>
                     <select id="divisionId">
                         <option value="">Select Division</option>
                     </select>
                 </div>
 
-                <!-- Brigade Dropdown - /api/orbat/brigades -->
-                <div class="form-group full" id="brigadeGroup" style="display: none;">
-                    <label>Select Brigade *</label>
+                <!-- Brigade Dropdown -->
+                <div class="form-group full-width" id="brigadeGroup" style="display: none;">
+                    <label>Select Brigade <span class="required">*</span></label>
                     <select id="brigadeId">
                         <option value="">Select Brigade</option>
                     </select>
                 </div>
 
-                <!-- Common Fields -->
-                <div class="form-group full" id="nameGroup" style="display: none;">
-                    <label>Name of Est *</label>
+                <!-- Name of Est -->
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label>Name of Est <span class="required">*</span></label>
                     <input id="name" type="text" placeholder="Enter Name of Est">
                 </div>
 
+                <!-- Location -->
                 <div class="form-group" id="locationGroup" style="display: none;">
-                    <label>Location *</label>
+                    <label>Location <span class="required">*</span></label>
                     <input id="location" type="text" placeholder="Enter Location">
                 </div>
 
+                <!-- SUS Number -->
                 <div class="form-group" id="susNoGroup" style="display: none;">
-                    <label>SUS Number *</label>
+                    <label>SUS Number <span class="required">*</span></label>
                     <input id="susNo" type="text" placeholder="Enter SUS Number">
                 </div>
 
+                <!-- PIN -->
                 <div class="form-group" id="pinGroup" style="display: none;">
-                    <label>PIN *</label>
+                    <label>PIN <span class="required">*</span></label>
                     <input id="pin" type="text" placeholder="Enter PIN">
                 </div>
 
-                <!-- Area Type Dropdown - /api/dropdown/AREA_TYPE -->
+                <!-- Area Type -->
                 <div class="form-group" id="areaTypeGroup" style="display: none;">
-                    <label>Area Type *</label>
+                    <label>Area Type <span class="required">*</span></label>
                     <select id="areaType">
                         <option value="">Loading Area Types...</option>
                     </select>
                 </div>
 
-                <!-- Unit Type Dropdown - /api/dropdown/UNIT_TYPE -->
-                <div class="form-group full" id="unitTypeGroup" style="display: none;">
-                    <label>Type of Unit *</label>
+                <!-- Unit Type -->
+                <div class="form-group full-width" id="unitTypeGroup" style="display: none;">
+                    <label>Type of Unit <span class="required">*</span></label>
                     <select id="unitType">
                         <option value="">Loading Unit Types...</option>
                     </select>
@@ -183,28 +247,24 @@
         </div>
     </main>
 </div>
+
 <script src="sidebar.js"></script>
 <script>
     class ORBATCreator {
         constructor() {
             this.baseUrl = 'http://localhost:6060/api';
-            // Static HQ ID - 1 (default)
             this.defaultHqId = 1;
-
-            // Hierarchy mapping for different formation types
             this.hierarchyMap = {
-                'Command': [],  // No parent dependencies
+                'Command': [],
                 'Corps': ['command'],
                 'Division': ['command', 'corps'],
                 'Brigade': ['command', 'corps', 'division'],
                 'Unit': ['command', 'corps', 'division', 'brigade']
             };
-
             this.init();
         }
 
         async init() {
-            // HQ dropdown removed - using static value
             await this.loadFormationTypes();
             await this.loadAreaTypes();
             await this.loadUnitTypes();
@@ -212,12 +272,10 @@
         }
 
         setupEventListeners() {
-            // Formation type change
             document.getElementById('formationType').addEventListener('change', (e) => {
                 this.handleFormationTypeChange(e.target.value);
             });
 
-            // Hierarchy dropdown changes
             document.getElementById('commandId').addEventListener('change', (e) => {
                 if (e.target.value) {
                     this.loadCorpsDropdown(e.target.value);
@@ -242,7 +300,6 @@
                 }
             });
 
-            // Form validation on any input change
             document.addEventListener('input', () => this.validateForm());
             document.addEventListener('change', () => this.validateForm());
         }
@@ -250,7 +307,6 @@
         clearLowerDropdowns(startLevel) {
             const levels = ['corps', 'division', 'brigade'];
             const startIndex = levels.indexOf(startLevel);
-
             if (startIndex >= 0) {
                 for (let i = startIndex; i < levels.length; i++) {
                     const level = levels[i];
@@ -263,23 +319,16 @@
             }
         }
 
-        // Load Formation Types - /api/dropdown/FORMATION_TYPE
         async loadFormationTypes() {
             const select = document.getElementById('formationType');
-
             try {
                 const response = await fetch(`${this.baseUrl}/dropdown/FORMATION_TYPE`);
                 if (!response.ok) throw new Error('Failed to load formation types');
-
                 const data = await response.json();
-
                 let options = '<option value="">Select Type</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.name}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading formation types:', error);
@@ -287,23 +336,16 @@
             }
         }
 
-        // Load Command dropdown - /api/orbat/commands
         async loadCommandDropdown() {
             const select = document.getElementById('commandId');
-
             try {
                 const response = await fetch(`${this.baseUrl}/orbat/commands`);
                 if (!response.ok) throw new Error('Failed to load commands');
-
                 const data = await response.json();
-
                 let options = '<option value="">Select Command</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.id}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading commands:', error);
@@ -311,25 +353,18 @@
             }
         }
 
-        // Load Corps dropdown filtered by command - /api/orbat/corps?commandId=xxx
         async loadCorpsDropdown(commandId) {
             const select = document.getElementById('corpsId');
             select.innerHTML = '<option value="">Loading Corps...</option>';
-
             try {
                 const url = `${this.baseUrl}/orbat/corps?commandId=${commandId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load corps');
-
                 const data = await response.json();
-
                 let options = '<option value="">Select Corps</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.id}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading corps:', error);
@@ -337,25 +372,18 @@
             }
         }
 
-        // Load Division dropdown filtered by corps - /api/orbat/divisions?corpsId=xxx
         async loadDivisionDropdown(corpsId) {
             const select = document.getElementById('divisionId');
             select.innerHTML = '<option value="">Loading Divisions...</option>';
-
             try {
                 const url = `${this.baseUrl}/orbat/divisions?corpsId=${corpsId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load divisions');
-
                 const data = await response.json();
-
                 let options = '<option value="">Select Division</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.id}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading divisions:', error);
@@ -363,25 +391,18 @@
             }
         }
 
-        // Load Brigade dropdown filtered by division - /api/orbat/brigades?divisionId=xxx
         async loadBrigadeDropdown(divisionId) {
             const select = document.getElementById('brigadeId');
             select.innerHTML = '<option value="">Loading Brigades...</option>';
-
             try {
                 const url = `${this.baseUrl}/orbat/brigades?divisionId=${divisionId}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to load brigades');
-
                 const data = await response.json();
-
                 let options = '<option value="">Select Brigade</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.id}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading brigades:', error);
@@ -389,24 +410,16 @@
             }
         }
 
-        // Load Area Types - /api/dropdown/AREA_TYPE
         async loadAreaTypes() {
             const select = document.getElementById('areaType');
-
             try {
                 const response = await fetch(`${this.baseUrl}/dropdown/AREA_TYPE`);
                 if (!response.ok) throw new Error('Failed to load area types');
-
                 const data = await response.json();
-                console.log('Area Types loaded:', data);
-
                 let options = '<option value="">Select Area Type</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.name}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading area types:', error);
@@ -414,24 +427,16 @@
             }
         }
 
-        // Load Unit Types - /api/dropdown/UNIT_TYPE
         async loadUnitTypes() {
             const select = document.getElementById('unitType');
-
             try {
                 const response = await fetch(`${this.baseUrl}/dropdown/UNIT_TYPE`);
                 if (!response.ok) throw new Error('Failed to load unit types');
-
                 const data = await response.json();
-                console.log('Unit Types loaded:', data);
-
                 let options = '<option value="">Select Unit Type</option>';
                 if (data && data.length > 0) {
-                    options += data.map(item =>
-                        `<option value="${item.name}">${item.name}</option>`
-                    ).join('');
+                    options += data.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
                 }
-
                 select.innerHTML = options;
             } catch (error) {
                 console.error('Error loading unit types:', error);
@@ -440,19 +445,15 @@
         }
 
         async handleFormationTypeChange(type) {
-            // Hide all groups first
             this.hideAllGroups();
-
             if (!type) return;
 
-            // Show common fields
             document.getElementById('nameGroup').style.display = 'block';
             document.getElementById('locationGroup').style.display = 'block';
             document.getElementById('susNoGroup').style.display = 'block';
             document.getElementById('pinGroup').style.display = 'block';
             document.getElementById('areaTypeGroup').style.display = 'block';
 
-            // Show/hide unit type based on selection
             if (type === 'Unit') {
                 document.getElementById('unitTypeGroup').style.display = 'block';
             } else {
@@ -460,44 +461,27 @@
                 document.getElementById('unitType').value = '';
             }
 
-            // Show and load hierarchy dropdowns based on type
             const parents = this.hierarchyMap[type] || [];
-
-            // Reset all hierarchy dropdowns
             this.resetHierarchyDropdowns();
 
-            // Show and load required dropdowns
             for (const parent of parents) {
                 const group = document.getElementById(`${parent}Group`);
                 if (group) {
                     group.style.display = 'block';
-
-                    // Load the dropdown data based on parent level
                     switch(parent) {
                         case 'command':
                             await this.loadCommandDropdown();
                             break;
-                        case 'corps':
-                            // Corps will be loaded when command is selected
-                            break;
-                        case 'division':
-                            // Division will be loaded when corps is selected
-                            break;
-                        case 'brigade':
-                            // Brigade will be loaded when division is selected
-                            break;
                     }
                 }
             }
-
             this.validateForm();
         }
 
         hideAllGroups() {
             const groups = ['commandGroup', 'corpsGroup', 'divisionGroup', 'brigadeGroup',
-                           'nameGroup', 'locationGroup', 'susNoGroup', 'pinGroup',
-                           'areaTypeGroup', 'unitTypeGroup'];
-
+                'nameGroup', 'locationGroup', 'susNoGroup', 'pinGroup',
+                'areaTypeGroup', 'unitTypeGroup'];
             groups.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) element.style.display = 'none';
@@ -506,7 +490,6 @@
 
         resetHierarchyDropdowns() {
             const dropdowns = ['commandId', 'corpsId', 'divisionId', 'brigadeId'];
-
             dropdowns.forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
@@ -519,8 +502,6 @@
 
         validateForm() {
             const submitBtn = document.getElementById('submitBtn');
-
-            // Check required fields (HQ is static, so always valid)
             const formationType = document.getElementById('formationType').value;
             const name = document.getElementById('name').value.trim();
             const location = document.getElementById('location').value.trim();
@@ -528,13 +509,11 @@
             const pin = document.getElementById('pin').value.trim();
             const areaType = document.getElementById('areaType').value;
 
-            // Basic validation (hqId is static so not checked)
             if (!formationType || !name || !location || !susNo || !pin || !areaType) {
                 submitBtn.disabled = true;
                 return;
             }
 
-            // Check hierarchy based on formation type
             const parents = this.hierarchyMap[formationType] || [];
             for (const parent of parents) {
                 const parentSelect = document.getElementById(`${parent}Id`);
@@ -544,7 +523,6 @@
                 }
             }
 
-            // Check unit type for Unit formation
             if (formationType === 'Unit') {
                 const unitType = document.getElementById('unitType').value;
                 if (!unitType) {
@@ -558,14 +536,11 @@
 
         async submitForm() {
             const formationType = document.getElementById('formationType').value;
-
-            // Get area type name
             const areaType = document.getElementById('areaType').value;
 
-            // Prepare payload with static HQ ID (1)
             const payload = {
                 formationType: formationType,
-                hqId: this.defaultHqId, // Static value 1
+                hqId: this.defaultHqId,
                 commandId: this.getHierarchyId('commandId'),
                 corpsId: this.getHierarchyId('corpsId'),
                 divisionId: this.getHierarchyId('divisionId'),
@@ -577,15 +552,10 @@
                 areaType: areaType
             };
 
-            // Add unit type if applicable
             if (formationType === 'Unit') {
                 payload.unitType = document.getElementById('unitType').value;
-                console.log('Unit Type being sent:', payload.unitType);
             }
 
-            console.log('Final Payload being sent:', payload);
-
-            // Validate payload
             if (!this.validatePayload(payload, formationType)) {
                 alert('Please fill all required fields');
                 return;
@@ -594,9 +564,7 @@
             try {
                 const response = await fetch(`${this.baseUrl}/orbat/create`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
@@ -605,7 +573,6 @@
                     window.location.reload();
                 } else {
                     const error = await response.text();
-                    console.error('Error response:', error);
                     alert(`Error: ${error}`);
                 }
             } catch (error) {
@@ -620,34 +587,19 @@
         }
 
         validatePayload(payload, formationType) {
-            // Validate based on formation type
             if (formationType === 'Command' && !payload.hqId) return false;
             if (formationType === 'Corps' && !payload.commandId) return false;
             if (formationType === 'Division' && !payload.corpsId) return false;
             if (formationType === 'Brigade' && !payload.divisionId) return false;
             if (formationType === 'Unit' && !payload.brigadeId) return false;
-
-            // Ensure areaType is present
-            if (!payload.areaType) {
-                console.error('Area Type is missing');
-                return false;
-            }
-
-            // For Unit formation, ensure unitType is present
-            if (formationType === 'Unit' && !payload.unitType) {
-                console.error('Unit Type is missing for Unit formation');
-                return false;
-            }
-
+            if (!payload.areaType) return false;
+            if (formationType === 'Unit' && !payload.unitType) return false;
             return true;
         }
     }
 
-    // Initialize the application
     document.addEventListener('DOMContentLoaded', () => {
         const app = new ORBATCreator();
-
-        // Attach submit handler
         document.getElementById('submitBtn').addEventListener('click', (e) => {
             e.preventDefault();
             app.submitForm();
