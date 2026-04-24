@@ -50,7 +50,7 @@ public class PersonnelController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "message", e.getMessage())
+                    Map.of("success", false, "message", "Something went wrong!")
             );
         }
     }
@@ -69,7 +69,7 @@ public class PersonnelController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "message", e.getMessage())
+                    Map.of("success", false, "message", "Something went wrong!")
             );
         }
     }

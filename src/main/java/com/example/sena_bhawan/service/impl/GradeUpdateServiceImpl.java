@@ -92,7 +92,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
 
         } catch (Exception e) {
             log.error("Error fetching grade update data for schedule ID: {}", scheduleId, e);
-            throw new RuntimeException("Failed to fetch grade update data: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to fetch grade update data ");
         }
     }
 
@@ -137,8 +137,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
                     }
                 } catch (Exception e) {
                     log.error("Error processing grade update for personnelId: {}", update.getPersonnelId(), e);
-                    throw new RuntimeException("Failed to save grade for personnel: " + update.getPersonnelId() +
-                            " - " + e.getMessage(), e);
+                    throw new RuntimeException("Failed to save grade for personnel");
                 }
             }
 
@@ -147,7 +146,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
 
         } catch (Exception e) {
             log.error("Error saving grades for schedule ID: {}", scheduleId, e);
-            throw new RuntimeException("Failed to save grades: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to save grades");
         }
     }
 
@@ -188,7 +187,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
             return courseInfo;
         } catch (Exception e) {
             log.error("Error building course info", e);
-            throw new RuntimeException("Failed to build course information: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to build course information ");
         }
     }
 
@@ -299,7 +298,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
         } catch (Exception e) {
             log.error("Error creating new nomination for schedule: {}, personnel: {}",
                     scheduleId, update.getPersonnelId(), e);
-            throw new RuntimeException("Failed to create nomination record: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to create nomination record ");
         }
     }
 
@@ -512,7 +511,7 @@ public class GradeUpdateServiceImpl implements GradeUpdateService {
 
         } catch (Exception e) {
             log.error("Error generating Excel: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to generate Excel report", e);
+            throw new RuntimeException("Failed to generate Excel report");
         }
     }
 

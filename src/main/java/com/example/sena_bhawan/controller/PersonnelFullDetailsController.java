@@ -40,7 +40,7 @@ public class PersonnelFullDetailsController {
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", e.getMessage());
+            response.put("message", "Something went wrong!");
             return ResponseEntity.badRequest().body(response);
         }
     }
@@ -72,7 +72,7 @@ public class PersonnelFullDetailsController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", e.getMessage());
+            response.put("message", "Something went wrong!");
 
             return ResponseEntity.badRequest().body(response);
         }

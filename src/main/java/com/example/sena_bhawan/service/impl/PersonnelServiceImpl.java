@@ -412,7 +412,7 @@ public class PersonnelServiceImpl implements PersonnelService {
             throw new RuntimeException("Duplicate data error: Army No, Aadhaar, PAN, or Email already exists");
         } catch (Exception e) {
             log.error("Error saving personnel: {}", e.getMessage(), e);
-            throw new RuntimeException("Something went wrong while saving personnel: " + e.getMessage());
+            throw new RuntimeException("Something went wrong while saving personnel ");
         }
     }
 
@@ -1074,7 +1074,7 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         } catch (Exception e) {
             log.error("Error filtering personnel: {}", e.getMessage(), e);
-            throw new RuntimeException("Error filtering personnel: " + e.getMessage());
+            throw new RuntimeException("Error filtering personnel: ");
         }
     }
 
@@ -1093,7 +1093,7 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         } catch (Exception e) {
             log.error("Error filtering all personnel: {}", e.getMessage(), e);
-            throw new RuntimeException("Error filtering all personnel: " + e.getMessage());
+            throw new RuntimeException("Error filtering all personnel");
         }
     }
 
@@ -1125,7 +1125,7 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         } catch (Exception e) {
             log.error("Error filtering all personnel: {}", e.getMessage(), e);
-            throw new RuntimeException("Error filtering all personnel: " + e.getMessage());
+            throw new RuntimeException("Error filtering all personnel" );
         }
     }
 

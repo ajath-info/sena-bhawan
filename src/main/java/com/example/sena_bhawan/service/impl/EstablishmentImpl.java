@@ -31,7 +31,7 @@ public class EstablishmentImpl implements EstablishmentService {
         try {
             return repository.listOfEstablishmentType();
         } catch (Exception e) {
-            System.err.println("Error fetching establishment types: " + e.getMessage());
+            System.err.println("Something went wrong!");
             return new ArrayList<>(); // Return empty list on error
         }
     }
@@ -131,10 +131,10 @@ public class EstablishmentImpl implements EstablishmentService {
 
         } catch (DataAccessException e) {
             System.err.println("Database error while fetching establishment data for ORBAT ID " + orbatId + ": " + e.getMessage());
-            throw new RuntimeException("Unable to fetch establishment data due to database error", e);
+            throw new RuntimeException("Unable to fetch establishment data due to database error");
         } catch (Exception e) {
             System.err.println("Unexpected error while fetching establishment data for ORBAT ID " + orbatId + ": " + e.getMessage());
-            throw new RuntimeException("Unexpected error occurred while fetching establishment data", e);
+            throw new RuntimeException("Unexpected error occurred while fetching establishment data");
         }
     }
 
@@ -155,7 +155,7 @@ public class EstablishmentImpl implements EstablishmentService {
         try {
             validateNumericFields(request);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Validation failed: " + e.getMessage());
+            throw new IllegalArgumentException("Something went wrong!");
         }
 
         try {
@@ -166,7 +166,7 @@ public class EstablishmentImpl implements EstablishmentService {
                         .orElse(new FormationEstablishment());
             } catch (DataAccessException e) {
                 System.err.println("Database error while checking existing establishment: " + e.getMessage());
-                throw new RuntimeException("Unable to check existing establishment data", e);
+                throw new RuntimeException("Unable to check existing establishment data");
             }
 
             // Fetch from orbat table
@@ -176,7 +176,7 @@ public class EstablishmentImpl implements EstablishmentService {
                         .orElseThrow(() -> new RuntimeException("Orbat not found with ID: " + orbatId));
             } catch (DataAccessException e) {
                 System.err.println("Database error while fetching ORBAT data: " + e.getMessage());
-                throw new RuntimeException("Unable to fetch ORBAT details", e);
+                throw new RuntimeException("Unable to fetch ORBAT details");
             }
 
             // Set basic info
@@ -191,7 +191,7 @@ public class EstablishmentImpl implements EstablishmentService {
                 }
             } catch (Exception e) {
                 System.err.println("Error setting basic entity data: " + e.getMessage());
-                throw new RuntimeException("Failed to set basic establishment data", e);
+                throw new RuntimeException("Failed to set basic establishment data");
             }
 
             // Set authorized fields
@@ -216,7 +216,7 @@ public class EstablishmentImpl implements EstablishmentService {
                 }
             } catch (Exception e) {
                 System.err.println("Error setting authorized fields: " + e.getMessage());
-                throw new RuntimeException("Failed to set authorized strength data", e);
+                throw new RuntimeException("Failed to set authorized strength data");
             }
 
             // Set hard scale fields
@@ -241,7 +241,7 @@ public class EstablishmentImpl implements EstablishmentService {
                 }
             } catch (Exception e) {
                 System.err.println("Error setting hard scale fields: " + e.getMessage());
-                throw new RuntimeException("Failed to set hard scale data", e);
+                throw new RuntimeException("Failed to set hard scale data");
             }
 
             // Save to database
@@ -250,27 +250,27 @@ public class EstablishmentImpl implements EstablishmentService {
             } catch (DataIntegrityViolationException e) {
                 System.err.println("Data integrity violation while saving: " + e.getMessage());
                 if (e.getMessage().contains("unique constraint") || e.getMessage().contains("duplicate")) {
-                    throw new RuntimeException("A record already exists for this unit with different parameters", e);
+                    throw new RuntimeException("A record already exists for this unit with different parameters");
                 }
-                throw new RuntimeException("Data integrity error while saving establishment", e);
+                throw new RuntimeException("Data integrity error while saving establishment");
             } catch (DataAccessException e) {
                 System.err.println("Database error while saving: " + e.getMessage());
-                throw new RuntimeException("Unable to save establishment data due to database error", e);
+                throw new RuntimeException("Unable to save establishment data due to database error");
             }
 
             return "Establishment saved successfully for unit: " + orbat.getName();
 
         } catch (IllegalArgumentException e) {
             // Re-throw validation errors
-            throw e;
+            return "Something went wrong!";
         } catch (RuntimeException e) {
             // Re-throw runtime exceptions with their messages
             System.err.println("Runtime error in updateEstablishment: " + e.getMessage());
-            throw e;
+            return "Something went wrong!";
         } catch (Exception e) {
             // Catch any unexpected exceptions
             System.err.println("Unexpected error in updateEstablishment: " + e.getMessage());
-            throw new RuntimeException("An unexpected error occurred while updating establishment", e);
+            return "Something went wrong!";
         }
     }
 

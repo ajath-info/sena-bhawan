@@ -59,7 +59,7 @@ public class CourseScheduleController {
 
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
-                    .body(BaseApiResponse.badRequest(e.getMessage()));
+                    .body(BaseApiResponse.badRequest("Something went wrong!"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(BaseApiResponse.internalError("An error occurred while saving the schedule"));

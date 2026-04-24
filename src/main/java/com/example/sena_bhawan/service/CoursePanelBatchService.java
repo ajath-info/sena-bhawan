@@ -98,7 +98,7 @@ public class CoursePanelBatchService {
                 try {
                     updateSingleNomination(batchId, update, errors);
                 } catch (Exception e) {
-                    errors.add("Error updating nomination: " + e.getMessage());
+                    errors.add("Error updating nomination ");
                 }
             }
         }

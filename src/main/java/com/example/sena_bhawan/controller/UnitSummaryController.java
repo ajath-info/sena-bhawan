@@ -42,7 +42,7 @@ public class UnitSummaryController {
 
         } catch (Exception e) {
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Failed to fetch unit summary: " + e.getMessage());
+                    "Something went wrong!");
         }
     }
 
@@ -63,7 +63,7 @@ public class UnitSummaryController {
 
         } catch (Exception e) {
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Failed to fetch unit summary: " + e.getMessage());
+                    "Something went wrong!");
         }
     }
 

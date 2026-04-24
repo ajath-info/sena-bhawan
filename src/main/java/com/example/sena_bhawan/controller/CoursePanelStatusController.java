@@ -84,7 +84,7 @@ public class CoursePanelStatusController {
             return ResponseEntity.ok(new StatusUpdateResponse(message, updatedNominations.size(), errors));
 
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error updating status: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong!");
         }
     }
     
@@ -118,7 +118,7 @@ public class CoursePanelStatusController {
             }
             
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error updating status: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong!");
         }
     }
     
@@ -132,7 +132,7 @@ public class CoursePanelStatusController {
             List<CoursePanelNomination> nominations = coursePanelRepository.findByScheduleId(scheduleId);
             return ResponseEntity.ok(nominations);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error fetching nominations: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Something went wrong!");
         }
     }
 }

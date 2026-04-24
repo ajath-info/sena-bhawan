@@ -78,7 +78,7 @@ public class UnitSummaryServiceImpl implements UnitSummaryService {
 
         } catch (Exception e) {
             log.error("Error fetching unit summary: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch unit summary: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch unit summary ");
         }
     }
 
