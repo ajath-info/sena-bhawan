@@ -5,6 +5,7 @@ import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.CourseMaster;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.entity.PostingDetails;
+import com.example.sena_bhawan.projection.ArmyNumberOnly;
 import com.example.sena_bhawan.service.PersonnelService;
 import com.example.sena_bhawan.service.PostingDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class PersonnelController {
     public PersonnelController(PersonnelService personnelService, PostingDetailsService postingService) {
         this.personnelService = personnelService;
         this.postingService = postingService;
+    }
+
+    @GetMapping("/army-numbers")
+    public ResponseEntity<Page<ArmyNumberOnly>> getArmyNumbers(@RequestParam(required = false) String search) {
+        Page<ArmyNumberOnly> result = personnelService.searchArmyNumbers(search);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping

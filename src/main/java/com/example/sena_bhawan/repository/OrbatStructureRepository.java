@@ -3,6 +3,9 @@ package com.example.sena_bhawan.repository;
 import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
 import com.example.sena_bhawan.projection.OrbatStructureProjection;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +16,24 @@ import java.util.Optional;
 
 @Repository
 public interface OrbatStructureRepository extends JpaRepository<OrbatStructure, Long> {
+
+    // Query without LOWER() function - case insensitive using ILIKE for PostgreSQL
+    @Query(value = "SELECT * FROM orbat_structure o WHERE " +
+            "(CAST(:search AS text) IS NULL OR " +
+            "o.command_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+            "o.corps_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+            "o.division_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+            "o.brigade_name ILIKE CONCAT('%', CAST(:search AS text), '%')) " +
+            "ORDER BY o.id DESC",
+            countQuery = "SELECT COUNT(*) FROM orbat_structure o WHERE " +
+                    "(CAST(:search AS text) IS NULL OR " +
+                    "o.command_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+                    "o.corps_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+                    "o.division_name ILIKE CONCAT('%', CAST(:search AS text), '%') OR " +
+                    "o.brigade_name ILIKE CONCAT('%', CAST(:search AS text), '%'))",
+            nativeQuery = true)
+    Page<OrbatStructure> findBySearch(@Param("search") String search, Pageable pageable);
+
     @Query("SELECT DISTINCT o.name FROM OrbatStructure o WHERE LOWER(o.formationType) = 'unit'")
     List<String> findAllUnitNames();
 

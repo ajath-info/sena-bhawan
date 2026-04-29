@@ -115,6 +115,103 @@
             background: #9ca3af;
             cursor: not-allowed;
         }
+        .table-container {
+            margin-top: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 13px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .pagination {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
 
         .btn-secondary {
             background: white;
@@ -244,6 +341,19 @@
                 <button class="btn btn-secondary" onclick="window.location.reload()">Cancel</button>
                 <button class="btn btn-primary" id="submitBtn" disabled>Create ORBAT Entry</button>
             </div>
+
+            <!-- TABLE SECTION - Add this after actions -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>ORBAT Structure List</h3>
+                </div>
+                <div style="padding: 0 24px 20px 24px;">
+                    <input type="text" id="tableSearch" class="search-box" placeholder="Search by Command, Corps, Division, Brigade...">
+                </div>
+                <div id="tableContent">
+                    <div class="loading">Loading data...</div>
+                </div>
+            </div>
         </div>
     </main>
 </div>
@@ -254,6 +364,12 @@
         constructor() {
             this.baseUrl = 'http://localhost:6060/api';
             this.defaultHqId = 1;
+            this.currentPage = 0;
+            this.pageSize = 15;
+            this.searchKeyword = '';
+            this.totalPages = 0;
+            this.totalElements = 0;
+
             this.hierarchyMap = {
                 'Command': [],
                 'Corps': ['command'],
@@ -268,6 +384,7 @@
             await this.loadFormationTypes();
             await this.loadAreaTypes();
             await this.loadUnitTypes();
+            await this.loadTableData();
             this.setupEventListeners();
         }
 
@@ -302,22 +419,135 @@
 
             document.addEventListener('input', () => this.validateForm());
             document.addEventListener('change', () => this.validateForm());
-        }
 
-        clearLowerDropdowns(startLevel) {
-            const levels = ['corps', 'division', 'brigade'];
-            const startIndex = levels.indexOf(startLevel);
-            if (startIndex >= 0) {
-                for (let i = startIndex; i < levels.length; i++) {
-                    const level = levels[i];
-                    const select = document.getElementById(`${level}Id`);
-                    if (select) {
-                        select.innerHTML = `<option value="">Select ${level.charAt(0).toUpperCase() + level.slice(1)}</option>`;
-                        select.value = '';
-                    }
-                }
+            // Table search with debounce
+            const searchInput = document.getElementById('tableSearch');
+            if (searchInput) {
+                let debounceTimer;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        this.searchKeyword = e.target.value;
+                        this.currentPage = 0;
+                        this.loadTableData();
+                    }, 500);
+                });
             }
         }
+
+        async loadTableData() {
+            const tableContent = document.getElementById('tableContent');
+            tableContent.innerHTML = '<div class="loading">Loading data...</div>';
+
+            try {
+                let url = `${this.baseUrl}/orbat/paginated?page=${this.currentPage}&size=${this.pageSize}`;
+                if (this.searchKeyword) {
+                    url += `&search=${encodeURIComponent(this.searchKeyword)}`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to load data');
+
+                const data = await response.json();
+                this.totalPages = data.totalPages;
+                this.totalElements = data.totalElements;
+
+                this.renderTable(data.content);
+                this.renderPagination();
+            } catch (error) {
+                console.error('Error loading table data:', error);
+                tableContent.innerHTML = '<div class="loading">Error loading data</div>';
+            }
+        }
+
+        renderTable(orbatList) {
+            const tableContent = document.getElementById('tableContent');
+
+            if (!orbatList || orbatList.length === 0) {
+                tableContent.innerHTML = '<div class="loading">No data found</div>';
+                return;
+            }
+
+            const tableHtml = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Corps</th>
+                        <th>Division</th>
+                        <th>Brigade</th>
+                        <th>Name of Est</th>
+                        <th>Location</th>
+                        <th>PIN</th>
+                        <th>Type of Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${orbatList.map(item => `
+                        <tr>
+                            <td>${item.commandName || '-'}</td>
+                            <td>${item.corpsName || '-'}</td>
+                            <td>${item.divisionName || '-'}</td>
+                            <td>${item.brigadeName || '-'}</td>
+                            <td>${item.name || '-'}</td>
+                            <td>${item.location || '-'}</td>
+                            <td>${item.pin || '-'}</td>
+                            <td>${item.unitType || '-'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+            tableContent.innerHTML = tableHtml;
+        }
+
+        renderPagination() {
+            const tableContent = document.getElementById('tableContent');
+            const paginationHtml = `
+            <div class="pagination">
+                <div class="pagination-info">
+                    Showing ${this.currentPage * this.pageSize + 1} to ${Math.min((this.currentPage + 1) * this.pageSize, this.totalElements)} of ${this.totalElements} entries
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" onclick="app.goToPage(0)" ${this.currentPage === 0 ? 'disabled' : ''}>
+                        First
+                    </button>
+                    <button class="pagination-btn" onclick="app.goToPage(${this.currentPage - 1})" ${this.currentPage === 0 ? 'disabled' : ''}>
+                        Previous
+                    </button>
+                    <span style="font-size: 14px; padding: 0 12px;">
+                        Page ${this.currentPage + 1} of ${this.totalPages}
+                    </span>
+                    <button class="pagination-btn" onclick="app.goToPage(${this.currentPage + 1})" ${this.currentPage + 1 >= this.totalPages ? 'disabled' : ''}>
+                        Next
+                    </button>
+                    <button class="pagination-btn" onclick="app.goToPage(${this.totalPages - 1})" ${this.currentPage + 1 >= this.totalPages ? 'disabled' : ''}>
+                        Last
+                    </button>
+                </div>
+            </div>
+        `;
+
+            // Append pagination to the table container
+            const existingPagination = document.querySelector('.pagination');
+            if (existingPagination) {
+                existingPagination.remove();
+            }
+
+            const tableContainer = document.querySelector('.table-container');
+            tableContainer.insertAdjacentHTML('beforeend', paginationHtml);
+        }
+
+        goToPage(page) {
+            if (page < 0 || page >= this.totalPages) return;
+            this.currentPage = page;
+            this.loadTableData();
+        }
+
+        // [Keep all your existing methods below exactly as they were]
+        // loadFormationTypes, loadCommandDropdown, loadCorpsDropdown, etc.
+        // Copy all your existing methods from your original code here...
 
         async loadFormationTypes() {
             const select = document.getElementById('formationType');
@@ -500,6 +730,21 @@
             });
         }
 
+        clearLowerDropdowns(startLevel) {
+            const levels = ['corps', 'division', 'brigade'];
+            const startIndex = levels.indexOf(startLevel);
+            if (startIndex >= 0) {
+                for (let i = startIndex; i < levels.length; i++) {
+                    const level = levels[i];
+                    const select = document.getElementById(`${level}Id`);
+                    if (select) {
+                        select.innerHTML = `<option value="">Select ${level.charAt(0).toUpperCase() + level.slice(1)}</option>`;
+                        select.value = '';
+                    }
+                }
+            }
+        }
+
         validateForm() {
             const submitBtn = document.getElementById('submitBtn');
             const formationType = document.getElementById('formationType').value;
@@ -570,7 +815,18 @@
 
                 if (response.ok) {
                     alert('ORBAT Entry created successfully!');
-                    window.location.reload();
+                    this.currentPage = 0;
+                    await this.loadTableData();
+                    // Reset form
+                    document.getElementById('formationType').value = '';
+                    this.handleFormationTypeChange('');
+                    document.getElementById('name').value = '';
+                    document.getElementById('location').value = '';
+                    document.getElementById('susNo').value = '';
+                    document.getElementById('pin').value = '';
+                    document.getElementById('areaType').value = '';
+                    document.getElementById('unitType').value = '';
+                    this.validateForm();
                 } else {
                     const error = await response.text();
                     alert(`Error: ${error}`);
@@ -599,10 +855,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const app = new ORBATCreator();
+        window.app = new ORBATCreator();
         document.getElementById('submitBtn').addEventListener('click', (e) => {
             e.preventDefault();
-            app.submitForm();
+            window.app.submitForm();
         });
     });
 </script>

@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ===== existing styles untouched ===== */
         *{margin:0;padding:0;box-sizing:border-box}
         html,body{height:100%;overflow:hidden}
         body{font-family:"Inter",sans-serif;background:#f1f3f5;color:#1f2937}
@@ -44,6 +43,53 @@
         input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;font-size:14px}
         textarea{min-height:90px;resize:vertical}
 
+        /* Searchable dropdown styles */
+        .searchable-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .searchable-dropdown input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .dropdown-list.show {
+            display: block;
+        }
+        .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+        .dropdown-item.selected {
+            background: #e5e7eb;
+        }
+        .dropdown-item strong {
+            color: #1b4332;
+        }
+
         .note-box{background:#fef3c7;color:#92400e;padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
 
         .table{width:100%;border-collapse:collapse;font-size:13px}
@@ -56,6 +102,19 @@
         .btn-primary{background:#1b4332;color:white;border:none}
         .btn-secondary{background:white;border:1px solid #d1d5db}
         .actions{display:flex;justify-content:flex-end;gap:12px;margin-top:20px}
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        .dropdown-loading {
+            text-align: center;
+            padding: 10px;
+            color: #6b7280;
+            font-size: 12px;
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -65,15 +124,12 @@
 <script src="logout.js"></script>
 <script src="sidebar.js"></script>
 <div class="container">
-    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
     <aside class="sidebar" id="sidebarContainer">
-        <!-- Loading indicator (optional) -->
         <div style="color: white; padding: 20px; text-align: center;">
             Loading menu...
         </div>
     </aside>
 
-    <!-- MAIN -->
     <main class="main-content">
         <div class="header">
             <h2>Add Personnel – Complete Profile</h2>
@@ -82,7 +138,6 @@
 
         <div class="content-area">
             <div class="form-card">
-
                 <div class="form-title">Personnel Information Form</div>
                 <div class="form-subtitle">Complete officer profile with all details</div>
 
@@ -92,9 +147,10 @@
                     <div class="grid">
                         <div>
                             <label>Army No *</label>
-                            <select id="armySelect">
-                                <option value="">Select Army No</option>
-                            </select>
+                            <div class="searchable-dropdown">
+                                <input type="text" id="armySearchInput" placeholder="Type to search army number..." autocomplete="off">
+                                <div id="dropdownList" class="dropdown-list"></div>
+                            </div>
                         </div>
                         <div>
                             <label>Rank *</label>
@@ -115,7 +171,6 @@
                     </div>
 
                     <div class="grid">
-
                         <div>
                             <label>Case Id</label>
                             <input id="caseId">
@@ -145,119 +200,330 @@
                 <!-- PREVIOUS -->
                 <div class="section">
                     <div class="section-title">📜 Previous Legal / Disciplinary Records</div>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Case Id</th>
-                            <th>Case Type</th>
-                            <th>Date Filed</th>
-                            <th>Status</th>
-                            <th>Outcome</th>
-                        </tr>
-                        </thead>
-                        <tbody id="recordsBody"></tbody>
-                    </table>
+                    <div id="recordsContainer">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Case Id</th>
+                                <th>Case Type</th>
+                                <th>Date Filed</th>
+                                <th>Status</th>
+                                <th>Outcome</th>
+                                '</thead>
+                            <tbody id="recordsBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Select an army number to view records</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="actions">
                     <button class="btn btn-secondary">Cancel</button>
                     <button class="btn btn-primary" id="saveBtn">Save Personnel</button>
                 </div>
-
             </div>
         </div>
     </main>
 </div>
 
 <script>
-    const PERSONNEL_API = "http://localhost:6060/api/personnel";
+    const ARMY_NUMBERS_API = "http://localhost:6060/api/personnel/army-numbers";
     const SAVE_API = "http://localhost:6060/api/personnelinformation";
     const GET_INFO_API = "http://localhost:6060/api/personnelinformation";
 
-    let personnelList = [];
     let selectedPersonnelId = null;
+    let debounceTimer = null;
+    let currentSearchTerm = "";
 
-    /* Load Army Numbers */
-    fetch(PERSONNEL_API)
-      .then(r => r.json())
-      .then(data => {
-        personnelList = data;
-        const select = document.getElementById("armySelect");
-        data.forEach(p => {
-          const opt = document.createElement("option");
-          opt.value = p.id;
-          opt.textContent = p.armyNo;
-          select.appendChild(opt);
-        });
-      });
+    // DOM Elements
+    const armySearchInput = document.getElementById("armySearchInput");
+    const dropdownList = document.getElementById("dropdownList");
+    const rankInput = document.getElementById("rankInput");
+    const fullNameInput = document.getElementById("fullNameInput");
+    const caseIdInput = document.getElementById("caseId");
+    const caseTypeInput = document.getElementById("caseType");
+    const currentStatusInput = document.getElementById("currentStatus");
+    const dateOfFilingInput = document.getElementById("dateOfFiling");
+    const finalOutcomeInput = document.getElementById("finalOutcome");
+    const recordsBody = document.getElementById("recordsBody");
+    const saveBtn = document.getElementById("saveBtn");
 
-    /* On Army Select */
-    document.getElementById("armySelect").addEventListener("change", e => {
-      const id = e.target.value;
-      if (!id) return;
+    /* Fetch army numbers with search parameter */
+    async function fetchArmyNumbers(search = "") {
+        try {
+            // Show loading in dropdown
+            if (search !== currentSearchTerm) return;
 
-      const p = personnelList.find(x => x.id == id);
-      selectedPersonnelId = p.id;
+            dropdownList.innerHTML = '<div class="dropdown-loading">Searching...</div>';
+            dropdownList.classList.add("show");
 
-      document.getElementById("rankInput").value = p.rank;
-      document.getElementById("fullNameInput").value = p.fullName;
+            // Build URL with search parameter
+            let url = ARMY_NUMBERS_API;
+            if (search && search.trim() !== "") {
+                url = `${ARMY_NUMBERS_API}?search=${encodeURIComponent(search)}&page=0&size=20`;
+            } else {
+                url = `${ARMY_NUMBERS_API}?page=0&size=20`;
+            }
 
-      loadRecords(id);
-    });
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-    /* Load previous records */
-    function loadRecords(id) {
-      fetch(`${GET_INFO_API}/${id}`)
-        .then(r => r.json())
-        .then(data => {
-          const tbody = document.getElementById("recordsBody");
-          tbody.innerHTML = "";
-          data.forEach((x, i) => {
-            tbody.innerHTML += `
-              <tr>
-                <td>${i + 1}</td>
-                 <td>${x.caseId}</td>
-                <td>${x.caseType}</td>
-                <td>${x.dateOfFiling}</td>
-                <td><span class="badge">${x.currentStatus}</span></td>
-                <td>${x.finalOutcome}</td>
-              </tr>`;
-          });
-        });
+            const data = await response.json();
+
+            // Handle paginated response
+            let results = [];
+            if (data.content) {
+                results = data.content;
+            } else if (Array.isArray(data)) {
+                results = data;
+            } else {
+                results = [];
+            }
+
+            // Only update if this is still the current search
+            if (search !== currentSearchTerm) return;
+
+            if (results.length === 0) {
+                dropdownList.innerHTML = '<div class="dropdown-item">No results found</div>';
+                return;
+            }
+
+            dropdownList.innerHTML = results.map(item => `
+                <div class="dropdown-item" data-id="${item.id}" data-armyno="${item.armyNo}" data-rank="${item.rank}" data-fullname="${item.fullName || ''}">
+                    <strong>${item.armyNo}</strong> - ${item.rank} ${item.fullName || ''}
+                </div>
+            `).join("");
+
+            // Add click event listeners to dropdown items
+            document.querySelectorAll(".dropdown-item[data-id]").forEach(item => {
+                item.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(item.dataset.id);
+                    const armyNo = item.dataset.armyno;
+                    const rank = item.dataset.rank;
+                    const fullName = item.dataset.fullname;
+
+                    selectPersonnel(id, armyNo, rank, fullName);
+                });
+            });
+
+        } catch (error) {
+            console.error("Error fetching army numbers:", error);
+            if (search === currentSearchTerm) {
+                dropdownList.innerHTML = '<div class="dropdown-item" style="color: red;">Error loading results</div>';
+            }
+        }
     }
 
-    /* Save */
-    document.getElementById("saveBtn").onclick = () => {
-      if (!selectedPersonnelId) {
-        alert("Select Army No first");
-        return;
-      }
+    /* Debounced search function */
+    function debouncedSearch(searchTerm) {
+        clearTimeout(debounceTimer);
+        currentSearchTerm = searchTerm;
 
-      const payload = {
-        personnelId: selectedPersonnelId,
-        rank: document.getElementById("rankInput").value,
-        fullName: document.getElementById("fullNameInput").value,
-        caseType: document.getElementById("caseType").value,
-          caseId: document.getElementById("caseId").value,
-        dateOfFiling: document.getElementById("dateOfFiling").value,
-        currentStatus: document.getElementById("currentStatus").value,
-        finalOutcome: document.getElementById("finalOutcome").value
-      };
+        debounceTimer = setTimeout(() => {
+            if (searchTerm === "") {
+                // When empty, fetch initial records (first page with no search)
+                fetchArmyNumbers("");
+            } else if (searchTerm.length >= 1) {
+                fetchArmyNumbers(searchTerm);
+            }
+        }, 300); // 300ms debounce delay
+    }
 
-      fetch(SAVE_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).then(r => {
-        if (r.ok) {
-          alert("Saved successfully");
-          loadRecords(selectedPersonnelId);
-        } else {
-          alert("Save failed");
+    /* Select a personnel and fetch their information */
+    async function selectPersonnel(id, armyNo, rank, fullName) {
+        selectedPersonnelId = id;
+
+        // Update input fields
+        armySearchInput.value = armyNo;
+        rankInput.value = rank;
+        fullNameInput.value = fullName || "";
+
+        // Clear legal form fields
+        caseIdInput.value = "";
+        caseTypeInput.value = "";
+        currentStatusInput.value = "";
+        dateOfFilingInput.value = "";
+        finalOutcomeInput.value = "";
+
+        // Fetch existing records for this personnel
+        await fetchPersonnelInformation(id);
+
+        // Hide dropdown
+        dropdownList.classList.remove("show");
+    }
+
+    /* Fetch personnel information by ID */
+    async function fetchPersonnelInformation(personnelId) {
+        try {
+            recordsBody.innerHTML = '<tr><td colspan="6" class="loading">Loading records...</td></tr>';
+
+            const response = await fetch(`${GET_INFO_API}/${personnelId}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No records found</td></tr>';
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!data || data.length === 0) {
+                recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No legal/disciplinary records found</td></tr>';
+                return;
+            }
+
+            // Display records in table
+            recordsBody.innerHTML = data.map((record, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${record.caseId || '-'}</td>
+                    <td>${record.caseType || '-'}</td>
+                    <td>${record.dateOfFiling || '-'}</td>
+                    <td><span class="badge">${record.currentStatus || 'N/A'}</span></td>
+                    <td>${record.finalOutcome || '-'}</td>
+                </tr>
+            `).join("");
+
+        } catch (error) {
+            console.error("Error fetching personnel information:", error);
+            recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading records</td></tr>';
         }
-      });
-    };
+    }
+
+    /* Save new legal/disciplinary record */
+    async function saveRecord() {
+        if (!selectedPersonnelId) {
+            alert("Please select an Army Number first");
+            return;
+        }
+
+        // Validate required fields
+        if (!caseIdInput.value.trim()) {
+            alert("Please enter Case ID");
+            caseIdInput.focus();
+            return;
+        }
+
+        if (!caseTypeInput.value.trim()) {
+            alert("Please enter Case Type");
+            caseTypeInput.focus();
+            return;
+        }
+
+        const payload = {
+            personnelId: selectedPersonnelId,
+            rank: rankInput.value,
+            fullName: fullNameInput.value,
+            caseId: caseIdInput.value,
+            caseType: caseTypeInput.value,
+            dateOfFiling: dateOfFilingInput.value || null,
+            currentStatus: currentStatusInput.value,
+            finalOutcome: finalOutcomeInput.value
+        };
+
+        try {
+            const response = await fetch(SAVE_API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("Record saved successfully!");
+                // Clear form
+                caseIdInput.value = "";
+                caseTypeInput.value = "";
+                currentStatusInput.value = "";
+                dateOfFilingInput.value = "";
+                finalOutcomeInput.value = "";
+                // Refresh records table
+                await fetchPersonnelInformation(selectedPersonnelId);
+            } else {
+                const error = await response.text();
+                alert(`Save failed: ${error}`);
+            }
+        } catch (error) {
+            console.error("Error saving record:", error);
+            alert("Error saving record. Please try again.");
+        }
+    }
+
+    /* Load initial data when page loads */
+    async function loadInitialData() {
+        currentSearchTerm = "";
+        await fetchArmyNumbers("");
+    }
+
+    /* Event Listeners */
+    armySearchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value;
+        debouncedSearch(searchTerm);
+
+        // Clear selected personnel if input is manually changed
+        if (selectedPersonnelId && searchTerm !== armySearchInput.value) {
+            selectedPersonnelId = null;
+            rankInput.value = "";
+            fullNameInput.value = "";
+            recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Select an army number to view records</td></tr>';
+        }
+    });
+
+    armySearchInput.addEventListener("focus", () => {
+        // If dropdown is empty or not shown, fetch based on current value
+        if (dropdownList.children.length === 0 || !dropdownList.classList.contains("show")) {
+            const currentValue = armySearchInput.value;
+            if (currentValue && currentValue.trim() !== "") {
+                fetchArmyNumbers(currentValue);
+            } else {
+                fetchArmyNumbers("");
+            }
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!armySearchInput.contains(e.target) && !dropdownList.contains(e.target)) {
+            dropdownList.classList.remove("show");
+        }
+    });
+
+    saveBtn.addEventListener("click", saveRecord);
+
+    // Cancel button functionality
+    document.querySelector(".btn-secondary").addEventListener("click", () => {
+        if (confirm("Clear all form data?")) {
+            armySearchInput.value = "";
+            rankInput.value = "";
+            fullNameInput.value = "";
+            caseIdInput.value = "";
+            caseTypeInput.value = "";
+            currentStatusInput.value = "";
+            dateOfFilingInput.value = "";
+            finalOutcomeInput.value = "";
+            recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Select an army number to view records</td></tr>';
+            selectedPersonnelId = null;
+            dropdownList.classList.remove("show");
+            // Reload initial data
+            loadInitialData();
+        }
+    });
+
+    // Initialize page
+    async function init() {
+        await loadInitialData();
+        console.log("Ready to search army numbers");
+    }
+
+    init();
 </script>
 </body>
 </html>

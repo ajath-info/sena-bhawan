@@ -3,16 +3,9 @@ package com.example.sena_bhawan.service.impl;
 import com.example.sena_bhawan.dto.CreatePersonnelRequest;
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.*;
-import com.example.sena_bhawan.entity.formation.Command;
-import com.example.sena_bhawan.entity.formation.Corps;
-import com.example.sena_bhawan.entity.formation.Division;
-import com.example.sena_bhawan.projection.AgeBandProjection;
-import com.example.sena_bhawan.projection.MedicalCategoryProjection;
-import com.example.sena_bhawan.projection.PostingDetailsProjection;
-import com.example.sena_bhawan.projection.RetirementYearProjection;
+import com.example.sena_bhawan.projection.*;
 import com.example.sena_bhawan.repository.*;
 import com.example.sena_bhawan.service.PersonnelService;
-import com.example.sena_bhawan.specification.PersonnelSpecification;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -236,7 +229,38 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .orElseThrow(() -> new RuntimeException("Personnel not found with id " + id));
     }
 
+    public Page<ArmyNumberOnly> searchArmyNumbers(String keyword) {
+        int page = 0;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size);
 
+        // If keyword is empty or null, pass empty string
+        String searchKeyword = (keyword == null || keyword.trim().isEmpty()) ? "" : keyword;
+
+        List<Object[]> results = personnelRepository.findArmyNumbersWithSearch(searchKeyword, size, page * size);
+        long total = personnelRepository.countWithSearch(searchKeyword);
+
+        List<ArmyNumberOnly> content = new ArrayList<>();
+        for (Object[] row : results) {
+            final Long id = ((Number) row[0]).longValue();
+            final String armyNo = (String) row[1];
+            final String fullName = (String) row[2];
+            final String rank = (String) row[3];
+
+            content.add(new ArmyNumberOnly() {
+                @Override
+                public Long getId() { return id; }
+                @Override
+                public String getArmyNo() { return armyNo; }
+                @Override
+                public String getFullName() { return fullName; }
+                @Override
+                public String getRank() { return rank; }
+            });
+        }
+
+        return new PageImpl<>(content, pageable, total);
+    }
 
     @Override
     public List<Personnel> getallPersonnels() {

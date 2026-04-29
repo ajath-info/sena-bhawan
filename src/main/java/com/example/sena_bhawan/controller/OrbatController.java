@@ -9,6 +9,7 @@ import com.example.sena_bhawan.service.impl.FormationServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,27 @@ public class OrbatController {
 
     private final OrbatService service;
     private final OrbatStructureService orbatStructureService;
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String, Object>> getPaginatedOrbatStructures(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) String search) {
+
+        Page<OrbatStructure> pageData = orbatStructureService.findPaginatedWithSearch(page, size, search);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", pageData.getContent());
+        response.put("pageNumber", pageData.getNumber());
+        response.put("pageSize", pageData.getSize());
+        response.put("totalElements", pageData.getTotalElements());
+        response.put("totalPages", pageData.getTotalPages());
+        response.put("last", pageData.isLast());
+        response.put("first", pageData.isFirst());
+        response.put("empty", pageData.isEmpty());
+
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchUnits(@RequestParam String term) {

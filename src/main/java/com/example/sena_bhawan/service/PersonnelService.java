@@ -2,6 +2,7 @@ package com.example.sena_bhawan.service;
 
 import com.example.sena_bhawan.dto.*;
 import com.example.sena_bhawan.entity.Personnel;
+import com.example.sena_bhawan.projection.ArmyNumberOnly;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +10,8 @@ import java.util.List;
 
 public interface PersonnelService {
     List<PersonnelDTO> searchPersonnels(String term);
+
+    Page<ArmyNumberOnly> searchArmyNumbers(String keyword);
 
     List<Personnel> getallPersonnels() ;
 

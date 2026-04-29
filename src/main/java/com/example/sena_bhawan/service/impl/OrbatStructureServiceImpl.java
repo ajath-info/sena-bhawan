@@ -15,9 +15,10 @@ import com.example.sena_bhawan.repository.formation.*;
 import com.example.sena_bhawan.service.OrbatStructureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,11 @@ public class OrbatStructureServiceImpl implements OrbatStructureService {
     private final BrigadeRepository brigadeRepository;
     private final UnitRepository unitRepository;
 
+
+    public Page<OrbatStructure> findPaginatedWithSearch(int page, int size, String search) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return repository.findBySearch(search, pageable);
+    }
 
     @Override
     public List<OrbatSearchDTO> searchUnits(String term) {

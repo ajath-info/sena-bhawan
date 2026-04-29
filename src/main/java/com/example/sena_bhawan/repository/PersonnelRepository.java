@@ -1,11 +1,10 @@
 package com.example.sena_bhawan.repository;
 
-import com.example.sena_bhawan.dto.PersonnelFilterRequest;
-import com.example.sena_bhawan.entity.OrbatStructure;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.projection.AgeBandProjection;
-import com.example.sena_bhawan.projection.MedicalCategoryProjection;
+import com.example.sena_bhawan.projection.ArmyNumberOnly;
 import com.example.sena_bhawan.projection.RetirementYearProjection;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -20,6 +19,22 @@ import java.util.Optional;
 
 @Repository
 public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
+
+    // Single method that handles both cases
+    @Query(value = "SELECT id, army_no as armyNo, full_name as fullName, rank FROM personnel " +
+            "WHERE (:keyword IS NULL OR :keyword = '' OR army_no ILIKE CONCAT('%', :keyword, '%')) " +
+            "LIMIT :limit OFFSET :offset",
+            nativeQuery = true)
+    List<Object[]> findArmyNumbersWithSearch(@Param("keyword") String keyword,
+                                             @Param("limit") int limit,
+                                             @Param("offset") int offset);
+
+    @Query(value = "SELECT COUNT(*) FROM personnel " +
+            "WHERE (:keyword IS NULL OR :keyword = '' OR army_no ILIKE CONCAT('%', :keyword, '%'))",
+            nativeQuery = true)
+    long countWithSearch(@Param("keyword") String keyword);
+
+    Page<ArmyNumberOnly> findByArmyNoContainingIgnoreCase(@Param("armyNo") String armyNo, Pageable pageable);
 
     // Count by exact rank match
     long countByRank(String rank);

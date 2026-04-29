@@ -4,11 +4,13 @@ import com.example.sena_bhawan.dto.DropdownDTO;
 import com.example.sena_bhawan.dto.OrbatDropdownDTO;
 import com.example.sena_bhawan.dto.OrbatSearchDTO;
 import com.example.sena_bhawan.dto.OrbatSimpleDTO;
+import com.example.sena_bhawan.entity.OrbatStructure;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface OrbatStructureService {
-
+    Page<OrbatStructure> findPaginatedWithSearch(int page, int size, String search);
     List<OrbatSearchDTO> searchUnits(String term);
     void validateSearchTerm(String term);
 
