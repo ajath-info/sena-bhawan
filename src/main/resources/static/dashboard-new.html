@@ -415,12 +415,6 @@
                 });
       </script>
 
-      <!-- DISTRIBUTION -->
-      <div class="section">
-        <div class="section-title">Personnel Distribution by Rank</div>
-        <div id="rankDistribution"></div>
-      </div>
-
       <script>
         fetch('http://localhost:6060/api/personnel/officer-strength')
                 .then(response => response.json())
@@ -448,12 +442,9 @@
                 `;
                   }).join('');
 
-                  document.getElementById('rankDistribution').innerHTML = distributionHtml;
                 })
                 .catch(error => {
                   console.error('Error loading distribution:', error);
-                  document.getElementById('rankDistribution').innerHTML =
-                          '<p style="color: red; padding: 10px;">Failed to load distribution data</p>';
                 });
       </script>
 
@@ -761,24 +752,6 @@
                     });
           </script>
         </div>
-      </div>
-
-      <!-- ALERTS -->
-      <div class="section">
-        <div class="section-title">Alerts & Reminders</div>
-        <div class="alert green">15 personnel retiring next month</div>
-        <div class="alert yellow">45 medical exams pending</div>
-        <div class="alert green">23 eligible for Staff College</div>
-        <div class="alert red">67 personnel tenure completing</div>
-      </div>
-
-      <!-- ACTIVITIES -->
-      <div class="section">
-        <div class="section-title">Recent Activities</div>
-        <div class="activity-item"><span>Maj. Rajesh Kumar promoted to Lt. Col.</span><span>2 hrs ago</span></div>
-        <div class="activity-item"><span>Capt. Amit Singh posted to 15 RAJPUT</span><span>5 hrs ago</span></div>
-        <div class="activity-item"><span>Hav. Suresh Yadav completed JCO Course</span><span>1 day ago</span></div>
-        <div class="activity-item"><span>Lt. Priya Sharma leave approved</span><span>2 days ago</span></div>
       </div>
 
       <!-- QUICK ACTIONS -->
