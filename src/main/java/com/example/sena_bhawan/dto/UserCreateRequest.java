@@ -12,9 +12,10 @@ public class UserCreateRequest {
     private String appointment;
     private String password;
 
-    private String sosNo;
+    private String susNo;
     private String unitName;
     private String name;
+    private Integer hierarchyOrder;
 
     private List<Long> roleIds = new ArrayList<>();
 }

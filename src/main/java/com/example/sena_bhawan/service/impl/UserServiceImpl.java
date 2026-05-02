@@ -29,9 +29,9 @@ public class UserServiceImpl implements UserService {
         user.setUsername(req.getUsername());
         user.setAppointment(req.getAppointment());
         user.setPassword(req.getPassword());
-        user.setSosNo(req.getSosNo());
-
-//        user.setUnitName(req.getUnitName());
+        user.setSosNo(req.getSusNo());
+        user.setName(req.getName());
+        user.setHierarchyOrder(req.getHierarchyOrder());
 
         UserMaster savedUser = userRepo.save(user);
 
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(req.getUsername());
         user.setAppointment(req.getAppointment());
         user.setPassword(req.getPassword());
-        user.setSosNo(req.getSosNo());
+        user.setSosNo(req.getSusNo());
 //        user.setUnitName(req.getUnitName());
 
 //        userRoleRepo.findByUserId(userId)

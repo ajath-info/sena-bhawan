@@ -479,6 +479,130 @@
           text-transform: uppercase;
           font-weight: 600;
         }
+
+        /* Multi-Select Dropdown Styles */
+        .multi-select-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .multi-select-input {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 46px;
+        }
+
+        .multi-select-input:hover {
+            border-color: #1b4332;
+        }
+
+        .selected-role-tags {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .selected-role-tags .placeholder {
+            color: #9ca3af;
+        }
+
+        .role-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1b4332;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .role-tag .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .role-tag .remove-tag:hover {
+            color: #ff6b6b;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+
+        .dropdown-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .multi-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-option {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .role-option:hover {
+            background: #f0fdf4;
+        }
+
+        .role-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1b4332;
+        }
+
+        .role-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .role-option .hierarchy-badge {
+            font-size: 10px;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -519,9 +643,17 @@
                             <label class="form-label">
                                 Role Assign <span class="required">*</span>
                             </label>
-                            <select class="form-select" id="roleDropdown" multiple="multiple" size="4">
-
-                            </select>
+                            <div class="multi-select-container" id="multiSelectContainer">
+                                <div class="multi-select-input" onclick="toggleRoleDropdown()">
+                                    <div class="selected-role-tags" id="selectedRoleTags">
+                                        <span class="placeholder">Select roles...</span>
+                                    </div>
+                                    <span class="dropdown-arrow">▼</span>
+                                </div>
+                                <div class="multi-select-options" id="roleOptions" style="display: none;">
+                                    <!-- Role checkboxes will be populated here -->
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">&nbsp;</div>
@@ -590,28 +722,117 @@
 </div>
 <script src="sidebar.js"></script>
 <script>
+    // Store roles data globally for hierarchyOrder access
+    let rolesData = [];
+
     document.addEventListener("DOMContentLoaded", () => {
         loadRoles();
         loadAppointments();
         loadSusNumbers();
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('multiSelectContainer');
+            if (container && !container.contains(event.target)) {
+                const options = document.getElementById('roleOptions');
+                if (options) {
+                    options.style.display = 'none';
+                    const arrow = document.querySelector('.dropdown-arrow');
+                    if (arrow) arrow.classList.remove('open');
+                }
+            }
+        });
     });
 
-    /* ================= ROLES ================= */
+    /* ================= ROLES - Enhanced Multi-Select ================= */
     function loadRoles() {
         fetch("http://localhost:6060/api/roles")
             .then(res => res.json())
             .then(data => {
-                const dropdown = document.getElementById("roleDropdown");
-                dropdown.innerHTML = '<option value="">Select Role</option>';
+                rolesData = data; // Store globally
 
-                data.forEach(role => {
-                    const opt = document.createElement("option");
-                    opt.value = role.roleId;           // entity field
-                    opt.textContent = role.roleName;
-                    dropdown.appendChild(opt);
+                // Sort by hierarchyOrder (ascending for display)
+                rolesData.sort((a, b) => a.hierarchyOrder - b.hierarchyOrder);
+
+                const optionsContainer = document.getElementById("roleOptions");
+                optionsContainer.innerHTML = '';
+
+                rolesData.forEach(role => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'role-option';
+                    optionDiv.innerHTML = `
+                    <input type="checkbox" id="role_${role.roleId}" value="${role.roleId}" data-role-name="${role.roleName}" data-hierarchy="${role.hierarchyOrder}">
+                    <label for="role_${role.roleId}">${role.roleName}</label>
+                    <span class="hierarchy-badge">Order: ${role.hierarchyOrder}</span>
+                `;
+
+                    const checkbox = optionDiv.querySelector('input');
+                    checkbox.addEventListener('change', function() {
+                        updateSelectedRoles();
+                    });
+
+                    optionsContainer.appendChild(optionDiv);
                 });
             })
             .catch(err => console.error("Role load error", err));
+    }
+
+    function toggleRoleDropdown() {
+        const options = document.getElementById('roleOptions');
+        const arrow = document.querySelector('.dropdown-arrow');
+
+        if (options.style.display === 'none' || !options.style.display) {
+            options.style.display = 'block';
+            if (arrow) arrow.classList.add('open');
+        } else {
+            options.style.display = 'none';
+            if (arrow) arrow.classList.remove('open');
+        }
+    }
+
+    function updateSelectedRoles() {
+        const checkboxes = document.querySelectorAll('#roleOptions input[type="checkbox"]');
+        const selectedRoles = [];
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedRoles.push({
+                    roleId: parseInt(checkbox.value),
+                    roleName: checkbox.getAttribute('data-role-name'),
+                    hierarchyOrder: parseInt(checkbox.getAttribute('data-hierarchy'))
+                });
+            }
+        });
+
+        // Update the display tags
+        const tagsContainer = document.getElementById('selectedRoleTags');
+        tagsContainer.innerHTML = '';
+
+        if (selectedRoles.length === 0) {
+            tagsContainer.innerHTML = '<span class="placeholder">Select roles...</span>';
+        } else {
+            selectedRoles.forEach(role => {
+                const tag = document.createElement('span');
+                tag.className = 'role-tag';
+                tag.innerHTML = `
+                ${role.roleName}
+                <span class="remove-tag" onclick="event.stopPropagation(); removeRole(${role.roleId})">✕</span>
+            `;
+                tagsContainer.appendChild(tag);
+            });
+        }
+
+        // Store selected role IDs for submission
+        window.selectedRoleIds = selectedRoles.map(r => r.roleId);
+        window.selectedRolesData = selectedRoles;
+    }
+
+    function removeRole(roleId) {
+        const checkbox = document.getElementById(`role_${roleId}`);
+        if (checkbox) {
+            checkbox.checked = false;
+            updateSelectedRoles();
+        }
     }
 
     /* ================= APPOINTMENTS ================= */
@@ -642,7 +863,7 @@
 
                 data.forEach(o => {
                     const opt = document.createElement("option");
-                    opt.value = o.susNo;            // ✔ correct field
+                    opt.value = o.susNo;
                     opt.textContent = o.susNo + " - " + o.name;
                     dropdown.appendChild(opt);
                 });
@@ -650,59 +871,76 @@
             .catch(err => console.error("SUS load error", err));
     }
 
-    /* ================= SAVE USER ================= */
+    /* ================= SAVE USER with hierarchyOrder ================= */
+    function saveUser() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const appointment = document.getElementById("appointment").value;
+        const susNo = document.getElementById("susDropdown").value;
+        const name = document.getElementById("name").value.trim();
 
-function saveUser() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
-  const appointment = document.getElementById("appointment").value;
-  const susNo = document.getElementById("susDropdown").value;
-  const name = document.getElementById("name").value.trim();
+        // Get selected role IDs from the multi-select
+        let roleIds = window.selectedRoleIds || [];
 
-  const roleSelect = document.getElementById("roleDropdown");
-  console.log(roleSelect);
-  const roleId = Number(roleSelect.value);
-  const roleIds = roleId ? [roleId] : [];   // ✅ ARRAY FORMAT
+        /* ===== validation ===== */
+        if (!username || !password || !appointment || !susNo || !name || roleIds.length === 0) {
+            alert("Please fill all required fields and select at least one role");
+            return;
+        }
 
-  /* ===== validation ===== */
-  if (!username || !password || !appointment || !susNo || roleIds.length === 0) {
-    alert("Please fill all required fields and select at least one role");
-    return;
-  }
+        // Get the highest hierarchyOrder from selected roles
+        let hierarchyOrder = null;
+        if (window.selectedRolesData && window.selectedRolesData.length > 0) {
+            // Find the role with maximum hierarchyOrder
+            const highestRole = window.selectedRolesData.reduce((max, role) =>
+                role.hierarchyOrder > max.hierarchyOrder ? role : max
+            );
+            hierarchyOrder = highestRole.hierarchyOrder;
+        }
 
-  const payload = {
-    username,
-    password,
-    roleIds,          // ✅ always array
-    appointment,
-      susNo,
-      name
-  };
+        const payload = {
+            username,
+            password,
+            roleIds,          // Array of selected role IDs
+            hierarchyOrder,   // Add the highest hierarchy order
+            appointment,
+            susNo,
+            name
+        };
 
-  console.log("POST PAYLOAD →", payload);
+        console.log("POST PAYLOAD →", payload);
 
-  fetch("http://localhost:6060/api/users", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Save failed");
-    return res.json();
-  })
-  .then(() => {
-    alert("✅ User saved successfully");
+        fetch("http://localhost:6060/api/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Save failed");
+                return res.json();
+            })
+            .then(() => {
+                alert("✅ User saved successfully");
 
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("appointmentDropdown").value = "";
-    document.getElementById("susDropdown").value = "";
-    roleSelect.value = "";
-  })
-  .catch(err => {
-    console.error(err);
-  });
-}
+                // Clear form
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+                document.getElementById("appointment").value = "";
+                document.getElementById("susDropdown").value = "";
+                document.getElementById("name").value = "";
+
+                // Clear role selections
+                const checkboxes = document.querySelectorAll('#roleOptions input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updateSelectedRoles();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("❌ Error saving user: " + err.message);
+            });
+    }
 </script>
 
 

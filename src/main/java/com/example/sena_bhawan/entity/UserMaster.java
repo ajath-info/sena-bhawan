@@ -19,5 +19,7 @@ public class UserMaster {
     private String password;
 
     private String sosNo;
+    @Column(name = "hierarchy_order")
+    private Integer hierarchyOrder;
 }
 
