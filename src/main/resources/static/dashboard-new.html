@@ -78,7 +78,7 @@
 
     .chart-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
       margin-bottom: 24px;
     }
@@ -98,13 +98,7 @@
     }
 
     /* Responsive */
-    @media (max-width: 1024px) {
-      .chart-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .chart-grid {
         grid-template-columns: 1fr;
       }
@@ -459,15 +453,58 @@
                 const response = await fetch('http://localhost:6060/api/personnel/officer-strength');
                 const chartData = await response.json();
 
-                console.log('Chart data:', chartData); // Debug log
+                console.log('Chart data:', chartData);
+
+                // Define the correct rank order (from highest to lowest or lowest to highest)
+                const rankOrder = [
+                  "Lieutenant",
+                  "Captain",
+                  "Major",
+                  "Lieutenant Colonel",
+                  "Colonel",
+                  "Brigadier",
+                  "Major General",
+                  "Lieutenant General",
+                  "General"
+                ];
+
+                // Rank abbreviation mapping
+                const rankAbbreviations = {
+                  "Lieutenant": "Lt.",
+                  "Captain": "Capt.",
+                  "Major": "Maj.",
+                  "Lieutenant Colonel": "Lt. Col.",
+                  "Colonel": "Col.",
+                  "Brigadier": "Brig.",
+                  "Major General": "Maj. Gen.",
+                  "Lieutenant General": "Lt. Gen.",
+                  "General": "Gen."
+                };
+
+                // Create a map of rank to count from API data
+                const rankCountMap = {};
+                chartData.labels.forEach((label, index) => {
+                  rankCountMap[label] = chartData.data[index];
+                });
+
+                // Create ordered arrays based on rankOrder
+                const orderedLabels = [];
+                const orderedData = [];
+
+                rankOrder.forEach(rank => {
+                  if (rankCountMap[rank] !== undefined) {
+                    orderedLabels.push(rankAbbreviations[rank] || rank);
+                    orderedData.push(rankCountMap[rank]);
+                  }
+                });
 
                 new Chart(document.getElementById('rankStrengthChart'), {
                   type: 'bar',
                   data: {
-                    labels: chartData.labels,
+                    labels: orderedLabels,
                     datasets: [{
                       label: 'Officers',
-                      data: chartData.data,
+                      data: orderedData,
                       backgroundColor: '#1b4332',
                       borderRadius: 8
                     }]
@@ -480,6 +517,7 @@
                       tooltip: {
                         callbacks: {
                           label: function(context) {
+                            const originalRank = rankOrder[context.dataIndex];
                             return context.raw.toLocaleString() + ' Officers';
                           }
                         }
@@ -505,8 +543,8 @@
                     onClick: (e, el) => {
                       if(el.length) {
                         const index = el[0].index;
-                        const rank = chartData.labels[index];
-                        alert(`Showing details for ${rank}`);
+                        const originalRank = rankOrder[index];
+                        alert(`Showing details for ${originalRank}`);
                       }
                     }
                   }
@@ -521,7 +559,6 @@
             })();
           </script>
         </div>
-
 
         <div class="chart-card">
           <div class="chart-title">Age Band Distribution</div>
@@ -620,9 +657,31 @@
             });
           </script>
         </div>
-      </div>
 
-      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Officer Status Overview</div>
+          <canvas id="officerStatusChart"></canvas>
+          <script>
+            fetch('http://localhost:6060/api/course-panel/officer-status')
+                    .then(response => response.json())
+                    .then(data => {
+                      new Chart(document.getElementById('officerStatusChart'), {
+                        type: 'doughnut',
+                        data: {
+                          labels: data.labels,  // Raw from DB: ['ATTENDING', 'NOT_ATTENDING', ...]
+                          datasets: [{
+                            data: data.data,     // [140, 60, 90, 710]
+                            backgroundColor: ['#e63946', '#f4a261', '#457b9d', '#2a9d8f']
+                          }]
+                        },
+                        options: {
+                          plugins: { legend: { position: 'bottom' } }
+                        }
+                      });
+                    });
+          </script>
+        </div>
+
         <div class="chart-card">
           <div class="chart-title">Retirement Forecast</div>
           <canvas id="retirementChart"></canvas>
@@ -723,30 +782,6 @@
                               title: { display: true, text: 'Number of Officers' }
                             }
                           }
-                        }
-                      });
-                    });
-          </script>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-title">Officer Status Overview</div>
-          <canvas id="officerStatusChart"></canvas>
-          <script>
-            fetch('http://localhost:6060/api/course-panel/officer-status')
-                    .then(response => response.json())
-                    .then(data => {
-                      new Chart(document.getElementById('officerStatusChart'), {
-                        type: 'doughnut',
-                        data: {
-                          labels: data.labels,  // Raw from DB: ['ATTENDING', 'NOT_ATTENDING', ...]
-                          datasets: [{
-                            data: data.data,     // [140, 60, 90, 710]
-                            backgroundColor: ['#e63946', '#f4a261', '#457b9d', '#2a9d8f']
-                          }]
-                        },
-                        options: {
-                          plugins: { legend: { position: 'bottom' } }
                         }
                       });
                     });
