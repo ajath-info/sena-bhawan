@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,6 +55,7 @@ public class CoursePanelNomination {
 
     // Audit columns
     @Column(name = "created_at")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt; // Timestamp when record was created
 
     @Column(name = "updated_at")

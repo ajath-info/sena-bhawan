@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,9 +32,11 @@ public class CourseSchedule {
     private String batchNumber;
 
     @Column(name = "start_date", nullable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
 
     @Column(name = "course_strength")

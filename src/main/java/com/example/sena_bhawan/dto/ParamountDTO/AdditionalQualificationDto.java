@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto.ParamountDTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class AdditionalQualificationDto {
     private String qualification;
     private String issuingAuthority;
     private Integer year; // Added year field
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate validity; // Added validity field
 }

@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class RankMaster {
     private int personnelCount;
 
     @Column(name = "updated_at")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     // getters & setters

@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,9 @@ public class PanelBatchListDTO {
     private String remarks;
     private Boolean batchStatus;
     private Long rejectMovementId;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime updatedAt;
     
     // Course Schedule Details
@@ -29,7 +32,9 @@ public class PanelBatchListDTO {
     private String courseName;
     private String year;
     private String batchNumber;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
     private String venue;
     private String courseStrength;

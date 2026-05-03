@@ -1,6 +1,7 @@
 package com.example.sena_bhawan.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +24,11 @@ public class PersonnelDecorations {
     private String decorationCategory;
 
     private String decorationName;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate awardDate;
     private String citation;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
 
     @ManyToOne

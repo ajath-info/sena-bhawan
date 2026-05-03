@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,6 +40,7 @@ public class CourseRemarks {
     private String generalRemarks;
 
     @CreationTimestamp
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

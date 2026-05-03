@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,9 @@ public class PanelApprovalDTO {
     private Long rejectMovementId;
     private Integer totalNominations;
     private String remarks;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime updatedAt;
     private List<OfficerNominationDTO> officers;
 }

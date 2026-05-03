@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto.ParamountDTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 public class DecorationDto {
     private Long decorationId;
     private String awardName;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate awardDate;
     private String citation;
     private String initials;

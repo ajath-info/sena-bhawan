@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +47,7 @@ public class PersonnelInformation {
     private String finalOutcome;
 
     @Column(name = "created_at", updatable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt = LocalDateTime.now();
 }
 

@@ -1,5 +1,7 @@
 package com.example.sena_bhawan.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -8,9 +10,11 @@ public class CourseScheduleRoleStatusResponseDTO {
     private Long id;
     private Long scheduleId;
     private Long roleId;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate sendDate;
     private String status;
     private String remark;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
 
     // getters & setters

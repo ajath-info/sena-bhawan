@@ -6,7 +6,8 @@ import java.util.List;
 
 
 @Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class CoursePanelBatchResponse {
     private Long batchId;

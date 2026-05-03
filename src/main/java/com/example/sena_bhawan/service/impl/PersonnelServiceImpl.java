@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -1502,6 +1503,21 @@ public class PersonnelServiceImpl implements PersonnelService {
         return cb.exists(subquery);
     }
 
+    public static String formatDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty() || dateStr.equals("-")) {
+            return "-";
+        }
+
+        try {
+            DateTimeFormatter input = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter output = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+            return LocalDate.parse(dateStr, input).format(output);
+        } catch (Exception e) {
+            return "-";
+        }
+    }
+
     private PersonnelListDTO mapToPersonnelListDTO(Object[] row) {
         PersonnelListDTO dto = new PersonnelListDTO();
 
@@ -1510,9 +1526,9 @@ public class PersonnelServiceImpl implements PersonnelService {
         dto.setArmyNo(asString(row[idx++]));
         dto.setRank(asString(row[idx++]));
         dto.setFullName(asString(row[idx++]));
-        dto.setDateOfBirth(asString(row[idx++]));
-        dto.setDateOfCommission(asString(row[idx++]));
-        dto.setDateOfSeniority(asString(row[idx++]));
+        dto.setDateOfBirth(formatDate(asString(row[idx++])));
+        dto.setDateOfCommission(formatDate(asString(row[idx++])));
+        dto.setDateOfSeniority(formatDate(asString(row[idx++])));
         dto.setMedicalCode(asString(row[idx++]));
         dto.setReligion(asString(row[idx++]));
         dto.setMaritalStatus(asString(row[idx++]));
@@ -1521,7 +1537,7 @@ public class PersonnelServiceImpl implements PersonnelService {
         dto.setCity(asString(row[idx++]));
         dto.setState(asString(row[idx++]));
         dto.setPlaceOfBirth(asString(row[idx++]));
-        dto.setTosDate(asString(row[idx++]));
+        dto.setTosDate(formatDate(asString(row[idx++])));
 
         // Unit (JSONB)
         Object unitObj = row[idx++];

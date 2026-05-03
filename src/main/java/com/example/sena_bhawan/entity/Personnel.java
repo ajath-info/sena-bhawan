@@ -48,15 +48,15 @@ public class Personnel {
     @Column(name = "case_type")
     private String caseType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_of_commission", nullable = false)
     private LocalDate dateOfCommission;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_of_seniority")
     private LocalDate dateOfSeniority;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
@@ -134,10 +134,12 @@ public class Personnel {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime updatedAt;
 
     // Child Relations

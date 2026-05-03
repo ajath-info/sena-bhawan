@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -24,6 +25,7 @@ public class Officer {
     private String corps;
 
     @Column(name = "created_on")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDateTime createdOn;
 
     // ===== getters & setters =====

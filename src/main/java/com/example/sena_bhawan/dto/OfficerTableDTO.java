@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,7 +16,9 @@ public class OfficerTableDTO {
     private String gender;
 
     private LocalDate dob;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate commissionDate;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate seniorityDate;
 
     private int coursesDone;

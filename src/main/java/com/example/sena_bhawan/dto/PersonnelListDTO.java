@@ -1,13 +1,7 @@
 // PersonnelListDTO.java
 package com.example.sena_bhawan.dto;
 
-import com.example.sena_bhawan.entity.Personnel;
-import com.example.sena_bhawan.entity.PersonnelQualifications;
 import lombok.Data;
-
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 public class PersonnelListDTO {

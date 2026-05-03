@@ -47,31 +47,35 @@ public class CourseScheduleServiceImpl implements CourseScheduleService {
     @Override
     @Transactional
     public List<CourseScheduleDto> getBatchesByCourseId(Long courseId) {
-        // 1. Verify course exists
-        CourseMaster course = courseRepo.findById(courseId.intValue())
-                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
+        try {
+            // 1. Verify course exists
+            CourseMaster course = courseRepo.findById(courseId.intValue())
+                    .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
 
-        // 2. Fetch all schedules for this course
-        List<CourseSchedule> schedules = scheduleRepository.findByCourseId(courseId.intValue());
+            // 2. Fetch all schedules for this course
+            List<CourseSchedule> schedules = scheduleRepository.findByCourseId(courseId.intValue());
 
-        // 3. Convert to DTO (raw data only)
-        return schedules.stream()
-                .map(schedule -> {
-                    CourseScheduleDto dto = new CourseScheduleDto();
-                    dto.setScheduleId(schedule.getScheduleId());
-                    dto.setCourseId(course.getSrno().longValue());
-                    dto.setCourseName(course.getCourseName());
-                    dto.setYear(schedule.getYear());
-                    dto.setBatchNumber(schedule.getBatchNumber());
-                    dto.setStartDate(schedule.getStartDate().toString());
-                    dto.setEndDate(schedule.getEndDate().toString());
-                    dto.setCourseStrength(schedule.getCourseStrength());
-                    dto.setVenue(schedule.getVenue());
-                    dto.setRemarks(schedule.getRemarks());
-                    dto.setPanelSize(schedule.getPanelSize().toString());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+            // 3. Convert to DTO (raw data only)
+            return schedules.stream()
+                    .map(schedule -> {
+                        CourseScheduleDto dto = new CourseScheduleDto();
+                        dto.setScheduleId(schedule.getScheduleId());
+                        dto.setCourseId(course.getSrno().longValue());
+                        dto.setCourseName(course.getCourseName());
+                        dto.setYear(schedule.getYear());
+                        dto.setBatchNumber(schedule.getBatchNumber());
+                        dto.setStartDate(schedule.getStartDate().toString());
+                        dto.setEndDate(schedule.getEndDate().toString());
+                        dto.setCourseStrength(schedule.getCourseStrength());
+                        dto.setVenue(schedule.getVenue());
+                        dto.setRemarks(schedule.getRemarks());
+                        dto.setPanelSize(schedule.getPanelSize() != null ? schedule.getPanelSize().toString() : "-");
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Something went Wrong");
+        }
     }
 
 

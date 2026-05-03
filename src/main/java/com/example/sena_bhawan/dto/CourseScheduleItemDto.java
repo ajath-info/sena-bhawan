@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -18,9 +19,11 @@ public class CourseScheduleItemDto {
     private String batchNumber;
 
     @JsonProperty("startDate")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
 
     @JsonProperty("endDate")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
 
     @JsonProperty("courseStrength")

@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.dto.ParamountDTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +17,11 @@ public class IdentityAndServiceDto {
     private String rank;
     private String fullName;
     private String gender;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfCommission;
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfSeniority;
     private String panCard;
     private String aadhaarNumber;
