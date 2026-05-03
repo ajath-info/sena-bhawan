@@ -603,6 +603,222 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Custom Single-Select Styles */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 46px;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: #1b4332;
+        }
+
+        .selected-value {
+            color: #374151;
+        }
+
+        .selected-value.placeholder {
+            color: #9ca3af;
+        }
+
+        .custom-select-trigger .arrow {
+            font-size: 12px;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+
+        .custom-select-trigger .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-select-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .custom-select-option:hover {
+            background: #f0fdf4;
+        }
+
+        .custom-select-option.selected {
+            background: #1b4332;
+            color: white;
+        }
+
+        .custom-select-option .hierarchy-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .custom-select-option.selected .hierarchy-badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        /* User Table Styles */
+        .user-table-container {
+            margin-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .user-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .user-table-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .table-search-box input {
+            width: 280px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 13px;
+        }
+
+        .user-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table thead {
+            background: #f9fafb;
+        }
+
+        .user-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .user-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #374151;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .user-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .user-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.role-high {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 3px solid #22c55e;
+        }
+
+        .role-badge.role-medium {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .role-badge.role-low {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .loading-row td {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .refresh-btn {
+            background: #1b4332;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            background: #2d6a4f;
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
@@ -643,15 +859,13 @@
                             <label class="form-label">
                                 Role Assign <span class="required">*</span>
                             </label>
-                            <div class="multi-select-container" id="multiSelectContainer">
-                                <div class="multi-select-input" onclick="toggleRoleDropdown()">
-                                    <div class="selected-role-tags" id="selectedRoleTags">
-                                        <span class="placeholder">Select roles...</span>
-                                    </div>
-                                    <span class="dropdown-arrow">▼</span>
+                            <div class="custom-select" id="customSelect">
+                                <div class="custom-select-trigger" onclick="toggleCustomSelect()">
+                                    <span class="selected-value">Select Role</span>
+                                    <span class="arrow">▼</span>
                                 </div>
-                                <div class="multi-select-options" id="roleOptions" style="display: none;">
-                                    <!-- Role checkboxes will be populated here -->
+                                <div class="custom-select-options" id="customSelectOptions" style="display: none;">
+                                    <!-- Options will be populated here -->
                                 </div>
                             </div>
                         </div>
@@ -715,6 +929,36 @@
 
                 </div>
 
+                <!-- User List Table -->
+                <div class="user-table-container">
+                    <div class="user-table-header">
+                        <h3>📋 Existing Users</h3>
+                        <div class="table-search-box">
+                            <input type="text" id="tableSearchInput" placeholder="🔍 Search users..." onkeyup="searchUserTable()"/>
+                        </div>
+                    </div>
+                    <div class="user-table-wrapper">
+                        <table class="user-table">
+                            <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Appointment</th>
+                                <th>Role</th>
+                                <th>SOS No</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                            <tr class="loading-row">
+                                <td colspan="7">Loading users...</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
 
             </div>
         </div>
@@ -722,54 +966,53 @@
 </div>
 <script src="sidebar.js"></script>
 <script>
-    // Store roles data globally for hierarchyOrder access
+    // Store roles data globally
     let rolesData = [];
 
     document.addEventListener("DOMContentLoaded", () => {
         loadRoles();
-        loadAppointments();
         loadSusNumbers();
+        loadUserTable();  // ← ADD THIS LINE - it's missing!
 
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
-            const container = document.getElementById('multiSelectContainer');
-            if (container && !container.contains(event.target)) {
-                const options = document.getElementById('roleOptions');
+            const customSelect = document.getElementById('customSelect');
+            if (customSelect && !customSelect.contains(event.target)) {
+                const options = document.getElementById('customSelectOptions');
                 if (options) {
                     options.style.display = 'none';
-                    const arrow = document.querySelector('.dropdown-arrow');
+                    const arrow = document.querySelector('.custom-select-trigger .arrow');
                     if (arrow) arrow.classList.remove('open');
                 }
             }
         });
     });
 
-    /* ================= ROLES - Enhanced Multi-Select ================= */
+    /* ================= ROLES - Custom Single Select ================= */
     function loadRoles() {
         fetch("http://localhost:6060/api/roles")
             .then(res => res.json())
             .then(data => {
-                rolesData = data; // Store globally
-
-                // Sort by hierarchyOrder (ascending for display)
+                rolesData = data;
                 rolesData.sort((a, b) => a.hierarchyOrder - b.hierarchyOrder);
 
-                const optionsContainer = document.getElementById("roleOptions");
+                const optionsContainer = document.getElementById("customSelectOptions");
                 optionsContainer.innerHTML = '';
 
                 rolesData.forEach(role => {
                     const optionDiv = document.createElement('div');
-                    optionDiv.className = 'role-option';
+                    optionDiv.className = 'custom-select-option';
+                    optionDiv.setAttribute('data-role-id', role.roleId);
+                    optionDiv.setAttribute('data-hierarchy', role.hierarchyOrder);
+                    optionDiv.setAttribute('data-role-name', role.roleName);
                     optionDiv.innerHTML = `
-                    <input type="checkbox" id="role_${role.roleId}" value="${role.roleId}" data-role-name="${role.roleName}" data-hierarchy="${role.hierarchyOrder}">
-                    <label for="role_${role.roleId}">${role.roleName}</label>
+                    <span>${role.roleName}</span>
                     <span class="hierarchy-badge">Order: ${role.hierarchyOrder}</span>
                 `;
 
-                    const checkbox = optionDiv.querySelector('input');
-                    checkbox.addEventListener('change', function() {
-                        updateSelectedRoles();
-                    });
+                    optionDiv.onclick = function() {
+                        selectRole(role.roleId, role.roleName, role.hierarchyOrder);
+                    };
 
                     optionsContainer.appendChild(optionDiv);
                 });
@@ -777,80 +1020,48 @@
             .catch(err => console.error("Role load error", err));
     }
 
-    function toggleRoleDropdown() {
-        const options = document.getElementById('roleOptions');
-        const arrow = document.querySelector('.dropdown-arrow');
+    let currentSelectedRole = null;
+
+    function toggleCustomSelect() {
+        const options = document.getElementById('customSelectOptions');
+        const arrow = document.querySelector('.custom-select-trigger .arrow');
 
         if (options.style.display === 'none' || !options.style.display) {
             options.style.display = 'block';
-            if (arrow) arrow.classList.add('open');
+            arrow.classList.add('open');
         } else {
             options.style.display = 'none';
-            if (arrow) arrow.classList.remove('open');
+            arrow.classList.remove('open');
         }
     }
 
-    function updateSelectedRoles() {
-        const checkboxes = document.querySelectorAll('#roleOptions input[type="checkbox"]');
-        const selectedRoles = [];
+    function selectRole(roleId, roleName, hierarchyOrder) {
+        // Update trigger text
+        const selectedValueSpan = document.querySelector('.selected-value');
+        selectedValueSpan.textContent = roleName;
+        selectedValueSpan.classList.remove('placeholder');
 
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedRoles.push({
-                    roleId: parseInt(checkbox.value),
-                    roleName: checkbox.getAttribute('data-role-name'),
-                    hierarchyOrder: parseInt(checkbox.getAttribute('data-hierarchy'))
-                });
+        // Store selected role
+        currentSelectedRole = {
+            roleId: roleId,
+            roleName: roleName,
+            hierarchyOrder: hierarchyOrder
+        };
+
+        // Update visual selection in dropdown
+        const allOptions = document.querySelectorAll('.custom-select-option');
+        allOptions.forEach(opt => {
+            opt.classList.remove('selected');
+            if (parseInt(opt.getAttribute('data-role-id')) === roleId) {
+                opt.classList.add('selected');
             }
         });
 
-        // Update the display tags
-        const tagsContainer = document.getElementById('selectedRoleTags');
-        tagsContainer.innerHTML = '';
-
-        if (selectedRoles.length === 0) {
-            tagsContainer.innerHTML = '<span class="placeholder">Select roles...</span>';
-        } else {
-            selectedRoles.forEach(role => {
-                const tag = document.createElement('span');
-                tag.className = 'role-tag';
-                tag.innerHTML = `
-                ${role.roleName}
-                <span class="remove-tag" onclick="event.stopPropagation(); removeRole(${role.roleId})">✕</span>
-            `;
-                tagsContainer.appendChild(tag);
-            });
-        }
-
-        // Store selected role IDs for submission
-        window.selectedRoleIds = selectedRoles.map(r => r.roleId);
-        window.selectedRolesData = selectedRoles;
-    }
-
-    function removeRole(roleId) {
-        const checkbox = document.getElementById(`role_${roleId}`);
-        if (checkbox) {
-            checkbox.checked = false;
-            updateSelectedRoles();
-        }
-    }
-
-    /* ================= APPOINTMENTS ================= */
-    function loadAppointments() {
-        fetch("http://localhost:6060/api/appointments")
-            .then(res => res.json())
-            .then(data => {
-                const dropdown = document.getElementById("appointmentDropdown");
-                dropdown.innerHTML = '<option value="">Select Appointment</option>';
-
-                data.forEach(app => {
-                    const opt = document.createElement("option");
-                    opt.value = app.id;
-                    opt.textContent = app.appointmentName;
-                    dropdown.appendChild(opt);
-                });
-            })
-            .catch(err => console.error("Appointment load error", err));
+        // Close dropdown
+        const options = document.getElementById('customSelectOptions');
+        const arrow = document.querySelector('.custom-select-trigger .arrow');
+        options.style.display = 'none';
+        arrow.classList.remove('open');
     }
 
     /* ================= SUS / ORBAT ================= */
@@ -871,7 +1082,8 @@
             .catch(err => console.error("SUS load error", err));
     }
 
-    /* ================= SAVE USER with hierarchyOrder ================= */
+    /* ================= SAVE USER ================= */
+    /* ================= SAVE USER ================= */
     function saveUser() {
         const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value;
@@ -879,30 +1091,25 @@
         const susNo = document.getElementById("susDropdown").value;
         const name = document.getElementById("name").value.trim();
 
-        // Get selected role IDs from the multi-select
-        let roleIds = window.selectedRoleIds || [];
-
         /* ===== validation ===== */
-        if (!username || !password || !appointment || !susNo || !name || roleIds.length === 0) {
-            alert("Please fill all required fields and select at least one role");
+        if (!username || !password || !appointment || !susNo || !name) {
+            alert("Please fill all required fields");
             return;
         }
 
-        // Get the highest hierarchyOrder from selected roles
-        let hierarchyOrder = null;
-        if (window.selectedRolesData && window.selectedRolesData.length > 0) {
-            // Find the role with maximum hierarchyOrder
-            const highestRole = window.selectedRolesData.reduce((max, role) =>
-                role.hierarchyOrder > max.hierarchyOrder ? role : max
-            );
-            hierarchyOrder = highestRole.hierarchyOrder;
+        if (!currentSelectedRole) {
+            alert("Please select a role");
+            return;
         }
+
+        // roleIds as array (for future multiple role support)
+        const roleIds = [currentSelectedRole.roleId];
 
         const payload = {
             username,
             password,
-            roleIds,          // Array of selected role IDs
-            hierarchyOrder,   // Add the highest hierarchy order
+            roleIds,                    // Array format [5] for single role
+            hierarchyOrder: currentSelectedRole.hierarchyOrder,
             appointment,
             susNo,
             name
@@ -929,21 +1136,299 @@
                 document.getElementById("susDropdown").value = "";
                 document.getElementById("name").value = "";
 
-                // Clear role selections
-                const checkboxes = document.querySelectorAll('#roleOptions input[type="checkbox"]');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                updateSelectedRoles();
+                // Clear role selection
+                currentSelectedRole = null;
+                const selectedValueSpan = document.querySelector('.selected-value');
+                selectedValueSpan.textContent = 'Select Role';
+                selectedValueSpan.classList.add('placeholder');
+
+                // Clear visual selection
+                const allOptions = document.querySelectorAll('.custom-select-option');
+                allOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Refresh the user table ← ADD THIS LINE
+                loadUserTable();
             })
             .catch(err => {
                 console.error(err);
                 alert("❌ Error saving user: " + err.message);
             });
     }
+
+
+    // ================= USER TABLE FUNCTIONS =================
+    let allUsers = [];
+    let rolesMapping = {};      // Map roleId -> roleName
+    let hierarchyMapping = {};  // Map hierarchyOrder -> roleName
+
+    // Load users for table display
+    // Load users for table display
+    async function loadUserTable() {
+        console.log("Loading user table...");
+        try {
+            const [userRes, roleRes] = await Promise.all([
+                fetch("http://localhost:6060/api/users"),
+                fetch("http://localhost:6060/api/roles")
+            ]);
+
+            console.log("User response status:", userRes.status);
+            console.log("Role response status:", roleRes.status);
+
+            const users = await userRes.json();
+            const roles = await roleRes.json();
+
+            console.log("Users received:", users);
+            console.log("Roles received:", roles);
+
+            // Create role mappings
+            roles.forEach(role => {
+                rolesMapping[role.roleId] = role.roleName;
+                hierarchyMapping[role.hierarchyOrder] = role.roleName;
+            });
+
+            console.log("Roles mapping:", rolesMapping);
+            console.log("Hierarchy mapping:", hierarchyMapping);
+
+            allUsers = users;
+            renderUserTable(allUsers);
+
+        } catch (error) {
+            console.error("Error loading users:", error);
+            const tbody = document.getElementById("userTableBody");
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Failed to load users: ' + error.message + '</td></tr>';
+        }
+    }
+
+    // Get role name from user object
+    function getUserRole(user) {
+        // Priority 1: roleId
+        if (user.roleId && rolesMapping[user.roleId]) {
+            return { name: rolesMapping[user.roleId], hierarchy: user.hierarchyOrder };
+        }
+        // Priority 2: hierarchyOrder
+        if (user.hierarchyOrder && hierarchyMapping[user.hierarchyOrder]) {
+            return { name: hierarchyMapping[user.hierarchyOrder], hierarchy: user.hierarchyOrder };
+        }
+        // Priority 3: roleIds array
+        if (user.roleIds && user.roleIds.length > 0 && rolesMapping[user.roleIds[0]]) {
+            return { name: rolesMapping[user.roleIds[0]], hierarchy: user.hierarchyOrder };
+        }
+        return { name: "-", hierarchy: 0 };
+    }
+
+    // Get role level for styling
+    function getRoleLevel(hierarchyOrder) {
+        if (hierarchyOrder >= 6) return "high";
+        if (hierarchyOrder >= 3) return "medium";
+        return "low";
+    }
+
+    // Render user table
+    function renderUserTable(users) {
+        const tbody = document.getElementById("userTableBody");
+
+        if (!users || users.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No users found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        users.forEach((user, index) => {
+            const role = getUserRole(user);
+            const roleLevel = getRoleLevel(role.hierarchy);
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${escapeHtml(user.username || "-")}</td>
+                <td>${escapeHtml(user.name || "-")}</td>
+                <td>${escapeHtml(user.appointment || "-")}</td>
+                <td><span class="role-badge role-${roleLevel}">${escapeHtml(role.name)}</span></td>
+                <td>${escapeHtml(user.sosNo || "-")}</td>
+                <td class="actions">
+                    <button class="icon-btn edit" onclick="editUser(${user.userId})" title="Edit">✏️</button>
+                    <button class="icon-btn delete" onclick="deleteUser(${user.userId})" title="Delete">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Helper function to escape HTML and prevent XSS
+    function escapeHtml(str) {
+        if (!str) return str;
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Search users in table
+    function searchUserTable() {
+        const searchInput = document.getElementById("tableSearchInput");
+        const keyword = searchInput ? searchInput.value.toLowerCase() : "";
+
+        if (!keyword.trim()) {
+            renderUserTable(allUsers);
+            return;
+        }
+
+        const filtered = allUsers.filter(user =>
+            (user.username && user.username.toLowerCase().includes(keyword)) ||
+            (user.name && user.name.toLowerCase().includes(keyword)) ||
+            (user.appointment && user.appointment.toLowerCase().includes(keyword)) ||
+            (user.sosNo && user.sosNo.toLowerCase().includes(keyword)) ||
+            (getUserRole(user).name && getUserRole(user).name.toLowerCase().includes(keyword))
+        );
+
+        renderUserTable(filtered);
+    }
+
+    // Edit user function
+    function editUser(userId) {
+        const user = allUsers.find(u => u.userId === userId);
+        if (user) {
+            // Populate form for editing
+            document.getElementById("username").value = user.username || "";
+            document.getElementById("appointment").value = user.appointment || "";
+            document.getElementById("name").value = user.name || "";
+
+            // Set SUS dropdown
+            const susDropdown = document.getElementById("susDropdown");
+            if (user.sosNo) {
+                susDropdown.value = user.sosNo;
+            }
+
+            // Set role selection
+            const role = getUserRole(user);
+            if (role.name !== "-") {
+                // Find and select the role in the custom dropdown
+                const roleOption = rolesData.find(r => r.roleName === role.name);
+                if (roleOption) {
+                    selectRole(roleOption.roleId, roleOption.roleName, roleOption.hierarchyOrder);
+                }
+            }
+
+            // Scroll to form
+            document.querySelector(".section-card").scrollIntoView({ behavior: "smooth" });
+
+            // Change save button text
+            const saveBtn = document.querySelector(".btn-primary");
+            saveBtn.textContent = "✏️ Update User";
+            saveBtn.setAttribute("onclick", "updateUser(" + userId + ")");
+
+            // Add cancel button
+            const buttonContainer = document.querySelector(".section-card div:last-child");
+            if (!document.getElementById("cancelBtn")) {
+                const cancelBtn = document.createElement("button");
+                cancelBtn.id = "cancelBtn";
+                cancelBtn.className = "btn btn-secondary btn-small";
+                cancelBtn.textContent = "Cancel";
+                cancelBtn.onclick = cancelEdit;
+                buttonContainer.insertBefore(cancelBtn, saveBtn);
+            }
+        }
+    }
+
+    // Update user function
+    function updateUser(userId) {
+        const username = document.getElementById("username").value.trim();
+        const appointment = document.getElementById("appointment").value;
+        const susNo = document.getElementById("susDropdown").value;
+        const name = document.getElementById("name").value.trim();
+
+        if (!username || !appointment || !susNo || !name) {
+            alert("Please fill all required fields");
+            return;
+        }
+
+        if (!currentSelectedRole) {
+            alert("Please select a role");
+            return;
+        }
+
+        const payload = {
+            username: username,
+            appointment: appointment,
+            susNo: susNo,
+            name: name,
+            roleIds: [currentSelectedRole.roleId],
+            hierarchyOrder: currentSelectedRole.hierarchyOrder
+        };
+
+        fetch(`http://localhost:6060/api/users/${userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Update failed");
+                return res.json();
+            })
+            .then(() => {
+                alert("✅ User updated successfully");
+                resetForm();
+                loadUserTable(); // Refresh table
+            })
+            .catch(err => {
+                console.error(err);
+                alert("❌ Error updating user: " + err.message);
+            });
+    }
+
+    // Delete user function
+    function deleteUser(userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            fetch(`http://localhost:6060/api/users/${userId}`, {
+                method: "DELETE"
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Delete failed");
+                    return res.json();
+                })
+                .then(() => {
+                    alert("✅ User deleted successfully");
+                    loadUserTable(); // Refresh table
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("❌ Error deleting user: " + err.message);
+                });
+        }
+    }
+
+    // Cancel edit mode
+    function cancelEdit() {
+        resetForm();
+        const saveBtn = document.querySelector(".btn-primary");
+        saveBtn.textContent = "💾 Save User";
+        saveBtn.setAttribute("onclick", "saveUser()");
+
+        const cancelBtn = document.getElementById("cancelBtn");
+        if (cancelBtn) cancelBtn.remove();
+    }
+
+    // Reset form
+    function resetForm() {
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("appointment").value = "";
+        document.getElementById("susDropdown").value = "";
+        document.getElementById("name").value = "";
+
+        // Clear role selection
+        currentSelectedRole = null;
+        const selectedValueSpan = document.querySelector('.selected-value');
+        selectedValueSpan.textContent = 'Select Role';
+        selectedValueSpan.classList.add('placeholder');
+
+        const allOptions = document.querySelectorAll('.custom-select-option');
+        allOptions.forEach(opt => opt.classList.remove('selected'));
+    }
+
 </script>
-
-
-
 </body>
 </html>

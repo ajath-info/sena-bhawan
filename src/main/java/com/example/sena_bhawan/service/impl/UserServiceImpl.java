@@ -58,16 +58,7 @@ public class UserServiceImpl implements UserService {
 
         user.setUsername(req.getUsername());
         user.setAppointment(req.getAppointment());
-        user.setPassword(req.getPassword());
         user.setSosNo(req.getSusNo());
-//        user.setUnitName(req.getUnitName());
-
-//        userRoleRepo.findByUserId(userId)
-//                .forEach(userRoleRepo::delete);
-
-        for (Long roleId : req.getRoleIds()) {
-            userRoleRepo.save(new UserRoleInfo(null, userId, roleId));
-        }
 
         return userRepo.save(user);
     }

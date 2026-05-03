@@ -1,5 +1,6 @@
 package com.example.sena_bhawan.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,10 +17,11 @@ public class UserMaster {
     private String name;
     private String username;
     private String appointment;
+    @JsonIgnore
     private String password;
 
     private String sosNo;
-    @Column(name = "hierarchy_order")
+    @Column(name = "heirarchy_order")
     private Integer hierarchyOrder;
 }
 

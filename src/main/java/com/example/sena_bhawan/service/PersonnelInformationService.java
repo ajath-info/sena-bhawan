@@ -9,6 +9,8 @@ public interface PersonnelInformationService {
 
     PersonnelInformation save(PersonnelInformation info);
 
+    PersonnelInformation update(Long id, PersonnelInformation updatedInfo);
+
     List<PersonnelInformation> getAll();
 
 

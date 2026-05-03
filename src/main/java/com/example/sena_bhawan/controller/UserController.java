@@ -10,9 +10,12 @@ import com.example.sena_bhawan.service.UserService;
 import com.example.sena_bhawan.service.AppointmentService;
 import com.example.sena_bhawan.service.OrbatService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -53,8 +56,14 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Deleted successfully");
+        response.put("success", 1);
+
+        return ResponseEntity.ok(response);
     }
 
     // ================= ROLES =================

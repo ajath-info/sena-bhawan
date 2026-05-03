@@ -24,6 +24,24 @@ public class PersonnelInformationServiceImpl implements PersonnelInformationServ
     }
 
     @Override
+    public PersonnelInformation update(Long id, PersonnelInformation updatedInfo) {
+        PersonnelInformation existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Personnel not found with id: " + id));
+
+        // update fields
+        existing.setPersonnelId(updatedInfo.getPersonnelId());
+        existing.setRank(updatedInfo.getRank());
+        existing.setFullName(updatedInfo.getFullName());
+        existing.setCaseType(updatedInfo.getCaseType());
+        existing.setCaseId(updatedInfo.getCaseId());
+        existing.setDateOfFiling(updatedInfo.getDateOfFiling());
+        existing.setCurrentStatus(updatedInfo.getCurrentStatus());
+        existing.setFinalOutcome(updatedInfo.getFinalOutcome());
+
+        return repository.save(existing);
+    }
+
+    @Override
     public List<PersonnelInformation> getAll() {
         return List.of();
     }

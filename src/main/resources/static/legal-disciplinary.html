@@ -210,6 +210,7 @@
                                 <th>Date Filed</th>
                                 <th>Status</th>
                                 <th>Outcome</th>
+                                <th>Action</th>
                                 '</thead>
                             <tbody id="recordsBody">
                             <tr>
@@ -232,8 +233,9 @@
 <script>
     const ARMY_NUMBERS_API = "http://localhost:6060/api/personnel/army-numbers";
     const SAVE_API = "http://localhost:6060/api/personnelinformation";
+    const UPDATE_API = "http://localhost:6060/api/personnelinformation";
     const GET_INFO_API = "http://localhost:6060/api/personnelinformation";
-
+    let editingRecordId = null;
     let selectedPersonnelId = null;
     let debounceTimer = null;
     let currentSearchTerm = "";
@@ -390,9 +392,39 @@
                     <td>${record.dateOfFiling || '-'}</td>
                     <td><span class="badge">${record.currentStatus || 'N/A'}</span></td>
                     <td>${record.finalOutcome || '-'}</td>
+                    <td>
+                        <button class="btn btn-secondary edit-btn"
+                            data-id="${record.id}"
+                            data-caseid="${record.caseId || ''}"
+                            data-casetype="${record.caseType || ''}"
+                            data-status="${record.currentStatus || ''}"
+                            data-date="${record.dateOfFiling || ''}"
+                            data-outcome="${record.finalOutcome || ''}">
+                            Edit
+                        </button>
+                    </td>
                 </tr>
             `).join("");
 
+            document.querySelectorAll(".edit-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+
+                    editingRecordId = btn.dataset.id;
+
+                    // fill form
+                    caseIdInput.value = btn.dataset.caseid;
+                    caseTypeInput.value = btn.dataset.casetype;
+                    currentStatusInput.value = btn.dataset.status;
+                    dateOfFilingInput.value = btn.dataset.date;
+                    finalOutcomeInput.value = btn.dataset.outcome;
+
+                    // change button text
+                    saveBtn.textContent = "Update Personnel";
+
+                    // scroll to form (optional)
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            });
         } catch (error) {
             console.error("Error fetching personnel information:", error);
             recordsBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading records</td></tr>';
@@ -430,22 +462,32 @@
             finalOutcome: finalOutcomeInput.value
         };
 
+        const method = editingRecordId ? "PUT" : "POST";
+        const url = editingRecordId
+            ? `${UPDATE_API}/${editingRecordId}`
+            : SAVE_API;
+
         try {
-            const response = await fetch(SAVE_API, {
-                method: "POST",
+            const response = await fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
-                alert("Record saved successfully!");
-                // Clear form
+
+                alert(editingRecordId ? "Updated successfully!" : "Saved successfully!");
+
+                // reset edit mode
+                editingRecordId = null;
+                saveBtn.textContent = "Save Personnel";
+
+                // clear form
                 caseIdInput.value = "";
                 caseTypeInput.value = "";
                 currentStatusInput.value = "";
                 dateOfFilingInput.value = "";
                 finalOutcomeInput.value = "";
-                // Refresh records table
                 await fetchPersonnelInformation(selectedPersonnelId);
             } else {
                 const error = await response.text();
