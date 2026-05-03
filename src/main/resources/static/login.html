@@ -281,10 +281,17 @@
                 sessionStorage.setItem("appointment", body.appointment || 'User');
 
                 // Redirect to dashboard
-                window.location.href = "/session.html";
+                window.location.href = "/dashboard-new.html";
               }
               else {
-                errorEl.textContent = body.error || 'Invalid credentials';
+                // Show specific error based on status
+                if (status === 401) {
+                  errorEl.textContent = '❌ Invalid username or password. Please try again.';
+                } else if (status === 400) {
+                  errorEl.textContent = '❌ Missing username or password.';
+                } else {
+                  errorEl.textContent = body.error || 'Login failed. Please try again.';
+                }
                 errorEl.style.display = 'block';
                 // Reset button
                 submitBtn.textContent = originalText;
@@ -293,7 +300,14 @@
             })
             .catch((err) => {
               console.error('Login error:', err);
-              errorEl.textContent = 'Server error. Try again.';
+
+              // Check if it's a network error (server not reachable)
+              if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+                errorEl.textContent = '⚠️ Cannot connect to server. Please check if the backend server is running.';
+              } else {
+                errorEl.textContent = '⚠️ Something went wrong. Please try again later.';
+              }
+
               errorEl.style.display = 'block';
               // Reset button
               submitBtn.textContent = originalText;
