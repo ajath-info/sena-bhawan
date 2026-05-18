@@ -529,6 +529,8 @@
 
         // Only show action buttons if we're in PENDING_APPROVAL tab
         const showActionButtons = (currentStatus === 'PENDING_APPROVAL');
+        const currentUser = getCurrentUser();
+        const isFinalApprover = currentUser?.roleId === 6;
 
         modalContent.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -602,14 +604,14 @@
          </table>
     </div>
 
-    ${showActionButtons ? `
+                ${showActionButtons ? `
         <div style="margin-top: 20px;">
-            <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back, Optional for Forward):</label>
+            <label for="modalRemark" style="font-weight: 600; display: block; margin-bottom: 5px;">Remarks (Required for Reject & Send Back${isFinalApprover ? '' : ', Optional for Forward'}):</label>
             <textarea id="modalRemark" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
         </div>
 
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px;">
-            <button class="btn btn-success" onclick="forwardPanelModal()">Forward</button>
+            <button class="btn btn-success" onclick="forwardPanelModal()">${isFinalApprover ? 'Final Approval' : 'Forward'}</button>
             <button class="btn btn-danger" onclick="rejectPanelModal()">Reject</button>
             <button class="btn btn-warning" onclick="sendBackPanelModal()" style="background: #f59e0b; color: white;">Send Back</button>
             <button class="btn btn-secondary" onclick="closeModal()">Close</button>
@@ -749,7 +751,8 @@
                 },
                 body: JSON.stringify({
                     userId: user?.userId || 1,
-                    remarks: remark
+                    remarks: remark,
+                    roleId: user?.roleId || 2  // ADD THIS LINE
                 })
             });
 

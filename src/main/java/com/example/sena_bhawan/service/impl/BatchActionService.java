@@ -69,7 +69,7 @@ public class BatchActionService {
             batch.setStatus("PENDING_APPROVAL");
             batch.setBatchStatus(true);
             message = String.format("Batch forwarded to next level (Movement %d -> %d)",
-                    originalMovementId, newMovementId);
+                    originalMovementId+1, newMovementId+1);
 
             log.info("Batch {} forwarded from movement {} to {}",
                     batchId, originalMovementId, newMovementId);
@@ -289,7 +289,7 @@ public class BatchActionService {
                 .movementId(batch.getMovementId())
                 .status("PENDING_APPROVAL")
                 .message(String.format("Batch sent back from movement %d to %d",
-                        currentMovementId, newMovementId))
+                        currentMovementId+1, newMovementId+1))
                 .build();
     }
 }
