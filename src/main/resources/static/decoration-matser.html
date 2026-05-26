@@ -539,7 +539,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="search-box" style="position: relative;">
-                    <input type="text" id="searchBox" placeholder="Search by Award Name..." autocomplete="off" />
+                    <input type="text" id="searchBox" placeholder="Search by Award Name or Decoration..." autocomplete="off" />
                     <span id="clearSearchBtn" class="clear-search" style="cursor: pointer; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: #f1f3f5; padding: 0 4px; border-radius: 30px;">✖</span>
                 </div>
                 <div id="searchStats" class="search-stats"></div>
@@ -720,7 +720,8 @@
         if (currentSearchTerm.trim() !== "") {
             const term = currentSearchTerm.trim().toLowerCase();
             filteredData = allDecorations.filter(item =>
-                item.awardName && item.awardName.toLowerCase().includes(term)
+                (item.awardName && item.awardName.toLowerCase().includes(term)) ||
+                (item.decoration && item.decoration.toLowerCase().includes(term))
             );
         }
 
@@ -744,7 +745,7 @@
                     <div style="text-align:center; padding: 48px 20px;">
                         <span style="font-size: 48px;">🔍</span>
                         <p style="margin-top: 12px; color:#6b7280;">
-                            ${currentSearchTerm ? `No decoration found with award name matching "${currentSearchTerm}"` : "No decorations available. Click + Add to get started!"}
+                            ${currentSearchTerm ? `No decoration found matching "${currentSearchTerm}" in Award Name or Decoration` : "No decorations available. Click + Add to get started!"}
                         </p>
                         ${currentSearchTerm ? `<button class="btn-primary" id="clearSearchEmptyBtn" style="margin-top: 16px; background:#4b5563;">Clear Search</button>` : ""}
                     </div>
