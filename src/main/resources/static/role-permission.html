@@ -10,6 +10,16 @@
       padding: 0;
       box-sizing: border-box;
     }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn:disabled:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
     body {
       font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f1f3f5;
@@ -505,6 +515,10 @@
   const ROLES_SUMMARY_API = "http://localhost:6060/api/roles/summary";
   const PERMISSIONS_API_BASE = "http://localhost:6060/api/roles";
 
+  let isDataChanged = false;        // Track if permissions have been modified
+  let isSaving = false;             // Prevent multiple save submissions
+  let currentRoleId = null;         // Track currently selected role ID
+
   let selectedRoleId = null;
   let currentPermissionsData = null;
   let originalPermissionsData = null;
@@ -628,6 +642,52 @@
     }
   }
 
+  // Update all save/apply button states
+  function updateSaveButtonState() {
+    const saveButtons = document.querySelectorAll('.btn-primary');
+    const applyButtons = document.querySelectorAll('.btn-primary.btn-small');
+
+    saveButtons.forEach(btn => {
+      if (btn.textContent.includes('Save') || btn.textContent.includes('Apply')) {
+        btn.disabled = isSaving || !isDataChanged;
+        btn.style.opacity = (isSaving || !isDataChanged) ? '0.5' : '1';
+        btn.style.cursor = (isSaving || !isDataChanged) ? 'not-allowed' : 'pointer';
+      }
+    });
+
+    // Also update Cancel/Reset buttons
+    const resetButtons = document.querySelectorAll('.btn-secondary');
+    resetButtons.forEach(btn => {
+      btn.disabled = isSaving;
+      btn.style.opacity = isSaving ? '0.5' : '1';
+      btn.style.cursor = isSaving ? 'not-allowed' : 'pointer';
+    });
+  }
+
+  // Check if permissions have changed from original
+  function checkForChanges() {
+    if (!selectedRoleId || !currentPermissionsData || !originalPermissionsData) {
+      isDataChanged = false;
+      updateSaveButtonState();
+      return;
+    }
+
+    let hasChanges = false;
+
+    // Compare current permissions with original
+    currentPermissionsData.modules.forEach((module, moduleIndex) => {
+      module.permissions.forEach((permission, permIndex) => {
+        const originalPerm = originalPermissionsData.modules[moduleIndex]?.permissions[permIndex];
+        if (originalPerm && permission.allowed !== originalPerm.allowed) {
+          hasChanges = true;
+        }
+      });
+    });
+
+    isDataChanged = hasChanges;
+    updateSaveButtonState();
+  }
+
   // 3. Select role
   function selectRole(card, role) {
     document.querySelectorAll(".role-card").forEach(c => c.classList.remove("selected"));
@@ -635,6 +695,11 @@
 
     selectedRoleId = role.roleId;
     roleNameDisplay.textContent = role.roleName;
+
+    // Reset change tracking when switching roles
+    isDataChanged = false;
+    isSaving = false;
+    updateSaveButtonState();
 
     permissionsContainer.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">Loading permissions...</div>';
     loadPermissions(role.roleId);
@@ -723,21 +788,26 @@ function deleteRole() {
 
   // 4. Load permissions
   function loadPermissions(roleId) {
+    currentRoleId = roleId;
+    isDataChanged = false;
+    updateSaveButtonState();
+
     fetch(`${PERMISSIONS_API_BASE}/${roleId}/permissions`)
-      .then(res => res.json())
-      .then(data => {
-        currentPermissionsData = data;
-        originalPermissionsData = JSON.parse(JSON.stringify(data));
-        renderPermissions(data);
-      })
-      .catch(err => {
-        permissionsContainer.innerHTML = `
-          <div style="text-align:center;padding:48px;color:#6b7280;">
-            <h3 style="color:#1f2937;">Failed to load permissions</h3>
-            <button class="btn btn-primary" onclick="loadPermissions(${roleId})" style="margin-top:16px;">🔄 Retry</button>
-          </div>
-        `;
-      });
+            .then(res => res.json())
+            .then(data => {
+              currentPermissionsData = data;
+              originalPermissionsData = JSON.parse(JSON.stringify(data));
+              renderPermissions(data);
+              checkForChanges(); // Initial check (should be false)
+            })
+            .catch(err => {
+              permissionsContainer.innerHTML = `
+        <div style="text-align:center;padding:48px;color:#6b7280;">
+          <h3 style="color:#1f2937;">Failed to load permissions</h3>
+          <button class="btn btn-primary" onclick="loadPermissions(${roleId})" style="margin-top:16px;">🔄 Retry</button>
+        </div>
+      `;
+            });
   }
 
   // 5. Render permissions
@@ -804,11 +874,14 @@ function deleteRole() {
         if (permission) {
           permission.allowed = !permission.allowed;
 
-          // 👈 REALTIME: Update role card permission count
+          // Update role card permission count
           const totalAllowed = currentPermissionsData.modules
-            .flatMap(m => m.permissions)
-            .filter(p => p.allowed).length;
+                  .flatMap(m => m.permissions)
+                  .filter(p => p.allowed).length;
           updateRoleCardPermissions(selectedRoleId, totalAllowed);
+
+          // Check if data has changed
+          checkForChanges();
 
           // Re-render permissions
           renderPermissions(currentPermissionsData);
@@ -831,6 +904,19 @@ function deleteRole() {
       return;
     }
 
+    if (isSaving) {
+      console.log("Save already in progress...");
+      return;
+    }
+
+    if (!isDataChanged) {
+      alert("No changes to save!");
+      return;
+    }
+
+    isSaving = true;
+    updateSaveButtonState(); // Disable save button
+
     const payload = { permissions: [] };
     currentPermissionsData.modules.forEach(module => {
       module.permissions.forEach(permission => {
@@ -847,44 +933,70 @@ function deleteRole() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-    .then(res => {
-      if (res.ok) {
-        alert('✅ Permissions saved successfully!');
-        originalPermissionsData = JSON.parse(JSON.stringify(currentPermissionsData));
-      } else {
-        throw new Error(`HTTP ${res.status}`);
-      }
-    })
-    .catch(err => {
-      alert('❌ Save failed: ' + err.message);
-    });
+            .then(res => {
+              if (res.ok) {
+                alert('✅ Permissions saved successfully!');
+                originalPermissionsData = JSON.parse(JSON.stringify(currentPermissionsData));
+                isDataChanged = false;  // Reset change flag
+                updateSaveButtonState(); // Update button states
+
+                // Update permission count on role card
+                const totalAllowed = currentPermissionsData.modules
+                        .flatMap(m => m.permissions)
+                        .filter(p => p.allowed).length;
+                updateRoleCardPermissions(selectedRoleId, totalAllowed);
+              } else {
+                throw new Error(`HTTP ${res.status}`);
+              }
+            })
+            .catch(err => {
+              alert('❌ Save failed: ' + err.message);
+            })
+            .finally(() => {
+              isSaving = false;
+              updateSaveButtonState(); // Re-enable buttons after completion
+            });
   }
 
   // 9. 👈 NEW FIXED RESET - Calls API + Refresh!
   function resetToDefault() {
-    if (!selectedRoleId || !confirm("Reset permissions to default? Page will refresh.")) {
+    if (!selectedRoleId || !confirm("Reset permissions to default? This will discard all unsaved changes.")) {
       return;
     }
 
-    // Call RESET API
+    if (isSaving) {
+      alert("Please wait, save operation in progress...");
+      return;
+    }
+
+    isSaving = true;
+    updateSaveButtonState();
+
     fetch(`${PERMISSIONS_API_BASE}/${selectedRoleId}/reset`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     })
-    .then(res => {
-      if (res.ok) {
-        console.log("✅ Reset API called successfully");
-        // 👈 PAGE REFRESH - Reloads everything fresh
-        window.location.reload();
-      } else {
-        throw new Error("Reset API failed");
-      }
-    })
-    .catch(err => {
-      console.error("Reset error:", err);
-      alert("Reset failed, refreshing anyway...");
-      window.location.reload();
-    });
+            .then(res => {
+              if (res.ok) {
+                console.log("✅ Reset API called successfully");
+                // Reload permissions instead of full page refresh
+                return loadPermissions(selectedRoleId);
+              } else {
+                throw new Error("Reset API failed");
+              }
+            })
+            .then(() => {
+              isDataChanged = false;
+              isSaving = false;
+              updateSaveButtonState();
+              alert("✅ Permissions reset to default!");
+            })
+            .catch(err => {
+              console.error("Reset error:", err);
+              alert("Reset failed. Please try again.");
+              isSaving = false;
+              updateSaveButtonState();
+            });
   }
 </script>
 

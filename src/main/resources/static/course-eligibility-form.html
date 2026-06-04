@@ -5,135 +5,247 @@
     <title>Course Eligibility / QR Setup - ARMY HRMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: "Inter", sans-serif;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f1f3f5;
             color: #1f2937;
         }
-        .container{display:flex;height:100vh}
-        .main{flex:1;padding:24px;overflow:auto}
-        .header h2{font-size:26px;font-weight:700}
-        .header p{color:#6b7280;margin-top:4px}
-        .card{background:#fff;border-radius:12px;padding:20px;margin-top:20px;border:1px solid #e5e7eb}
-        .card-title{font-size:18px;font-weight:700;margin-bottom:16px}
-        .label{font-weight:600;margin-bottom:6px;display:block}
-        .input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;font-size:14px}
-        textarea{min-height:90px}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-        .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-        .mt{margin-top:16px}
-        .info{background:#ecfdf5;border:1px solid #34d399;padding:12px;border-radius:8px;margin-top:12px;font-weight:600}
-        .rank-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;border:1px solid #e5e7eb;padding:12px;border-radius:8px}
-        .rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:6px}
-        .pills{display:flex;flex-wrap:wrap;gap:10px}
-        .pill{padding:8px 14px;border-radius:20px;border:1px solid #cfd6e0;background:#f7f9fc;cursor:pointer;user-select:none}
-        .pill.active{background:#065f46;color:#fff;border-color:#065f46}
-        .selected-box{margin-top:16px;padding:12px;background:#f1f4f8;border-radius:6px;display:none}
-        .actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}
-        .btn{padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer}
-        .btn-secondary{background:#fff;border:1px solid #065f46;color:#065f46}
-        .btn-primary{background:#065f46;color:#fff;border:none}
-        .section-divider{margin:20px 0;border-top:2px solid #e5e7eb}
-        .select2-container{width:100% !important;}
-        /* Multi-select Dropdowns using custom dropdown style */
-.grid-2.mt {
-    position: relative;
-}
-
-.dropdown {
-    position: relative;
-    width: 100%;
-}
-
-.dropdown-btn {
-    border: 1px solid #d1d5db;
-    padding: 10px 12px;
-    cursor: pointer;
-    background: #ffffff;
-    border-radius: 8px;
-    width: 100%;
-    text-align: left;
-    font-size: 14px;
-    position: relative;
-    z-index: 5;
-}
-
-.dropdown-btn:hover {
-    background: #f9fafb;
-}
-
-.dropdown-btn:focus {
-    outline: none;
-    border-color: #065f46;
-    box-shadow: 0 0 0 2px rgba(6, 95, 70, 0.1);
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin-top: 4px;
-    max-height: 250px;
-    overflow-y: auto;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    z-index: 1000;
-}
-
-.dropdown-content label {
-    display: block;
-    padding: 10px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f3f4f6;
-    transition: background 0.15s ease;
-}
-
-.dropdown-content label:last-child {
-    border-bottom: none;
-}
-
-.dropdown-content label:hover {
-    background: #f3f4f6;
-}
-
-.dropdown-content input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-}
-
-/* Ensure dropdowns have proper stacking context */
-.grid-2.mt:first-of-type {
-    position: relative;
-    z-index: 20;
-}
-
-.grid-2.mt:last-of-type {
-    position: relative;
-    z-index: 10;
-}
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .header p {
+            color: #6b7280;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s ease;
+        }
+        .card:first-of-type {
+            margin-top: 20px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1b4332;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #1b4332;
+            padding-left: 12px;
+        }
+        .label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+            color: #374151;
+        }
+        .input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1b4332;
+            box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
+        }
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .mt {
+            margin-top: 20px;
+        }
+        .info {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #065f46;
+        }
+        .pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pill {
+            padding: 8px 18px;
+            border-radius: 40px;
+            border: 1px solid #cfd6e0;
+            background: #f9fafb;
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .pill.active {
+            background: #1b4332;
+            color: #fff;
+            border-color: #1b4332;
+            box-shadow: 0 2px 6px rgba(27,67,50,0.2);
+        }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-top: 32px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .btn-secondary {
+            background: #fff;
+            border: 1px solid #1b4332;
+            color: #1b4332;
+        }
+        .btn-secondary:hover {
+            background: #f0fdf4;
+            transform: translateY(-1px);
+        }
+        .btn-primary {
+            background: #1b4332;
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #0f3324;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(27,67,50,0.2);
+        }
+        /* Custom multi-select dropdown styles */
+        .multiselect-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        .multiselect-btn {
+            width: 100%;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+            color: #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .multiselect-btn:hover {
+            border-color: #1b4332;
+        }
+        .multiselect-btn span:first-child {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .multiselect-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-top: 6px;
+            max-height: 280px;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .multiselect-dropdown-content label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+        .multiselect-dropdown-content label:hover {
+            background: #f0fdf4;
+        }
+        .multiselect-dropdown-content input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .dropdown-open .multiselect-dropdown-content {
+            display: block;
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
 <script src="auth.js"></script>
 <script src="logout.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <div class="container">
-    <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
     <aside class="sidebar" id="sidebarContainer">
-        <!-- Loading indicator (optional) -->
-        <div style="color: white; padding: 20px; text-align: center;">
-            Loading menu...
-        </div>
+        <div style="color: white; padding: 20px; text-align: center;">Loading menu...</div>
     </aside>
 
     <main class="main">
@@ -152,14 +264,13 @@
             <div class="info" id="courseInfo" style="display:none"></div>
         </div>
 
-        <!-- ELIGIBILITY CRITERIA -->
+        <!-- ELIGIBILITY CRITERIA CARD -->
         <div class="card">
             <div class="card-title">📋 Eligibility Criteria (QR)</div>
 
-            <!-- Date Filters -->
-            <div class="card mt">
+            <!-- Date Filters (Commission + Seniority only, DOB removed) -->
+            <div class="card" style="margin-top: 0; background: #fafcfb;">
                 <div class="card-title">📅 Date Filters</div>
-
                 <div class="grid-2">
                     <div>
                         <label class="label">Commission Date From</label>
@@ -170,7 +281,6 @@
                         <input type="date" id="commissionTo" class="input">
                     </div>
                 </div>
-
                 <div class="grid-2 mt">
                     <div>
                         <label class="label">Seniority Date From</label>
@@ -181,51 +291,64 @@
                         <input type="date" id="seniorityTo" class="input">
                     </div>
                 </div>
+            </div>
 
-                <div class="grid-2 mt">
-                    <div>
-                        <label class="label">Date of Birth From</label>
-                        <input type="date" id="dobFrom" class="input">
+            <!-- Ranks: Multi-select Dropdown -->
+            <div class="card mt" style="background: #fafcfb;">
+                <div class="card-title">🎖 Select Ranks</div>
+                <div class="multiselect-dropdown" id="ranksDropdownContainer">
+                    <div class="multiselect-btn" id="ranksDropdownBtn">
+                        <span id="ranksSelectedText">Select ranks</span>
+                        <span class="dropdown-arrow">▼</span>
                     </div>
-                    <div>
-                        <label class="label">Date of Birth To</label>
-                        <input type="date" id="dobTo" class="input">
-                    </div>
+                    <div class="multiselect-dropdown-content" id="ranksDropdownList"></div>
                 </div>
             </div>
 
-            <!-- Ranks Selection -->
-            <div class="card mt">
-                <div class="card-title">🎖 Select Ranks</div>
-                <div class="rank-list" id="rankList">Loading ranks…</div>
-            </div>
-
-            <!-- Units Selection -->
-            <div class="card mt">
+            <!-- Units (Arms/Services): Multi-select Dropdown -->
+            <div class="card mt" style="background: #fafcfb;">
                 <div class="card-title">🏢 Select Arms / Services</div>
-                <div class="rank-list" id="unitList">Loading units…</div>
+                <div class="multiselect-dropdown" id="unitsDropdownContainer">
+                    <div class="multiselect-btn" id="unitsDropdownBtn">
+                        <span id="unitsSelectedText">Select arms/services</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="multiselect-dropdown-content" id="unitsDropdownList"></div>
+                </div>
             </div>
 
-            <!-- Posting Type Selection -->
-            <div class="card mt">
+            <!-- Posting Types: Multi-select Dropdown -->
+            <div class="card mt" style="background: #fafcfb;">
                 <div class="card-title">📌 Posting Types</div>
-                <div class="rank-list" id="postingTypeList">Loading posting types…</div>
+                <div class="multiselect-dropdown" id="postingTypesDropdownContainer">
+                    <div class="multiselect-btn" id="postingTypesDropdownBtn">
+                        <span id="postingTypesSelectedText">Select posting types</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                    <div class="multiselect-dropdown-content" id="postingTypesDropdownList"></div>
+                </div>
             </div>
 
-            <!-- Multi-select Dropdowns using /api/dropdown/{type} -->
+            <!-- Existing dropdowns: Grading, Educational, Medical, Establishment -->
             <div class="grid-2 mt">
                 <div>
                     <label class="label">Minimum Course Grading</label>
-                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="grading">Select Options</div>
-                        <div class="dropdown-content" id="dropdown-grading" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    <div class="multiselect-dropdown" id="gradingDropdownContainer">
+                        <div class="multiselect-btn" id="gradingDropdownBtn">
+                            <span id="gradingSelectedText">Select options</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="multiselect-dropdown-content" id="gradingDropdownList"></div>
                     </div>
                 </div>
                 <div>
                     <label class="label">Educational Qualifications</label>
-                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="edu">Select Options</div>
-                        <div class="dropdown-content" id="dropdown-edu" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    <div class="multiselect-dropdown" id="eduDropdownContainer">
+                        <div class="multiselect-btn" id="eduDropdownBtn">
+                            <span id="eduSelectedText">Select options</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="multiselect-dropdown-content" id="eduDropdownList"></div>
                     </div>
                 </div>
             </div>
@@ -233,22 +356,28 @@
             <div class="grid-2 mt">
                 <div>
                     <label class="label">Medical Categories</label>
-                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="medical">Select Options</div>
-                        <div class="dropdown-content" id="dropdown-medical" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    <div class="multiselect-dropdown" id="medicalDropdownContainer">
+                        <div class="multiselect-btn" id="medicalDropdownBtn">
+                            <span id="medicalSelectedText">Select options</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="multiselect-dropdown-content" id="medicalDropdownList"></div>
                     </div>
                 </div>
                 <div>
                     <label class="label">Establishment Types</label>
-                    <div class="dropdown" tabindex="0" style="position:relative; width:100%;">
-                        <div class="dropdown-btn" style="border:1px solid #ccc; padding:10px; cursor:pointer; background:#f9f9f9; border-radius:8px;" data-target="estab">Select Options</div>
-                        <div class="dropdown-content" id="dropdown-estab" style="display:none; position:absolute; width:100%; border:1px solid #ccc; background:white; max-height:200px; overflow-y:auto; z-index:10; border-radius:8px; margin-top:2px;"></div>
+                    <div class="multiselect-dropdown" id="estabDropdownContainer">
+                        <div class="multiselect-btn" id="estabDropdownBtn">
+                            <span id="estabSelectedText">Select options</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="multiselect-dropdown-content" id="estabDropdownList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Remarks -->
-            <div class="card mt">
+            <!-- Remarks Section (empty placeholder, no default text) -->
+            <div class="card mt" style="background: #fafcfb;">
                 <div class="card-title">📝 Remarks</div>
                 <div class="pills" id="remarksPills">
                     <div class="pill" data-value="Taken Off">Taken Off</div>
@@ -259,7 +388,7 @@
 
             <div class="mt">
                 <label class="label">Additional Remarks</label>
-                <textarea id="additionalRemarks" class="input">Must have field tenure</textarea>
+                <textarea id="additionalRemarks" class="input" placeholder="Enter any additional remarks..."></textarea>
             </div>
 
             <div class="actions">
@@ -269,338 +398,125 @@
         </div>
     </main>
 </div>
+
 <script src="sidebar.js"></script>
 <script>
-    // State management
+    // ----------------------------- STATE MANAGEMENT ---------------------------------
     let selectedCourseId = null;
+
+    // Multi-select arrays
     let selectedRankIds = [];
     let selectedUnitIds = [];
     let selectedPostingTypeIds = [];
-    let selectedRemarks = [];
     let gradingSelected = [];
     let eduSelected = [];
-    let medicalSelected = [];
+    let medicalSelected = [];   // strings for medical categories
     let estabSelected = [];
+    let selectedRemarks = [];
 
-    // Custom dropdown toggle functionality
-    document.addEventListener('click', function(e) {
-        // Close all dropdowns if click outside
-        const isDropdown = e.target.closest('.dropdown');
-        if (!isDropdown) {
-            document.querySelectorAll('.dropdown-content').forEach(dd => dd.style.display = 'none');
+    // DOM elements for dynamic dropdowns
+    let ranksData = [];
+    let unitsData = [];
+    let postingTypesData = [];
+    let gradingData = [];
+    let eduData = [];
+    let medicalData = [];
+    let estabData = [];
+
+    // Helper: Close all custom dropdowns
+    function closeAllDropdowns() {
+        document.querySelectorAll('.multiselect-dropdown').forEach(dd => {
+            dd.classList.remove('dropdown-open');
+        });
+    }
+
+    // Helper: initialize generic multi-select dropdown
+    function setupDropdown(containerId, items, selectedArray, selectedTextSpanId, onItemToggle) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const btn = container.querySelector('.multiselect-btn');
+        const content = container.querySelector('.multiselect-dropdown-content');
+
+        // Remove old listeners and re-render
+        if (btn) {
+            btn.removeEventListener('click', btn._listener);
+            const clickHandler = (e) => {
+                e.stopPropagation();
+                closeAllDropdowns();
+                container.classList.toggle('dropdown-open');
+            };
+            btn.addEventListener('click', clickHandler);
+            btn._listener = clickHandler;
         }
-    });
 
-    // Initialize dropdown buttons
-    document.querySelectorAll('.dropdown-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const targetKey = this.dataset.target;
-            const content = document.getElementById(`dropdown-${targetKey}`);
+        function renderContent() {
             if (!content) return;
-
-            // Close all other dropdowns
-            document.querySelectorAll('.dropdown-content').forEach(dd => {
-                if (dd !== content) dd.style.display = 'none';
-            });
-
-            // Toggle current
-            content.style.display = content.style.display === 'block' ? 'none' : 'block';
-        });
-    });
-
-    // Function to populate dropdown with checkboxes
-    function populateDropdown(dropdownId, items, selectedArrayRef) {
-        const container = document.getElementById(dropdownId);
-        if (!container) return;
-        container.innerHTML = '';
-
-        items.forEach(item => {
-            const label = document.createElement('label');
-            label.style.display = 'block';
-            label.style.padding = '8px';
-            label.style.cursor = 'pointer';
-            label.style.userSelect = 'none';
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = item.id;
-            checkbox.checked = selectedArrayRef.includes(item.id);
-            checkbox.style.marginRight = '8px';
-
-            // Handle checkbox change
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const val = Number(this.value);
-                if (this.checked) {
-                    if (!selectedArrayRef.includes(val)) {
-                        selectedArrayRef.push(val);
-                    }
-                } else {
-                    const idx = selectedArrayRef.indexOf(val);
-                    if (idx > -1) {
-                        selectedArrayRef.splice(idx, 1);
-                    }
-                }
-                // Update button text
-                updateDropdownButtonText(dropdownId);
-            });
-
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(` ${item.name}`));
-
-            // Prevent dropdown from closing when clicking on label
-            label.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-
-            container.appendChild(label);
-        });
-    }
-
-    function updateDropdownButtonText(dropdownId) {
-        let target = '';
-        if (dropdownId.includes('grading')) target = 'grading';
-        else if (dropdownId.includes('edu')) target = 'edu';
-        else if (dropdownId.includes('medical')) target = 'medical';
-        else if (dropdownId.includes('estab')) target = 'estab';
-        if (!target) return;
-
-        const btn = document.querySelector(`.dropdown-btn[data-target="${target}"]`);
-        if (!btn) return;
-
-        let selectedArray = [];
-        if (target === 'grading') selectedArray = gradingSelected;
-        else if (target === 'edu') selectedArray = eduSelected;
-        else if (target === 'medical') selectedArray = medicalSelected;
-        else if (target === 'estab') selectedArray = estabSelected;
-
-        btn.innerText = selectedArray.length === 0 ? 'Select Options' : `${selectedArray.length} selected`;
-    }
-
-    // Initialize all event listeners and data loading
-    document.addEventListener('DOMContentLoaded', function() {
-        loadCourses();
-        loadRanks();
-        loadUnits();
-        loadPostingTypes();
-        loadAllDropdowns();
-        initializePillListeners();
-        initializeSelect2();
-
-        // Re-attach dropdown button listeners after content is loaded
-        setTimeout(function() {
-            document.querySelectorAll('.dropdown-btn').forEach(btn => {
-                // Remove existing listeners and add new ones
-                btn.replaceWith(btn.cloneNode(true));
-            });
-
-            // Re-attach click listeners
-            document.querySelectorAll('.dropdown-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
+            content.innerHTML = '';
+            if (!items || items.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.padding = '12px';
+                emptyMsg.style.color = '#9ca3af';
+                emptyMsg.textContent = 'No options available';
+                content.appendChild(emptyMsg);
+                return;
+            }
+            items.forEach(item => {
+                const label = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                const isChecked = selectedArray.some(v => v === item.id);
+                cb.checked = isChecked;
+                cb.value = item.id;
+                cb.addEventListener('change', (e) => {
                     e.stopPropagation();
-                    const targetKey = this.dataset.target;
-                    const content = document.getElementById(`dropdown-${targetKey}`);
-                    if (!content) return;
-
-                    // Close all other dropdowns
-                    document.querySelectorAll('.dropdown-content').forEach(dd => {
-                        if (dd !== content) dd.style.display = 'none';
-                    });
-
-                    // Toggle current
-                    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-                });
-            });
-        }, 500); // Small delay to ensure DOM is ready
-    });
-
-    function initializeSelect2() {
-        $('.select2-multi').select2({
-            placeholder: 'Select options',
-            allowClear: true,
-            width: '100%'
-        });
-    }
-
-    // Load all dropdown data from the new API
-    // Load all dropdown data from the new API
-    function loadAllDropdowns() {
-        console.log('Loading all dropdowns...');
-
-        // Load Course Grading
-        fetch('http://localhost:6060/api/dropdown/COURSE_GRADE')
-            .then(r => {
-                if (!r.ok) throw new Error('Failed to load course grades');
-                return r.json();
-            })
-            .then(data => {
-                console.log('Course grades loaded:', data);
-                if (data && data.length > 0) {
-                    populateDropdown('dropdown-grading', data, gradingSelected);
-                } else {
-                    console.warn('No course grades data received');
-                    document.getElementById('dropdown-grading').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
-                }
-            })
-            .catch(e => {
-                console.error('Error loading grading:', e);
-                document.getElementById('dropdown-grading').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load course grades</div>';
-            });
-
-        // Load Educational Qualifications
-        fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS')
-            .then(r => {
-                if (!r.ok) throw new Error('Failed to load qualifications');
-                return r.json();
-            })
-            .then(data => {
-                console.log('Educational qualifications loaded:', data);
-                if (data && data.length > 0) {
-                    populateDropdown('dropdown-edu', data, eduSelected);
-                } else {
-                    console.warn('No educational qualifications data received');
-                    document.getElementById('dropdown-edu').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
-                }
-            })
-            .catch(e => {
-                console.error('Error loading edu:', e);
-                document.getElementById('dropdown-edu').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load educational qualifications</div>';
-            });
-
-        // Load Medical Categories from master/filter endpoint
-        fetch('http://localhost:6060/api/master/filter/medical-category')
-            .then(r => {
-                if (!r.ok) throw new Error('Failed to load medical categories');
-                return r.json();
-            })
-            .then(data => {
-                console.log('Medical categories loaded:', data);
-                // Filter out null values and keep the actual medical category strings
-                const categories = data
-                    .filter(cat => cat !== null && cat !== '') // Remove null/empty values
-                    .map((cat, index) => ({
-                        id: cat,  // Use the actual medical category string as ID
-                        name: cat // Use the actual medical category string as name
-                    }));
-
-                if (categories && categories.length > 0) {
-                    populateMedicalDropdown('dropdown-medical', categories, medicalSelected);
-                } else {
-                    console.warn('No medical categories data received');
-                    document.getElementById('dropdown-medical').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
-                }
-            })
-            .catch(e => {
-                console.error('Error loading medical categories:', e);
-                document.getElementById('dropdown-medical').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load medical categories</div>';
-            });
-
-        // Load Establishment Types
-        fetch('http://localhost:6060/api/dropdown/ESTABLISHMENT')
-            .then(r => {
-                if (!r.ok) throw new Error('Failed to load establishment types');
-                return r.json();
-            })
-            .then(data => {
-                console.log('Establishment types loaded:', data);
-                if (data && data.length > 0) {
-                    populateDropdown('dropdown-estab', data, estabSelected);
-                } else {
-                    console.warn('No establishment types data received');
-                    document.getElementById('dropdown-estab').innerHTML = '<div style="padding: 10px; color: #6b7280;">No options available</div>';
-                }
-            })
-            .catch(e => {
-                console.error('Error loading estab:', e);
-                document.getElementById('dropdown-estab').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load establishment types</div>';
-            });
-    }
-
-    function populateMedicalDropdown(dropdownId, items, selectedArrayRef) {
-        const container = document.getElementById(dropdownId);
-        if (!container) return;
-        container.innerHTML = '';
-
-        items.forEach(item => {
-            const label = document.createElement('label');
-            label.style.display = 'block';
-            label.style.padding = '8px';
-            label.style.cursor = 'pointer';
-            label.style.userSelect = 'none';
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = item.id; // This will be the medical category string
-            checkbox.checked = selectedArrayRef.includes(item.id);
-            checkbox.style.marginRight = '8px';
-
-            // Handle checkbox change for medical categories
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                const val = this.value; // This is the medical category string
-                if (this.checked) {
-                    if (!selectedArrayRef.includes(val)) {
-                        selectedArrayRef.push(val);
+                    const val = item.id;
+                    if (cb.checked) {
+                        if (!selectedArray.some(v => v === val)) selectedArray.push(val);
+                    } else {
+                        const idx = selectedArray.findIndex(v => v === val);
+                        if (idx !== -1) selectedArray.splice(idx, 1);
                     }
-                } else {
-                    const idx = selectedArrayRef.indexOf(val);
-                    if (idx > -1) {
-                        selectedArrayRef.splice(idx, 1);
-                    }
-                }
-                // Update button text
-                updateDropdownButtonText(dropdownId);
-            });
-
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(` ${item.name}`));
-
-            // Prevent dropdown from closing when clicking on label
-            label.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-
-            container.appendChild(label);
-        });
-    }
-
-
-    // Generic function to load dropdown data from /api/dropdown/{type}
-    function loadDropdown(type, elementId) {
-        const select = document.getElementById(elementId);
-        if (!select) return;
-
-        fetch(`http://localhost:6060/api/dropdown/${type}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`Failed to load ${type} dropdown`);
-                return response.json();
-            })
-            .then(data => {
-                select.innerHTML = '';
-                data.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.name;
-                    select.appendChild(option);
+                    if (onItemToggle) onItemToggle(selectedArray);
+                    updateSelectedText(selectedTextSpanId, selectedArray);
                 });
-                $(`#${elementId}`).trigger('change');
-            })
-            .catch(error => {
-                console.error(`Error loading ${type} dropdown:`, error);
-                select.innerHTML = '<option value="">Failed to load options</option>';
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(` ${item.name}`));
+                content.appendChild(label);
             });
+        }
+
+        function updateSelectedText(spanId, arr) {
+            const span = document.getElementById(spanId);
+            if (span) {
+                if (arr.length === 0) span.innerText = spanId.includes('ranks') ? 'Select ranks' :
+                    (spanId.includes('units') ? 'Select arms/services' :
+                        (spanId.includes('posting') ? 'Select posting types' : 'Select options'));
+                else span.innerText = `${arr.length} selected`;
+            }
+        }
+
+        renderContent();
+        updateSelectedText(selectedTextSpanId, selectedArray);
     }
 
-    // Load Courses
+    // Global function to refresh all dropdowns after data loads
+    function refreshAllDropdowns() {
+        setupDropdown('ranksDropdownContainer', ranksData, selectedRankIds, 'ranksSelectedText', null);
+        setupDropdown('unitsDropdownContainer', unitsData, selectedUnitIds, 'unitsSelectedText', null);
+        setupDropdown('postingTypesDropdownContainer', postingTypesData, selectedPostingTypeIds, 'postingTypesSelectedText', null);
+        setupDropdown('gradingDropdownContainer', gradingData, gradingSelected, 'gradingSelectedText', null);
+        setupDropdown('eduDropdownContainer', eduData, eduSelected, 'eduSelectedText', null);
+
+        // Medical special: items use object with id/name (id same as string)
+        const medicalItems = medicalData.map(m => ({ id: m.id, name: m.name }));
+        setupDropdown('medicalDropdownContainer', medicalItems, medicalSelected, 'medicalSelectedText', null);
+        setupDropdown('estabDropdownContainer', estabData, estabSelected, 'estabSelectedText', null);
+    }
+
+    // ---------- API LOADERS ----------
     function loadCourses() {
         fetch('http://localhost:6060/api/course')
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to load courses');
-                return response.json();
-            })
+            .then(res => res.ok ? res.json() : Promise.reject('Courses API failed'))
             .then(data => {
                 const courseSelect = document.getElementById('courseSelect');
                 courseSelect.innerHTML = '<option value="">Select Course</option>';
@@ -612,398 +528,145 @@
                     courseSelect.appendChild(option);
                 });
             })
-            .catch(error => {
-                console.error('Error loading courses:', error);
-                alert('Failed to load courses');
-            });
+            .catch(err => { console.error(err); alert('Failed to load courses'); });
     }
 
-    // Course selection handler - NOW WITH AUTO-LOAD
-    document.getElementById('courseSelect').addEventListener('change', function() {
-        if (!this.value) {
-            document.getElementById('courseInfo').style.display = 'none';
-            resetForm(); // Reset all fields when no course is selected
-            return;
-        }
+    function loadRanks() {
+        return fetch('http://localhost:6060/api/dropdown/RANK')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { ranksData = data.map(r => ({ id: r.id, name: r.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); ranksData = []; refreshAllDropdowns(); });
+    }
 
-        const selectedOption = this.options[this.selectedIndex];
-        const course = JSON.parse(selectedOption.dataset.course);
-        selectedCourseId = course.srno;
+    function loadUnits() {
+        return fetch('http://localhost:6060/api/dropdown/UNIT_TYPE')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { unitsData = data.map(u => ({ id: u.id, name: u.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); unitsData = []; refreshAllDropdowns(); });
+    }
 
-        const courseInfo = document.getElementById('courseInfo');
-        courseInfo.style.display = 'block';
-        courseInfo.innerHTML = `
-            Selected: <b>${course.courseName}</b><br>
-            Location: ${course.location || 'N/A'} |
-            Duration: ${course.duration || 'N/A'} Weeks
-        `;
+    function loadPostingTypes() {
+        return fetch('http://localhost:6060/api/dropdown/POST_TYPES')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { postingTypesData = data.map(p => ({ id: p.id, name: p.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); postingTypesData = []; refreshAllDropdowns(); });
+    }
 
-        // AUTO-LOAD eligibility data when course is selected
-        loadEligibilityForCourse(selectedCourseId);
-    });
+    function loadGrading() {
+        return fetch('http://localhost:6060/api/dropdown/COURSE_GRADE')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { gradingData = data.map(g => ({ id: g.id, name: g.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); gradingData = []; refreshAllDropdowns(); });
+    }
 
-    // Function to reset form
+    function loadEducational() {
+        return fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { eduData = data.map(e => ({ id: e.id, name: e.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); eduData = []; refreshAllDropdowns(); });
+    }
+
+    function loadMedical() {
+        return fetch('http://localhost:6060/api/master/filter/medical-category')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => {
+                const filtered = data.filter(cat => cat && cat !== '').map((cat, idx) => ({ id: cat, name: cat }));
+                medicalData = filtered;
+                refreshAllDropdowns();
+            })
+            .catch(err => { console.error(err); medicalData = []; refreshAllDropdowns(); });
+    }
+
+    function loadEstablishment() {
+        return fetch('http://localhost:6060/api/dropdown/ESTABLISHMENT')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => { estabData = data.map(e => ({ id: e.id, name: e.name })); refreshAllDropdowns(); })
+            .catch(err => { console.error(err); estabData = []; refreshAllDropdowns(); });
+    }
+
+    async function loadAllMasterData() {
+        await Promise.all([loadRanks(), loadUnits(), loadPostingTypes(), loadGrading(), loadEducational(), loadMedical(), loadEstablishment()]);
+    }
+
+    // Reset form (clears all selections)
     function resetForm() {
-        // reset custom dropdown selections
+        selectedRankIds = [];
+        selectedUnitIds = [];
+        selectedPostingTypeIds = [];
         gradingSelected = [];
         eduSelected = [];
         medicalSelected = [];
         estabSelected = [];
-        selectedRankIds = [];
+        selectedRemarks = [];
 
-        // Update dropdown buttons
-        document.querySelectorAll('.dropdown-btn').forEach(btn => {
-            btn.innerText = 'Select Options';
-        });
-
-        // Reset checkboxes in dropdowns
-        document.querySelectorAll('.dropdown-content input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
-
-        // Reset date fields
         document.getElementById('commissionFrom').value = '';
         document.getElementById('commissionTo').value = '';
         document.getElementById('seniorityFrom').value = '';
         document.getElementById('seniorityTo').value = '';
-        document.getElementById('dobFrom').value = '';
-        document.getElementById('dobTo').value = '';
-
-        // Reset additional remarks
         document.getElementById('additionalRemarks').value = '';
 
-        // Reset checkboxes
-        document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
-        document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
-        document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
-        document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
-
-        // Reset selected arrays
-        selectedRankIds = [];
-        selectedUnitIds = [];
-        selectedPostingTypeIds = [];
-
-        // Reset multi-select dropdowns
-        $('#minCourseGrading').val([]).trigger('change');
-        $('#educationalQualifications').val([]).trigger('change');
-        $('#medicalCategories').val([]).trigger('change');
-        $('#establishmentTypes').val([]).trigger('change');
-
-        // Reset remarks pills
-        selectedRemarks = [];
+        // Reset pills
         document.querySelectorAll('#remarksPills .pill').forEach(pill => {
             pill.classList.remove('active');
         });
+
+        refreshAllDropdowns();
     }
 
-    // Function to load eligibility data for a course
-    function loadEligibilityForCourse(courseId) {
-        fetch(`http://localhost:6060/api/eligibility/course/${courseId}`)
-            .then(response => {
-                if (response.status === 404) {
-                    console.log('No existing eligibility found for this course');
-                    resetForm(); // Reset form if no data exists
-                    return null;
-                }
-                if (!response.ok) throw new Error('Failed to load eligibility');
-                return response.json();
-            })
-            .then(data => {
-                if (data) {
-                    populateForm(data);
-                    console.log('Eligibility data auto-loaded successfully');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading eligibility:', error);
-                resetForm(); // Reset on error as well
-            });
-    }
-
-    // Populate form with existing data
+    // Populate form from eligibility data
     function populateForm(data) {
-        // Custom dropdowns
-        gradingSelected = data.minCourseGrading ? data.minCourseGrading.map(id => Number(id)) : [];
-        eduSelected = data.educationalQualifications ? data.educationalQualifications.map(id => Number(id)) : [];
-
-        // For medical categories - they are strings, not numbers
-        medicalSelected = data.medicalCategories ? [...data.medicalCategories] : [];
-        estabSelected = data.establishmentTypes ? data.establishmentTypes.map(id => Number(id)) : [];
-
-        // Reload dropdowns to reflect selections
-        loadAllDropdowns();
-
-        document.querySelector('.dropdown-btn[data-target="grading"]').innerText = gradingSelected.length ? gradingSelected.length + ' selected' : 'Select Options';
-        document.querySelector('.dropdown-btn[data-target="edu"]').innerText = eduSelected.length ? eduSelected.length + ' selected' : 'Select Options';
-        document.querySelector('.dropdown-btn[data-target="medical"]').innerText = medicalSelected.length ? medicalSelected.length + ' selected' : 'Select Options';
-        document.querySelector('.dropdown-btn[data-target="estab"]').innerText = estabSelected.length ? estabSelected.length + ' selected' : 'Select Options';
-
-        // Date fields
+        if (!data) return;
+        // Dates
         document.getElementById('commissionFrom').value = data.commissionDateFrom || '';
         document.getElementById('commissionTo').value = data.commissionDateTo || '';
         document.getElementById('seniorityFrom').value = data.seniorityDateFrom || '';
         document.getElementById('seniorityTo').value = data.seniorityDateTo || '';
-        document.getElementById('dobFrom').value = data.dobFrom || '';
-        document.getElementById('dobTo').value = data.dobTo || '';
-
-        // Additional remarks
         document.getElementById('additionalRemarks').value = data.additionalRemarks || '';
 
         // Ranks
-        if (data.rankIds && data.rankIds.length > 0) {
-            selectedRankIds = data.rankIds.map(id => Number(id));
-            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedRankIds.includes(Number(cb.value));
-            });
-        } else {
-            selectedRankIds = [];
-            document.querySelectorAll('#rankList input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-        }
-
+        selectedRankIds = data.rankIds ? data.rankIds.map(id => Number(id)) : [];
         // Units
-        if (data.unitIds && data.unitIds.length > 0) {
-            selectedUnitIds = data.unitIds;
-            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedUnitIds.includes(Number(cb.value));
-            });
-        } else {
-            selectedUnitIds = [];
-            document.querySelectorAll('#unitList input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-        }
-
+        selectedUnitIds = data.unitIds ? data.unitIds.map(id => Number(id)) : [];
         // Posting Types
-        if (data.postingTypeIds && data.postingTypeIds.length > 0) {
-            selectedPostingTypeIds = data.postingTypeIds;
-            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedPostingTypeIds.includes(Number(cb.value));
-            });
-        } else {
-            selectedPostingTypeIds = [];
-            document.querySelectorAll('#postingTypeList input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-        }
-
-        // Multi-select dropdowns - set values by IDs
-        if (data.minCourseGrading && data.minCourseGrading.length > 0) {
-            $('#minCourseGrading').val(data.minCourseGrading.map(id => String(id))).trigger('change');
-        } else {
-            $('#minCourseGrading').val([]).trigger('change');
-        }
-
-        if (data.educationalQualifications && data.educationalQualifications.length > 0) {
-            $('#educationalQualifications').val(data.educationalQualifications.map(id => String(id))).trigger('change');
-        } else {
-            $('#educationalQualifications').val([]).trigger('change');
-        }
-
-        // For medical categories - they are strings, so no need to convert
-        if (data.medicalCategories && data.medicalCategories.length > 0) {
-            $('#medicalCategories').val(data.medicalCategories).trigger('change');
-        } else {
-            $('#medicalCategories').val([]).trigger('change');
-        }
-
-        if (data.establishmentTypes && data.establishmentTypes.length > 0) {
-            $('#establishmentTypes').val(data.establishmentTypes.map(id => String(id))).trigger('change');
-        } else {
-            $('#establishmentTypes').val([]).trigger('change');
-        }
-
-        // Remarks
-        if (data.remarks && data.remarks.length > 0) {
+        selectedPostingTypeIds = data.postingTypeIds ? data.postingTypeIds.map(id => Number(id)) : [];
+        // Grading + Edu
+        gradingSelected = data.minCourseGrading ? data.minCourseGrading.map(id => Number(id)) : [];
+        eduSelected = data.educationalQualifications ? data.educationalQualifications.map(id => Number(id)) : [];
+        // Medical (strings)
+        medicalSelected = data.medicalCategories ? [...data.medicalCategories] : [];
+        // Establishment
+        estabSelected = data.establishmentTypes ? data.establishmentTypes.map(id => Number(id)) : [];
+        // Remarks pills
+        if (data.remarks && data.remarks.length) {
             selectedRemarks = data.remarks;
             document.querySelectorAll('#remarksPills .pill').forEach(pill => {
-                pill.classList.toggle('active', data.remarks.includes(pill.dataset.value));
+                const val = pill.dataset.value;
+                if (selectedRemarks.includes(val)) pill.classList.add('active');
+                else pill.classList.remove('active');
             });
         } else {
             selectedRemarks = [];
-            document.querySelectorAll('#remarksPills .pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
+            document.querySelectorAll('#remarksPills .pill').forEach(p => p.classList.remove('active'));
         }
+
+        refreshAllDropdowns();
     }
 
-    // Load Ranks
-    function loadRanks() {
-        fetch('http://localhost:6060/api/dropdown/RANK')
+    function loadEligibilityForCourse(courseId) {
+        fetch(`http://localhost:6060/api/eligibility/course/${courseId}`)
             .then(response => {
-                if (!response.ok) throw new Error('Failed to load ranks');
+                if (response.status === 404) { resetForm(); return null; }
+                if (!response.ok) throw new Error('Failed to fetch eligibility');
                 return response.json();
             })
-            .then(ranks => {
-                const rankList = document.getElementById('rankList');
-                rankList.innerHTML = '';
-
-                if (!ranks || ranks.length === 0) {
-                    rankList.innerHTML = '<div style="padding: 10px; color: #666;">No ranks available</div>';
-                    return;
-                }
-
-                ranks.forEach(rank => {
-                    const label = document.createElement('label');
-                    label.className = 'rank-item';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = rank.id;
-                    checkbox.checked = selectedRankIds.includes(rank.id);
-
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            if (!selectedRankIds.includes(rank.id)) {
-                                selectedRankIds.push(rank.id);
-                            }
-                        } else {
-                            selectedRankIds = selectedRankIds.filter(id => id !== rank.id);
-                        }
-                    });
-
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${rank.name}`)); // Changed from rank.rank to rank.name
-                    rankList.appendChild(label);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading ranks:', error);
-                document.getElementById('rankList').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load ranks</div>';
-
-                // Optional: Add mock data for testing
-                addMockRanks();
-            });
+            .then(data => { if (data) populateForm(data); })
+            .catch(err => { console.error(err); resetForm(); });
     }
-
-    // Load Units
-    // Load Units from ORBAT endpoint
-    function loadUnits() {
-        fetch('http://localhost:6060/api/dropdown/UNIT_TYPE')
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to load units');
-                return response.json();
-            })
-            .then(units => {
-                const unitList = document.getElementById('unitList');
-                unitList.innerHTML = '';
-
-                if (!units || units.length === 0) {
-                    unitList.innerHTML = '<div style="padding: 10px; color: #666;">No units available</div>';
-                    return;
-                }
-
-                units.forEach(unit => {
-                    const label = document.createElement('label');
-                    label.className = 'rank-item';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = unit.id;
-
-                    // Check if this unit is already selected (for when populating existing data)
-                    checkbox.checked = selectedUnitIds.includes(unit.id);
-
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            if (!selectedUnitIds.includes(unit.id)) {
-                                selectedUnitIds.push(unit.id);
-                            }
-                        } else {
-                            selectedUnitIds = selectedUnitIds.filter(id => id !== unit.id);
-                        }
-                    });
-
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${unit.name}`));
-                    unitList.appendChild(label);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading units:', error);
-                // Show error message to user, no mock data
-                document.getElementById('unitList').innerHTML = '<div style="padding: 10px; color: #dc2626;">Failed to load units. Please try again later.</div>';
-            });
-    }
-
-    // Load Posting Types
-    function loadPostingTypes() {
-        fetch('http://localhost:6060/api/dropdown/POST_TYPES')
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to load posting types');
-                return response.json();
-            })
-            .then(types => {
-                const postingList = document.getElementById('postingTypeList');
-                postingList.innerHTML = '';
-
-                types.forEach(type => {
-                    const label = document.createElement('label');
-                    label.className = 'rank-item';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = type.id;
-                    checkbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            if (!selectedPostingTypeIds.includes(type.id)) {
-                                selectedPostingTypeIds.push(type.id);
-                            }
-                        } else {
-                            selectedPostingTypeIds = selectedPostingTypeIds.filter(id => id !== type.id);
-                        }
-                    });
-
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${type.name}`));
-                    postingList.appendChild(label);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading posting types:', error);
-                document.getElementById('postingTypeList').innerHTML = 'Failed to load posting types';
-            });
-    }
-
-    // Initialize pill listeners
-    function initializePillListeners() {
-        document.querySelectorAll('#remarksPills .pill').forEach(pill => {
-            pill.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const value = this.dataset.value;
-                if (this.classList.contains('active')) {
-                    if (!selectedRemarks.includes(value)) {
-                        selectedRemarks.push(value);
-                    }
-                } else {
-                    selectedRemarks = selectedRemarks.filter(v => v !== value);
-                }
-            });
-        });
-    }
-
-    // Manual load button (kept for backward compatibility)
-    document.getElementById('loadEligibility').addEventListener('click', function() {
-        if (!selectedCourseId) {
-            alert('Please select a course first');
-            return;
-        }
-        loadEligibilityForCourse(selectedCourseId);
-    });
 
     // Save eligibility
-    document.getElementById('saveEligibility').addEventListener('click', function() {
+    function saveEligibility() {
         if (!selectedCourseId) {
-            alert('Please select a course');
+            alert('Please select a course first');
             return;
         }
 
@@ -1013,44 +676,81 @@
             commissionDateTo: document.getElementById('commissionTo').value || null,
             seniorityDateFrom: document.getElementById('seniorityFrom').value || null,
             seniorityDateTo: document.getElementById('seniorityTo').value || null,
-            dobFrom: document.getElementById('dobFrom').value || null,
-            dobTo: document.getElementById('dobTo').value || null,
             rankIds: selectedRankIds,
             unitIds: selectedUnitIds,
             postingTypeIds: selectedPostingTypeIds,
             minCourseGrading: gradingSelected,
             educationalQualifications: eduSelected,
-            medicalCategories: medicalSelected, // This is now an array of strings (medical codes)
+            medicalCategories: medicalSelected,
             establishmentTypes: estabSelected,
             remarks: selectedRemarks,
             additionalRemarks: document.getElementById('additionalRemarks').value || null
         };
 
-        console.log('Saving payload with medical categories:', payload);
-
         fetch('http://localhost:6060/api/eligibility/save', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Save failed');
-                    });
+            .then(res => {
+                if (!res.ok) return res.text().then(t => { throw new Error(t || 'Save failed'); });
+                return res.json();
+            })
+            .then(() => { alert('✅ Eligibility criteria saved successfully!'); })
+            .catch(err => { console.error(err); alert('❌ Save failed: ' + err.message); });
+    }
+
+    // Event Listeners & Initialization
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadCourses();
+        await loadAllMasterData();
+        resetForm();
+
+        // Course change handler
+        const courseSelect = document.getElementById('courseSelect');
+        courseSelect.addEventListener('change', function() {
+            const val = this.value;
+            if (!val) {
+                document.getElementById('courseInfo').style.display = 'none';
+                selectedCourseId = null;
+                resetForm();
+                return;
+            }
+            const selectedOption = this.options[this.selectedIndex];
+            const course = JSON.parse(selectedOption.dataset.course);
+            selectedCourseId = course.srno;
+            const courseInfoDiv = document.getElementById('courseInfo');
+            courseInfoDiv.style.display = 'block';
+            courseInfoDiv.innerHTML = `Selected: <b>${course.courseName}</b><br>Location: ${course.location || 'N/A'} | Duration: ${course.duration || 'N/A'} Weeks`;
+            loadEligibilityForCourse(selectedCourseId);
+        });
+
+        // Load button manual
+        document.getElementById('loadEligibility').addEventListener('click', () => {
+            if (!selectedCourseId) alert('Please select a course first');
+            else loadEligibilityForCourse(selectedCourseId);
+        });
+
+        // Save button
+        document.getElementById('saveEligibility').addEventListener('click', saveEligibility);
+
+        // Remarks pills listener
+        document.querySelectorAll('#remarksPills .pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const value = this.dataset.value;
+                if (this.classList.contains('active')) {
+                    if (!selectedRemarks.includes(value)) selectedRemarks.push(value);
+                } else {
+                    selectedRemarks = selectedRemarks.filter(v => v !== value);
                 }
-                return response.json();
-            })
-            .then(data => {
-                alert('Eligibility criteria saved successfully!');
-                console.log('Saved data:', data);
-            })
-            .catch(error => {
-                console.error('Error saving eligibility:', error);
-                alert('Failed to save eligibility criteria: ' + error.message);
             });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.multiselect-dropdown')) closeAllDropdowns();
+        });
     });
 </script>
 </body>

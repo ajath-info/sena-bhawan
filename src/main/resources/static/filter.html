@@ -1,2499 +1,1268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Filter & Search - ARMY HRMS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f1f3f5;
-      color: #1f2937;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ================= SIDEBAR ================= */
-    .sidebar {
-      width: 256px;
-      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      padding: 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      min-height: 72px;
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: #ffb703;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-
-    .logo-text h1 {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .logo-text p {
-      font-size: 11px;
-      color: #52b788;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 16px 0;
-    }
-
-    .nav-section-title {
-      padding: 16px 20px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #52b788;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: white;
-      text-decoration: none;
-      border-left: 4px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .nav-item:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .nav-item.active {
-      background: rgba(255,255,255,0.1);
-      border-left-color: #ffb703;
-      font-weight: 600;
-    }
-
-    .nav-icon {
-      font-size: 18px;
-    }
-
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2d6a4f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .user-info .name {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .user-info .role {
-      font-size: 12px;
-      color: #52b788;
-    }
-
-    .logout-btn {
-      cursor: pointer;
-      color: #ffffff;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    /* ================= IMPROVED LOADING SPINNER ================= */
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #1b4332;
-      border-right-color: #1b4332;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Loading overlay for the whole table */
-    .table-loading {
-      position: relative;
-      min-height: 400px;
-    }
-
-    .table-loading::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    /* ================= MAIN CONTENT ================= */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .header {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .header h2 {
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    .header p {
-      font-size: 14px;
-      color: #6b7280;
-      margin-top: 4px;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-    }
-
-    .btn-primary {
-      background: #1b4332;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #2d6a4f;
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: white;
-      color: #1b4332;
-      border: 2px solid #1b4332;
-    }
-
-    .btn-secondary:hover {
-      background: #f8fafc;
-    }
-
-    .btn-outline {
-      background: white;
-      border: 1px solid #e5e7eb;
-      color: #6b7280;
-    }
-
-    .btn-outline:hover {
-      background: #f8fafc;
-    }
-
-    .content-area {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* ================= FILTER PANEL ================= */
-    .filter-panel {
-      width: 380px;
-      background: white;
-      border-right: 1px solid #e5e7eb;
-      padding: 24px;
-      overflow-y: auto;
-      flex-shrink: 0;
-    }
-
-    .filter-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .filter-header h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1f2937;
-    }
-
-    .clear-filters {
-      font-size: 13px;
-      color: #dc2626;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 6px;
-      background: #fef2f2;
-    }
-
-    .clear-filters:hover {
-      background: #fee2e2;
-    }
-
-    .filter-section {
-      margin-bottom: 24px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .filter-section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .filter-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .filter-group {
-      margin-bottom: 16px;
-    }
-
-    .filter-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #4b5563;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .filter-input,
-    .filter-select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .filter-input:focus,
-    .filter-select:focus {
-      outline: none;
-      border-color: #1b4332;
-      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
-    }
-
-    /* Select2 Customization */
-    .select2-container--default .select2-selection--multiple {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      min-height: 42px;
-    }
-
-    .select2-container--default.select2-container--focus .select2-selection--multiple {
-      border-color: #1b4332;
-      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-      background-color: #1b4332;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-    }
-
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-      color: white;
-      margin-right: 4px;
-    }
-
-    .filter-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .filter-actions .btn {
-      flex: 1;
-      justify-content: center;
-    }
-
-    /* ================= RESULTS AREA ================= */
-    .results-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: #f8fafc;
-    }
-
-    .results-header {
-      background: white;
-      padding: 16px 24px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .results-count {
-      font-size: 14px;
-      color: #6b7280;
-    }
-
-    .results-count strong {
-      color: #1f2937;
-      font-weight: 700;
-    }
-
-    .unit-strength {
-      background: #1b4332;
-      color: white;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .results-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-    }
-
-    /* ================= TABLE STYLES ================= */
-    .table-container {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      overflow-x: auto;
-      overflow-y: visible;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 2000px;
-    }
-
-    .data-table thead {
-      background: #f8fafc;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .data-table th {
-      padding: 14px 16px;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #4b5563;
-      border-bottom: 2px solid #e5e7eb;
-      white-space: nowrap;
-    }
-
-    .data-table td {
-      padding: 16px;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 13px;
-      color: #1e293b;
-      white-space: nowrap;
-    }
-
-    .data-table tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    .data-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .badge-success {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .badge-warning {
-      background: #fef9c3;
-      color: #b45309;
-    }
-
-    .badge-info {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .badge-gray {
-      background: #f1f5f9;
-      color: #4b5563;
-    }
-
-    .action-icons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid #e5e7eb;
-      background: white;
-      transition: all 0.2s;
-    }
-
-    .icon-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .icon-btn.view {
-      color: #15803d;
-      border-color: #15803d;
-    }
-
-    .icon-btn.edit {
-      color: #2563eb;
-      border-color: #2563eb;
-    }
-
-    /* ================= PAGINATION ================= */
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 24px;
-      padding: 16px 20px;
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .pagination-info {
-      font-size: 14px;
-      color: #6b7280;
-    }
-
-    .pagination-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .pagination-btn {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      border: 1px solid #e5e7eb;
-      background: white;
-      color: #4b5563;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .pagination-btn:hover:not(:disabled) {
-      background: #f8fafc;
-      border-color: #9ca3af;
-    }
-
-    .pagination-btn.active {
-      background: #1b4332;
-      color: white;
-      border-color: #1b4332;
-    }
-
-    .pagination-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* ================= LOADING ================= */
-    .loading-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      border-radius: 12px;
-    }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #e5e7eb;
-      border-top-color: #1b4332;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ================= SEARCH ================= */
-    .search-bar {
-      margin-bottom: 20px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 12px 16px 12px 40px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
-      background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 12px center;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: #1b4332;
-      box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1);
-    }
-
-    /* ================= TOAST ================= */
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 16px 24px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 9999;
-      animation: slideIn 0.3s ease;
-    }
-
-    .toast.success {
-      border-left: 4px solid #15803d;
-    }
-
-    .toast.error {
-      border-left: 4px solid #dc2626;
-    }
-
-    .toast.warning {
-      border-left: 4px solid #b45309;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    /* ================= MODAL STYLES ================= */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .modal-container {
-      background: white;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 1200px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      animation: slideUp 0.3s ease;
-    }
-
-    .modal-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #f8fafc;
-      border-radius: 16px 16px 0 0;
-      position: sticky;
-      top: 0;
-      background: white;
-      z-index: 10;
-    }
-
-    .modal-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1f2937;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: #fee2e2;
-      border: none;
-      color: #dc2626;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .modal-close:hover {
-      background: #fecaca;
-      transform: scale(1.05);
-    }
-
-    .modal-body {
-      padding: 24px;
-    }
-
-    /* Officer Profile Section */
-    .officer-profile {
-      display: flex;
-      gap: 24px;
-      margin-bottom: 32px;
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .officer-avatar-large {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: #1b4332;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      font-weight: 700;
-      border: 4px solid #ffb703;
-      flex-shrink: 0;
-    }
-
-    .officer-avatar-large img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .officer-info-summary {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .summary-label {
-      font-size: 12px;
-      color: #6b7280;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .summary-value {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    .summary-value.badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      width: fit-content;
-    }
-
-    /* Details Grid */
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 16px;
-    }
-
-    .detail-card {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      transition: all 0.2s;
-    }
-
-    .detail-card:hover {
-      background: white;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .detail-card.full-width {
-      grid-column: span 3;
-    }
-
-    .detail-card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1b4332;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    .detail-content {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 4px 0;
-      font-size: 13px;
-    }
-
-    .detail-label {
-      color: #6b7280;
-      font-weight: 500;
-    }
-
-    .detail-value {
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    /* Qualifications Table */
-    .qualifications-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .qualifications-table th {
-      text-align: left;
-      padding: 8px;
-      background: #f1f5f9;
-      color: #475569;
-      font-weight: 600;
-    }
-
-    .qualifications-table td {
-      padding: 8px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-  </style>
-  <link rel="stylesheet" href="sidebar.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Master Filter & Search - ARMY HRMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f1f3f5; color: #1f2937; height: 100vh; overflow: hidden; }
+        .container { display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 256px; background: linear-gradient(180deg, #1b4332 0%, #081c15 100%); color: white; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; overflow-x: hidden; flex-shrink: 0; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; min-height: 72px; }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 32px; height: 32px; background: #ffb703; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #1b4332; }
+        .logo-text h1 { font-size: 18px; font-weight: 700; }
+        .logo-text p { font-size: 11px; color: #52b788; }
+        .sidebar-nav { flex: 1; padding: 16px 0; }
+        .nav-section-title { padding: 16px 20px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #52b788; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: white; text-decoration: none; border-left: 4px solid transparent; transition: all 0.2s; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
+        .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: #ffb703; font-weight: 600; }
+        .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2d6a4f; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .user-info .name { font-size: 14px; font-weight: 600; }
+        .user-info .role { font-size: 12px; color: #52b788; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #1b4332; border-right-color: #1b4332; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: white; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .header h2 { font-size: 22px; font-weight: 700; }
+        .header p { font-size: 14px; color: #6b7280; margin-top: 4px; }
+        .header-right { display: flex; gap: 12px; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-primary { background: #1b4332; color: white; }
+        .btn-primary:hover { background: #2d6a4f; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: white; color: #1b4332; border: 2px solid #1b4332; }
+        .btn-secondary:hover { background: #f8fafc; }
+        .content-area { flex: 1; display: flex; overflow: hidden; }
+        .filter-panel { width: 320px; background: white; border-right: 1px solid #e5e7eb; padding: 20px; overflow-y: auto; flex-shrink: 0; }
+        .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .filter-header h3 { font-size: 18px; font-weight: 700; color: #1f2937; }
+        .clear-filters { font-size: 13px; color: #dc2626; cursor: pointer; font-weight: 600; padding: 6px 12px; border-radius: 6px; background: #fef2f2; user-select: none; transition: background 0.2s; }
+        .clear-filters:hover { background: #fee2e2; }
+        .filter-section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
+        .filter-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .filter-title { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .filter-group { margin-bottom: 12px; }
+        .filter-group:last-child { margin-bottom: 0; }
+        .filter-label { font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px; display: block; }
+        .filter-input, .filter-select { width: 100%; padding: 9px 11px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; transition: all 0.2s; background: white; color: #1f2937; }
+        .filter-input:focus, .filter-select:focus { outline: none; border-color: #1b4332; box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1); }
+        .custom-multiselect { position: relative; width: 100%; }
+        .cms-trigger { min-height: 40px; border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 32px 6px 8px; background: white; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; transition: all 0.2s; position: relative; user-select: none; }
+        .cms-trigger:hover { border-color: #9ca3af; }
+        .cms-trigger.open { border-color: #1b4332; box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1); }
+        .cms-arrow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 11px; pointer-events: none; transition: transform 0.2s; }
+        .cms-trigger.open .cms-arrow { transform: translateY(-50%) rotate(180deg); }
+        .cms-placeholder { font-size: 13px; color: #9ca3af; }
+        .cms-tag { background: #1b4332; color: white; padding: 3px 8px; border-radius: 5px; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; max-width: 180px; }
+        .cms-tag-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cms-tag-remove { cursor: pointer; color: #86efac; font-size: 14px; line-height: 1; flex-shrink: 0; font-weight: 700; }
+        .cms-tag-remove:hover { color: white; }
+        .cms-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-radius: 10px; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.12); overflow: hidden; max-height: 220px; flex-direction: column; }
+        .cms-dropdown.open { display: flex; }
+        .cms-search-box { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; flex-shrink: 0; }
+        .cms-search-input { width: 100%; padding: 7px 10px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 13px; outline: none; background: #f8fafc; }
+        .cms-search-input:focus { border-color: #1b4332; background: white; }
+        .cms-options-list { overflow-y: auto; flex: 1; }
+        .cms-option { padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f8fafc; transition: background 0.15s; font-size: 13px; color: #1f2937; }
+        .cms-option:last-child { border-bottom: none; }
+        .cms-option:hover { background: #f0fdf4; }
+        .cms-option.selected { background: #f0fdf4; }
+        .cms-checkbox { width: 16px; height: 16px; border: 2px solid #d1d5db; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; background: white; }
+        .cms-option.selected .cms-checkbox { background: #1b4332; border-color: #1b4332; }
+        .cms-checkbox-tick { color: white; font-size: 11px; font-weight: 700; display: none; }
+        .cms-option.selected .cms-checkbox-tick { display: block; }
+        .cms-option-label { flex: 1; }
+        .cms-no-results { padding: 16px 12px; text-align: center; color: #9ca3af; font-size: 13px; }
+        .filter-actions { display: flex; gap: 10px; margin-top: 24px; }
+        .filter-actions .btn { flex: 1; justify-content: center; }
+        .results-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f8fafc; }
+        .results-header { background: white; padding: 14px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .results-count { font-size: 14px; color: #6b7280; }
+        .results-count strong { color: #1f2937; font-weight: 700; }
+        .unit-strength { background: #1b4332; color: white; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .results-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .table-container { background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 2000px; }
+        .data-table thead { background: #f8fafc; }
+        .data-table th { padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #4b5563; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+        .data-table td { padding: 14px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #1e293b; white-space: nowrap; }
+        .data-table tbody tr:hover { background: #f8fafc; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-warning { background: #fef9c3; color: #b45309; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-gray { background: #f1f5f9; color: #4b5563; }
+        .action-icons { display: flex; gap: 6px; }
+        .icon-btn { padding: 5px 10px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; border: 1px solid #e5e7eb; background: white; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+        .icon-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
+        .icon-btn.view { color: #15803d; border-color: #86efac; }
+        .icon-btn.edit { color: #2563eb; border-color: #93c5fd; }
+        .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 14px 18px; background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
+        .pagination-info { font-size: 14px; color: #6b7280; }
+        .pagination-controls { display: flex; gap: 6px; }
+        .pagination-btn { padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; border: 1px solid #e5e7eb; background: white; color: #4b5563; cursor: pointer; transition: all 0.2s; }
+        .pagination-btn:hover:not(:disabled) { background: #f8fafc; border-color: #9ca3af; }
+        .pagination-btn.active { background: #1b4332; color: white; border-color: #1b4332; }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .search-input { width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 11px center; transition: all 0.2s; }
+        .search-input:focus { outline: none; border-color: #1b4332; box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.1); }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 14px 20px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 9999; animation: slideIn 0.3s ease; }
+        .toast.success { border-left: 4px solid #15803d; }
+        .toast.error { border-left: 4px solid #dc2626; }
+        .toast.warning { border-left: 4px solid #b45309; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .modal-container { background: white; border-radius: 16px; width: 90%; max-width: 1100px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
+        .modal-header h2 { font-size: 18px; font-weight: 700; color: #1f2937; }
+        .modal-close { width: 34px; height: 34px; border-radius: 8px; background: #fee2e2; border: none; color: #dc2626; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 24px; }
+        .officer-profile { display: flex; gap: 24px; margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e5e7eb; }
+        .officer-avatar-large { width: 100px; height: 100px; border-radius: 50%; background: #1b4332; color: white; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; border: 4px solid #ffb703; flex-shrink: 0; }
+        .officer-info-summary { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+        .summary-item { display: flex; flex-direction: column; }
+        .summary-label { font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .summary-value { font-size: 15px; font-weight: 600; color: #1f2937; }
+        .details-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .detail-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; }
+        .detail-card-title { font-size: 13px; font-weight: 700; color: #1b4332; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+        .detail-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+        .detail-label { color: #6b7280; }
+        .detail-value { font-weight: 600; color: #1f2937; }
+    </style>
+    <link rel="stylesheet" href="sidebar.css">
 </head>
 <body>
+<script src="auth.js"></script>
+<script src="logout.js"></script>
+<script src="sidebar.js"></script>
 <div class="container">
-  <!-- Sidebar -->
-  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
-  <aside class="sidebar" id="sidebarContainer">
-    <!-- Loading indicator (optional) -->
-    <div style="color: white; padding: 20px; text-align: center;">
-      Loading menu...
-    </div>
-  </aside>
+    <aside class="sidebar" id="sidebarContainer">
+        <div style="color: white; padding: 20px; text-align: center;">Loading menu...</div>
+    </aside>
 
-  <main class="main-content">
-    <header class="header">
-      <div>
-        <h2>Master Filter & Search</h2>
-        <p>Advanced filtering for officer records</p>
-      </div>
-      <div class="header-right">
-        <button class="btn btn-secondary" onclick="exportResults()" id="exportBtn">
-          <span>📊</span>
-          Export Results
-        </button>
-      </div>
-    </header>
-
-    <div class="content-area">
-      <!-- Filter Panel -->
-      <div class="filter-panel">
-        <div class="filter-header">
-          <h3>Filters</h3>
-          <span class="clear-filters" onclick="clearAllFilters()">Clear All</span>
-        </div>
-
-        <!-- Quick Search -->
-        <div class="filter-section">
-          <div class="filter-title">🔍 Quick Search</div>
-          <div class="search-bar">
-            <input type="text" class="search-input" id="globalSearch" placeholder="Search by name, army no...">
-          </div>
-        </div>
-
-        <!-- Rank Filter (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🏅 Rank</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="rankFilter" multiple="multiple">
-              <option value="">All Ranks</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Medical Category (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">⚕️ Medical Category</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="medicalFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Command (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">📍 Command</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="commandFilter" multiple="multiple">
-              <option value="">All Commands</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Corps (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🎯 Corps</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="corpsFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Division (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🚩 Division</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="divisionFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Type of Establishment (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🏢 Type of Establishment</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="estFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Area Type (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🗺️ Area Type</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="areaTypeFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Civil Qualification (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">🎓 Civil Qualification</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="civilFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Sports (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">⚽ Sports</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="sportsFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Course Name -->
-        <div class="filter-section">
-          <div class="filter-title">📚 Course Name</div>
-          <div class="filter-group">
-            <select class="filter-select" id="courseNameFilter">
-              <option value="">All Courses</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Posting Due (Multi-select) -->
-        <div class="filter-section">
-          <div class="filter-title">⏰ Posting Due (Months)</div>
-          <div class="filter-group">
-            <select class="filter-select multi-select" id="postingDueFilter" multiple="multiple">
-              <option value="">All</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Date Filters -->
-        <div class="filter-section">
-          <div class="filter-title">📅 Date Filters</div>
-
-          <div class="filter-group">
-            <label class="filter-label">DOB (Greater Than)</label>
-            <input type="date" class="filter-input" id="dobFilter">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Date of Commission From</label>
-            <input type="date" class="filter-input" id="docFrom">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Date of Commission To</label>
-            <input type="date" class="filter-input" id="docTo">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Date of Seniority From</label>
-            <input type="date" class="filter-input" id="dosFrom">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">Date of Seniority To</label>
-            <input type="date" class="filter-input" id="dosTo">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">NOT on Course From</label>
-            <input type="date" class="filter-input" id="courseFrom">
-          </div>
-
-          <div class="filter-group">
-            <label class="filter-label">NOT on Course To</label>
-            <input type="date" class="filter-input" id="courseTo">
-          </div>
-        </div>
-
-        <!-- Place of Birth -->
-        <div class="filter-section">
-          <div class="filter-title">📍 Place of Birth</div>
-          <div class="filter-group">
-            <input type="text" class="filter-input" id="pobFilter" placeholder="Enter state/city">
-          </div>
-        </div>
-
-        <!-- Filter Actions Reset -->
-        <div class="filter-actions">
-          <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
-          <button class="btn btn-primary" onclick="applyFilters()" id="applyFiltersBtn">Apply Filters</button>
-        </div>
-      </div>
-
-      <!-- Results Area -->
-      <div class="results-area">
-        <div class="results-header">
-          <div class="results-count" id="resultsCount">
-            Loading...
-          </div>
-          <div class="unit-strength" id="unitStrength">
-            Unit Strength: 0
-          </div>
-        </div>
-
-        <div class="results-content">
-          <div id="resultsContainer">
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                <tr>
-                  <th>Army No</th>
-                  <th>Rank</th>
-                  <th>Name</th>
-                  <th>DOB</th>
-                  <th>Commission</th>
-                  <th>Seniority</th>
-                  <th>Unit</th>
-                  <th>Command</th>
-                  <th>Corps</th>
-                  <th>Division</th>
-                  <th>Est Type</th>
-                  <th>Medical</th>
-                  <th>TOS Date</th>
-                  <th>Course</th>
-                  <th>Civil Qual</th>
-                  <th>Sports</th>
-                  <th>POB</th>
-                  <th>Area Type</th>
-                  <th>Posting Due</th>
-                  <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody id="tableBody">
-                <tr id="loadingRow">
-                  <td colspan="21" style="text-align: center; padding: 60px 40px;">
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
-                      <div class="loading-spinner"></div>
-                      <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h2>Master Filter & Search</h2>
+                <p>Advanced filtering for officer records</p>
             </div>
-          </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="exportBtn">
+                    <span>📊</span> Export Results
+                </button>
+            </div>
+        </header>
 
-          <div class="pagination" id="pagination"></div>
+        <div class="content-area">
+            <div class="filter-panel">
+                <div class="filter-header">
+                    <h3>Filters</h3>
+                    <span class="clear-filters" id="clearAllBtn">Clear All</span>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🔍 Quick Search</div>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search by name, army no...">
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🏅 Rank</div>
+                    <div class="custom-multiselect" id="cms-rank" data-filter="rankFilter" data-placeholder="Select ranks"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">⚕️ Medical Category</div>
+                    <div class="custom-multiselect" id="cms-medical" data-filter="medicalFilter" data-placeholder="Select categories"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">📍 Command</div>
+                    <div class="custom-multiselect" id="cms-command" data-filter="commandFilter" data-placeholder="Select command"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🎯 Corps</div>
+                    <div class="custom-multiselect" id="cms-corps" data-filter="corpsFilter" data-placeholder="Select corps"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🚩 Division</div>
+                    <div class="custom-multiselect" id="cms-division" data-filter="divisionFilter" data-placeholder="Select division"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🏢 Establishment Type</div>
+                    <div class="custom-multiselect" id="cms-est" data-filter="estFilter" data-placeholder="Select type"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🗺️ Area Type</div>
+                    <div class="custom-multiselect" id="cms-area" data-filter="areaTypeFilter" data-placeholder="Select area type"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">🎓 Civil Qualification</div>
+                    <div class="custom-multiselect" id="cms-civil" data-filter="civilFilter" data-placeholder="Select qualification"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">⚽ Sports</div>
+                    <div class="custom-multiselect" id="cms-sports" data-filter="sportsFilter" data-placeholder="Select sports"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">📚 Course Name</div>
+                    <select class="filter-select" id="courseNameFilter">
+                        <option value="">All Courses</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">⏰ Posting Due (Months)</div>
+                    <div class="custom-multiselect" id="cms-posting" data-filter="postingDueFilter" data-placeholder="Select months"></div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">📅 Date Filters</div>
+                    <div class="filter-group">
+                        <label class="filter-label">DOB (Greater Than)</label>
+                        <input type="date" class="filter-input" id="dobFilter">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date of Commission From</label>
+                        <input type="date" class="filter-input" id="docFrom">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date of Commission To</label>
+                        <input type="date" class="filter-input" id="docTo">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date of Seniority From</label>
+                        <input type="date" class="filter-input" id="dosFrom">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Date of Seniority To</label>
+                        <input type="date" class="filter-input" id="dosTo">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">NOT on Course From</label>
+                        <input type="date" class="filter-input" id="courseFrom">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">NOT on Course To</label>
+                        <input type="date" class="filter-input" id="courseTo">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-title">📍 Place of Birth</div>
+                    <input type="text" class="filter-input" id="pobFilter" placeholder="Enter state/city">
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                    <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+                </div>
+            </div>
+
+            <div class="results-area">
+                <div class="results-header">
+                    <div class="results-count" id="resultsCount">Loading...</div>
+                    <div class="unit-strength" id="unitStrength">Unit Strength: 0</div>
+                </div>
+                <div class="results-content">
+                    <div id="resultsContainer">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                <tr>
+                                    <th>Army No</th><th>Rank</th><th>Name</th><th>DOB</th>
+                                    <th>Commission</th><th>Seniority</th><th>Unit</th><th>Command</th>
+                                    <th>Corps</th><th>Division</th><th>Est Type</th><th>Medical</th>
+                                    <th>TOS Date</th><th>Course</th><th>Civil Qual</th><th>Sports</th>
+                                    <th>POB</th><th>Area Type</th><th>Posting Due</th><th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                <tr id="loadingRow">
+                                    <td colspan="20" style="text-align:center;padding:60px 40px;">
+                                        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                                            <div class="loading-spinner"></div>
+                                            <div style="color:#6b7280;font-size:14px;">Loading officer records...</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </main>
+    </main>
 </div>
 
-<!-- Toast Container -->
 <div id="toastContainer"></div>
-<script src="sidebar.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
-  // API Base URL
-  const API_BASE_URL = 'http://localhost:6060/api';
-
-  // Global state
-  let currentPage = 1;
-  let itemsPerPage = 10;
-  let totalItems = 0;
-  let totalPages = 0;
-  let debounceTimer;
-  let isLoading = false;
-
-  // Store ORBAT mappings
-  let commandsMap = new Map(); // command name -> command id
-  let corpsMap = new Map(); // corps name -> corps id
-
-  // Initialize Select2 for multi-select dropdowns
-  function initializeMultiSelects() {
-    $('.multi-select').select2({
-      placeholder: 'Select options',
-      allowClear: true,
-      width: '100%'
-    });
-  }
-
-  // Logout function
-  function logout() {
-    sessionStorage.clear();
-    window.location.replace("/login.html");
-    return false;
-  }
-
-  // Load dropdown data
-  async function loadDropdownData() {
-    try {
-      showLoading(true);
-
-      await Promise.all([
-        loadRankDropdown(),
-        loadMedicalDropdown(),
-        loadCommandDropdown(), // This will load commands and then trigger corps/divisions
-        loadEstablishmentDropdown(),
-        loadAreaTypeDropdown(),
-        loadCivilDropdown(),
-        loadSportsDropdown(),
-        loadPostingDueDropdown(),
-        loadCourseDropdown() // Add this line
-      ]);
-
-      // Load corps and divisions initially without command filter
-      await loadCorpsDropdown(null);
-      await loadDivisionDropdown(null);
-
-      initializeMultiSelects();
-
-    } catch (error) {
-      console.error('Error loading dropdowns:', error);
-      showToast('Error loading filter options', 'error');
-    } finally {
-      showLoading(false);
-    }
-  }
-
-  async function loadRankDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/ranks`);
-      if (response.ok) {
-        const ranks = await response.json();
-        const select = $('#rankFilter');
-        ranks.forEach(rank => {
-          const option = new Option(rank, rank, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading ranks:', error);
-    }
-  }
-
-  async function loadMedicalDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/medical-category`);
-      if (response.ok) {
-        const categories = await response.json();
-        const select = $('#medicalFilter');
-        categories.forEach(cat => {
-          const option = new Option(cat, cat, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading medical categories:', error);
-    }
-  }
-
-  async function loadCommandDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/orbat/commands`);
-      if (response.ok) {
-        const commands = await response.json();
-        const select = $('#commandFilter');
-
-        select.empty();
-        select.append(new Option('All', '', false, false));
-
-        commands.forEach(cmd => {
-          // Store command ID for reference
-          commandsMap.set(cmd.name, cmd.id);
-          const option = new Option(cmd.name, cmd.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-
-        // Add change event listener for cascading
-        select.on('change', function() {
-          const selectedCommand = $(this).val();
-          let commandId = null;
-
-          if (selectedCommand && selectedCommand.length > 0 && selectedCommand[0] !== '') {
-            // Get the ID of the selected command (for multi-select, take the first one)
-            commandId = commandsMap.get(selectedCommand[0]);
-          }
-
-          // Load corps and divisions based on selected command
-          loadCorpsDropdown(commandId);
-          loadDivisionDropdown(commandId);
-        });
-      }
-    } catch (error) {
-      console.error('Error loading commands:', error);
-    }
-  }
-
-  async function loadCorpsDropdown(commandId = null) {
-    try {
-      let url = `${API_BASE_URL}/orbat/list/corps`;
-      if (commandId) {
-        url += `?commandId=${commandId}`;
-      }
-
-      const response = await fetch(url);
-      if (response.ok) {
-        const corpsList = await response.json();
-        const select = $('#corpsFilter');
-
-        // Clear existing options
-        select.empty();
-        select.append(new Option('All', '', false, false));
-
-        corpsList.forEach(corps => {
-          // Use corps.name for both display and value
-          const option = new Option(corps.name, corps.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading corps:', error);
-    }
-  }
-
-  async function loadDivisionDropdown(commandId = null) {
-    try {
-      let url = `${API_BASE_URL}/orbat/list/divisions`;
-      if (commandId) {
-        url += `?commandId=${commandId}`;
-      }
-
-      const response = await fetch(url);
-      if (response.ok) {
-        const divisions = await response.json();
-        const select = $('#divisionFilter');
-
-        // Clear existing options
-        select.empty();
-        select.append(new Option('All', '', false, false));
-
-        divisions.forEach(div => {
-          // Use div.name for both display and value
-          const option = new Option(div.name, div.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading divisions:', error);
-    }
-  }
-
-  async function loadEstablishmentDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/ESTABLISHMENT`);
-      if (response.ok) {
-        const establishments = await response.json();
-        const select = $('#estFilter');
-        establishments.forEach(est => {
-          // Use est.name for both display and value
-          const option = new Option(est.name, est.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading establishment types:', error);
-    }
-  }
-
-  async function loadAreaTypeDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/area-type`);
-      if (response.ok) {
-        const areas = await response.json();
-        const select = $('#areaTypeFilter');
-        areas.forEach(area => {
-          const option = new Option(area, area, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading area types:', error);
-    }
-  }
-
-  async function loadCivilDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/CIVIL_QUALIFICATION`);
-      if (response.ok) {
-        const qualifications = await response.json();
-        const select = $('#civilFilter');
-        qualifications.forEach(qual => {
-          // Use qual.name for both display and value
-          const option = new Option(qual.name, qual.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading civil qualifications:', error);
-    }
-  }
-
-  async function loadSportsDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/dropdown/SPORTS`);
-      if (response.ok) {
-        const sportsList = await response.json();
-        const select = $('#sportsFilter');
-        sportsList.forEach(sport => {
-          // Use sport.name for both display and value
-          const option = new Option(sport.name, sport.name, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading sports:', error);
-    }
-  }
-
-  async function loadPostingDueDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/master/filter/posting-due-months`);
-      if (response.ok) {
-        const months = await response.json();
-        const select = $('#postingDueFilter');
-        months.forEach(month => {
-          const option = new Option(month + (month === 1 ? ' Month' : ' Months'), month, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading posting due months:', error);
-    }
-  }
-
-  async function loadCourseDropdown() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/course`);
-      if (response.ok) {
-        const courses = await response.json();
-        const select = $('#courseNameFilter');
-
-        select.empty();
-        select.append(new Option('All Courses', '', false, false));
-
-        courses.forEach(course => {
-          const option = new Option(course.courseName, course.courseName, false, false);
-          select.append(option);
-        });
-        select.trigger('change');
-      }
-    } catch (error) {
-      console.error('Error loading courses:', error);
-    }
-  }
-
-  // Build filter request from form
-  // Build filter request from form - UPDATED to handle null values properly
-  function buildFilterRequest() {
-    const getSelectValue = (selectId) => {
-      const val = $(`#${selectId}`).val();
-      return val && val.length ? val : null;
-    };
-
-    const getInputValue = (inputId) => {
-      const val = document.getElementById(inputId).value;
-      return val && val.trim() !== '' ? val : null;
-    };
-
-    const getDateValue = (inputId) => {
-      const val = document.getElementById(inputId).value;
-      return val || null;
-    };
-
-    return {
-      rank: getSelectValue('rankFilter'),
-      medicalCategory: getSelectValue('medicalFilter'),
-      command: getSelectValue('commandFilter'),
-      corps: getSelectValue('corpsFilter'),
-      division: getSelectValue('divisionFilter'),
-      establishmentType: getSelectValue('estFilter'),
-      areaType: getSelectValue('areaTypeFilter'),
-      civilQualification: getSelectValue('civilFilter'),
-      sports: getSelectValue('sportsFilter'),
-      postingDueMonths: (() => {
-        const val = $('#postingDueFilter').val();
-        return val && val.length ? val.map(v => parseInt(v)) : null;
-      })(),
-      courseName: getInputValue('courseNameFilter'),
-      placeOfBirth: getInputValue('pobFilter'),
-      dobGreaterThan: getDateValue('dobFilter'),
-      docFrom: getDateValue('docFrom'),
-      docTo: getDateValue('docTo'),
-      dosFrom: getDateValue('dosFrom'),
-      dosTo: getDateValue('dosTo'),
-      // Removed tosFrom and tosTo
-      courseFrom: getDateValue('courseFrom'),
-      courseTo: getDateValue('courseTo'),
-      search: getInputValue('globalSearch')
-    };
-  }
-
-  // Fetch filtered data
-  // Fetch filtered data
-  async function fetchFilteredData() {
-    if (isLoading) return;
-
-    try {
-      isLoading = true;
-      showLoading(true);
-      setTableLoading(true); // Show loading in table
-
-      const filterRequest = buildFilterRequest();
-
-      // Add pagination parameters to the request
-      const requestWithPagination = {
-        ...filterRequest,
-        page: currentPage - 1,  // API uses 0-based page index
-        size: itemsPerPage
-      };
-
-      console.log('Sending request:', requestWithPagination); // Debug log
-
-      const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestWithPagination)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Received data:', result); // Debug log
-
-        // Extract data from paginated response structure
-        const officers = result.content || [];
-        totalItems = result.totalElements || 0;
-        totalPages = result.totalPages || 0;
-        // Update currentPage to match API's page number (0-based)
-        currentPage = (result.number || 0) + 1;
-
-        renderTable(officers);
-        updateResultsCount();
-        renderPagination();
-        document.getElementById('unitStrength').innerText = `Unit Strength: ${totalItems}`;
-      } else {
-        const errorText = await response.text();
-        console.error('API Error:', errorText);
-        showToast('Error loading officer records', 'error');
-        // Show empty state
-        renderTable([]);
-      }
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      showToast('Error loading officer records: ' + error.message, 'error');
-      renderTable([]);
-    } finally {
-      isLoading = false;
-      showLoading(false);
-      // setTableLoading will be called inside renderTable
-    }
-  }
-
-  // Render table
-  function renderTable(officers) {
-    const tbody = document.getElementById('tableBody');
-
-    if (!officers || officers.length === 0) {
-      tbody.innerHTML = `
-     <tr>
-      <td colspan="20" style="text-align: center; padding: 60px 40px;">  <!-- Changed colspan from 21 to 20 -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
-          <div style="font-size: 48px;">🔍</div>
-          <div style="font-size: 18px; font-weight: 600; color: #1e293b;">No officers found</div>
-          <div style="color: #6b7280; font-size: 14px;">Try adjusting your filters</div>
-        </div>
-       </td>
-     </tr>
-   `;
-      document.getElementById('unitStrength').innerText = 'Unit Strength: 0';
-      return;
-    }
-
-    let html = '';
-    officers.forEach(o => {
-      // Format dates safely
-      const dob = o.dateOfBirth ? new Date(o.dateOfBirth).toLocaleDateString('en-GB') : '—';
-      const doc = o.dateOfCommission ? new Date(o.dateOfCommission).toLocaleDateString('en-GB') : '—';
-      const dos = o.dateOfSeniority ? new Date(o.dateOfSeniority).toLocaleDateString('en-GB') : '—';
-      const tosDate = o.tosDate ? new Date(o.tosDate).toLocaleDateString('en-GB') : '—';  // Added TOS Date formatting
-
-      // Use actual fields from API response
-      const courseName = o.course || '—';
-      const civilQual = o.civilQual || '—';
-      const sports = o.sports || '—';
-      const medicalValue = o.medicalCode || '—';
-      const postingDue = o.postingDueMonths !== null && o.postingDueMonths !== undefined ? o.postingDueMonths : '—';
-
-      html += `
-     <tr>
-      <td>${o.armyNo || '—'}</td>
-      <td><span class="badge badge-info">${o.rank || '—'}</span></td>
-      <td>${o.fullName || '—'}</td>
-      <td>${dob}</td>
-      <td>${doc}</td>
-      <td>${dos}</td>
-      <td>${o.unit || '—'}</td>
-      <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
-      <td>${o.corps || '—'}</td>
-      <td>${o.division || '—'}</td>
-      <td>${o.establishmentType || '—'}</td>
-      <td><span class="badge ${medicalValue.includes('S1') ? 'badge-success' : 'badge-gray'}">${medicalValue}</span></td>
-      <td>${tosDate}</td>  <!-- Changed from TOS From/TOS To to single TOS Date -->
-      <td>${courseName}</td>
-      <td>${civilQual}</td>
-      <td>${sports}</td>
-      <td>${o.placeOfBirth || '—'}</td>
-      <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
-      <td>${postingDue !== '—' ? postingDue + ' M' : '—'}</td>
-      <td>
-        <div class="action-icons">
-          <div class="icon-btn view" onclick="viewOfficer(${o.id})" title="View Details">View</div>
-          <div class="icon-btn edit" onclick="editOfficer(${o.id})" title="Edit Officer">Edit</div>
-        </div>
-      </td>
-     </tr>
-   `;
-    });
-
-    tbody.innerHTML = html;
-    document.getElementById('unitStrength').innerText = `Unit Strength: ${totalItems}`;
-  }
-
-  // Show/hide loading state in table
-  function setTableLoading(loading) {
-    const tbody = document.getElementById('tableBody');
-    if (loading) {
-      tbody.innerHTML = `
-     <tr>
-      <td colspan="20" style="text-align: center; padding: 60px 40px;">  <!-- Changed colspan from 21 to 20 -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
-          <div class="loading-spinner"></div>
-          <div style="color: #6b7280; font-size: 14px;">Loading officer records...</div>
-        </div>
-       </td>
-     </tr>
-   `;
-    }
-  }
-
-  // Render pagination
-  function renderPagination() {
-    const pagination = document.getElementById('pagination');
-
-    if (totalPages <= 1) {
-      pagination.innerHTML = '';
-      return;
-    }
-
-    let html = `
-        <div class="pagination-info">
-            Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of
-            <strong>${totalItems}</strong> officers
-        </div>
-        <div class="pagination-controls">
-    `;
-
-    // First page button
-    html += `
-        <button class="pagination-btn" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>
-            « First
-        </button>
-    `;
-
-    // Previous button
-    html += `
-        <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
-            ← Previous
-        </button>
-    `;
-
-    // Page numbers
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, currentPage + 2);
-
-    if (startPage > 1) {
-      html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
-      if (startPage > 2) {
-        html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      html += `
-            <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
-                ${i}
-            </button>
-        `;
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        html += `<span class="pagination-btn" style="border: none; background: none;">...</span>`;
-      }
-      html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
-    }
-
-    // Next button
-    html += `
-        <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
-            Next →
-        </button>
-    `;
-
-    // Last page button
-    html += `
-        <button class="pagination-btn" onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>
-            Last »
-        </button>
-    `;
-
-    html += '</div>';
-    pagination.innerHTML = html;
-  }
-
-  function updateResultsCount() {
-    const countElement = document.getElementById('resultsCount');
-    if (totalItems > 0) {
-      countElement.innerHTML = `Showing <strong>${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)}</strong> of <strong>${totalItems}</strong> officers matching your filters`;
-    } else {
-      countElement.innerHTML = 'No officers found';
-    }
-  }
-
-  function changePage(page) {
-    if (page < 1 || page > totalPages || isLoading) return;
-    currentPage = page;
-    fetchFilteredData();
-  }
-
-  function debounceSearch() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      currentPage = 1;
-      fetchFilteredData();
-    }, 500);
-  }
-
-  function applyFilters() {
-    currentPage = 1;
-    fetchFilteredData();
-  }
-
-  function resetFilters() {
-    // Reset all select2 dropdowns
-    $('.multi-select').val(null).trigger('change');
-
-    // Reset command dropdown and trigger change to reload corps/divisions
-    const commandSelect = $('#commandFilter');
-    commandSelect.val(null).trigger('change');
-
-    // After reset, reload corps and divisions with null command
-    loadCorpsDropdown(null);
-    loadDivisionDropdown(null);
-
-    // Reset course dropdown if it's a select
-    const courseSelect = $('#courseNameFilter');
-    if (courseSelect.length) {
-      courseSelect.val('');
-    } else {
-      document.getElementById('courseNameFilter').value = '';
-    }
-
-    // Reset all other input fields
-    document.getElementById('globalSearch').value = '';
-    document.getElementById('dobFilter').value = '';
-    document.getElementById('docFrom').value = '';
-    document.getElementById('docTo').value = '';
-    document.getElementById('dosFrom').value = '';
-    document.getElementById('dosTo').value = '';
-    // Removed tosFrom and tosTo
-    document.getElementById('courseFrom').value = '';
-    document.getElementById('courseTo').value = '';
-    document.getElementById('pobFilter').value = '';
-
-    currentPage = 1;  // Reset to first page
-    fetchFilteredData();
-  }
-
-  function clearAllFilters() {
-    resetFilters();
-  }
-
-  async function viewOfficer(id) {
-    try {
-      showLoading(true);
-      const response = await fetch(`${API_BASE_URL}/personnel/${id}`);
-      if (response.ok) {
-        const officer = await response.json();
-        showOfficerModal(officer);
-      } else {
-        showToast('Officer not found', 'error');
-      }
-    } catch (error) {
-      console.error('Error fetching officer:', error);
-      showToast('Error loading officer details', 'error');
-    } finally {
-      showLoading(false);
-    }
-  }
-
-  function showOfficerModal(officer) {
-    // Create modal overlay
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    modalOverlay.id = 'officerModal';
-
-    // Format dates helper
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '—';
-      return new Date(dateStr).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    };
-
-    // Get initials for avatar
-    const getInitials = (name) => {
-      if (!name) return 'O';
-      return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    };
-
-    // Build qualifications HTML
-    const qualificationsHtml = officer.qualifications && officer.qualifications.length > 0 ? `
-    <div class="detail-card full-width">
-      <div class="detail-card-title">
-        <span>🎓</span> Educational Qualifications
-      </div>
-      <table class="qualifications-table">
-        <thead>
-          <tr>
-            <th>Qualification</th>
-            <th>Institution</th>
-            <th>Year</th>
-            <th>Grade</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${officer.qualifications.map(q => `
-            <tr>
-              <td><strong>${q.qualification || '—'}</strong></td>
-              <td>${q.institution || '—'}</td>
-              <td>${q.yearOfCompletion || '—'}</td>
-              <td>${q.gradePercentage || '—'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  ` : '';
-
-    // Build additional qualifications HTML
-    const additionalQualHtml = officer.additionalQualifications && officer.additionalQualifications.length > 0 ? `
-    <div class="detail-card full-width">
-      <div class="detail-card-title">
-        <span>📋</span> Additional Qualifications
-      </div>
-      <table class="qualifications-table">
-        <thead>
-          <tr>
-            <th>Qualification</th>
-            <th>Issuing Authority</th>
-            <th>Year</th>
-            <th>Valid Till</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${officer.additionalQualifications.map(aq => `
-            <tr>
-              <td><strong>${aq.qualification || '—'}</strong></td>
-              <td>${aq.issuingAuthority || '—'}</td>
-              <td>${aq.year || '—'}</td>
-              <td>${formatDate(aq.validity)}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  ` : '';
-
-    // Build family members HTML
-    const familyHtml = officer.familyMembers && officer.familyMembers.length > 0 ? `
-    <div class="detail-card full-width">
-      <div class="detail-card-title">
-        <span>👨‍👩‍👧‍👦</span> Family Members
-      </div>
-      <table class="qualifications-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Relationship</th>
-            <th>Contact</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${officer.familyMembers.map(fm => `
-            <tr>
-              <td><strong>${fm.name || '—'}</strong></td>
-              <td>${fm.relationship || '—'}</td>
-              <td>${fm.contactNumber || '—'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  ` : '';
-
-    // Build decorations HTML
-    const decorationsHtml = officer.decorations && officer.decorations.length > 0 ? `
-    <div class="detail-card full-width">
-      <div class="detail-card-title">
-        <span>🏅</span> Decorations & Awards
-      </div>
-      <table class="qualifications-table">
-        <thead>
-          <tr>
-            <th>Award</th>
-            <th>Date</th>
-            <th>Citation</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${officer.decorations.map(d => `
-            <tr>
-              <td><strong>${d.decorationName || '—'}</strong></td>
-              <td>${formatDate(d.awardDate)}</td>
-              <td>${d.citation || '—'}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  ` : '';
-
-    modalOverlay.innerHTML = `
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2>
-          <span>👤</span>
-          Officer Details: ${officer.armyNo || ''}
-        </h2>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <!-- Profile Summary -->
-        <div class="officer-profile">
-          <div class="officer-avatar-large">
-            ${officer.officerImage ?
-            `<img src="http://localhost:6060/${officer.officerImage}" alt="${officer.fullName}" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%231b4332%22%2F%3E%3Ctext%20x%3D%2260%22%20y%3D%2270%22%20font-size%3D%2248%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-family%3D%22Inter%22%3E${getInitials(officer.fullName)}%3C%2Ftext%3E%3C%2Fsvg%3E'">`
-            : getInitials(officer.fullName)
-    }
-          </div>
-          <div class="officer-info-summary">
-            <div class="summary-item">
-              <span class="summary-label">Full Name</span>
-              <span class="summary-value">${officer.fullName || '—'}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Rank</span>
-              <span class="summary-value badge badge-info">${officer.rank || '—'}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Army No</span>
-              <span class="summary-value">${officer.armyNo || '—'}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Medical Category</span>
-<span class="summary-value badge ${(officer.medicalCode || '').includes('S1') ? 'badge-success' : 'badge-gray'}">${officer.medicalCode || '—'}</span>            </div>
-            <div class="summary-item">
-              <span class="summary-label">Date of Birth</span>
-              <span class="summary-value">${formatDate(officer.dateOfBirth)}</span>
-            </div>
-            <div class="summary-item">
-              <span class="summary-label">Date of Commission</span>
-              <span class="summary-value">${formatDate(officer.dateOfCommission)}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Details Grid -->
-        <div class="details-grid">
-          <!-- Personal Details -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>📋</span> Personal Details
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Place of Birth:</span>
-                <span class="detail-value">${officer.placeOfBirth || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Religion:</span>
-                <span class="detail-value">${officer.religion || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Marital Status:</span>
-                <span class="detail-value">${officer.maritalStatus || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">PAN Card:</span>
-                <span class="detail-value">${officer.panCard || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Aadhaar:</span>
-                <span class="detail-value">${officer.aadhaarNumber || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Contact Details -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>📞</span> Contact Details
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Mobile:</span>
-                <span class="detail-value">${officer.mobileNumber || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Alternate:</span>
-                <span class="detail-value">${officer.alternateMobile || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Email:</span>
-                <span class="detail-value">${officer.emailAddress || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">NSG Email:</span>
-                <span class="detail-value">${officer.nsgEmail || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">CDA Account:</span>
-                <span class="detail-value">${officer.cdaAccountNo || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">NRS:</span>
-                <span class="detail-value">${officer.nrs || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Address Details -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>🏠</span> Address
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Permanent Address:</span>
-                <span class="detail-value">${officer.permanentAddress || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">City/District:</span>
-                <span class="detail-value">${officer.city || '—'} / ${officer.district || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">State:</span>
-                <span class="detail-value">${officer.state || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Pin Code:</span>
-                <span class="detail-value">${officer.pinCode || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Medical Details -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>⚕️</span> Medical Information
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Medical Category:</span>
-                <span class="detail-value">${officer.medicalCategory || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Medical Date:</span>
-                <span class="detail-value">${formatDate(officer.medicalDate)}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Injury Category:</span>
-                <span class="detail-value">${officer.injuryCategory || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Diagnosis:</span>
-                <span class="detail-value">${officer.diagnosis || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Remarks:</span>
-                <span class="detail-value">${officer.medicalRemark || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Details -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>📅</span> Service Details
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Commission Type:</span>
-                <span class="detail-value">${officer.commissionType || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Date of Seniority:</span>
-                <span class="detail-value">${formatDate(officer.dateOfSeniority)}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">IRS Transfer:</span>
-                <span class="detail-value">${officer.irsTransfer || '—'}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Restriction:</span>
-                <span class="detail-value">${officer.restriction || '—'}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sports -->
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>⚽</span> Sports
-            </div>
-            <div class="detail-content">
-              ${officer.sports && officer.sports.length > 0 ?
-            officer.sports.map(sport => `
-                  <div class="detail-row">
-                    <span class="detail-value">${sport}</span>
-                  </div>
-                `).join('') :
-            '<div class="detail-row"><span class="detail-value">—</span></div>'
-    }
-            </div>
-          </div>
-        </div>
-
-        <!-- Qualifications Sections -->
-        ${qualificationsHtml}
-        ${additionalQualHtml}
-        ${familyHtml}
-        ${decorationsHtml}
-
-        <!-- Metadata -->
-        <div class="details-grid" style="margin-top: 16px;">
-          <div class="detail-card">
-            <div class="detail-card-title">
-              <span>⏰</span> Record Information
-            </div>
-            <div class="detail-content">
-              <div class="detail-row">
-                <span class="detail-label">Created:</span>
-                <span class="detail-value">${formatDate(officer.createdAt)}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Last Updated:</span>
-                <span class="detail-value">${formatDate(officer.updatedAt)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-    document.body.appendChild(modalOverlay);
-
-    // Close modal when clicking outside
-    modalOverlay.addEventListener('click', function(e) {
-      if (e.target === modalOverlay) {
-        closeModal();
-      }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
-    });
-  }
-
-  function closeModal() {
-    const modal = document.getElementById('officerModal');
-    if (modal) {
-      modal.remove();
-    }
-  }
-
-  function editOfficer(id) {
-    window.location.href = `/personnel-edit.html?id=${id}`;
-  }
-
-  async function exportResults() {
-    try {
-      const exportBtn = document.getElementById('exportBtn');
-      exportBtn.disabled = true;
-      exportBtn.innerHTML = '<span>⏳</span> Exporting...';
-
-      // Build filter request WITHOUT pagination to get ALL records
-      const filterRequest = buildFilterRequest();
-      const exportRequest = {
-        ...filterRequest,
-        page: 0,
-        size: 99999
-      };
-
-      const response = await fetch(`${API_BASE_URL}/personnel/filter`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportRequest)
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch export data');
-
-      const result = await response.json();
-      const officers = result.content || [];
-
-      if (officers.length === 0) {
-        showToast('No records to export', 'warning');
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-GB');
-      const timeStr = today.toLocaleTimeString();
-
-      // ── Header bar ──
-      doc.setFillColor(27, 67, 50);
-      doc.rect(0, 0, 297, 20, 'F');
-
-      doc.setFontSize(14);
-      doc.setTextColor(255, 183, 3);
-      doc.setFont('helvetica', 'bold');
-      doc.text('ARMY HRMS — Personnel Export Report', 148, 13, { align: 'center' });
-
-      // ── Sub-header ──
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Generated: ${dateStr} ${timeStr}`, 14, 26);
-      doc.text(`Total Records: ${officers.length}`, 148, 26, { align: 'center' });
-      doc.text('CONFIDENTIAL — FOR OFFICIAL USE ONLY', 283, 26, { align: 'right' });
-
-      // ── Table ──
-      const columns = [
-        { header: 'Army No',     dataKey: 'armyNo' },
-        { header: 'Rank',        dataKey: 'rank' },
-        { header: 'Name',        dataKey: 'fullName' },
-        { header: 'DOB',         dataKey: 'dateOfBirth' },
-        { header: 'Commission',  dataKey: 'dateOfCommission' },
-        { header: 'Seniority',   dataKey: 'dateOfSeniority' },
-        { header: 'Unit',        dataKey: 'unit' },
-        { header: 'Command',     dataKey: 'command' },
-        { header: 'Corps',       dataKey: 'corps' },
-        { header: 'Division',    dataKey: 'division' },
-        { header: 'Est Type',    dataKey: 'establishmentType' },
-        { header: 'Medical',     dataKey: 'medicalCode' },
-        { header: 'TOS Date',    dataKey: 'tosDate' },
-        { header: 'Course',      dataKey: 'course' },
-        { header: 'Civil Qual',  dataKey: 'civilQual' },
-        { header: 'Sports',      dataKey: 'sports' },
-        { header: 'POB',         dataKey: 'placeOfBirth' },
-        { header: 'Area Type',   dataKey: 'areaType' },
-        { header: 'Post Due',    dataKey: 'postingDueMonths' },
-        { header: 'State',       dataKey: 'state' },
-        { header: 'Mobile',      dataKey: 'mobileNumber' },
-      ];
-
-      const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
-
-      const rows = officers.map(o => ({
-        armyNo:            o.armyNo || '—',
-        rank:              o.rank || '—',
-        fullName:          o.fullName || '—',
-        dateOfBirth:       formatDate(o.dateOfBirth),
-        dateOfCommission:  formatDate(o.dateOfCommission),
-        dateOfSeniority:   formatDate(o.dateOfSeniority),
-        unit:              o.unit || '—',
-        command:           o.command || '—',
-        corps:             o.corps || '—',
-        division:          o.division || '—',
-        establishmentType: o.establishmentType || '—',
-        medicalCode:       o.medicalCode || '—',
-        tosDate:           formatDate(o.tosDate),
-        course:            o.course || '—',
-        civilQual:         o.civilQual || '—',
-        sports:            o.sports || '—',
-        placeOfBirth:      o.placeOfBirth || '—',
-        areaType:          o.areaType || '—',
-        postingDueMonths:  o.postingDueMonths != null ? o.postingDueMonths + ' M' : '—',
-        state:             o.state || '—',
-        mobileNumber:      o.mobileNumber || '—',
-      }));
-
-      doc.autoTable({
-        columns,
-        body: rows,
-        startY: 30,
-        margin: { left: 5, right: 5 },
-        styles: {
-          fontSize: 6.5,
-          cellPadding: 2.5,
-          overflow: 'linebreak',
-          valign: 'middle',
-          lineColor: [229, 231, 235],
-          lineWidth: 0.3,
-        },
-        headStyles: {
-          fillColor: [27, 67, 50],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          fontSize: 7,
-          halign: 'center',
-        },
-        alternateRowStyles: {
-          fillColor: [245, 250, 247],
-        },
-        bodyStyles: {
-          textColor: [31, 41, 55],
-        },
-        columnStyles: {
-          0:  { cellWidth: 16 },  // Army No
-          1:  { cellWidth: 12 },  // Rank
-          2:  { cellWidth: 22 },  // Name
-          3:  { cellWidth: 14 },  // DOB
-          4:  { cellWidth: 14 },  // Commission
-          5:  { cellWidth: 14 },  // Seniority
-          6:  { cellWidth: 20 },  // Unit
-          7:  { cellWidth: 16 },  // Command
-          8:  { cellWidth: 18 },  // Corps
-          9:  { cellWidth: 18 },  // Division
-          10: { cellWidth: 10 },  // Est Type
-          11: { cellWidth: 16 },  // Medical
-          12: { cellWidth: 14 },  // TOS Date
-          13: { cellWidth: 18 },  // Course
-          14: { cellWidth: 14 },  // Civil Qual
-          15: { cellWidth: 10 },  // Sports
-          16: { cellWidth: 12 },  // POB
-          17: { cellWidth: 12 },  // Area Type
-          18: { cellWidth: 10 },  // Post Due
-          19: { cellWidth: 12 },  // State
-          20: { cellWidth: 14 },  // Mobile
-        },
-        didDrawPage: function (data) {
-          // Footer on every page
-          const pageCount = doc.internal.getNumberOfPages();
-          doc.setFontSize(7);
-          doc.setTextColor(150, 150, 150);
-          doc.text(
-                  `Page ${data.pageNumber} of ${pageCount}`,
-                  148, 208, { align: 'center' }
-          );
-          doc.text('ARMY HRMS — CONFIDENTIAL', 14, 208);
-          doc.text(dateStr, 283, 208, { align: 'right' });
-
-          // Footer line
-          doc.setDrawColor(27, 67, 50);
-          doc.setLineWidth(0.5);
-          doc.line(5, 205, 292, 205);
+    const API_BASE_URL = 'http://localhost:6060/api';
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let totalItems = 0;
+    let totalPages = 0;
+    let debounceTimer;
+    let isLoading = false;
+    let commandsMap = new Map();
+    let dropdownsInitialized = false;
+    const cmsInstances = {};
+
+    /* ============================================================
+       SIMPLIFIED CUSTOM MULTI-SELECT - NO COMPLEX RERENDERING
+       ============================================================ */
+    class CustomMultiSelect {
+        constructor(containerEl) {
+            this.container = containerEl;
+            this.filterId = containerEl.dataset.filter;
+            this.placeholder = containerEl.dataset.placeholder || 'Select options';
+            this.options = [];
+            this.selected = new Set();
+            this.onChange = null;
+            this._render();
+            this._bindGlobalClose();
         }
-      });
 
-      const filename = `ARMY_HRMS_Personnel_${today.toISOString().split('T')[0]}.pdf`;
-      doc.save(filename);
+        _render() {
+            if (!this.container) return;
 
-      showToast(`Exported ${officers.length} records to PDF`, 'success');
+            this.container.innerHTML = `
+                <div class="cms-trigger" tabindex="0">
+                    <span class="cms-placeholder">${this.placeholder}</span>
+                    <span class="cms-arrow">▼</span>
+                </div>
+                <div class="cms-dropdown">
+                    <div class="cms-search-box">
+                        <input class="cms-search-input" type="text" placeholder="Search...">
+                    </div>
+                    <div class="cms-options-list"></div>
+                </div>
+            `;
 
-    } catch (error) {
-      console.error('Export error:', error);
-      showToast('Export failed: ' + error.message, 'error');
-    } finally {
-      const exportBtn = document.getElementById('exportBtn');
-      exportBtn.disabled = false;
-      exportBtn.innerHTML = '<span>📊</span> Export Results';
+            this.trigger = this.container.querySelector('.cms-trigger');
+            this.dropdown = this.container.querySelector('.cms-dropdown');
+            this.searchInput = this.container.querySelector('.cms-search-input');
+            this.optionsList = this.container.querySelector('.cms-options-list');
+
+            if (this.trigger) {
+                this.trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this._toggle();
+                });
+            }
+
+            if (this.searchInput) {
+                this.searchInput.addEventListener('input', () => {
+                    this._renderOptions(this.searchInput.value.toLowerCase());
+                });
+                this.searchInput.addEventListener('click', e => e.stopPropagation());
+            }
+        }
+
+        _toggle() {
+            if (!this.dropdown) return;
+            const isOpen = this.dropdown.classList.contains('open');
+            document.querySelectorAll('.cms-dropdown.open').forEach(d => {
+                d.classList.remove('open');
+                const parent = d.closest('.custom-multiselect');
+                if (parent) {
+                    const trigger = parent.querySelector('.cms-trigger');
+                    if (trigger) trigger.classList.remove('open');
+                }
+            });
+            if (!isOpen) {
+                this.dropdown.classList.add('open');
+                if (this.trigger) this.trigger.classList.add('open');
+                if (this.searchInput) {
+                    this.searchInput.value = '';
+                    this._renderOptions('');
+                    setTimeout(() => this.searchInput.focus(), 50);
+                }
+            }
+        }
+
+        _close() {
+            if (this.dropdown) this.dropdown.classList.remove('open');
+            if (this.trigger) this.trigger.classList.remove('open');
+        }
+
+        _bindGlobalClose() {
+            document.addEventListener('click', (e) => {
+                if (this.container && !this.container.contains(e.target)) {
+                    this._close();
+                }
+            });
+        }
+
+        _renderOptions(filter) {
+            if (!this.optionsList) return;
+
+            // SAFE: Check if options exist and are valid
+            let filtered = [];
+            if (this.options && this.options.length > 0) {
+                if (filter) {
+                    filtered = this.options.filter(o => o && o.label && o.label.toLowerCase().includes(filter));
+                } else {
+                    filtered = [...this.options];
+                }
+            }
+
+            if (filtered.length === 0) {
+                this.optionsList.innerHTML = `<div class="cms-no-results">No options found</div>`;
+                return;
+            }
+
+            this.optionsList.innerHTML = filtered.map(o => {
+                if (!o || !o.value) return '';
+                return `
+                <div class="cms-option ${this.selected.has(o.value) ? 'selected' : ''}"
+                     data-value="${this._escape(o.value)}">
+                    <div class="cms-checkbox">
+                        <span class="cms-checkbox-tick">✓</span>
+                    </div>
+                    <span class="cms-option-label">${this._escape(o.label || o.value)}</span>
+                </div>`;
+            }).join('');
+
+            this.optionsList.querySelectorAll('.cms-option').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = el.dataset.value;
+                    if (this.selected.has(val)) {
+                        this.selected.delete(val);
+                        el.classList.remove('selected');
+                    } else {
+                        this.selected.add(val);
+                        el.classList.add('selected');
+                    }
+                    this._updateTrigger();
+                    if (this.onChange) {
+                        this.onChange(this.getValues());
+                    }
+                });
+            });
+        }
+
+        _updateTrigger() {
+            if (!this.trigger) return;
+
+            let tagsHtml = '';
+            for (let v of this.selected) {
+                const opt = this.options.find(o => o && o.value === v);
+                const label = (opt && opt.label) ? opt.label : v;
+                tagsHtml += `<span class="cms-tag">
+                    <span class="cms-tag-text">${this._escape(label)}</span>
+                    <span class="cms-tag-remove" data-value="${this._escape(v)}">×</span>
+                </span>`;
+            }
+
+            const placeholderHtml = this.selected.size === 0
+                ? `<span class="cms-placeholder">${this.placeholder}</span>`
+                : '';
+
+            this.trigger.innerHTML = tagsHtml + placeholderHtml + `<span class="cms-arrow">▼</span>`;
+
+            this.trigger.querySelectorAll('.cms-tag-remove').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = btn.dataset.value;
+                    if (val) {
+                        this.selected.delete(val);
+                        this._updateTrigger();
+                        if (this.searchInput) {
+                            this._renderOptions(this.searchInput.value?.toLowerCase() || '');
+                        } else {
+                            this._renderOptions('');
+                        }
+                        if (this.onChange) {
+                            this.onChange(this.getValues());
+                        }
+                    }
+                });
+            });
+        }
+
+        _escape(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        setOptions(options) {
+            if (!options || !Array.isArray(options)) return;
+            this.options = options.filter(o => o != null).map(o =>
+                typeof o === 'string' ? { label: o, value: o } : { label: o.label || o.value, value: o.value }
+            );
+            this._renderOptions('');
+        }
+
+        getValues() {
+            return [...this.selected];
+        }
+
+        clearSelection() {
+            this.selected.clear();
+            if (this.trigger) {
+                this.trigger.innerHTML = `<span class="cms-placeholder">${this.placeholder}</span><span class="cms-arrow">▼</span>`;
+            }
+        }
     }
-  }
 
-  function generateLetter() {
-    showToast('Letter generation feature coming soon!', 'info');
-  }
-
-  function showLoading(show) {
-    const applyBtn = document.getElementById('applyFiltersBtn');
-    if (applyBtn) {
-      applyBtn.disabled = show;
-      applyBtn.textContent = show ? 'Loading...' : 'Apply Filters';
+    function initCMS(id, filterId, placeholder) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const instance = new CustomMultiSelect(el);
+        cmsInstances[filterId] = instance;
+        instance.onChange = () => {
+            currentPage = 1;
+            fetchFilteredData();
+        };
+        return instance;
     }
-  }
 
-  function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
-      <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-      <span>${message}</span>
-    `;
+    /* ============================================================
+       LOAD DROPDOWNS
+       ============================================================ */
+    async function loadDropdownData() {
+        if (dropdownsInitialized) return;
 
-    document.getElementById('toastContainer').appendChild(toast);
+        initCMS('cms-rank', 'rankFilter', 'Select ranks');
+        initCMS('cms-medical', 'medicalFilter', 'Select categories');
+        initCMS('cms-command', 'commandFilter', 'Select command');
+        initCMS('cms-corps', 'corpsFilter', 'Select corps');
+        initCMS('cms-division', 'divisionFilter', 'Select division');
+        initCMS('cms-est', 'estFilter', 'Select type');
+        initCMS('cms-area', 'areaTypeFilter', 'Select area type');
+        initCMS('cms-civil', 'civilFilter', 'Select qualification');
+        initCMS('cms-sports', 'sportsFilter', 'Select sports');
+        initCMS('cms-posting', 'postingDueFilter', 'Select months');
 
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
-  }
+        try {
+            await Promise.all([
+                loadRankDropdown(),
+                loadMedicalDropdown(),
+                loadCommandDropdown(),
+                loadEstablishmentDropdown(),
+                loadAreaTypeDropdown(),
+                loadCivilDropdown(),
+                loadSportsDropdown(),
+                loadPostingDueDropdown(),
+                loadCourseDropdown(),
+            ]);
+            await loadCorpsDropdown(null);
+            await loadDivisionDropdown(null);
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', async function() {
-    await loadDropdownData();
-    await fetchFilteredData();
+            if (cmsInstances['commandFilter']) {
+                cmsInstances['commandFilter'].onChange = () => {
+                    const vals = cmsInstances['commandFilter'].getValues();
+                    const commandId = vals.length > 0 ? commandsMap.get(vals[0]) : null;
+                    loadCorpsDropdown(commandId);
+                    loadDivisionDropdown(commandId);
+                    currentPage = 1;
+                    fetchFilteredData();
+                };
+            }
 
-    // Add event listeners
-    document.getElementById('globalSearch').addEventListener('keyup', debounceSearch);
-    document.querySelectorAll('.filter-input[type="date"]').forEach(input => {
-      input.addEventListener('change', applyFilters);
+            dropdownsInitialized = true;
+        } catch (err) {
+            console.error('Dropdown load error:', err);
+            showToast('Error loading filter options', 'error');
+        }
+    }
+
+    async function loadRankDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/ranks`);
+            if (res.ok && cmsInstances['rankFilter']) {
+                const ranks = await res.json();
+                cmsInstances['rankFilter'].setOptions(ranks);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadMedicalDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/master/filter/medical-category`);
+            if (res.ok && cmsInstances['medicalFilter']) {
+                const cats = await res.json();
+                cmsInstances['medicalFilter'].setOptions(cats);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadCommandDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/orbat/commands`);
+            if (res.ok && cmsInstances['commandFilter']) {
+                const commands = await res.json();
+                commandsMap.clear();
+                commands.forEach(cmd => commandsMap.set(cmd.name, cmd.id));
+                cmsInstances['commandFilter'].setOptions(commands.map(c => ({ label: c.name, value: c.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadCorpsDropdown(commandId) {
+        try {
+            let url = `${API_BASE_URL}/orbat/list/corps`;
+            if (commandId) url += `?commandId=${commandId}`;
+            const res = await fetch(url);
+            if (res.ok && cmsInstances['corpsFilter']) {
+                const list = await res.json();
+                cmsInstances['corpsFilter'].setOptions(list.map(c => ({ label: c.name, value: c.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadDivisionDropdown(commandId) {
+        try {
+            let url = `${API_BASE_URL}/orbat/list/divisions`;
+            if (commandId) url += `?commandId=${commandId}`;
+            const res = await fetch(url);
+            if (res.ok && cmsInstances['divisionFilter']) {
+                const list = await res.json();
+                cmsInstances['divisionFilter'].setOptions(list.map(d => ({ label: d.name, value: d.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadEstablishmentDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/dropdown/ESTABLISHMENT`);
+            if (res.ok && cmsInstances['estFilter']) {
+                const list = await res.json();
+                cmsInstances['estFilter'].setOptions(list.map(e => ({ label: e.name, value: e.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadAreaTypeDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/master/filter/area-type`);
+            if (res.ok && cmsInstances['areaTypeFilter']) {
+                const list = await res.json();
+                cmsInstances['areaTypeFilter'].setOptions(list);
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadCivilDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/dropdown/CIVIL_QUALIFICATION`);
+            if (res.ok && cmsInstances['civilFilter']) {
+                const list = await res.json();
+                cmsInstances['civilFilter'].setOptions(list.map(q => ({ label: q.name, value: q.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadSportsDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/dropdown/SPORTS`);
+            if (res.ok && cmsInstances['sportsFilter']) {
+                const list = await res.json();
+                cmsInstances['sportsFilter'].setOptions(list.map(s => ({ label: s.name, value: s.name })));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadPostingDueDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/master/filter/posting-due-months`);
+            if (res.ok && cmsInstances['postingDueFilter']) {
+                const months = await res.json();
+                cmsInstances['postingDueFilter'].setOptions(
+                    months.map(m => ({ label: m + (m === 1 ? ' Month' : ' Months'), value: String(m) }))
+                );
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function loadCourseDropdown() {
+        try {
+            const res = await fetch(`${API_BASE_URL}/course`);
+            if (res.ok) {
+                const courses = await res.json();
+                const sel = document.getElementById('courseNameFilter');
+                if (sel) {
+                    sel.innerHTML = '<option value="">All Courses</option>';
+                    courses.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.courseName;
+                        opt.textContent = c.courseName;
+                        sel.appendChild(opt);
+                    });
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function buildFilterRequest() {
+        const getCMSValue = (filterId) => {
+            const inst = cmsInstances[filterId];
+            if (!inst) return null;
+            const vals = inst.getValues().filter(v => v !== null && v !== undefined && v !== '');
+            return vals.length > 0 ? vals : null;
+        };
+
+        const getPostingDueValue = () => {
+            const inst = cmsInstances['postingDueFilter'];
+            if (!inst) return null;
+            const vals = inst.getValues()
+                .filter(v => v !== null && v !== undefined && v !== '')
+                .map(v => parseInt(v))
+                .filter(v => !isNaN(v));
+            return vals.length > 0 ? vals : null;
+        };
+
+        const getInputValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            const val = el.value?.trim();
+            return val && val !== '' ? val : null;
+        };
+
+        const getDateValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            const val = el.value;
+            return val && val !== '' ? val : null;
+        };
+
+        const getSelectValue = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            const val = el.value;
+            return val && val !== '' ? val : null;
+        };
+
+        return {
+            rank: getCMSValue('rankFilter'),
+            medicalCategory: getCMSValue('medicalFilter'),
+            command: getCMSValue('commandFilter'),
+            corps: getCMSValue('corpsFilter'),
+            division: getCMSValue('divisionFilter'),
+            establishmentType: getCMSValue('estFilter'),
+            areaType: getCMSValue('areaTypeFilter'),
+            civilQualification: getCMSValue('civilFilter'),
+            sports: getCMSValue('sportsFilter'),
+            postingDueMonths: getPostingDueValue(),
+            courseName: getSelectValue('courseNameFilter'),
+            placeOfBirth: getInputValue('pobFilter'),
+            dobGreaterThan: getDateValue('dobFilter'),
+            docFrom: getDateValue('docFrom'),
+            docTo: getDateValue('docTo'),
+            dosFrom: getDateValue('dosFrom'),
+            dosTo: getDateValue('dosTo'),
+            courseFrom: getDateValue('courseFrom'),
+            courseTo: getDateValue('courseTo'),
+            search: getInputValue('globalSearch'),
+        };
+    }
+
+    /* ============================================================
+       CLEAR ALL FILTERS - SIMPLE AND RELIABLE
+       ============================================================ */
+    function clearAllFilters() {
+        console.log("Clearing all filters...");
+
+        // Clear all custom multi-select dropdowns (just clear the selected Set, don't re-render options)
+        Object.values(cmsInstances).forEach(inst => {
+            if (inst) {
+                inst.selected.clear();
+                if (inst.trigger) {
+                    inst.trigger.innerHTML = `<span class="cms-placeholder">${inst.placeholder}</span><span class="cms-arrow">▼</span>`;
+                }
+            }
+        });
+
+        // Clear all text and search inputs
+        const globalSearch = document.getElementById('globalSearch');
+        if (globalSearch) globalSearch.value = '';
+
+        const pobFilter = document.getElementById('pobFilter');
+        if (pobFilter) pobFilter.value = '';
+
+        // Clear Course Name select dropdown
+        const courseSelect = document.getElementById('courseNameFilter');
+        if (courseSelect) courseSelect.value = '';
+
+        // Clear all date inputs
+        const dateInputs = ['dobFilter', 'docFrom', 'docTo', 'dosFrom', 'dosTo', 'courseFrom', 'courseTo'];
+        dateInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) input.value = '';
+        });
+
+        // Reset pagination
+        currentPage = 1;
+
+        // Show visual feedback
+        const clearBtn = document.getElementById('clearAllBtn');
+        if (clearBtn) {
+            const originalText = clearBtn.innerHTML;
+            clearBtn.innerHTML = '✓ Cleared!';
+            clearBtn.style.background = '#dcfce7';
+            clearBtn.style.color = '#15803d';
+
+            setTimeout(() => {
+                clearBtn.innerHTML = originalText;
+                clearBtn.style.background = '';
+                clearBtn.style.color = '';
+            }, 1000);
+        }
+
+        console.log("All filters cleared, fetching data...");
+        // Fetch data with cleared filters
+        fetchFilteredData();
+    }
+
+    async function fetchFilteredData() {
+        if (isLoading) return;
+        try {
+            isLoading = true;
+            setTableLoading(true);
+
+            const payload = {
+                ...buildFilterRequest(),
+                page: currentPage - 1,
+                size: itemsPerPage
+            };
+
+            console.log('Filter payload:', JSON.stringify(payload, null, 2));
+
+            const res = await fetch(`${API_BASE_URL}/personnel/filter`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                const officers = result.content || [];
+                totalItems = result.totalElements || 0;
+                totalPages = result.totalPages || 0;
+                currentPage = (result.number || 0) + 1;
+                renderTable(officers);
+                updateResultsCount();
+                renderPagination();
+                const unitStrengthEl = document.getElementById('unitStrength');
+                if (unitStrengthEl) unitStrengthEl.innerText = `Unit Strength: ${totalItems}`;
+            } else {
+                const errText = await res.text();
+                console.error('API error:', errText);
+                showToast('Error loading officer records', 'error');
+                renderTable([]);
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            showToast('Error: ' + err.message, 'error');
+            renderTable([]);
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    function renderTable(officers) {
+        const tbody = document.getElementById('tableBody');
+        if (!tbody) return;
+
+        if (!officers || officers.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="20" style="text-align:center;padding:60px 40px;">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+                            <div style="font-size:48px;">🔍</div>
+                            <div style="font-size:18px;font-weight:600;color:#1e293b;">No officers found</div>
+                            <div style="color:#6b7280;font-size:14px;">Try adjusting your filters</div>
+                        </div>
+                    </td>
+                </tr>`;
+            const unitStrengthEl = document.getElementById('unitStrength');
+            if (unitStrengthEl) unitStrengthEl.innerText = 'Unit Strength: 0';
+            return;
+        }
+
+        let html = '';
+        officers.forEach(o => {
+            const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+            const med = o.medicalCode || '—';
+            const postingDue = (o.postingDueMonths !== null && o.postingDueMonths !== undefined)
+                ? o.postingDueMonths + ' M' : '—';
+
+            html += `
+                <tr>
+                    <td>${o.armyNo || '—'}</td>
+                    <td><span class="badge badge-info">${o.rank || '—'}</span></td>
+                    <td>${o.fullName || '—'}</td>
+                    <td>${fmt(o.dateOfBirth)}</td>
+                    <td>${fmt(o.dateOfCommission)}</td>
+                    <td>${fmt(o.dateOfSeniority)}</td>
+                    <td>${o.unit || '—'}</td>
+                    <td><span class="badge ${o.command === 'Northern' ? 'badge-warning' : 'badge-success'}">${o.command || '—'}</span></td>
+                    <td>${o.corps || '—'}</td>
+                    <td>${o.division || '—'}</td>
+                    <td>${o.establishmentType || '—'}</td>
+                    <td><span class="badge ${med.includes('S1') ? 'badge-success' : 'badge-gray'}">${med}</span></td>
+                    <td>${fmt(o.tosDate)}</td>
+                    <td>${o.course || '—'}</td>
+                    <td>${o.civilQual || '—'}</td>
+                    <td>${o.sports || '—'}</td>
+                    <td>${o.placeOfBirth || '—'}</td>
+                    <td><span class="badge ${o.areaType === 'Field' ? 'badge-warning' : 'badge-gray'}">${o.areaType || '—'}</span></td>
+                    <td>${postingDue}</td>
+                    <td>
+                        <div class="action-icons">
+                            <div class="icon-btn view" onclick="viewOfficer(${o.id})">View</div>
+                            <div class="icon-btn edit" onclick="editOfficer(${o.id})">Edit</div>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function setTableLoading(loading) {
+        if (!loading) return;
+        const tbody = document.getElementById('tableBody');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="20" style="text-align:center;padding:60px 40px;">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                            <div class="loading-spinner"></div>
+                            <div style="color:#6b7280;font-size:14px;">Loading officer records...</div>
+                        </div>
+                    </td>
+                <tr>`;
+        }
+    }
+
+    function updateResultsCount() {
+        const el = document.getElementById('resultsCount');
+        if (!el) return;
+        if (totalItems > 0) {
+            const from = (currentPage - 1) * itemsPerPage + 1;
+            const to = Math.min(currentPage * itemsPerPage, totalItems);
+            el.innerHTML = `Showing <strong>${from}–${to}</strong> of <strong>${totalItems}</strong> officers`;
+        } else {
+            el.innerHTML = 'No officers found';
+        }
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        if (!pagination) return;
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        const from = (currentPage - 1) * itemsPerPage + 1;
+        const to = Math.min(currentPage * itemsPerPage, totalItems);
+
+        let html = `
+            <div class="pagination-info">Showing <strong>${from}–${to}</strong> of <strong>${totalItems}</strong></div>
+            <div class="pagination-controls">
+                <button class="pagination-btn" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>« First</button>
+                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+
+        const start = Math.max(1, currentPage - 2);
+        const end = Math.min(totalPages, currentPage + 2);
+
+        if (start > 1) {
+            html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+            if (start > 2) html += `<span class="pagination-btn" style="border:none;background:none;">…</span>`;
+        }
+
+        for (let i = start; i <= end; i++) {
+            html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+
+        if (end < totalPages) {
+            if (end < totalPages - 1) html += `<span class="pagination-btn" style="border:none;background:none;">…</span>`;
+            html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+
+        html += `
+                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+                <button class="pagination-btn" onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>Last »</button>
+            </div>`;
+
+        pagination.innerHTML = html;
+    }
+
+    function changePage(page) {
+        if (page < 1 || page > totalPages || isLoading) return;
+        currentPage = page;
+        fetchFilteredData();
+    }
+
+    async function viewOfficer(id) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/personnel/${id}`);
+            if (res.ok) {
+                showOfficerModal(await res.json());
+            } else {
+                showToast('Officer not found', 'error');
+            }
+        } catch (e) {
+            showToast('Error loading officer details', 'error');
+        }
+    }
+
+    function showOfficerModal(officer) {
+        const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+        const initials = (name) => name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'O';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'officerModal';
+        overlay.innerHTML = `
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2>👤 Officer: ${officer.armyNo || ''}</h2>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="officer-profile">
+                        <div class="officer-avatar-large">${initials(officer.fullName)}</div>
+                        <div class="officer-info-summary">
+                            <div class="summary-item"><span class="summary-label">Full Name</span><span class="summary-value">${officer.fullName || '—'}</span></div>
+                            <div class="summary-item"><span class="summary-label">Rank</span><span class="summary-value badge badge-info">${officer.rank || '—'}</span></div>
+                            <div class="summary-item"><span class="summary-label">Army No</span><span class="summary-value">${officer.armyNo || '—'}</span></div>
+                            <div class="summary-item"><span class="summary-label">Medical</span><span class="summary-value">${officer.medicalCode || '—'}</span></div>
+                            <div class="summary-item"><span class="summary-label">Date of Birth</span><span class="summary-value">${fmt(officer.dateOfBirth)}</span></div>
+                            <div class="summary-item"><span class="summary-label">Commission</span><span class="summary-value">${fmt(officer.dateOfCommission)}</span></div>
+                        </div>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-card-title">📋 Personal</div>
+                            <div class="detail-row"><span class="detail-label">Place of Birth</span><span class="detail-value">${officer.placeOfBirth || '—'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Religion</span><span class="detail-value">${officer.religion || '—'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Marital Status</span><span class="detail-value">${officer.maritalStatus || '—'}</span></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-card-title">📞 Contact</div>
+                            <div class="detail-row"><span class="detail-label">Mobile</span><span class="detail-value">${officer.mobileNumber || '—'}</span></div>
+                            <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${officer.emailAddress || '—'}</span></div>
+                        </div>
+                        <div class="detail-card">
+                            <div class="detail-card-title">🏠 Address</div>
+                            <div class="detail-row"><span class="detail-label">State</span><span class="detail-value">${officer.state || '—'}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) closeModal();
+        });
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('officerModal');
+        if (modal) modal.remove();
+    }
+
+    function editOfficer(id) {
+        window.location.href = `/personnel-edit.html?id=${id}`;
+    }
+
+    async function exportResults() {
+        const btn = document.getElementById('exportBtn');
+        if (!btn) return;
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Exporting...';
+
+            // First, get the total count with current filters
+            const filterPayload = buildFilterRequest();
+            const countPayload = { ...filterPayload, page: 0, size: 1 };
+
+            const countRes = await fetch(`${API_BASE_URL}/personnel/filter`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(countPayload)
+            });
+
+            if (!countRes.ok) throw new Error('Failed to get record count');
+            const countResult = await countRes.json();
+            const totalRecords = countResult.totalElements || 0;
+
+            if (totalRecords === 0) {
+                showToast('No records to export with current filters', 'warning');
+                return;
+            }
+
+            // Now fetch all records with the same filters
+            const exportPayload = { ...filterPayload, page: 0, size: totalRecords };
+
+            const res = await fetch(`${API_BASE_URL}/personnel/filter`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exportPayload)
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch export data');
+
+            const result = await res.json();
+            const officers = result.content || [];
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            doc.setFillColor(27, 67, 50);
+            doc.rect(0, 0, 297, 20, 'F');
+            doc.setFontSize(14);
+            doc.setTextColor(255, 183, 3);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ARMY HRMS — Personnel Export Report', 148, 13, { align: 'center' });
+
+            // Add filter summary
+            const activeFilters = [];
+            if (filterPayload.rank && filterPayload.rank.length) activeFilters.push(`Rank: ${filterPayload.rank.join(', ')}`);
+            if (filterPayload.command && filterPayload.command.length) activeFilters.push(`Command: ${filterPayload.command.join(', ')}`);
+            if (filterPayload.corps && filterPayload.corps.length) activeFilters.push(`Corps: ${filterPayload.corps.join(', ')}`);
+            if (filterPayload.search) activeFilters.push(`Search: "${filterPayload.search}"`);
+
+            if (activeFilters.length > 0) {
+                doc.setFontSize(8);
+                doc.setTextColor(80, 80, 80);
+                doc.text(`Filters: ${activeFilters.join(' | ')}`, 148, 22, { align: 'center' });
+            }
+
+            doc.autoTable({
+                columns: [
+                    { header: 'Army No', dataKey: 'armyNo' },
+                    { header: 'Rank', dataKey: 'rank' },
+                    { header: 'Name', dataKey: 'fullName' },
+                    { header: 'Corps', dataKey: 'corps' },
+                    { header: 'Command', dataKey: 'command' },
+                    { header: 'Medical', dataKey: 'medicalCode' },
+                ],
+                body: officers.map(o => ({
+                    armyNo: o.armyNo || '—',
+                    rank: o.rank || '—',
+                    fullName: o.fullName || '—',
+                    corps: o.corps || '—',
+                    command: o.command || '—',
+                    medicalCode: o.medicalCode || '—',
+                })),
+                startY: activeFilters.length > 0 ? 30 : 25,
+                margin: { left: 5, right: 5 },
+                styles: { fontSize: 6.5, cellPadding: 2.5 },
+                headStyles: { fillColor: [27, 67, 50], textColor: [255, 255, 255], fontStyle: 'bold' }
+            });
+
+            doc.save(`ARMY_HRMS_Export_${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast(`Exported ${officers.length} records (with applied filters)`, 'success');
+        } catch (err) {
+            console.error('Export error:', err);
+            showToast('Export failed: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>📊</span> Export Results';
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><span>${message}</span>`;
+        container.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadDropdownData();
+        await fetchFilteredData();
+
+        const globalSearch = document.getElementById('globalSearch');
+        if (globalSearch) {
+            globalSearch.addEventListener('keyup', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    fetchFilteredData();
+                }, 500);
+            });
+        }
+
+        document.querySelectorAll('.filter-input[type="date"]').forEach(inp => {
+            inp.addEventListener('change', () => {
+                currentPage = 1;
+                fetchFilteredData();
+            });
+        });
+
+        const courseSelect = document.getElementById('courseNameFilter');
+        if (courseSelect) {
+            courseSelect.addEventListener('change', () => {
+                currentPage = 1;
+                fetchFilteredData();
+            });
+        }
+
+        const pobFilter = document.getElementById('pobFilter');
+        if (pobFilter) {
+            pobFilter.addEventListener('keyup', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    currentPage = 1;
+                    fetchFilteredData();
+                }, 500);
+            });
+        }
+
+        const applyBtn = document.getElementById('applyFiltersBtn');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                currentPage = 1;
+                fetchFilteredData();
+            });
+        }
+
+        const resetBtn = document.getElementById('resetBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', clearAllFilters);
+        }
+
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', clearAllFilters);
+        }
+
+        const exportBtn = document.getElementById('exportBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportResults);
+        }
     });
-    document.getElementById('courseNameFilter').addEventListener('change', applyFilters);
-    document.getElementById('pobFilter').addEventListener('change', applyFilters);
-
-    // Add change listeners for select2 dropdowns
-    $('.multi-select').on('change', function() {
-      applyFilters();
-    });
-  });
 </script>
 </body>
 </html>
