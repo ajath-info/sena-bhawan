@@ -182,9 +182,10 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
             (
                 SELECT tc.command_name
                 FROM posting_details pd
-                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
-                INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
-                INNER JOIN tb_command tc ON tcor.command_id = tc.command_id
+                INNER JOIN orbat_structure os
+                    ON pd.orbat_id = os.id
+                INNER JOIN tb_command tc
+                    ON os.command_code = tc.command_code
                 WHERE pd.personnel_id = p.id
                 ORDER BY pd.from_date DESC
                 LIMIT 1
@@ -322,9 +323,10 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
             (
                 SELECT tc.command_name
                 FROM posting_details pd
-                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
-                INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
-                INNER JOIN tb_command tc ON tcor.command_id = tc.command_id
+                INNER JOIN orbat_structure os
+                    ON pd.orbat_id = os.id
+                INNER JOIN tb_command tc
+                    ON os.command_code = tc.command_code
                 WHERE pd.personnel_id = p.id
                 ORDER BY pd.from_date DESC
                 LIMIT 1
