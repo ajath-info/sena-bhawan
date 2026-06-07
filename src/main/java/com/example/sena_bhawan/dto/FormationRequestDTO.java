@@ -16,6 +16,11 @@ public class FormationRequestDTO {
     private Long divisionId;
     private Long brigadeId;
 
+    private String commandName;
+    private String corpsName;
+    private String divisionName;
+    private String brigadeName;
+
     // Common fields
     private String name;        // commandName / corpsName / etc.
     private String location;

@@ -2,1554 +2,730 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Add New Personnel - ARMY HRMS</title>
+  <title>Edit Personnel - ARMY HRMS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body { height:100%; overflow:hidden; }
-    body {
-      background: #f3f4f6;
-    }
-
-    .form-card {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 28px;
-    }
-
-    .section {
-      margin-bottom: 22px;
-    }
-
-    .section-title {
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .btn {
-      height: 40px;
-      padding: 0 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background: #1b4332;
-      color: #ffffff;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background: #16372a;
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      border: 1px solid #d1d5db;
-      color: #374151;
-    }
-
-    .btn-secondary:hover {
-      background: #f9fafb;
-    }
-
-    .btn-success {
-      background: #0b5e42;
-      color: white;
-      border: none;
-    }
-
-    .section button.btn-secondary {
-      margin-top: 10px;
-    }
-
-    .grid > button.btn-secondary {
-      align-self: flex-end;
-      margin-top: 22px;
-      height: 36px;
-      font-size: 12px;
-    }
-
-    .medical-item span {
-      color: #dc2626;
-      font-size: 12px;
-    }
-
-    .medical-box {
-      background: #ffffff;
-      border: 1.5px solid #d1d5db;
-      height: 38px;
-      width: 38px;
-      border-radius: 6px;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .actions .btn {
-      min-width: 140px;
-    }
-
-    input,
-    select,
-    textarea {
-      transition:
-              border-color 0.15s ease,
-              box-shadow 0.15s ease,
-              background-color 0.15s ease;
-    }
-
-    input:hover,
-    select:hover,
-    textarea:hover {
-      border-color: #9ca3af;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #1b4332;
-      box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.12);
-      background-color: #ffffff;
-    }
-
-    input:disabled,
-    textarea:disabled {
-      background: #f9fafb;
-      color: #6b7280;
-      cursor: not-allowed;
-    }
-
-    .repeater-item {
-      animation: fadeInSlide 0.25s ease forwards;
-    }
-
-    .repeater-item.removing {
-      animation: fadeOutSlide 0.2s ease forwards;
-    }
-
-    @keyframes fadeInSlide {
-      from {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeOutSlide {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
-    }
-
-    body {
-      font-family: "Inter", sans-serif;
-      background:#f1f3f5;
-      color:#1f2937;
-    }
-
-    .container {
-      display:flex;
-      height:100vh;
-      overflow:hidden;
-    }
-
-    .sidebar {
-      width: 256px;
-      background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      flex-shrink: 0;
-    }
-
-    .sidebar-header {
-      padding: 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      min-height: 72px;
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: #ffb703;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-
-    .logo-text h1 {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .logo-text p {
-      font-size: 11px;
-      color: #52b788;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 16px 0;
-    }
-
-    .nav-section-title {
-      padding: 16px 20px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #52b788;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: white;
-      text-decoration: none;
-      border-left: 4px solid transparent;
-    }
-
-    .nav-item.active {
-      background: rgba(255,255,255,0.1);
-      border-left-color: #ffb703;
-      font-weight: 600;
-    }
-
-    .nav-icon {
-      font-size: 18px;
-    }
-
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #2d6a4f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .user-info .name {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .user-info .role {
-      font-size: 12px;
-      color: #52b788;
-    }
-
-    .main-content {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-
-    .header {
-      background:white;
-      border-bottom:1px solid #e5e7eb;
-      padding:16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    body { font-family:"Inter",sans-serif; background:#f1f3f5; color:#1f2937; }
+    .container { display:flex; height:100vh; overflow:hidden; }
+    .sidebar { width:256px; background:linear-gradient(180deg,#1b4332 0%,#081c15 100%); color:white; display:flex; flex-direction:column; height:100vh; overflow-y:auto; overflow-x:hidden; flex-shrink:0; }
+    .sidebar-header { padding:20px; border-bottom:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; min-height:72px; }
+    .logo-section { display:flex; align-items:center; gap:12px; }
+    .logo-icon { width:32px; height:32px; background:#ffb703; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#000; }
+    .logo-text h1 { font-size:18px; font-weight:700; }
+    .logo-text p { font-size:11px; color:#52b788; }
+    .sidebar-nav { flex:1; padding:16px 0; }
+    .nav-section-title { padding:16px 20px 8px; font-size:11px; font-weight:700; text-transform:uppercase; color:#52b788; }
+    .nav-item { display:flex; align-items:center; gap:12px; padding:12px 20px; color:white; text-decoration:none; border-left:4px solid transparent; }
+    .nav-item.active { background:rgba(255,255,255,0.1); border-left-color:#ffb703; font-weight:600; }
+    .nav-icon { font-size:18px; }
+    .sidebar-footer { padding:16px; border-top:1px solid rgba(255,255,255,0.1); }
+    .user-profile { display:flex; align-items:center; gap:12px; }
+    .user-avatar { width:40px; height:40px; border-radius:50%; background:#2d6a4f; display:flex; align-items:center; justify-content:center; font-weight:700; }
+    .user-info .name { font-size:14px; font-weight:600; }
+    .user-info .role { font-size:12px; color:#52b788; }
+    .main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .header { background:white; border-bottom:1px solid #e5e7eb; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; }
     .header h2 { font-size:22px; font-weight:700; }
     .header p { font-size:13px; color:#6b7280; margin-top:4px; }
-
-    .section-selector {
-      width: 250px;
-    }
-
-    .section-selector select {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-    }
-
-    .content-area {
-      flex:1;
-      overflow-y:auto;
-      padding:24px;
-    }
-
-    .form-card {
-      max-width:900px;
-      margin:auto;
-      background:white;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      padding:24px;
-    }
-
-    .form-title {
-      font-size:16px;
-      font-weight:700;
-      margin-bottom:6px;
-    }
-
-    .form-subtitle {
-      font-size:13px;
-      color:#6b7280;
-      margin-bottom:20px;
-    }
-
-    .upload-box {
-      border:2px dashed #d1d5db;
-      border-radius:10px;
-      padding:20px;
-      text-align:center;
-      font-size:13px;
-      color:#6b7280;
-      margin-bottom:24px;
-    }
-
-    .section {
-      margin-bottom:24px;
-    }
-
-    .section-title {
-      font-size:14px;
-      font-weight:700;
-      margin-bottom:12px;
-      display:flex;
-      gap:6px;
-      align-items:center;
-    }
-
-    .grid {
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:16px;
-    }
-
+    .content-area { flex:1; overflow-y:auto; padding:24px; }
+    .form-card { max-width:960px; margin:auto; background:white; border:1px solid #e5e7eb; border-radius:12px; padding:28px; }
+    .form-title { font-size:16px; font-weight:700; margin-bottom:6px; }
+    .form-subtitle { font-size:13px; color:#6b7280; margin-bottom:24px; }
+    .section { margin-bottom:32px; padding-bottom:32px; border-bottom:1px solid #f3f4f6; }
+    .section:last-of-type { border-bottom:none; }
+    .section-title { font-size:14px; font-weight:700; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; }
+    .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
     .grid-1 { grid-template-columns:1fr; }
-
-    label {
-      font-size:13px;
-      font-weight:600;
-      margin-bottom:6px;
-      display:block;
-    }
-
-    input, select, textarea {
-      width:100%;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid #d1d5db;
-      font-size:14px;
-    }
-
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    label { font-size:13px; font-weight:600; margin-bottom:6px; display:block; }
+    label.required:after { content:" *"; color:#dc2626; font-weight:bold; }
+    input, select, textarea { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #d1d5db; font-size:14px; transition:border-color .15s,box-shadow .15s,background-color .15s; font-family:inherit; }
+    input:hover, select:hover, textarea:hover { border-color:#9ca3af; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color:#1b4332; box-shadow:0 0 0 2px rgba(27,67,50,.12); background:#fff; }
+    input:disabled, select:disabled, textarea:disabled { background:#f9fafb; color:#6b7280; cursor:not-allowed; }
     textarea { resize:vertical; min-height:80px; }
-
-    .medical-category {
-      display:flex;
-      gap:18px;
-      margin-top:10px;
-    }
-
-    .medical-item {
-      text-align:center;
-      font-size:12px;
-      font-weight:600;
-      color:#374151;
-    }
-
-    .medical-item span {
-      display:block;
-      margin-bottom:6px;
-      color:#ef4444;
-      font-weight:700;
-    }
-
-    .medical-box {
-      width:44px;
-      height:40px;
-      border:1.5px solid #d1d5db;
-      border-radius:6px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:14px;
-      font-weight:700;
-      background:#fff;
-    }
-
-    .actions {
-      display:flex;
-      justify-content:flex-end;
-      gap:12px;
-      margin-top:20px;
-    }
-
-    .btn {
-      padding:10px 16px;
-      border-radius:8px;
-      font-weight:600;
-      border:none;
-      cursor:pointer;
-    }
-
-    .btn-secondary {
-      background:white;
-      border:1px solid #d1d5db;
-    }
-
-    .btn-primary {
-      background:#1b4332;
-      color:white;
-    }
-
-    #decorations-container .repeater-item {
-      background: #f0f7f3;
-      border: 1px solid #d7ebe1;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .section > button.btn-secondary {
-      background: #1b4332;
-      color: #ffffff;
-      border: 1px solid #1b4332;
-    }
-
-    .section > button.btn-secondary:hover {
-      background: #16372a;
-      border-color: #16372a;
-    }
-
+    .btn { height:40px; padding:0 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; border:none; font-family:inherit; }
+    .btn-primary { background:#1b4332; color:#fff; }
+    .btn-primary:hover { background:#16372a; }
+    .btn-secondary { background:#fff; border:1px solid #d1d5db; color:#374151; }
+    .btn-secondary:hover { background:#f9fafb; }
+    .btn-success { background:#0b5e42; color:#fff; }
+    .btn-success:hover { background:#0a4a35; }
+    .btn-danger { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+    .btn-danger:hover { background:#fecaca; border-color:#f87171; color:#7f1d1d; }
+    .btn-add { background:#1b4332; color:#fff; border:none; margin-top:10px; }
+    .btn-add:hover { background:#16372a; }
+    .repeater-item { animation:fadeInSlide .25s ease forwards; }
+    .repeater-item.removing { animation:fadeOutSlide .2s ease forwards; }
+    @keyframes fadeInSlide { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeOutSlide { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-6px)} }
+    #decorations-container .repeater-item { background:#f0f7f3; border:1px solid #d7ebe1; border-radius:10px; padding:16px; margin-bottom:12px; }
     #civil-qualifications-container .repeater-item,
     #additional-qualifications-container .repeater-item,
-    #family-container .repeater-item {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .grid button.btn-secondary {
-      width: auto;
-      min-width: 120px;
-      height: 40px;
-      padding: 0 16px;
-      font-size: 13px;
-      font-weight: 600;
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      justify-self: end;
-      align-self: center;
-    }
-
-    .grid button.btn-secondary:hover {
-      background: #fecaca;
-      border-color: #f87171;
-      color: #7f1d1d;
-    }
-
-    .medical-box {
-      cursor: pointer;
-      transition: background-color 0.15s ease,
-      border-color 0.15s ease,
-      color 0.15s ease;
-    }
-
-    .medical-box.selected {
-      background: #1b4332;
-      border-color: #1b4332;
-      color: #ffffff;
-    }
-
-    .update-btn {
-      background: #0b5e42;
-      color: white;
-      margin-left: auto;
-    }
-
-    .update-btn:hover {
-      background: #0a4a35;
-    }
-
-    .success-message {
-      background: #d4edda;
-      color: #155724;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      display: none;
-    }
-
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      display: none;
-    }
-
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
+    #family-container .repeater-item,
+    #sports-container .repeater-item { background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:16px; margin-bottom:12px; }
+    .success-message { background:#d4edda; color:#155724; padding:10px 16px; border-radius:8px; margin-bottom:15px; display:none; font-size:13px; }
+    .error-message-box { background:#f8d7da; color:#721c24; padding:10px 16px; border-radius:8px; margin-bottom:15px; display:none; font-size:13px; }
+    .field-hint { color:#6b7280; font-size:11px; margin-top:4px; display:block; }
+    .upload-box { border:2px dashed #d1d5db; border-radius:10px; padding:20px; text-align:center; font-size:13px; color:#6b7280; }
+    .cdt { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #d1d5db; font-size:14px; background:white; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+    .cdt:hover { border-color:#9ca3af; }
+    .dropdown-content { display:none; position:absolute; background:#fff; min-width:100%; border:1px solid #d1d5db; border-radius:8px; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,.12); top:100%; left:0; right:0; margin-top:4px; }
+    .dropdown-item { padding:10px 12px; cursor:pointer; border-bottom:1px solid #f3f4f6; font-size:14px; }
+    .dropdown-item:last-child { border-bottom:none; }
+    .dropdown-item:hover { background:#f3f4f6; }
+    .no-results { padding:12px; color:#6b7280; text-align:center; font-style:italic; font-size:13px; }
+    .dsearch { width:100%; padding:10px 12px; border:none; border-bottom:1px solid #d1d5db; border-radius:8px 8px 0 0; outline:none; font-size:14px; box-sizing:border-box; font-family:inherit; }
+    .actions { display:flex; justify-content:flex-end; gap:12px; margin-top:28px; }
+    .medical-table { width:100%; border-collapse:collapse; background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; }
+    .medical-table th { padding:12px; text-align:center; font-weight:700; color:#1f2937; background:#f9fafb; border-bottom:2px solid #e5e7eb; }
+    .medical-table td { padding:8px; border-bottom:1px solid #e5e7eb; }
+    .medical-table td.lc { padding:12px; font-weight:600; background:#f9fafb; text-align:center; }
+    .medical-table tr:last-child td { border-bottom:none; }
+    .loading-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center; z-index:9999; font-size:15px; font-weight:600; color:#1b4332; gap:12px; }
   </style>
   <link rel="stylesheet" href="sidebar.css">
 </head>
-
 <body>
 <script src="sidebar.js"></script>
 <script src="auth.js"></script>
 <script src="logout.js"></script>
 
+<div id="loadingOverlay" class="loading-overlay">
+  <div style="width:24px;height:24px;border:3px solid #d7ebe1;border-top-color:#1b4332;border-radius:50%;animation:spin .7s linear infinite;"></div>
+  Loading personnel data...
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
 <div class="container">
-
-  <!-- SIDEBAR CONTAINER - This will be populated by sidebar.js -->
   <aside class="sidebar" id="sidebarContainer">
-    <!-- Loading indicator (optional) -->
-    <div style="color: white; padding: 20px; text-align: center;">
-      Loading menu...
-    </div>
+    <div style="color:white;padding:20px;text-align:center;">Loading menu...</div>
   </aside>
-
   <main class="main-content">
     <div class="header">
       <div>
         <h2>Edit Personnel</h2>
-        <p>Update personnel information section by section</p>
-      </div>
-      <div class="section-selector">
-        <select id="sectionSelector" onchange="showSection()">
-          <option value="">-- Select Section to Update --</option>
-          <option value="basic">Basic Information</option>
-          <option value="service">Service Details</option>
-          <option value="address">Address Details</option>
-          <option value="contact">Contact Details</option>
-          <option value="decorations">Decorations</option>
-          <option value="qualifications">Qualifications</option>
-          <option value="additional-qualifications">Additional Qualifications</option>
-          <option value="sports">Sports Details</option>
-          <option value="family">Family Details</option>
-          <option value="medical">Medical Category</option>
-          <option value="image">Officer Image</option>
-        </select>
+        <p>Update personnel information — all sections shown below</p>
       </div>
     </div>
-
     <div class="content-area">
       <div id="successMessage" class="success-message"></div>
-      <div id="errorMessage" class="error-message"></div>
-
+      <div id="errorMessage" class="error-message-box"></div>
       <div class="form-card">
-
         <div class="form-title">Personnel Information Form</div>
-        <div class="form-subtitle">
-          Complete officer profile with photograph and address details
-        </div>
+        <div class="form-subtitle">Review and update the officer's complete profile. Use the <strong>Update</strong> button on each section to save changes individually.</div>
 
-        <!-- BASIC INFORMATION SECTION -->
-        <div id="section-basic" class="section">
-          <div class="section-title">
-            <span>🧾 Basic Information</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('basic')">Update Basic Info</button>
-          </div>
-          <div class="grid">
-            <div><label>Types of Commission *</label><input id="commission" class="basic-field"></div>
-            <div><label>Army No *</label><input id="armyNo" class="basic-field"></div>
-            <div><label>Rank *</label><input id="rank" class="basic-field"></div>
-            <div><label>Full Name *</label><input id="fullName" class="basic-field"></div>
-            <div><label>Date of Commission *</label><input type="date" id="dateOfCommission" class="basic-field"></div>
-            <div><label>Date of Seniority *</label><input type="date" id="dateOfSeniority" class="basic-field"></div>
-            <div><label>Date of Birth *</label><input type="date" id="dateOfBirth" class="basic-field"></div>
-            <div><label>Place of Birth *</label><input id="placeOfBirth" class="basic-field"></div>
-          </div>
-        </div>
-
-        <!-- SERVICE DETAILS SECTION -->
-        <div id="section-service" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🎖️ Service Details</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('service')">Update Service Details</button>
-          </div>
-          <div class="grid">
-            <div><label>NRS *</label><input id="nrs" class="service-field"></div>
-            <div><label>Religion *</label><select id="religion" class="service-field">
-              <option value="">Select Religion</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Muslim">Muslim</option>
-              <option value="Sikh">Sikh</option>
-              <option value="Christian">Christian</option>
-            </select></div>
-            <div><label>Aadhaar Number *</label><input id="aadhaarNumber" class="service-field"></div>
-            <div><label>PAN Card *</label><input id="panCard" class="service-field"></div>
-            <div><label>Marital Status *</label><select id="maritalStatus" class="service-field">
-              <option value="">Select Marital Status</option>
-              <option value="Married">Married</option>
-              <option value="Unmarried">Unmarried</option>
-            </select></div>
-            <div><label>CDA Account No *</label><input id="cdaAccountNo" class="service-field"></div>
-          </div>
-        </div>
-
-        <!-- ADDRESS SECTION -->
-        <div id="section-address" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🏠 Address Details</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('address')">Update Address</button>
-          </div>
-          <div class="grid grid-1">
-            <div>
-              <label>Permanent Address *</label>
-              <textarea id="permanentAddress" class="address-field"></textarea>
+        <!-- BASIC -->
+        <div class="section">
+          <div class="section-title"><span>🧾 Basic Information</span><button class="btn btn-success" onclick="updateSection('basic')">Update Basic Info</button></div>
+          <div class="upload-box" style="margin-bottom:20px;">
+            <div style="margin-bottom:8px;">📷 Officer Image &nbsp;<span style="color:#6b7280;font-size:12px;">(JPG/PNG, Max 2MB — optional)</span></div>
+            <input type="file" id="officerImageFile" accept="image/*" onchange="previewImage(this)">
+            <div id="imagePreviewContainer" style="margin-top:12px;display:none;">
+              <div style="position:relative;display:inline-block;">
+                <img id="imagePreview" src="#" alt="" style="max-width:180px;max-height:180px;border-radius:8px;border:2px solid #1b4332;padding:3px;">
+                <button onclick="removeImage()" style="position:absolute;top:-10px;right:-10px;background:#dc2626;color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;font-weight:bold;line-height:1;">×</button>
+              </div>
+              <div style="margin-top:6px;font-size:12px;color:#6b7280;"><span id="imageDetails"></span></div>
             </div>
           </div>
           <div class="grid">
-            <div><label>City *</label><input id="city" class="address-field"></div>
-            <div><label>District *</label><input id="district" class="address-field"></div>
-            <div><label>State *</label><input id="state" class="address-field"></div>
-            <div><label>PIN Code *</label><input id="pinCode" class="address-field"></div>
-          </div>
-        </div>
-
-        <!-- CONTACT SECTION -->
-        <div id="section-contact" class="section" style="display: none;">
-          <div class="section-title">
-            <span>📞 Contact Details</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('contact')">Update Contact</button>
-          </div>
-          <div class="grid">
-            <div><label>Mobile Number *</label><input id="mobileNumber" class="contact-field"></div>
-            <div><label>Alternate Mobile</label><input id="alternateMobile" class="contact-field"></div>
-            <div class="grid-1">
-              <label>Email Address *</label>
-              <input type="email" id="emailAddress" class="contact-field">
+            <div><label class="required">Types of Commission</label><select id="commission"><option value="">Select Commission Type</option></select></div>
+            <div><label class="required">Army No</label><input id="armyNo" placeholder="Select commission type first" disabled><span class="field-hint">Format: [Commission]-12345A</span></div>
+            <div><label class="required">Rank</label><select id="rank"><option value="">Select Rank</option></select></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-column:span 2;">
+              <div><label class="required">First Name</label><input id="firstName" oninput="formatNameField(this)"></div>
+              <div><label>Last Name</label><input id="lastName" oninput="formatNameField(this)"></div>
             </div>
-            <div class="grid-1">
-              <label>NSG Email *</label>
-              <input type="email" id="nsgEmail" class="contact-field">
+            <div><label class="required">Date of Commission</label><input type="date" id="dateOfCommission"></div>
+            <div><label class="required">Date of Seniority</label><input type="date" id="dateOfSeniority"></div>
+            <div><label class="required">Date of Birth</label><input type="date" id="dateOfBirth"></div>
+            <div><label class="required">Gender</label><select id="gender"><option value="">Select Gender</option><option value="M">Male</option><option value="F">Female</option><option value="T">Transgender</option><option value="O">Other</option></select></div>
+            <div><label>Place of Birth</label><input id="placeOfBirth"></div>
+            <div><label>Case Type</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('caseTypeDropdown')"><span id="selectedCaseTypeDisplay">Select Case Type</span><span>▼</span></div>
+                <select id="caseType" style="display:none;"></select>
+                <div id="caseTypeDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search case type..." id="caseTypeSearchInput" onkeyup="filterCaseTypes()" onclick="event.stopPropagation()">
+                  <div id="caseTypeItemsContainer" style="max-height:240px;overflow-y:auto;"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- DECORATIONS SECTION -->
-        <div id="section-decorations" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🏅 Decorations</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('decorations')">Update Decorations</button>
+        <!-- SERVICE -->
+        <div class="section">
+          <div class="section-title"><span>🎖️ Service Details</span><button class="btn btn-success" onclick="updateSection('service')">Update Service Details</button></div>
+          <div class="grid">
+            <div><label>NRS (Nearest Railway Station)</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('nrsDropdown')"><span id="selectedNrsDisplay">Select Railway Station</span><span>▼</span></div>
+                <input type="hidden" id="nrs">
+                <div id="nrsDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search by name or code..." id="nrsSearchInput" onkeyup="filterStations()" onclick="event.stopPropagation()">
+                  <div id="nrsItemsContainer" style="max-height:280px;overflow-y:auto;"><div class="no-results">Loading stations...</div></div>
+                </div>
+              </div>
+            </div>
+            <div><label>Nearest Airport</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('airportDropdown')"><span id="selectedAirportDisplay">Select Airport</span><span>▼</span></div>
+                <input type="hidden" id="nearestAirport">
+                <div id="airportDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search by name or code..." id="airportSearchInput" onkeyup="filterAirports()" onclick="event.stopPropagation()">
+                  <div id="airportItemsContainer" style="max-height:280px;overflow-y:auto;"><div class="no-results">Loading airports...</div></div>
+                </div>
+              </div>
+            </div>
+            <div><label>Religion</label><select id="religion"><option value="">Select Religion</option><option value="Hindu">Hindu</option><option value="Muslim">Muslim</option><option value="Sikhs">Sikhs</option><option value="Christian">Christian</option></select></div>
+            <div><label>Aadhaar Number</label><input id="aadhaarNumber" placeholder="1234 5678 9012" oninput="formatAadhaarNumber(this)"><span class="field-hint">Format: 1234 5678 9012</span></div>
+            <div><label>PAN Card</label><input id="panCard" placeholder="ABCDE1234F" oninput="formatPanCard(this)"><span class="field-hint">5 letters + 4 numbers + 1 letter</span></div>
+            <div><label>Marital Status</label><select id="maritalStatus"><option value="">Select Marital Status</option><option value="Married">Married</option><option value="Unmarried">Unmarried</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option><option value="Separated">Separated</option></select></div>
+            <div><label>CDA Account No</label><input id="cdaAccountNo" placeholder="15/102/234180K"><span class="field-hint">Format: 12/345/67890A</span></div>
           </div>
+        </div>
+
+        <!-- ADDRESS -->
+        <div class="section">
+          <div class="section-title"><span>🏠 Address Details</span><button class="btn btn-success" onclick="updateSection('address')">Update Address</button></div>
+          <div class="grid-1" style="margin-bottom:16px;"><div><label>Permanent Address</label><textarea id="permanentAddress"></textarea></div></div>
+          <div class="grid">
+            <div><label>State</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('stateDropdown')"><span id="selectedStateDisplay">Select State</span><span>▼</span></div>
+                <input type="hidden" id="state">
+                <div id="stateDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search state..." id="stateSearchInput" onkeyup="filterStates()" onclick="event.stopPropagation()">
+                  <div id="stateItemsContainer" style="max-height:280px;overflow-y:auto;"><div class="no-results">Loading states...</div></div>
+                </div>
+              </div>
+            </div>
+            <div><label>District</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('districtDropdown')"><span id="selectedDistrictDisplay">Select District</span><span>▼</span></div>
+                <input type="hidden" id="district">
+                <div id="districtDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search district..." id="districtSearchInput" onkeyup="filterDistricts()" onclick="event.stopPropagation()">
+                  <div id="districtItemsContainer" style="max-height:280px;overflow-y:auto;"><div class="no-results">Select a state first</div></div>
+                </div>
+              </div>
+            </div>
+            <div><label>City</label>
+              <div style="position:relative;">
+                <div class="cdt" onclick="toggleDD('cityDropdown')"><span id="selectedCityDisplay">Select City</span><span>▼</span></div>
+                <input type="hidden" id="city">
+                <div id="cityDropdown" class="dropdown-content">
+                  <input class="dsearch" placeholder="Search city..." id="citySearchInput" onkeyup="filterCities()" onclick="event.stopPropagation()">
+                  <div id="cityItemsContainer" style="max-height:280px;overflow-y:auto;"><div class="no-results">Select a state first</div></div>
+                </div>
+              </div>
+            </div>
+            <div><label>PIN Code</label><input id="pinCode" maxlength="6" oninput="formatPinCode(this)"></div>
+          </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="section">
+          <div class="section-title"><span>📞 Contact Details</span><button class="btn btn-success" onclick="updateSection('contact')">Update Contact</button></div>
+          <div class="grid">
+            <div><label>Mobile Number</label><input id="mobileNumber" placeholder="9876543210" maxlength="10" oninput="formatMobileNumber(this)"><span class="field-hint">10 digits, starting with 6-9</span></div>
+            <div><label>Alternate Mobile</label><input id="alternateMobile" placeholder="9876543210" maxlength="10" oninput="formatMobileNumber(this)"><span class="field-hint">Optional</span></div>
+            <div><label>Email Address</label><input type="email" id="emailAddress" placeholder="name@example.com"></div>
+            <div><label>NIC Email</label><input type="email" id="nicEmail" placeholder="name@gov.nic.in"><span class="field-hint">Optional</span></div>
+          </div>
+        </div>
+
+        <!-- DECORATIONS -->
+        <div class="section">
+          <div class="section-title"><span>🏅 Decorations</span><button class="btn btn-success" onclick="updateSection('decorations')">Update Decorations</button></div>
           <div id="decorations-container"></div>
-          <button type="button" class="btn btn-secondary" onclick="addDecoration()">
-            + Add Decoration
-          </button>
+          <button type="button" class="btn btn-add" onclick="addDecoration()">+ Add Decoration</button>
         </div>
 
-        <!-- QUALIFICATIONS SECTION -->
-        <div id="section-qualifications" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🎓 Civil Qualifications</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('qualifications')">Update Qualifications</button>
-          </div>
+        <!-- CIVIL QUALIFICATIONS -->
+        <div class="section">
+          <div class="section-title"><span>🎓 Civil Qualifications</span><button class="btn btn-success" onclick="updateSection('qualifications')">Update Qualifications</button></div>
           <div id="civil-qualifications-container"></div>
-          <button type="button" class="btn btn-secondary" onclick="addCivilQualification()">
-            + Add Civil Qualification
-          </button>
+          <button type="button" class="btn btn-add" onclick="addCivilQualification()">+ Add Civil Qualification</button>
         </div>
 
-        <!-- ADDITIONAL QUALIFICATIONS SECTION -->
-        <div id="section-additional-qualifications" class="section" style="display: none;">
-          <div class="section-title">
-            <span>📚 Additional Qualifications</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('additional-qualifications')">Update Additional Qualifications</button>
-          </div>
+        <!-- MIL QUALIFICATIONS -->
+        <div class="section">
+          <div class="section-title"><span>📚 MIL Qualifications</span><button class="btn btn-success" onclick="updateSection('additional-qualifications')">Update MIL Qualifications</button></div>
           <div id="additional-qualifications-container"></div>
-          <button type="button" class="btn btn-secondary" onclick="addAdditionalQualification()">
-            + Add Additional Qualification
-          </button>
+          <button type="button" class="btn btn-add" onclick="addAdditionalQualification()">+ Add MIL Qualification</button>
         </div>
 
-        <!-- SPORTS SECTION -->
-        <div id="section-sports" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🏆 Sports Details</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('sports')">Update Sports</button>
-          </div>
+        <!-- SPORTS -->
+        <div class="section">
+          <div class="section-title"><span>🏆 Sports Details</span><button class="btn btn-success" onclick="updateSection('sports')">Update Sports</button></div>
           <div id="sports-container"></div>
-          <button type="button" class="btn btn-secondary" onclick="addSport()">
-            + Add Sport
-          </button>
+          <button type="button" class="btn btn-add" onclick="addSportsDetail()">+ Add Sport</button>
         </div>
 
-        <!-- FAMILY SECTION -->
-        <div id="section-family" class="section" style="display: none;">
-          <div class="section-title">
-            <span>👪 Family Details</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('family')">Update Family</button>
-          </div>
+        <!-- FAMILY -->
+        <div class="section">
+          <div class="section-title"><span>👪 Family Details</span><button class="btn btn-success" onclick="updateSection('family')">Update Family</button></div>
           <div id="family-container"></div>
-          <button type="button" class="btn btn-secondary" onclick="addFamilyMember()">
-            + Add Family Member
-          </button>
+          <button type="button" class="btn btn-add" onclick="addFamilyMember()">+ Add Family Member</button>
         </div>
 
-        <!-- MEDICAL SECTION -->
-        <div id="section-medical" class="section" style="display: none;">
-          <div class="section-title">
-            <span>🩺 Medical Category</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('medical')">Update Medical</button>
+        <!-- MEDICAL -->
+        <div class="section">
+          <div class="section-title"><span>🩺 Medical Category</span><button class="btn btn-success" onclick="updateSection('medical')">Update Medical</button></div>
+          <div style="overflow-x:auto;margin-top:8px;">
+            <table class="medical-table">
+              <thead><tr><th style="width:90px;">Category</th><th>S</th><th>H</th><th>A</th><th>P</th><th>E</th></tr></thead>
+              <tbody>
+              <tr><td class="lc">Value</td>
+                <td><select id="medicalS" onchange="updateMedicalRow('S',this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+                <td><select id="medicalH" onchange="updateMedicalRow('H',this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+                <td><select id="medicalA" onchange="updateMedicalRow('A',this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+                <td><select id="medicalP" onchange="updateMedicalRow('P',this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+                <td><select id="medicalE" onchange="updateMedicalRow('E',this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+              </tr>
+              <tr><td class="lc">Temp/Perm</td>
+                <td><select id="medicalTypeS" disabled style="background:#f3f4f6;" onchange="updateMedicalType('S',this.value)"><option value="">Select</option><option value="T">T (Temporary)</option><option value="P">P (Permanent)</option></select></td>
+                <td><select id="medicalTypeH" disabled style="background:#f3f4f6;" onchange="updateMedicalType('H',this.value)"><option value="">Select</option><option value="T">T (Temporary)</option><option value="P">P (Permanent)</option></select></td>
+                <td><select id="medicalTypeA" disabled style="background:#f3f4f6;" onchange="updateMedicalType('A',this.value)"><option value="">Select</option><option value="T">T (Temporary)</option><option value="P">P (Permanent)</option></select></td>
+                <td><select id="medicalTypeP" disabled style="background:#f3f4f6;" onchange="updateMedicalType('P',this.value)"><option value="">Select</option><option value="T">T (Temporary)</option><option value="P">P (Permanent)</option></select></td>
+                <td><select id="medicalTypeE" disabled style="background:#f3f4f6;" onchange="updateMedicalType('E',this.value)"><option value="">Select</option><option value="T">T (Temporary)</option><option value="P">P (Permanent)</option></select></td>
+              </tr>
+              <tr><td class="lc">Period</td>
+                <td><input type="text" id="medicalPeriodS" placeholder="Weeks" disabled style="background:#f3f4f6;" oninput="updateMedicalPeriod('S',this.value)"></td>
+                <td><input type="text" id="medicalPeriodH" placeholder="Weeks" disabled style="background:#f3f4f6;" oninput="updateMedicalPeriod('H',this.value)"></td>
+                <td><input type="text" id="medicalPeriodA" placeholder="Weeks" disabled style="background:#f3f4f6;" oninput="updateMedicalPeriod('A',this.value)"></td>
+                <td><input type="text" id="medicalPeriodP" placeholder="Weeks" disabled style="background:#f3f4f6;" oninput="updateMedicalPeriod('P',this.value)"></td>
+                <td><input type="text" id="medicalPeriodE" placeholder="Weeks" disabled style="background:#f3f4f6;" oninput="updateMedicalPeriod('E',this.value)"></td>
+              </tr>
+              <tr><td class="lc">Remark</td>
+                <td><input type="text" id="medicalRemarkS" placeholder="Remark" disabled style="background:#f3f4f6;" oninput="updateMedicalRemark('S',this.value)"></td>
+                <td><input type="text" id="medicalRemarkH" placeholder="Remark" disabled style="background:#f3f4f6;" oninput="updateMedicalRemark('H',this.value)"></td>
+                <td><input type="text" id="medicalRemarkA" placeholder="Remark" disabled style="background:#f3f4f6;" oninput="updateMedicalRemark('A',this.value)"></td>
+                <td><input type="text" id="medicalRemarkP" placeholder="Remark" disabled style="background:#f3f4f6;" oninput="updateMedicalRemark('P',this.value)"></td>
+                <td><input type="text" id="medicalRemarkE" placeholder="Remark" disabled style="background:#f3f4f6;" oninput="updateMedicalRemark('E',this.value)"></td>
+              </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="medical-category">
-            <div class="medical-item">
-              <label>S</label>
-              <select class="medical-select" data-letter="S" id="medicalS">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </div>
-            <div class="medical-item">
-              <label>H</label>
-              <select class="medical-select" data-letter="H" id="medicalH">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </div>
-            <div class="medical-item">
-              <label>A</label>
-              <select class="medical-select" data-letter="A" id="medicalA">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </div>
-            <div class="medical-item">
-              <label>P</label>
-              <select class="medical-select" data-letter="P" id="medicalP">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </div>
-            <div class="medical-item">
-              <label>E</label>
-              <select class="medical-select" data-letter="E" id="medicalE">
-                <option value="">Select</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </div>
-          </div>
-          <div class="grid grid-1" style="margin-top:16px;">
-            <div>
-              <label>Medical Remarks</label>
-              <textarea id="medicalRemark" placeholder="Enter any medical observations..." rows="3"></textarea>
+          <div style="margin-top:16px;padding:14px 16px;background:#f0f7f3;border:1px solid #d7ebe1;border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+            <div><span style="font-weight:600;color:#1b4332;">Medical Code:</span><span id="medicalCodeDisplay" style="margin-left:12px;font-family:monospace;font-size:15px;font-weight:600;color:#1b4332;">S1H1A1P1E1</span></div>
+            <div style="display:flex;gap:12px;">
+              <button type="button" class="btn btn-secondary" style="height:36px;" onclick="cancelMedicalChanges()">Cancel</button>
+              <button type="button" class="btn btn-primary" style="height:36px;" onclick="applyMedicalChanges()">OK</button>
             </div>
           </div>
         </div>
 
-        <!-- IMAGE SECTION -->
-        <div id="section-image" class="section" style="display: none;">
-          <div class="section-title">
-            <span>📷 Officer Image</span>
-            <button class="btn btn-success update-btn" onclick="updateSection('image')">Update Image</button>
-          </div>
-          <div class="upload-box">
-            📷 Upload Officer Image<br>
-            JPG / PNG, Max 2MB
-            <br><br>
-            <input type="file" id="officerImageFile" accept="image/*">
-            <div id="currentImage" style="margin-top: 10px; display: none;">
-              <img id="previewImage" style="max-width: 200px; max-height: 200px; border-radius: 5px;">
-            </div>
-          </div>
-        </div>
-
-        <!-- Overall Save Button (Optional) -->
         <div class="actions">
-          <button class="btn btn-secondary" onclick="window.location.href='personnel-list.html'">Cancel</button>
-          <button class="btn btn-primary" id="saveAllBtn" onclick="saveAllSections()">Save All Changes</button>
+          <button class="btn btn-secondary" onclick="window.location.href='personnel-list.html'">← Back to List</button>
         </div>
-
       </div>
     </div>
   </main>
 </div>
 
 <script>
-  // Global variables
-  let personnelId = null;
-  let decorationIndex = 0;
-  let sportIndex = 0;
-  let civilIndex = 0;
-  let additionalIndex = 0;
-  let familyIndex = 0;
+  // ================================================================
+  // GLOBAL STATE
+  // ================================================================
+  let personnelId=null, decorationIndex=0, civilIndex=0, additionalIndex=0, familyIndex=0, sportsIndex=0;
+  let allStates=[], allCities={}, currentStateDistricts=[], currentCityList=[];
+  let allStations=[], allAirports=[], allCaseTypes=[];
+  let allQualifications=[], allArmyCourses=[], allSportsTypes=[];
+  window.medicalData={S:{value:'1',type:'',period:'',remark:''},H:{value:'1',type:'',period:'',remark:''},A:{value:'1',type:'',period:'',remark:''},P:{value:'1',type:'',period:'',remark:''},E:{value:'1',type:'',period:'',remark:''}};
+  window.originalMedicalData=JSON.parse(JSON.stringify(window.medicalData));
+  window.medicalCode='S1H1A1P1E1';
 
-  // Get ID from URL
-  function getPersonnelIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id');
+  // ================================================================
+  // HELPERS
+  // ================================================================
+  function getIdFromUrl(){return new URLSearchParams(window.location.search).get('id');}
+  function showMessage(type,msg){
+    const s=document.getElementById('successMessage'),e=document.getElementById('errorMessage');
+    if(type==='success'){s.style.display='block';s.textContent=msg;e.style.display='none';setTimeout(()=>s.style.display='none',3500);}
+    else{e.style.display='block';e.textContent=msg;s.style.display='none';setTimeout(()=>e.style.display='none',4500);}
+    document.querySelector('.content-area').scrollTo({top:0,behavior:'smooth'});
   }
-
-  // Show selected section
-  function showSection() {
-    const selected = document.getElementById("sectionSelector").value;
-    const sections = document.querySelectorAll(".section");
-
-    sections.forEach(section => {
-      section.style.display = "none";
-    });
-
-    if (selected) {
-      document.getElementById(`section-${selected}`).style.display = "block";
-    }
+  function parseDate(v){
+    if(!v)return'';
+    if(/^\d{4}-\d{2}-\d{2}/.test(v))return v.split('T')[0];
+    if(/^\d{2}-\d{2}-\d{4}/.test(v)){const[d,m,y]=v.split('-');return`${y}-${m}-${d}`;}
+    return v;
   }
+  function setVal(id,val){const el=document.getElementById(id);if(el&&val!=null&&val!==undefined)el.value=val;}
+  function removeBlock(id){const el=document.getElementById(id);if(!el)return;el.classList.add('removing');setTimeout(()=>el.remove(),220);}
+  function formatAadhaarDisplay(v){v=String(v).replace(/\s/g,'');return v.replace(/(\d{4})(?=\d)/g,'$1 ').trim();}
 
-  // Load personnel data
-  async function loadPersonnelData() {
-    if (!personnelId) return;
+  // ================================================================
+  // LOAD PERSONNEL DATA
+  // ================================================================
+  async function loadPersonnelData(){
+    if(!personnelId)return;
+    try{
+      const res=await fetch(`http://localhost:6060/api/personnel/${personnelId}`);
+      if(!res.ok)throw new Error(`HTTP ${res.status}`);
+      const d=await res.json();
 
-    try {
-      const response = await fetch(`http://localhost:6060/api/personnel/${personnelId}`);
-      if (!response.ok) throw new Error('Failed to fetch personnel data');
+      // Commission
+      if(d.commissionType){
+        const cs=document.getElementById('commission');
+        if(!Array.from(cs.options).find(o=>o.value===d.commissionType))cs.appendChild(new Option(d.commissionType,d.commissionType));
+        cs.value=d.commissionType;
+        const ai=document.getElementById('armyNo');ai.disabled=false;ai.placeholder=`${d.commissionType}-12345A`;
+      }
+      setVal('armyNo',d.armyNo);
+      if(d.rank){const rs=document.getElementById('rank');if(!Array.from(rs.options).find(o=>o.value===d.rank))rs.appendChild(new Option(d.rank,d.rank));rs.value=d.rank;}
+      setVal('firstName',d.firstName);setVal('lastName',d.lastName);
+      setVal('dateOfCommission',parseDate(d.dateOfCommission));
+      setVal('dateOfSeniority',parseDate(d.dateOfSeniority));
+      setVal('dateOfBirth',parseDate(d.dateOfBirth));
+      setVal('gender',d.gender);setVal('placeOfBirth',d.placeOfBirth);
+      if(d.caseType&&d.caseType!=='undefined'){document.getElementById('caseType').value=d.caseType;document.getElementById('selectedCaseTypeDisplay').textContent=d.caseType;}
 
-      const data = await response.json();
+      // Image
+      if(d.officerImage){
+        document.getElementById('imagePreview').src=`http://localhost:6060/${d.officerImage.replace(/\\/g,'/')}`;
+        document.getElementById('imagePreviewContainer').style.display='block';
+        document.getElementById('imageDetails').textContent='Current saved image';
+      }
 
-      // Basic Info
-      document.getElementById('commission').value = data.commissionType || '';
-      document.getElementById('armyNo').value = data.armyNo || '';
-      document.getElementById('rank').value = data.rank || '';
-      document.getElementById('fullName').value = data.fullName || '';
-      document.getElementById('dateOfCommission').value = data.dateOfCommission ? data.dateOfCommission.split('T')[0] : '';
-      document.getElementById('dateOfSeniority').value = data.dateOfSeniority ? data.dateOfSeniority.split('T')[0] : '';
-      document.getElementById('dateOfBirth').value = data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '';
-      document.getElementById('placeOfBirth').value = data.placeOfBirth || '';
-
-      // Service Details
-      document.getElementById('nrs').value = data.nrs || '';
-      document.getElementById('religion').value = data.religion || '';
-      document.getElementById('aadhaarNumber').value = data.aadhaarNumber || '';
-      document.getElementById('panCard').value = data.panCard || '';
-      document.getElementById('maritalStatus').value = data.maritalStatus || '';
-      document.getElementById('cdaAccountNo').value = data.cdaAccountNo || '';
+      // Service
+      if(d.nrs){document.getElementById('nrs').value=d.nrs;document.getElementById('selectedNrsDisplay').textContent=d.nrs;}
+      if(d.nearestAirport){document.getElementById('nearestAirport').value=d.nearestAirport;document.getElementById('selectedAirportDisplay').textContent=d.nearestAirport;}
+      setVal('religion',d.religion);
+      setVal('aadhaarNumber',d.aadhaarNumber?formatAadhaarDisplay(d.aadhaarNumber):'');
+      setVal('panCard',d.panCard);setVal('maritalStatus',d.maritalStatus);setVal('cdaAccountNo',d.cdaAccountNo);
 
       // Address
-      document.getElementById('permanentAddress').value = data.permanentAddress || '';
-      document.getElementById('city').value = data.city || '';
-      document.getElementById('district').value = data.district || '';
-      document.getElementById('state').value = data.state || '';
-      document.getElementById('pinCode').value = data.pinCode || '';
+      setVal('permanentAddress',d.permanentAddress);setVal('pinCode',d.pinCode);
+      if(d.state){document.getElementById('state').value=d.state;document.getElementById('selectedStateDisplay').textContent=d.state;const st=allStates.find(s=>s.state===d.state);if(st)currentStateDistricts=st.districts||[];currentCityList=allCities[d.state]||[];}
+      if(d.district){document.getElementById('district').value=d.district;document.getElementById('selectedDistrictDisplay').textContent=d.district;}
+      if(d.city){document.getElementById('city').value=d.city;document.getElementById('selectedCityDisplay').textContent=d.city;}
 
       // Contact
-      document.getElementById('mobileNumber').value = data.mobileNumber || '';
-      document.getElementById('alternateMobile').value = data.alternateMobile || '';
-      document.getElementById('emailAddress').value = data.emailAddress || '';
-      document.getElementById('nsgEmail').value = data.nsgEmail || '';
+      setVal('mobileNumber',d.mobileNumber);setVal('alternateMobile',d.alternateMobile);
+      setVal('emailAddress',d.emailAddress);setVal('nicEmail',d.nicEmail);
 
-      // Medical
-      if (data.medicalCategory) {
-        const medical = data.medicalCategory;
-        document.getElementById('medicalS').value = medical.match(/S(\d)/)?.[1] || '';
-        document.getElementById('medicalH').value = medical.match(/H(\d)/)?.[1] || '';
-        document.getElementById('medicalA').value = medical.match(/A(\d)/)?.[1] || '';
-        document.getElementById('medicalP').value = medical.match(/P(\d)/)?.[1] || '';
-        document.getElementById('medicalE').value = medical.match(/E(\d)/)?.[1] || '';
-      }
-      document.getElementById('medicalRemark').value = data.medicalRemark || '';
-
-      // Image preview
-      if (data.officerImage) {
-        document.getElementById('currentImage').style.display = 'block';
-        document.getElementById('previewImage').src = `http://localhost:6060/${data.officerImage}`;
-      }
-
-      // Load nested data
-      await loadDecorations(data.decorations);
-      await loadQualifications(data.qualifications);
-      await loadAdditionalQualifications(data.additionalQualifications);
-      await loadSports(data.sports);
-      await loadFamily(data.familyMembers);
-
-    } catch (error) {
-      console.error('Error loading personnel data:', error);
-      showMessage('error', 'Failed to load personnel data');
-    }
-  }
-
-  // Load decorations
-  function loadDecorations(decorations) {
-    const container = document.getElementById('decorations-container');
-    container.innerHTML = '';
-    decorationIndex = 0;
-
-    if (decorations && decorations.length > 0) {
-      decorations.forEach((dec, index) => {
-        addDecoration(true, dec);
+      // Medical — use medicalDetails array + medicalValuesX fields
+      const LETTERS=['S','H','A','P','E'];
+      LETTERS.forEach(l=>{
+        const key=`medicalValues${l}`;const val=d[key]||'1';
+        window.medicalData[l].value=val;
+        const sel=document.getElementById(`medical${l}`);if(sel)sel.value=val;
+        if(val!=='1')enableMedicalFields(l);
       });
-    } else {
-      addDecoration(true);
-    }
-  }
-
-  // Load qualifications
-  function loadQualifications(qualifications) {
-    const container = document.getElementById('civil-qualifications-container');
-    container.innerHTML = '';
-    civilIndex = 0;
-
-    if (qualifications && qualifications.length > 0) {
-      qualifications.forEach((qual, index) => {
-        addCivilQualification(true, qual);
-      });
-    } else {
-      addCivilQualification(true);
-    }
-  }
-
-  // Load additional qualifications
-  function loadAdditionalQualifications(additionalQuals) {
-    const container = document.getElementById('additional-qualifications-container');
-    container.innerHTML = '';
-    additionalIndex = 0;
-
-    if (additionalQuals && additionalQuals.length > 0) {
-      additionalQuals.forEach((qual, index) => {
-        addAdditionalQualification(true, qual);
-      });
-    } else {
-      addAdditionalQualification(true);
-    }
-  }
-
-  // Load sports
-  function loadSports(sports) {
-    const container = document.getElementById('sports-container');
-    container.innerHTML = '';
-    sportIndex = 0;
-
-    if (sports && sports.length > 0) {
-      sports.forEach((sport, index) => {
-        addSport(true, sport);
-      });
-    } else {
-      addSport(true);
-    }
-  }
-
-  // Load family
-  function loadFamily(family) {
-    const container = document.getElementById('family-container');
-    container.innerHTML = '';
-    familyIndex = 0;
-
-    if (family && family.length > 0) {
-      family.forEach((member, index) => {
-        addFamilyMember(true, member);
-      });
-    } else {
-      addFamilyMember(true);
-    }
-  }
-
-  // Update section
-  async function updateSection(section) {
-    if (!personnelId) {
-      showMessage('error', 'Personnel ID not found');
-      return;
-    }
-
-    const updateBtn = event.target;
-    updateBtn.classList.add('loading');
-
-    try {
-      let response;
-
-      switch(section) {
-        case 'basic':
-          response = await updateBasicInfo();
-          break;
-        case 'service':
-          response = await updateServiceDetails();
-          break;
-        case 'address':
-          response = await updateAddress();
-          break;
-        case 'contact':
-          response = await updateContact();
-          break;
-        case 'decorations':
-          response = await updateDecorations();
-          break;
-        case 'qualifications':
-          response = await updateQualifications();
-          break;
-        case 'additional-qualifications':
-          response = await updateAdditionalQualifications();
-          break;
-        case 'sports':
-          response = await updateSports();
-          break;
-        case 'family':
-          response = await updateFamily();
-          break;
-        case 'medical':
-          response = await updateMedical();
-          break;
-        case 'image':
-          response = await updateImage();
-          break;
-      }
-
-      if (response && response.ok) {
-        showMessage('success', `${section.replace('-', ' ')} updated successfully`);
-      } else {
-        throw new Error('Update failed');
-      }
-    } catch (error) {
-      console.error('Error updating section:', error);
-      showMessage('error', `Failed to update ${section}`);
-    } finally {
-      updateBtn.classList.remove('loading');
-    }
-  }
-
-  // Update functions for each section
-  async function updateBasicInfo() {
-    const data = {
-      armyNo: document.getElementById('armyNo').value,
-      rank: document.getElementById('rank').value,
-      fullName: document.getElementById('fullName').value,
-      dateOfCommission: document.getElementById('dateOfCommission').value,
-      dateOfSeniority: document.getElementById('dateOfSeniority').value,
-      dateOfBirth: document.getElementById('dateOfBirth').value,
-      placeOfBirth: document.getElementById('placeOfBirth').value
-    };
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/basic-info`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
-
-  async function updateServiceDetails() {
-    const data = {
-      nrs: document.getElementById('nrs').value,
-      religion: document.getElementById('religion').value,
-      aadhaarNumber: document.getElementById('aadhaarNumber').value,
-      panCard: document.getElementById('panCard').value,
-      maritalStatus: document.getElementById('maritalStatus').value,
-      cdaAccountNo: document.getElementById('cdaAccountNo').value
-    };
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/service`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
-
-  async function updateAddress() {
-    const data = {
-      permanentAddress: document.getElementById('permanentAddress').value,
-      city: document.getElementById('city').value,
-      district: document.getElementById('district').value,
-      state: document.getElementById('state').value,
-      pinCode: document.getElementById('pinCode').value
-    };
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/address`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
-
-  async function updateContact() {
-    const data = {
-      mobileNumber: document.getElementById('mobileNumber').value,
-      alternateMobile: document.getElementById('alternateMobile').value,
-      emailAddress: document.getElementById('emailAddress').value
-    };
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/contact`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
-
-  async function updateDecorations() {
-    const decorations = [];
-    document.querySelectorAll('#decorations-container .repeater-item').forEach(item => {
-      decorations.push({
-        id: item.dataset.id ? parseInt(item.dataset.id) : null,
-        decorationCategory: item.querySelector('select[name*="[category]"]').value,
-        decorationName: item.querySelector('select[name*="[name]"]').value,
-        awardDate: item.querySelector('input[type="date"]').value,
-        citation: item.querySelector('textarea').value
-      });
-    });
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/decorations`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(decorations)
-    });
-  }
-
-  async function updateQualifications() {
-    const qualifications = [];
-    document.querySelectorAll('#civil-qualifications-container .repeater-item').forEach(item => {
-      const inputs = item.querySelectorAll('input');
-      qualifications.push({
-        id: item.dataset.id ? parseInt(item.dataset.id) : null,
-        qualification: inputs[0]?.value || '',
-        institution: inputs[1]?.value || '',
-        yearOfCompletion: inputs[2]?.value || '',
-        gradePercentage: inputs[3]?.value || ''
-      });
-    });
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/qualifications`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(qualifications)
-    });
-  }
-
-  async function updateAdditionalQualifications() {
-    const additionalQualifications = [];
-    document.querySelectorAll('#additional-qualifications-container .repeater-item').forEach(item => {
-      const inputs = item.querySelectorAll('input');
-      additionalQualifications.push({
-        id: item.dataset.id ? parseInt(item.dataset.id) : null,
-        qualification: inputs[0]?.value || '',
-        issuingAuthority: inputs[1]?.value || '',
-        year: inputs[2]?.value || '',
-        validity: inputs[3]?.value || ''
-      });
-    });
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/additional-qualifications`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(additionalQualifications)
-    });
-  }
-
-  async function updateSports() {
-    const sports = [];
-    document.querySelectorAll('#sports-container .repeater-item').forEach(item => {
-      const inputs = item.querySelectorAll('input');
-      const selects = item.querySelectorAll('select');
-      sports.push({
-        id: item.dataset.id ? parseInt(item.dataset.id) : null,
-        sportName: inputs[0]?.value || '',
-        level: selects[0]?.value || '',
-        remarks: item.querySelector('textarea')?.value || ''
-      });
-    });
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/sports`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sports)
-    });
-  }
-
-  async function updateFamily() {
-    const family = [];
-    document.querySelectorAll('#family-container .repeater-item').forEach(item => {
-      const inputs = item.querySelectorAll('input');
-      family.push({
-        id: item.dataset.id ? parseInt(item.dataset.id) : null,
-        name: inputs[0]?.value || '',
-        relationship: inputs[1]?.value || '',
-        contactNumber: inputs[2]?.value || ''
-      });
-    });
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/family`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(family)
-    });
-  }
-
-  async function updateMedical() {
-    const medicalCategory = getMedicalCategoryString();
-    const data = {
-      medicalCategory: medicalCategory,
-      medicalDate: null,
-      diagnosis: document.getElementById('medicalRemark').value,
-      reviewDate: null,
-      restriction: null,
-      injuryCategory: null
-    };
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/medical`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
-
-  async function updateImage() {
-    const imageFile = document.getElementById('officerImageFile').files[0];
-    if (!imageFile) {
-      showMessage('error', 'Please select an image');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', imageFile);
-
-    return await fetch(`http://localhost:6060/api/personnel/${personnelId}/image`, {
-      method: 'PUT',
-      body: formData
-    });
-  }
-
-  // Helper functions
-  function getMedicalCategoryString() {
-    let result = "";
-    document.querySelectorAll(".medical-select").forEach(select => {
-      const letter = select.dataset.letter;
-      const value = select.value;
-      if (value) {
-        result += letter + value;
-      }
-    });
-    return result;
-  }
-
-  function showMessage(type, message) {
-    const successMsg = document.getElementById('successMessage');
-    const errorMsg = document.getElementById('errorMessage');
-
-    if (type === 'success') {
-      successMsg.style.display = 'block';
-      successMsg.textContent = message;
-      errorMsg.style.display = 'none';
-      setTimeout(() => {
-        successMsg.style.display = 'none';
-      }, 3000);
-    } else {
-      errorMsg.style.display = 'block';
-      errorMsg.textContent = message;
-      successMsg.style.display = 'none';
-      setTimeout(() => {
-        errorMsg.style.display = 'none';
-      }, 3000);
-    }
-  }
-
-  // Remove block with animation
-  function removeBlock(id) {
-    const el = document.getElementById(id);
-    el.classList.add("removing");
-    setTimeout(() => el.remove(), 200);
-  }
-
-  // Add decoration
-  async function addDecoration(isFirst = false, data = null) {
-    const index = decorationIndex++;
-    const id = `decoration-${index}`;
-    const container = document.getElementById("decorations-container");
-
-    container.insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
-        <div>
-          <label>Decoration Category *</label>
-          <select name="decorations[${index}][category]"
-                  id="decorationCategory-${index}"
-                  onchange="loadAwardsForCategory(this.value, ${index})">
-            <option value="">Loading...</option>
-          </select>
-        </div>
-        <div>
-          <label>Decoration Name *</label>
-          <select name="decorations[${index}][name]" id="decorationName-${index}">
-            <option value="">Select Award</option>
-          </select>
-        </div>
-        <div>
-          <label>Award Date *</label>
-          <input type="date" name="decorations[${index}][date]" value="${data?.awardDate ? data.awardDate.split('T')[0] : ''}">
-        </div>
-        <div class="grid-1">
-          <label>Citation / Remarks</label>
-          <textarea name="decorations[${index}][remarks]">${data?.citation || ''}</textarea>
-        </div>
-        ${isFirst ? "" : `
-          <button type="button" class="btn btn-secondary"
-                  onclick="removeBlock('${id}')">
-            Remove
-          </button>
-        `}
-      </div>
-      `
-    );
-
-    await loadDecorationCategories(index);
-
-    if (data) {
-      // Set selected values after categories are loaded
-      setTimeout(() => {
-        const categorySelect = document.getElementById(`decorationCategory-${index}`);
-        if (categorySelect) {
-          categorySelect.value = data.decorationCategory || '';
-          loadAwardsForCategory(data.decorationCategory, index);
-
-          setTimeout(() => {
-            const nameSelect = document.getElementById(`decorationName-${index}`);
-            if (nameSelect) {
-              nameSelect.value = data.decorationName || '';
-            }
-          }, 500);
-        }
-      }, 500);
-    }
-  }
-
-  // Load decoration categories
-  async function loadDecorationCategories(index) {
-    try {
-      const res = await fetch("http://localhost:6060/api/decoration-master/dropdown/categories");
-      const categories = await res.json();
-
-      const dropdown = document.getElementById(`decorationCategory-${index}`);
-      if (dropdown) {
-        dropdown.innerHTML = `<option value="">Select Category</option>`;
-        categories.forEach(cat => {
-          dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+      if(d.medicalDetails&&d.medicalDetails.length){
+        d.medicalDetails.forEach(md=>{
+          const l=md.medicalCategory;if(!window.medicalData[l])return;
+          window.medicalData[l].type=md.type||'';window.medicalData[l].period=md.period||'';window.medicalData[l].remark=md.remark||'';
+          const ts=document.getElementById(`medicalType${l}`);if(ts){ts.value=md.type||'';}
+          const pi=document.getElementById(`medicalPeriod${l}`);if(pi){pi.value=md.period||'';}
+          const ri=document.getElementById(`medicalRemark${l}`);if(ri){ri.value=md.remark||'';}
         });
       }
-    } catch (err) {
-      console.error("Failed loading categories:", err);
-    }
+      window.originalMedicalData=JSON.parse(JSON.stringify(window.medicalData));
+      window.medicalCode=d.medicalCode||generateMedicalCode();
+      document.getElementById('medicalCodeDisplay').textContent=window.medicalCode;
+
+      // Repeaters
+      loadDecorations(d.decorations);
+      loadQualifications(d.qualifications);
+      loadAdditionalQualifications(d.additionalQualifications);
+      loadSports(d.sports);
+      loadFamily(d.familyMembers);
+    }catch(err){console.error('loadPersonnelData:',err);showMessage('error','Failed to load personnel data: '+err.message);}
   }
 
-  // Load awards for category
-  async function loadAwardsForCategory(category, index) {
-    const awardDropdown = document.getElementById(`decorationName-${index}`);
+  // ================================================================
+  // REPEATER LOADERS
+  // ================================================================
+  function loadDecorations(list){document.getElementById('decorations-container').innerHTML='';decorationIndex=0;if(list&&list.length)list.forEach(d=>addDecoration(false,d));else addDecoration(true);}
+  function loadQualifications(list){document.getElementById('civil-qualifications-container').innerHTML='';civilIndex=0;if(list&&list.length)list.forEach(q=>addCivilQualification(false,q));else addCivilQualification(true);}
+  function loadAdditionalQualifications(list){document.getElementById('additional-qualifications-container').innerHTML='';additionalIndex=0;if(list&&list.length)list.forEach(q=>addAdditionalQualification(false,q));else addAdditionalQualification(true);}
+  function loadSports(list){document.getElementById('sports-container').innerHTML='';sportsIndex=0;if(list&&list.length)list.forEach(s=>addSportsDetail(false,s));else addSportsDetail(true);}
+  function loadFamily(list){document.getElementById('family-container').innerHTML='';familyIndex=0;if(list&&list.length)list.forEach(m=>addFamilyMember(false,m));else addFamilyMember(true);}
 
-    if (!category || !awardDropdown) {
-      return;
-    }
-
-    awardDropdown.innerHTML = `<option value="">Loading...</option>`;
-
-    try {
-      const res = await fetch(
-              `http://localhost:6060/api/decoration-master/dropdown/awards/${encodeURIComponent(category)}`
-      );
-      const awards = await res.json();
-
-      awardDropdown.innerHTML = `<option value="">Select Award</option>`;
-
-      awards.forEach(a => {
-        awardDropdown.innerHTML += `
-          <option value="${a.name}">${a.name} (${a.suffix})</option>
-        `;
-      });
-    } catch (err) {
-      console.error("Failed loading awards:", err);
-      awardDropdown.innerHTML = `<option>Error Loading</option>`;
-    }
+  // ================================================================
+  // UPDATE DISPATCHER
+  // ================================================================
+  async function updateSection(section){
+    if(!personnelId){showMessage('error','Personnel ID not found');return;}
+    const btn=event.target,orig=btn.textContent;
+    btn.disabled=true;btn.textContent='Saving...';
+    try{
+      let res;
+      if(section==='basic')res=await updateBasicInfo();
+      else if(section==='service')res=await updateServiceDetails();
+      else if(section==='address')res=await updateAddress();
+      else if(section==='contact')res=await updateContact();
+      else if(section==='decorations')res=await updateDecorations();
+      else if(section==='qualifications')res=await updateQualifications();
+      else if(section==='additional-qualifications')res=await updateAdditionalQualifications();
+      else if(section==='sports')res=await updateSports();
+      else if(section==='family')res=await updateFamily();
+      else if(section==='medical')res=await updateMedical();
+      if(res&&res.ok)showMessage('success',`${section.replace(/-/g,' ')} updated successfully!`);
+      else{const t=res?await res.text():'No response';throw new Error(t);}
+    }catch(e){console.error(e);showMessage('error',`Failed to update ${section}: ${e.message}`);}
+    finally{btn.disabled=false;btn.textContent=orig;}
   }
 
-  // Add civil qualification
-  function addCivilQualification(isFirst = false, data = null) {
-    const index = civilIndex++;
-    const id = `civil-${index}`;
-
-    document.getElementById("civil-qualifications-container").insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
-        <div><label>Qualification *</label><input value="${data?.qualification || ''}"></div>
-        <div><label>Institution</label><input value="${data?.institution || ''}"></div>
-        <div><label>Year</label><input value="${data?.yearOfCompletion || ''}"></div>
-        <div><label>Grade / Percentage</label><input value="${data?.gradePercentage || ''}"></div>
-        ${isFirst ? "" : `
-        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-        `}
-      </div>
-      `
-    );
+  async function updateBasicInfo(){
+    const fn=document.getElementById('firstName').value,ln=document.getElementById('lastName').value;
+    const imgFile=document.getElementById('officerImageFile').files[0];
+    if(imgFile)await updateImage();
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/basic-info`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({commissionType:document.getElementById('commission').value,armyNo:document.getElementById('armyNo').value,rank:document.getElementById('rank').value,firstName:fn,lastName:ln,fullName:`${fn} ${ln}`.trim(),gender:document.getElementById('gender').value,caseType:document.getElementById('caseType').value,dateOfCommission:document.getElementById('dateOfCommission').value,dateOfSeniority:document.getElementById('dateOfSeniority').value,dateOfBirth:document.getElementById('dateOfBirth').value,placeOfBirth:document.getElementById('placeOfBirth').value})});
+  }
+  async function updateServiceDetails(){
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/service`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({nrs:document.getElementById('nrs').value,nearestAirport:document.getElementById('nearestAirport').value,religion:document.getElementById('religion').value,aadhaarNumber:document.getElementById('aadhaarNumber').value.replace(/\s/g,''),panCard:document.getElementById('panCard').value.toUpperCase(),maritalStatus:document.getElementById('maritalStatus').value,cdaAccountNo:document.getElementById('cdaAccountNo').value})});
+  }
+  async function updateAddress(){
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/address`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({permanentAddress:document.getElementById('permanentAddress').value,state:document.getElementById('state').value,district:document.getElementById('district').value,city:document.getElementById('city').value,pinCode:document.getElementById('pinCode').value})});
+  }
+  async function updateContact(){
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/contact`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobileNumber:document.getElementById('mobileNumber').value,alternateMobile:document.getElementById('alternateMobile').value,emailAddress:document.getElementById('emailAddress').value,nicEmail:document.getElementById('nicEmail').value})});
+  }
+  async function updateDecorations(){
+    const list=[];
+    document.querySelectorAll('#decorations-container .repeater-item').forEach(item=>{
+      const cs=item.querySelector('select[id^="decorationCategory-"]'),ns=item.querySelector('select[id^="decorationName-"]');
+      if(cs&&ns&&cs.value){const co=cs.options[cs.selectedIndex],no=ns.options[ns.selectedIndex];list.push({id:item.dataset.id?parseInt(item.dataset.id):null,decorationCategory:co?.getAttribute('data-name')||cs.value,decorationName:no?.getAttribute('data-name')||ns.value,awardDate:item.querySelector('input[type="date"]')?.value||'',citation:item.querySelector('textarea')?.value||''});}
+    });
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/decorations`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)});
+  }
+  async function updateQualifications(){
+    const list=[];
+    document.querySelectorAll('#civil-qualifications-container .repeater-item').forEach(item=>{
+      const qc=item.querySelector('.civil-qualification-code');
+      if(qc&&qc.value)list.push({id:item.dataset.id?parseInt(item.dataset.id):null,qualification:qc.value,board:item.querySelector('.civil-board')?.value||'',yearOfCompletion:item.querySelector('.civil-year')?.value||'',institution:item.querySelector('.civil-institution')?.value||'',gradePercentage:item.querySelector('.civil-grade')?.value||'',part2OrderNo:item.querySelector('.civil-order-no')?.value||''});
+    });
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/qualifications`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)});
+  }
+  async function updateAdditionalQualifications(){
+    const list=[];
+    document.querySelectorAll('#additional-qualifications-container .repeater-item').forEach(item=>{
+      const qc=item.querySelector('.additional-qualification-code');
+      if(qc&&qc.value)list.push({id:item.dataset.id?parseInt(item.dataset.id):null,qualification:qc.value,authorityNo:item.querySelector('.additional-authority-no')?.value||'',date:item.querySelector('.additional-date')?.value||'',location:item.querySelector('.additional-location')?.value||'',part2OrderNo:item.querySelector('.additional-order-no')?.value||''});
+    });
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/additional-qualifications`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)});
+  }
+  async function updateSports(){
+    const list=[];
+    document.querySelectorAll('#sports-container .repeater-item').forEach(item=>{
+      const sn=item.querySelector('.sport-name');
+      if(sn&&sn.value)list.push({id:item.dataset.id?parseInt(item.dataset.id):null,sportName:sn.value,sportsLevel:item.querySelector('.sport-level')?.value||'',place:item.querySelector('.sport-place')?.value||'',achievements:item.querySelector('.sport-achievements')?.value||''});
+    });
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/sports`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)});
+  }
+  async function updateFamily(){
+    const list=[];
+    document.querySelectorAll('#family-container .repeater-item').forEach(item=>{
+      const fn=item.querySelector('.family-first-name')?.value,ln=item.querySelector('.family-last-name')?.value;
+      if(fn||ln)list.push({id:item.dataset.id?parseInt(item.dataset.id):null,firstName:fn||'',lastName:ln||'',fullName:`${fn||''} ${ln||''}`.trim(),relationship:item.querySelector('.family-relationship')?.value||'',contactNumber:item.querySelector('.family-contact')?.value||'',part2OrderNo:item.querySelector('.family-order-no')?.value||'',date:item.querySelector('.family-order-date')?.value||''});
+    });
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/family`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(list)});
+  }
+  async function updateMedical(){
+    applyMedicalChanges();
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/medical`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({medicalCategory:window.medicalCode,medicalCode:window.medicalCode,medicalDetails:Object.keys(window.medicalData).filter(l=>window.medicalData[l].value!=='1').map(l=>({medicalCategory:l,medicalValue:window.medicalData[l].value,type:window.medicalData[l].type,period:window.medicalData[l].period,remark:window.medicalData[l].remark}))})});
+  }
+  async function updateImage(){
+    const f=document.getElementById('officerImageFile').files[0];if(!f)return;
+    const fd=new FormData();fd.append('image',f);
+    return fetch(`http://localhost:6060/api/personnel/${personnelId}/image`,{method:'PUT',body:fd});
   }
 
-  // Add additional qualification
-  function addAdditionalQualification(isFirst = false, data = null) {
-    const index = additionalIndex++;
-    const id = `additional-${index}`;
+  // ================================================================
+  // IMAGE
+  // ================================================================
+  function previewImage(input){
+    if(!input.files||!input.files[0])return;const f=input.files[0];
+    if(!f.type.match('image.*')){alert('Please select a valid image (JPG/PNG)');input.value='';return;}
+    if(f.size>2*1024*1024){alert('Image must be under 2MB');input.value='';return;}
+    const r=new FileReader();r.onload=e=>{document.getElementById('imagePreview').src=e.target.result;document.getElementById('imagePreviewContainer').style.display='block';document.getElementById('imageDetails').textContent=`${f.name} (${(f.size/1024).toFixed(1)} KB)`;};r.readAsDataURL(f);
+  }
+  function removeImage(){document.getElementById('officerImageFile').value='';document.getElementById('imagePreviewContainer').style.display='none';document.getElementById('imagePreview').src='#';document.getElementById('imageDetails').textContent='';}
 
-    document.getElementById("additional-qualifications-container").insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
-        <div><label>Qualification *</label><input value="${data?.qualification || ''}"></div>
-        <div><label>Authority</label><input value="${data?.issuingAuthority || ''}"></div>
-        <div><label>Year</label><input value="${data?.year || ''}"></div>
-        <div><label>Validity</label><input type="date" value="${data?.validity ? data.validity.split('T')[0] : ''}"></div>
-        ${isFirst ? "" : `
-        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-        `}
-      </div>
-      `
-    );
+  // ================================================================
+  // DECORATIONS
+  // ================================================================
+  async function addDecoration(isFirst=false,data=null){
+    const index=decorationIndex++,id=`decoration-${index}`;
+    document.getElementById('decorations-container').insertAdjacentHTML('beforeend',`<div class="grid repeater-item" id="${id}" data-id="${data?.id||''}"><div><label>Decoration Category</label><select id="decorationCategory-${index}" onchange="loadAwardsForCategory(this.value,${index})"><option value="">Loading...</option></select></div><div><label>Decoration Name</label><select id="decorationName-${index}"><option value="">Select Award</option></select></div><div><label>Award Date</label><input type="date" id="decoDate-${index}" value="${data?.awardDate?parseDate(data.awardDate):''}"></div><div><label>Citation / Remarks</label><textarea id="decoCitation-${index}">${data?.citation||''}</textarea></div>${!isFirst?`<div style="display:flex;justify-content:flex-end;grid-column:span 2;margin-top:4px;"><button type="button" class="btn btn-danger" onclick="removeBlock('${id}')">Remove</button></div>`:''}</div>`);
+    await loadDecorationCategories(index,data?.decorationCategory,data?.decorationName);
+  }
+  async function loadDecorationCategories(index,preCat,preName){
+    try{
+      const res=await fetch('http://localhost:6060/api/dropdown/DECORATION_CATEGORY?code=1');
+      const cats=await res.json();const sel=document.getElementById(`decorationCategory-${index}`);if(!sel)return;
+      sel.innerHTML='<option value="">Select Category</option>';
+      cats.forEach(c=>{const o=new Option(c.name,c.code);o.setAttribute('data-name',c.name);sel.appendChild(o);});
+      if(preCat){const m=cats.find(c=>c.name===preCat||c.code===preCat);if(m){sel.value=m.code;await loadAwardsForCategory(m.code,index,preName);}}
+    }catch(e){console.error(e);}
+  }
+  async function loadAwardsForCategory(code,index,preName){
+    const sel=document.getElementById(`decorationName-${index}`);if(!sel||!code){if(sel)sel.innerHTML='<option value="">Select Award</option>';return;}
+    sel.innerHTML='<option value="">Loading...</option>';
+    try{
+      const awards=await(await fetch(`http://localhost:6060/api/dropdown/${code}?code=1`)).json();
+      sel.innerHTML='<option value="">Select Award</option>';
+      awards.forEach(a=>{const o=new Option(a.name,a.code);o.setAttribute('data-name',a.name);sel.appendChild(o);});
+      if(preName){const m=awards.find(a=>a.name===preName||a.code===preName);if(m)sel.value=m.code;}
+    }catch(e){sel.innerHTML='<option>Error Loading</option>';}
   }
 
-  // Add sport
-  function addSport(isFirst = false, data = null) {
-    const index = sportIndex++;
-    const id = `sport-${index}`;
-
-    document.getElementById("sports-container").insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
-        <div>
-          <label>Sport Name *</label>
-          <input type="text" value="${data?.sportName || ''}">
-        </div>
-        <div>
-          <label>Sports Level *</label>
-          <select>
-            <option value="">Select Level</option>
-            <option value="Domestic" ${data?.level === 'Domestic' ? 'selected' : ''}>Domestic</option>
-            <option value="National" ${data?.level === 'National' ? 'selected' : ''}>National</option>
-            <option value="International" ${data?.level === 'International' ? 'selected' : ''}>International</option>
-          </select>
-        </div>
-        <div class="grid-1">
-          <label>Achievements / Remarks</label>
-          <textarea rows="2">${data?.remarks || ''}</textarea>
-        </div>
-        ${isFirst ? "" : `
-          <button type="button"
-                  class="btn btn-secondary"
-                  onclick="removeBlock('${id}')">
-            Remove
-          </button>
-        `}
-      </div>
-      `
-    );
+  // ================================================================
+  // CIVIL QUALIFICATIONS
+  // ================================================================
+  async function loadCivilQualifications(){if(allQualifications.length)return allQualifications;try{allQualifications=await(await fetch('http://localhost:6060/api/dropdown/CIVIL_QUALIFICATIONS')).json();}catch(e){}return allQualifications;}
+  async function addCivilQualification(isFirst=false,data=null){
+    const index=civilIndex++,id=`civil-${index}`;
+    const quals=await loadCivilQualifications();
+    const cy=new Date().getFullYear();let yo='<option value="">Select Year</option>';
+    for(let y=cy;y>=cy-70;y--)yo+=`<option value="${y}" ${data?.yearOfCompletion==y?'selected':''}>${y}</option>`;
+    const ql=data?.qualification||'Select Qualification';
+    document.getElementById('civil-qualifications-container').insertAdjacentHTML('beforeend',`<div class="repeater-item" id="${id}" data-id="${data?.id||''}"><div class="grid-3" style="margin-bottom:16px;"><div><label>Qualification</label><div style="position:relative;"><div class="cdt" onclick="toggleCDD('qualDrop-${index}')"><span id="qualDisp-${index}">${ql}</span><span>▼</span></div><input type="hidden" class="civil-qualification-code" id="qualCode-${index}" value="${data?.qualification||''}"><div id="qualDrop-${index}" class="dropdown-content"><input class="dsearch" placeholder="Search..." onkeyup="filterList(this,'qualItems-${index}',allQualifications,(n)=>selectGeneric(n,'qualCode-${index}','qualDisp-${index}','qualDrop-${index}'))" onclick="event.stopPropagation()"><div id="qualItems-${index}" style="max-height:260px;overflow-y:auto;">${quals.map(q=>`<div class="dropdown-item" onclick="selectGeneric('${q.name.replace(/'/g,"\\'")}','qualCode-${index}','qualDisp-${index}','qualDrop-${index}')">${q.name}</div>`).join('')}</div></div></div></div><div><label>Board/University</label><input type="text" class="civil-board" value="${data?.board||''}" placeholder="e.g. Allahabad University" maxlength="100"></div><div><label>Year of Passing</label><select class="civil-year">${yo}</select></div></div><div class="grid-3" style="margin-bottom:16px;"><div><label>Institution</label><input type="text" class="civil-institution" value="${data?.institution||''}" placeholder="Institution name" maxlength="100" oninput="updateCharCount(this,'ic-${index}')"><span id="ic-${index}" class="field-hint" style="text-align:right;">${(data?.institution||'').length}/100</span></div><div><label>Percentage</label><div style="display:flex;align-items:center;gap:8px;"><input type="text" class="civil-grade" value="${data?.gradePercentage||''}" placeholder="85" style="flex:1;" oninput="validatePercentageInput(this)"><span style="font-weight:bold;color:#1b4332;">%</span></div></div><div><label>Part II Order No.</label><input type="text" class="civil-order-no" value="${data?.part2OrderNo||''}" placeholder="0/0013/0001/2026" oninput="formatPartIIOrderNo(this)"><span class="field-hint">X/XXXX/XXXX/YYYY</span></div></div>${!isFirst?`<div style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-danger" onclick="removeBlock('${id}')">Remove Qualification</button></div>`:''}</div>`);
   }
 
-  // Add family member
-  function addFamilyMember(isFirst = false, data = null) {
-    const index = familyIndex++;
-    const id = `family-${index}`;
-
-    document.getElementById("family-container").insertAdjacentHTML(
-            "beforeend",
-            `
-      <div class="grid repeater-item" id="${id}" data-id="${data?.id || ''}">
-        <div><label>Name *</label><input value="${data?.name || ''}"></div>
-        <div><label>Relationship *</label><input value="${data?.relationship || ''}"></div>
-        <div><label>Contact Number</label><input value="${data?.contactNumber || ''}"></div>
-        ${isFirst ? "" : `
-        <button type="button" class="btn btn-secondary" onclick="removeBlock('${id}')">Remove</button>
-        `}
-      </div>
-      `
-    );
+  // ================================================================
+  // MIL QUALIFICATIONS
+  // ================================================================
+  async function loadArmyCourses(){if(allArmyCourses.length)return allArmyCourses;try{allArmyCourses=await(await fetch('http://localhost:6060/api/dropdown/ARMY_COURSES')).json();}catch(e){}return allArmyCourses;}
+  async function addAdditionalQualification(isFirst=false,data=null){
+    const index=additionalIndex++,id=`additional-${index}`;
+    const courses=await loadArmyCourses();const ql=data?.qualification||'Select Qualification';
+    document.getElementById('additional-qualifications-container').insertAdjacentHTML('beforeend',`<div class="repeater-item" id="${id}" data-id="${data?.id||''}"><div class="grid-3" style="margin-bottom:16px;"><div><label>Qualification</label><div style="position:relative;"><div class="cdt" onclick="toggleCDD('addQDrop-${index}')"><span id="addQDisp-${index}">${ql}</span><span>▼</span></div><input type="hidden" class="additional-qualification-code" id="addQCode-${index}" value="${data?.qualification||''}"><div id="addQDrop-${index}" class="dropdown-content"><input class="dsearch" placeholder="Search..." onkeyup="filterList(this,'addQItems-${index}',allArmyCourses,(n)=>selectGeneric(n,'addQCode-${index}','addQDisp-${index}','addQDrop-${index}'))" onclick="event.stopPropagation()"><div id="addQItems-${index}" style="max-height:260px;overflow-y:auto;">${courses.map(c=>`<div class="dropdown-item" onclick="selectGeneric('${c.name.replace(/'/g,"\\'")}','addQCode-${index}','addQDisp-${index}','addQDrop-${index}')">${c.name}</div>`).join('')}</div></div></div></div><div><label>Authority No.</label><input type="text" class="additional-authority-no" value="${data?.authorityNo||''}" placeholder="Enter authority number"></div><div><label>Date</label><input type="date" class="additional-date" value="${data?.date?parseDate(data.date):''}"></div></div><div class="grid" style="margin-bottom:12px;"><div><label>Location</label><input type="text" class="additional-location" value="${data?.location||''}" placeholder="Enter location"></div><div><label>Part II Order No.</label><input type="text" class="additional-order-no" value="${data?.part2OrderNo||''}" placeholder="0/0013/0001/2026" oninput="formatPartIIOrderNo(this)"><span class="field-hint">X/XXXX/XXXX/YYYY</span></div></div>${!isFirst?`<div style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-danger" onclick="removeBlock('${id}')">Remove Qualification</button></div>`:''}</div>`);
   }
 
-  // Save all sections (optional)
-  async function saveAllSections() {
-    showMessage('info', 'Please update sections individually for better control');
+  // Generic searchable dropdown helpers
+  function filterList(input,itemsId,arr,onSelect){
+    const f=input.value.toUpperCase();const c=document.getElementById(itemsId);if(!c)return;
+    const filtered=arr.filter(q=>q.name.toUpperCase().includes(f));
+    c.innerHTML=filtered.length?filtered.map(q=>`<div class="dropdown-item" onclick="(${onSelect.toString()})('${q.name.replace(/'/g,"\\'")}')">` +q.name+`</div>`).join(''):'<div class="no-results">No results found</div>';
+  }
+  function selectGeneric(name,codeId,displayId,dropdownId){
+    document.getElementById(displayId).textContent=name;document.getElementById(codeId).value=name;document.getElementById(dropdownId).style.display='none';
+  }
+  function toggleCDD(id){
+    const d=document.getElementById(id);const v=d.style.display==='block';
+    document.querySelectorAll('.dropdown-content').forEach(x=>x.style.display='none');
+    if(!v){d.style.display='block';setTimeout(()=>d.querySelector('.dsearch')?.focus(),80);}
   }
 
-  // Initialize on page load
-  document.addEventListener("DOMContentLoaded", async () => {
-    personnelId = getPersonnelIdFromUrl();
+  // ================================================================
+  // SPORTS
+  // ================================================================
+  async function loadSportsTypes(){if(allSportsTypes.length)return allSportsTypes;try{allSportsTypes=(await(await fetch('http://localhost:6060/api/dropdown/SPORTS')).json()).sort((a,b)=>a.name.localeCompare(b.name));}catch(e){}return allSportsTypes;}
+  async function addSportsDetail(isFirst=false,data=null){
+    const index=sportsIndex++,id=`sports-${index}`;
+    const types=await loadSportsTypes();let levels=[];
+    try{levels=await(await fetch('http://localhost:6060/api/dropdown/SPORTS_LEVEL')).json();}catch(e){}
+    const dataLevel=data?.sportsLevel||data?.level||'',dataPlace=data?.place||'',dataAch=data?.achievements||data?.remarks||'',dataName=data?.sportName||'';
+    const lo='<option value="">Select Sports Level</option>'+levels.map(l=>`<option value="${l.name}" ${dataLevel===l.name?'selected':''}>${l.name}</option>`).join('');
+    const po=['','1st Place','2nd Place','3rd Place','Gold Medalist','Silver Medalist','Bronze Medalist','Participate'].map((p,i)=>i===0?'<option value="">Select Place</option>':`<option value="${p}" ${dataPlace===p?'selected':''}>${p}</option>`).join('');
+    document.getElementById('sports-container').insertAdjacentHTML('beforeend',`<div class="repeater-item" id="${id}" data-id="${data?.id||''}"><div class="grid-3" style="margin-bottom:16px;"><div><label>Sport Name</label><div style="position:relative;"><div class="cdt" onclick="toggleCDD('sportDrop-${index}')"><span id="sportDisp-${index}">${dataName||'Select Sport'}</span><span>▼</span></div><input type="hidden" class="sport-name" id="sportName-${index}" value="${dataName}"><div id="sportDrop-${index}" class="dropdown-content"><input class="dsearch" placeholder="Search sport..." id="sportSearch-${index}" onkeyup="filterSports(${index})" onclick="event.stopPropagation()"><div id="sportItems-${index}" style="max-height:260px;overflow-y:auto;">${types.map(s=>`<div class="dropdown-item" onclick="selectSport(${index},'${s.name.replace(/'/g,"\\'")}')"><span style="font-weight:500;">${s.name}</span></div>`).join('')}</div></div></div></div><div><label>Sports Level</label><select class="sport-level">${lo}</select></div><div><label>Place</label><select class="sport-place">${po}</select></div></div><div style="margin-bottom:12px;"><label>Achievements / Remarks</label><textarea class="sport-achievements" rows="2" style="resize:vertical;">${dataAch}</textarea></div>${!isFirst?`<div style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-danger" onclick="removeBlock('${id}')">Remove Sport</button></div>`:''}</div>`);
+  }
+  async function filterSports(index){
+    const f=document.getElementById(`sportSearch-${index}`).value.toUpperCase();
+    const c=document.getElementById(`sportItems-${index}`);if(!c)return;
+    const types=await loadSportsTypes();const filtered=types.filter(s=>s.name.toUpperCase().includes(f));
+    c.innerHTML=filtered.length?filtered.map(s=>`<div class="dropdown-item" onclick="selectSport(${index},'${s.name.replace(/'/g,"\\'")}')"><span style="font-weight:500;">${s.name}</span></div>`).join(''):'<div class="no-results">No sports found</div>';
+  }
+  function selectSport(index,name){document.getElementById(`sportDisp-${index}`).textContent=name;document.getElementById(`sportName-${index}`).value=name;document.getElementById(`sportDrop-${index}`).style.display='none';}
 
-    if (!personnelId) {
-      showMessage('error', 'No personnel ID found in URL');
-      return;
-    }
+  // ================================================================
+  // FAMILY
+  // ================================================================
+  async function loadRelationshipTypes(){try{return(await(await fetch('http://localhost:6060/api/dropdown/RELATIONSHIP_TYPE')).json()).map(r=>r.name);}catch(e){return[];}}
+  async function addFamilyMember(isFirst=false,data=null){
+    const index=familyIndex++,id=`family-${index}`;
+    const rels=await loadRelationshipTypes();const dataDate=data?.orderDate||data?.date||'';
+    const ro='<option value="">Select Relationship</option>'+rels.map(r=>`<option value="${r}" ${data?.relationship===r?'selected':''}>${r}</option>`).join('');
+    document.getElementById('family-container').insertAdjacentHTML('beforeend',`<div class="repeater-item" id="${id}" data-id="${data?.id||''}"><div class="grid-3" style="margin-bottom:16px;"><div><label>First Name</label><input type="text" class="family-first-name" value="${data?.firstName||''}" placeholder="First name" oninput="formatNameField(this)"></div><div><label>Last Name</label><input type="text" class="family-last-name" value="${data?.lastName||''}" placeholder="Last name" oninput="formatNameField(this)"></div><div><label>Relationship</label><select class="family-relationship">${ro}</select></div></div><div class="grid-3" style="margin-bottom:12px;"><div><label>Contact <span style="color:#6b7280;font-weight:400;">(Optional)</span></label><input type="tel" class="family-contact" value="${data?.contactNumber||''}" placeholder="9876543210" maxlength="10" oninput="formatMobileNumber(this)"></div><div><label>Part II Order No. <span style="color:#6b7280;font-weight:400;">(Optional)</span></label><input type="text" class="family-order-no" value="${data?.part2OrderNo||''}" placeholder="0/0013/0001/2026" oninput="formatPartIIOrderNo(this)"></div><div><label>Date <span style="color:#6b7280;font-weight:400;">(Optional)</span></label><input type="date" class="family-order-date" value="${dataDate?parseDate(dataDate):''}"></div></div>${!isFirst?`<div style="display:flex;justify-content:flex-end;"><button type="button" class="btn btn-danger" onclick="removeBlock('${id}')">Remove Member</button></div>`:''}</div>`);
+  }
 
+  // ================================================================
+  // MEDICAL
+  // ================================================================
+  function enableMedicalFields(l){['medicalType','medicalPeriod','medicalRemark'].forEach(p=>{const el=document.getElementById(`${p}${l}`);if(el){el.disabled=false;el.style.background='white';}});}
+  function disableMedicalFields(l){['medicalType','medicalPeriod','medicalRemark'].forEach(p=>{const el=document.getElementById(`${p}${l}`);if(el){el.disabled=true;el.style.background='#f3f4f6';el.value='';}});}
+  function updateMedicalRow(l,v){window.medicalData[l].value=v;if(v!=='1')enableMedicalFields(l);else{disableMedicalFields(l);window.medicalData[l].type='';window.medicalData[l].period='';}updateMedicalCodeDisplay();}
+  function updateMedicalType(l,v){window.medicalData[l].type=v;const pi=document.getElementById(`medicalPeriod${l}`);if(pi){pi.value='';pi.placeholder=v==='T'?'Max 24 weeks':'Max 2 years';}window.medicalData[l].period='';updateMedicalCodeDisplay();}
+  function updateMedicalPeriod(l,v){window.medicalData[l].period=v;updateMedicalCodeDisplay();}
+  function updateMedicalRemark(l,v){window.medicalData[l].remark=v;}
+  function generateMedicalCode(){return['S','H','A','P','E'].map(l=>{const d=window.medicalData[l];let s=l+d.value;if(d.value!=='1'&&d.type&&d.period)s+=`(${d.type}${d.period})`;return s;}).join('');}
+  function updateMedicalCodeDisplay(){document.getElementById('medicalCodeDisplay').textContent=generateMedicalCode();}
+  function applyMedicalChanges(){window.medicalCode=generateMedicalCode();window.originalMedicalData=JSON.parse(JSON.stringify(window.medicalData));updateMedicalCodeDisplay();}
+  function cancelMedicalChanges(){window.medicalData=JSON.parse(JSON.stringify(window.originalMedicalData));['S','H','A','P','E'].forEach(l=>{const vs=document.getElementById(`medical${l}`);if(vs)vs.value=window.medicalData[l].value;if(window.medicalData[l].value!=='1')enableMedicalFields(l);else disableMedicalFields(l);const ts=document.getElementById(`medicalType${l}`);if(ts)ts.value=window.medicalData[l].type||'';const pi=document.getElementById(`medicalPeriod${l}`);if(pi)pi.value=window.medicalData[l].period||'';const ri=document.getElementById(`medicalRemark${l}`);if(ri)ri.value=window.medicalData[l].remark||'';});window.medicalCode=generateMedicalCode();updateMedicalCodeDisplay();}
+
+  // ================================================================
+  // DROPDOWN SYSTEM
+  // ================================================================
+  function toggleDD(id){const d=document.getElementById(id);const v=d.style.display==='block';document.querySelectorAll('.dropdown-content').forEach(x=>x.style.display='none');if(!v){d.style.display='block';const m={stateDropdown:'stateSearchInput',districtDropdown:'districtSearchInput',cityDropdown:'citySearchInput',nrsDropdown:'nrsSearchInput',airportDropdown:'airportSearchInput',caseTypeDropdown:'caseTypeSearchInput'};if(m[id])setTimeout(()=>document.getElementById(m[id])?.focus(),80);}}
+  document.addEventListener('click',e=>{if(!e.target.closest('.cdt')&&!e.target.closest('.dropdown-content'))document.querySelectorAll('.dropdown-content').forEach(x=>x.style.display='none');});
+
+  async function loadStates(){try{allStates=(await(await fetch('/all_india_state_district.json')).json()).states||[];displayStates(allStates);}catch(e){document.getElementById('stateItemsContainer').innerHTML='<div class="no-results">Failed to load states</div>';}}
+  function displayStates(list){const c=document.getElementById('stateItemsContainer');if(!c)return;c.innerHTML=list.length?list.map(s=>`<div class="dropdown-item" onclick="selectState('${s.state.replace(/'/g,"\\'")}')"><span style="font-weight:500;">${s.state}</span></div>`).join(''):'<div class="no-results">No states found</div>';}
+  function filterStates(){displayStates(allStates.filter(s=>s.state.toUpperCase().includes(document.getElementById('stateSearchInput').value.toUpperCase())));}
+  function selectState(name){document.getElementById('state').value=name;document.getElementById('selectedStateDisplay').textContent=name;document.getElementById('stateDropdown').style.display='none';document.getElementById('district').value='';document.getElementById('selectedDistrictDisplay').textContent='Select District';document.getElementById('city').value='';document.getElementById('selectedCityDisplay').textContent='Select City';const st=allStates.find(s=>s.state===name);currentStateDistricts=st?st.districts||[]:[];displayDistricts(currentStateDistricts);currentCityList=allCities[name]||[];displayCities(currentCityList);}
+  function displayDistricts(list){const c=document.getElementById('districtItemsContainer');if(!c)return;c.innerHTML=list.length?list.map(d=>`<div class="dropdown-item" onclick="selectDistrict('${d.replace(/'/g,"\\'")}')"><span style="font-weight:500;">${d}</span></div>`).join(''):'<div class="no-results">No districts found</div>';}
+  function filterDistricts(){displayDistricts(currentStateDistricts.filter(d=>d.toUpperCase().includes(document.getElementById('districtSearchInput').value.toUpperCase())));}
+  function selectDistrict(name){document.getElementById('district').value=name;document.getElementById('selectedDistrictDisplay').textContent=name;document.getElementById('districtDropdown').style.display='none';}
+  async function loadCities(){try{allCities=await(await fetch('/all_india_state_city.json')).json();}catch(e){}}
+  function displayCities(list){const c=document.getElementById('cityItemsContainer');if(!c)return;c.innerHTML=list.length?list.map(ci=>`<div class="dropdown-item" onclick="selectCity('${ci.replace(/'/g,"\\'")}')"><span style="font-weight:500;">${ci}</span></div>`).join(''):'<div class="no-results">No cities found</div>';}
+  function filterCities(){displayCities(currentCityList.filter(c=>c.toUpperCase().includes(document.getElementById('citySearchInput').value.toUpperCase())));}
+  function selectCity(name){document.getElementById('city').value=name;document.getElementById('selectedCityDisplay').textContent=name;document.getElementById('cityDropdown').style.display='none';}
+  async function loadStations(){try{allStations=(await(await fetch('/all_india_junctions.json')).json()).stations||[];displayStations(allStations.slice(0,200));}catch(e){document.getElementById('nrsItemsContainer').innerHTML='<div class="no-results">Failed to load</div>';}}
+  function displayStations(list){const c=document.getElementById('nrsItemsContainer');if(!c)return;c.innerHTML=list.map(s=>`<div class="dropdown-item" onclick="selectStation('${s.stnCode}','${(s.stnName+' ('+s.stnCode+') - '+s.stnCity).replace(/'/g,"\\'")}')"><div style="display:flex;justify-content:space-between;"><span style="font-weight:500;">${s.stnName}</span><span style="font-size:11px;color:#6b7280;">${s.stnCode}</span></div><div style="font-size:11px;color:#6b7280;">${s.stnCity}</div></div>`).join('')||'<div class="no-results">No stations found</div>';}
+  function filterStations(){const f=document.getElementById('nrsSearchInput').value.toUpperCase();displayStations(allStations.filter(s=>s.stnName.toUpperCase().includes(f)||s.stnCode.toUpperCase().includes(f)||s.stnCity.toUpperCase().includes(f)).slice(0,100));}
+  function selectStation(code,display){document.getElementById('nrs').value=code;document.getElementById('selectedNrsDisplay').textContent=display;document.getElementById('nrsDropdown').style.display='none';}
+  async function loadAirports(){try{allAirports=(await(await fetch('/all_india_airport.json')).json()).airports||[];displayAirports(allAirports.slice(0,200));}catch(e){document.getElementById('airportItemsContainer').innerHTML='<div class="no-results">Failed to load</div>';}}
+  function displayAirports(list){const c=document.getElementById('airportItemsContainer');if(!c)return;c.innerHTML=list.map(a=>`<div class="dropdown-item" onclick="selectAirport('${a.IATA_code}','${(a.airport_name+' ('+a.IATA_code+') - '+a.city_name).replace(/'/g,"\\'")}')"><div style="display:flex;justify-content:space-between;"><span style="font-weight:500;">${a.airport_name}</span><span style="font-size:11px;color:#6b7280;">${a.IATA_code}</span></div><div style="font-size:11px;color:#6b7280;">${a.city_name}</div></div>`).join('')||'<div class="no-results">No airports found</div>';}
+  function filterAirports(){const f=document.getElementById('airportSearchInput').value.toUpperCase();displayAirports(allAirports.filter(a=>a.airport_name.toUpperCase().includes(f)||a.IATA_code.toUpperCase().includes(f)||a.city_name.toUpperCase().includes(f)).slice(0,100));}
+  function selectAirport(code,display){document.getElementById('nearestAirport').value=code;document.getElementById('selectedAirportDisplay').textContent=display;document.getElementById('airportDropdown').style.display='none';}
+  async function loadCaseTypes(){try{allCaseTypes=await(await fetch('http://localhost:6060/api/dropdown/CASE_TYPE?code=1')).json();populateCaseTypeItems(allCaseTypes);}catch(e){}}
+  function populateCaseTypeItems(items){const c=document.getElementById('caseTypeItemsContainer');if(!c)return;c.innerHTML=items.map(i=>`<div class="dropdown-item" onclick="selectCaseType('${i.code}','${i.name.replace(/'/g,"\\'")}')"><div style="display:flex;justify-content:space-between;"><span>${i.name}</span>${i.code?`<span style="font-size:11px;color:#6b7280;">${i.code}</span>`:''}</div></div>`).join('')||'<div class="no-results">No case types found</div>';}
+  function filterCaseTypes(){populateCaseTypeItems(allCaseTypes.filter(i=>i.name.toUpperCase().includes(document.getElementById('caseTypeSearchInput').value.toUpperCase())));}
+  function selectCaseType(code,name){document.getElementById('caseType').value=code;document.getElementById('selectedCaseTypeDisplay').textContent=name;document.getElementById('caseTypeDropdown').style.display='none';}
+  async function loadDropdowns(){
+    try{const cr=await(await fetch('http://localhost:6060/api/dropdown/COMMISSION_TYPE')).json();const cs=document.getElementById('commission');cs.innerHTML='<option value="">Select Commission Type</option>';cr.forEach(c=>cs.appendChild(new Option(c.name,c.name)));}catch(e){}
+    try{const rr=await(await fetch('http://localhost:6060/api/dropdown/RANK')).json();const rs=document.getElementById('rank');rs.innerHTML='<option value="">Select Rank</option>';rr.forEach(r=>rs.appendChild(new Option(r.name,r.name)));}catch(e){}
+    setupCommissionListener();
+  }
+  function setupCommissionListener(){
+    const cs=document.getElementById('commission'),ai=document.getElementById('armyNo');if(!cs||!ai)return;
+    cs.addEventListener('change',function(){if(this.value){ai.disabled=false;ai.placeholder=`${this.value}-12345A`;}else{ai.disabled=true;ai.value='';ai.placeholder='Select commission type first';}});
+    if(cs.value){ai.disabled=false;ai.placeholder=`${cs.value}-12345A`;}else{ai.disabled=true;ai.placeholder='Select commission type first';}
+  }
+
+  // ================================================================
+  // FORMATTING
+  // ================================================================
+  function formatNameField(input){input.value=input.value.replace(/[0-9]/g,'');}
+  function formatMobileNumber(input){input.value=input.value.replace(/\D/g,'').slice(0,10);}
+  function formatPinCode(input){input.value=input.value.replace(/\D/g,'').slice(0,6);}
+  function validatePercentageInput(input){let v=input.value.replace(/[^0-9.]/g,'');const p=v.split('.');if(p.length>2)v=p[0]+'.'+p.slice(1).join('');if(p.length===2&&p[1].length>2)v=p[0]+'.'+p[1].slice(0,2);if(parseFloat(v)>100)v='100';input.value=v;}
+  function formatPartIIOrderNo(input){const cur=input.selectionStart,old=input.value.length;let v=input.value.replace(/\D/g,''),f='';for(let i=0;i<v.length;i++){if(i===1||i===5||i===9)f+='/';f+=v[i];if(i===12)break;}input.value=f;const nw=f.length;let np=cur+(nw>old?1:0);if(nw>old&&f[np-1]==='/')np++;try{input.setSelectionRange(np,np);}catch(e){}}
+  function formatAadhaarNumber(input){let v=input.value.replace(/\D/g,'').slice(0,12),f='';for(let i=0;i<v.length;i++){if(i>0&&i%4===0)f+=' ';f+=v[i];}input.value=f;}
+  function formatPanCard(input){let v=input.value.toUpperCase().replace(/[^A-Z0-9]/g,''),f='';for(let i=0;i<v.length;i++){if(i<5&&/[A-Z]/.test(v[i]))f+=v[i];else if(i>=5&&i<9&&/[0-9]/.test(v[i]))f+=v[i];else if(i===9&&/[A-Z]/.test(v[i]))f+=v[i];}input.value=f.slice(0,10);}
+  function updateCharCount(input,cid){const s=document.getElementById(cid);if(s){s.textContent=`${input.value.length}/100`;s.style.color=input.value.length>=100?'#dc2626':'#6b7280';}}
+
+  // ================================================================
+  // INIT
+  // ================================================================
+  document.addEventListener('DOMContentLoaded',async()=>{
+    personnelId=getIdFromUrl();
+    if(!personnelId){document.getElementById('loadingOverlay').style.display='none';showMessage('error','No personnel ID found in URL.');return;}
+    await Promise.all([loadDropdowns(),loadCaseTypes(),loadStates(),loadCities(),loadStations(),loadAirports(),loadSportsTypes(),loadCivilQualifications(),loadArmyCourses()]);
     await loadPersonnelData();
+    document.getElementById('loadingOverlay').style.display='none';
   });
-
 </script>
-
 </body>
 </html>

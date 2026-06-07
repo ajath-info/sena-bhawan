@@ -42,8 +42,9 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     @Query("""
     SELECT DISTINCT p
     FROM Personnel p
-    WHERE LOWER(p.armyNo) LIKE LOWER(CONCAT(:term, '%'))
+    WHERE LOWER(p.armyNo) LIKE LOWER(CONCAT('%', :term, '%'))
     ORDER BY p.armyNo
+    LIMIT 10
     """)
     List<Personnel> findDistinctByArmyNoStartingWith(@Param("term") String term);
 

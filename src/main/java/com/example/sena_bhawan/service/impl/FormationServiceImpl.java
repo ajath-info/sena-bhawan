@@ -82,8 +82,7 @@ public class FormationServiceImpl implements FormationService {
     }
 
     private void saveOrbatEntry(Long hqId, String commandCode, String corpsCode, String divisionCode, String brigadeCode,
-            String unitCode, String type, String name, String location, String susNo, String pin,String areaType, String unitType) {
-
+            String unitCode, String type, String name, String location, String susNo, String pin,String areaType, String unitType, String commandName, String corpsName, String divisionName, String brigadeName) {
         OrbatStructure orbat = new OrbatStructure();
 
         orbat.setHqCode(hqId == null ? null : hqId.toString());
@@ -92,6 +91,10 @@ public class FormationServiceImpl implements FormationService {
         orbat.setDivisionCode(divisionCode);
         orbat.setBrigadeCode(brigadeCode);
         orbat.setUnitCode(unitCode);
+        orbat.setCommandName(commandName);
+        orbat.setCorpsName(corpsName);
+        orbat.setDivisionName(divisionName);
+        orbat.setBrigadeName(brigadeName);
 
         orbat.setFormationType(type);
         orbat.setName(name);
@@ -122,7 +125,7 @@ public class FormationServiceImpl implements FormationService {
         commandRepository.save(saved);
 
         saveOrbatEntry(dto.getHqId(), commandCode, null, null, null, null,
-                "Command", dto.getName(), dto.getLocation(), dto.getSusNo(), dto.getPinNo(),dto.getAreaType(), dto.getUnitType()
+                "Command", dto.getName(), dto.getLocation(), dto.getSusNo(), dto.getPinNo(),dto.getAreaType(), dto.getUnitType(), dto.getCommandName(), dto.getDivisionName(), dto.getCorpsName(), dto.getBrigadeName()
         );
     }
 
@@ -157,7 +160,11 @@ public class FormationServiceImpl implements FormationService {
                 dto.getSusNo(),
                 dto.getPinNo(),
                 dto.getAreaType(),
-                dto.getUnitType()
+                dto.getUnitType(),
+                dto.getCommandName(),
+                dto.getCorpsName(),
+                null,
+                null
         );
     }
 
@@ -193,7 +200,11 @@ public class FormationServiceImpl implements FormationService {
                 dto.getSusNo(),
                 dto.getPinNo(),
                 dto.getAreaType(),
-                dto.getUnitType()
+                dto.getUnitType(),
+                dto.getCommandName(),
+                dto.getCorpsName(),
+                dto.getDivisionName(),
+                null
         );
     }
 
@@ -227,7 +238,11 @@ public class FormationServiceImpl implements FormationService {
                 dto.getSusNo(),
                 dto.getPinNo(),
                 dto.getAreaType(),
-                dto.getUnitType()
+                dto.getUnitType(),
+                dto.getCommandName(),
+                dto.getCorpsName(),
+                dto.getDivisionName(),
+                dto.getBrigadeName()
         );
     }
 
@@ -264,7 +279,11 @@ public class FormationServiceImpl implements FormationService {
                 dto.getSusNo(),
                 dto.getPinNo(),
                 dto.getAreaType(),
-                dto.getUnitType()
+                dto.getUnitType(),
+                dto.getCommandName(),
+                dto.getCorpsName(),
+                dto.getDivisionName(),
+                dto.getBrigadeName()
         );
 
 //        Unit saved = unitRepository.save(unit);

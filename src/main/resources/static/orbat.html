@@ -694,6 +694,7 @@
             const parents = this.hierarchyMap[type] || [];
             this.resetHierarchyDropdowns();
 
+            // Load dropdowns in sequence
             for (const parent of parents) {
                 const group = document.getElementById(`${parent}Group`);
                 if (group) {
@@ -701,6 +702,16 @@
                     switch(parent) {
                         case 'command':
                             await this.loadCommandDropdown();
+                            break;
+                        case 'corps':
+                            // Corps dropdown will be loaded when command is selected
+                            // The event listener will handle loading corps
+                            break;
+                        case 'division':
+                            // Division dropdown will be loaded when corps is selected
+                            break;
+                        case 'brigade':
+                            // Brigade dropdown will be loaded when division is selected
                             break;
                     }
                 }
@@ -783,6 +794,15 @@
             const formationType = document.getElementById('formationType').value;
             const areaType = document.getElementById('areaType').value;
 
+            // Helper function to get selected option text (name)
+            const getSelectedName = (selectId) => {
+                const select = document.getElementById(selectId);
+                if (select && select.selectedIndex > 0) {
+                    return select.options[select.selectedIndex].text;
+                }
+                return null;
+            };
+
             const payload = {
                 formationType: formationType,
                 hqId: this.defaultHqId,
@@ -790,6 +810,10 @@
                 corpsId: this.getHierarchyId('corpsId'),
                 divisionId: this.getHierarchyId('divisionId'),
                 brigadeId: this.getHierarchyId('brigadeId'),
+                commandName: getSelectedName('commandId'),
+                corpsName: getSelectedName('corpsId'),
+                divisionName: getSelectedName('divisionId'),
+                brigadeName: getSelectedName('brigadeId'),
                 name: document.getElementById('name').value.trim(),
                 location: document.getElementById('location').value.trim(),
                 susNo: document.getElementById('susNo').value.trim(),
@@ -850,6 +874,13 @@
             if (formationType === 'Unit' && !payload.brigadeId) return false;
             if (!payload.areaType) return false;
             if (formationType === 'Unit' && !payload.unitType) return false;
+
+            // Validate that names are captured correctly based on hierarchy
+            if (formationType === 'Corps' && !payload.commandName) return false;
+            if (formationType === 'Division' && !payload.corpsName) return false;
+            if (formationType === 'Brigade' && !payload.divisionName) return false;
+            if (formationType === 'Unit' && !payload.brigadeName) return false;
+
             return true;
         }
     }
