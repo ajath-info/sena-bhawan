@@ -20,6 +20,12 @@ import java.util.Optional;
 @Repository
 public interface PersonnelRepository extends JpaRepository<Personnel, Long>, JpaSpecificationExecutor<Personnel> {
 
+    // In PersonnelRepository
+    @Query(value = "SELECT DISTINCT pd.personnel_id FROM posting_details pd " +
+            "INNER JOIN orbat_structure os ON pd.orbat_id = os.id " +
+            "WHERE os.unit_type IN (:unitTypes)", nativeQuery = true)
+    List<Long> findPersonnelIdsByUnitTypes(@Param("unitTypes") List<String> unitTypes);
+
     // Single method that handles both cases
     @Query(value = "SELECT id, army_no as armyNo, full_name as fullName, rank FROM personnel " +
             "WHERE (:keyword IS NULL OR :keyword = '' OR army_no ILIKE CONCAT('%', :keyword, '%')) " +

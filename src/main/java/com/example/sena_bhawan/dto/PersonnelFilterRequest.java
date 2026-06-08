@@ -17,6 +17,7 @@ public class PersonnelFilterRequest {
     public LocalDate dosFrom;
     public LocalDate dosTo;
     public String search;
+    public List<String> unitIds;
 
     // Multi-select filters
     public List<String> rank;

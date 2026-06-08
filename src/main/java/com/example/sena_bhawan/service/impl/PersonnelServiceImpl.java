@@ -1129,21 +1129,30 @@ public class PersonnelServiceImpl implements PersonnelService {
     @Transactional(readOnly = true)
     public List<PersonnelListDTO> filterAllPersonnel(PersonnelFilterRequest filter) {
         try {
-            // Build specification for filters
+            Set<Long> allIds = new HashSet<>();
+
+            // Handle unitIds filter if present
+            if (filter.unitIds != null && !filter.unitIds.isEmpty()) {
+                List<Long> personnelIdsFromUnits = personnelRepository.findPersonnelIdsByUnitTypes(filter.unitIds);
+                allIds.addAll(personnelIdsFromUnits);
+            }
+
+            // Build specification for other filters
             Specification<Personnel> spec = buildSpecification(filter);
 
-            // Fetch ALL records without pagination
+            // Fetch ALL records matching other criteria without pagination
             List<Personnel> allPersonnel = personnelRepository.findAll(spec);
 
-            // Get IDs from all records
-            List<Long> ids = allPersonnel.stream()
+            // Get IDs from all personnel matching other criteria
+            List<Long> specIds = allPersonnel.stream()
                     .map(Personnel::getId)
-                    .collect(Collectors.toList());
+                    .toList();
+            allIds.addAll(specIds);
 
             // Fetch detailed data with native query
             List<PersonnelListDTO> dtos = new ArrayList<>();
-            if (!ids.isEmpty()) {
-                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByIds(ids);
+            if (!allIds.isEmpty()) {
+                List<Object[]> results = personnelRepository.findPersonnelWithDetailsByIds(new ArrayList<>(allIds));
                 dtos = results.stream()
                         .map(this::mapToPersonnelListDTO)
                         .collect(Collectors.toList());
@@ -1153,7 +1162,7 @@ public class PersonnelServiceImpl implements PersonnelService {
 
         } catch (Exception e) {
             log.error("Error filtering all personnel: {}", e.getMessage(), e);
-            throw new RuntimeException("Error filtering all personnel" );
+            throw new RuntimeException("Error filtering all personnel");
         }
     }
 

@@ -23,7 +23,18 @@
             display: flex;
             height: 100vh;
         }
+        /* Style for readonly date fields */
+        .form-input[readonly] {
+            background-color: #f9fafb;
+            cursor: default;
+            border-color: #e5e7eb;
+        }
 
+        .form-input[readonly]:focus {
+            outline: none;
+            border-color: #d1d5db;
+            box-shadow: none;
+        }
         .sidebar {
             width: 256px;
             background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
@@ -2269,8 +2280,9 @@ document.head.appendChild(style);
                     option.value = course.scheduleId;
                     option.textContent = `${course.courseName} (${course.startDate} → ${course.endDate})`;
                     option.dataset.courseId = course.courseId;
-                    option.dataset.startDate = course.startDate;
-                    option.dataset.endDate = course.endDate;
+                    // CHANGE: Format dates for input fields (DD-MM-YYYY to YYYY-MM-DD)
+                    option.dataset.startDate = formatDateForInput(course.startDate);
+                    option.dataset.endDate = formatDateForInput(course.endDate);
                     option.dataset.scheduleId = course.scheduleId;
                     courseSelect.appendChild(option);
                 });
@@ -2279,16 +2291,24 @@ document.head.appendChild(style);
         courseSelect.addEventListener("change", async function () {
             const selectedOption = this.options[this.selectedIndex];
             const scheduleId = this.value;
-            const courseId = selectedOption.dataset.courseId; // Get courseId from dataset
+            const courseId = selectedOption.dataset.courseId;
 
             if (!scheduleId) {
                 sessionStorage.clear();
+                // CHANGE: Clear date fields when no course is selected
+                document.getElementById("courseStartDate").value = "";
+                document.getElementById("courseEndDate").value = "";
                 return;
             }
 
             sessionStorage.setItem("scheduleId", scheduleId);
-            document.getElementById("courseStartDate").value = selectedOption.dataset.startDate;
-            document.getElementById("courseEndDate").value = selectedOption.dataset.endDate;
+
+            // CHANGE: Get dates from dataset (already formatted)
+            const startDate = selectedOption.dataset.startDate || "";
+            const endDate = selectedOption.dataset.endDate || "";
+
+            document.getElementById("courseStartDate").value = startDate;
+            document.getElementById("courseEndDate").value = endDate;
 
             // Load course strength for step 2 using scheduleId
             loadStep2PanelStrength(scheduleId);
@@ -2300,7 +2320,6 @@ document.head.appendChild(style);
             if (courseId) {
                 try {
                     showLoading(true);
-                    // Call eligibility API with courseId
                     const eligibilityResponse = await fetch(`http://localhost:6060/api/eligibility/filter/${courseId}`);
 
                     if (!eligibilityResponse.ok) {
@@ -2310,11 +2329,9 @@ document.head.appendChild(style);
                     const eligibilityData = await eligibilityResponse.json();
                     console.log("Eligibility data:", eligibilityData);
 
-                    // Transform eligibility data to filter request format
                     const filterRequest = transformEligibilityToFilter(eligibilityData);
                     console.log("Filter request:", filterRequest);
 
-                    // Call filter API with eligibility criteria
                     const filterResponse = await fetch('http://localhost:6060/api/personnel/filter?cpg=1', {
                         method: 'POST',
                         headers: {
@@ -2327,21 +2344,14 @@ document.head.appendChild(style);
                         const filterResult = await filterResponse.json();
                         console.log("Filter result:", filterResult);
 
-                        // Update officers array with filtered data
                         officers = Array.isArray(filterResult) ? filterResult : (filterResult.data || []);
-
-                        // Clear previous selections
                         selectedSet.clear();
                         statusMap.clear();
 
-                        // Update UI
                         document.getElementById("totalEligible").innerText = officers.length;
                         document.getElementById("selectedCount").innerText = "0";
 
-                        // Render the table with filtered officers
                         renderOfficerTable();
-
-                        // Update panel summary
                         updatePanelSummary();
 
                         showToast(`Found ${officers.length} eligible officers`, 'success');
@@ -4014,6 +4024,20 @@ document.head.appendChild(style);
         if (!dateStr) return "-";
         const d = new Date(dateStr);
         return d.toLocaleDateString("en-GB");
+    }
+
+    // Add this helper function to convert date format
+    function formatDateForInput(dateStr) {
+        if (!dateStr) return "";
+        // If date is in DD-MM-YYYY format
+        if (dateStr && dateStr.includes('-')) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+                // Convert from DD-MM-YYYY to YYYY-MM-DD
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        }
+        return dateStr;
     }
 
     function showLoading(show) {
