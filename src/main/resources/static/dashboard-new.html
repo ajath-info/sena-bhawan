@@ -620,41 +620,78 @@
           <div class="chart-title">Medical Category Distribution</div>
           <canvas id="medicalChart"></canvas>
           <script>
-            // fetch('http://localhost:6060/api/personnel/medical-distribution')
-            //         .then(response => response.json())
-            //         .then(data => {
-            //           new Chart(document.getElementById('medicalChart'), {
-            //             type: 'doughnut',
-            //             data: {
-            //               labels: data.labels,
-            //               datasets: [{
-            //                 data: data.data,
-            //                 backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
-            //               }]
-            //             },
-            //             options: {
-            //               plugins: { legend: { position: 'bottom' } }
-            //             }
-            //           });
-            //         });
-            const medicalStaticData = {
-              labels: ['SHAPE-1', 'SHAPE-2', 'SHAPE-3', 'SHAPE-4', 'SHAPE-5'],
-              data: [4, 8, 2, 1, 5]
-            };
+            // Fetch medical distribution data from API
+            fetch('http://localhost:6060/api/personnel/medical-distribution')
+                    .then(response => response.json())
+                    .then(data => {
+                      // Define color palette for medical categories
+                      const colorPalette = [
+                        '#16a34a', // Green
+                        '#84cc16', // Lime
+                        '#facc15', // Yellow
+                        '#dc2626', // Red
+                        '#0284c7', // Blue
+                        '#7c3aed', // Purple
+                        '#ea580c', // Orange
+                        '#0891b2', // Cyan
+                        '#db2777', // Pink
+                        '#4b5563'  // Gray
+                      ];
 
-            new Chart(document.getElementById('medicalChart'), {
-              type: 'doughnut',
-              data: {
-                labels: medicalStaticData.labels,
-                datasets: [{
-                  data: medicalStaticData.data,
-                  backgroundColor: ['#16a34a', '#84cc16', '#facc15', '#dc2626', '#0284c7', '#7c3aed']
-                }]
-              },
-              options: {
-                plugins: { legend: { position: 'bottom' } }
-              }
-            });
+                      // Assign colors based on number of categories
+                      const backgroundColors = data.labels.map((_, index) =>
+                              colorPalette[index % colorPalette.length]
+                      );
+
+                      new Chart(document.getElementById('medicalChart'), {
+                        type: 'doughnut',
+                        data: {
+                          labels: data.labels,
+                          datasets: [{
+                            data: data.data,
+                            backgroundColor: backgroundColors,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                          }]
+                        },
+                        options: {
+                          responsive: true,
+                          maintainAspectRatio: true,
+                          plugins: {
+                            legend: {
+                              position: 'bottom',
+                              labels: {
+                                font: {
+                                  size: 12
+                                },
+                                padding: 10
+                              }
+                            },
+                            tooltip: {
+                              callbacks: {
+                                label: function(context) {
+                                  const label = context.label || '';
+                                  const value = context.raw || 0;
+                                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                  const percentage = ((value / total) * 100).toFixed(1);
+                                  return `${label}: ${value} (${percentage}%)`;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      });
+                    })
+                    .catch(error => {
+                      console.error('Error fetching medical distribution data:', error);
+                      // Show error message in chart
+                      const canvas = document.getElementById('medicalChart');
+                      const ctx = canvas.getContext('2d');
+                      ctx.font = '14px Arial';
+                      ctx.fillStyle = '#dc2626';
+                      ctx.textAlign = 'center';
+                      ctx.fillText('Failed to load medical distribution data', canvas.width/2, canvas.height/2);
+                    });
           </script>
         </div>
 

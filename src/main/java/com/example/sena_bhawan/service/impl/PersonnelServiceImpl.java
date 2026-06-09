@@ -218,6 +218,51 @@ public class PersonnelServiceImpl implements PersonnelService {
                 .build();
     }
 
+    // New method for medical category distribution
+    public MedicalCategoryResponse getMedicalCategoryDistribution() {
+        List<Object[]> results = personnelRepository.getMedicalCategoryDistribution();
+
+        List<String> labels = new ArrayList<>();
+        List<Integer> data = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String medicalCode = result[0] != null ? result[0].toString() : "Unknown";
+            Long count = (Long) result[1];
+
+            // Format medical code for better display
+            String displayLabel = formatMedicalCode(medicalCode);
+            labels.add(displayLabel);
+            data.add(count.intValue());
+        }
+
+        // If no data found, return empty response
+        if (labels.isEmpty()) {
+            labels.add("No Data");
+            data.add(0);
+        }
+
+        return MedicalCategoryResponse.builder()
+                .labels(labels)
+                .data(data)
+                .chartType("doughnut")
+                .title("Medical Category Distribution")
+                .build();
+    }
+
+    private String formatMedicalCode(String medicalCode) {
+        if (medicalCode == null) return "Unknown";
+
+        // Format based on your medical code patterns
+        // Example: "SHAPE-1" -> "SHAPE-1", "MED001" -> "MED-001"
+        if (medicalCode.toUpperCase().contains("SHAPE")) {
+            return medicalCode.toUpperCase();
+        } else if (medicalCode.matches("\\d+")) {
+            return "Category " + medicalCode;
+        } else {
+            return medicalCode;
+        }
+    }
+
 //    public PersonnelServiceImpl(PersonnelRepository personnelRepository, UnitMasterRepository unitMasterRepository, PostingDetailsRepository postingDetailsRepository, CoursePanelRepository coursePanelRepository, ObjectMapper objectMapper, OrbatStructureRepository orbatStructureRepository) {
 //        this.personnelRepository = personnelRepository;
 //        this.unitMasterRepository= unitMasterRepository;

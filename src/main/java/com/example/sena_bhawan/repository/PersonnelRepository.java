@@ -45,6 +45,10 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
     // Count by exact rank match
     long countByRank(String rank);
 
+    // Method to get medical category distribution
+    @Query("SELECT p.medicalCode, COUNT(p) FROM Personnel p WHERE p.medicalCode IS NOT NULL GROUP BY p.medicalCode ORDER BY p.medicalCode")
+    List<Object[]> getMedicalCategoryDistribution();
+
     @Query("""
     SELECT DISTINCT p
     FROM Personnel p
@@ -409,6 +413,240 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
 
     @Query("SELECT p FROM Personnel p WHERE p.id IN :personnelIds")
     List<Personnel> findAllByIdIn(@Param("personnelIds") List<Long> personnelIds);
+    @Query(value = """
+        SELECT 
+            p.id AS id,
+            p.army_no AS armyNo,
+            p.rank AS rank,
+            p.full_name AS fullName,
+            TO_CHAR(p.date_of_birth, 'YYYY-MM-DD') AS dateOfBirth,
+            TO_CHAR(p.date_of_commission, 'YYYY-MM-DD') AS dateOfCommission,
+            TO_CHAR(p.date_of_seniority, 'YYYY-MM-DD') AS dateOfSeniority,
+            COALESCE(p.medical_code, '-') AS medicalCode,
+            COALESCE(p.religion, '-') AS religion,
+            COALESCE(p.marital_status, '-') AS maritalStatus,
+            COALESCE(p.mobile_number, '-') AS mobileNumber,
+            COALESCE(p.email_address, '-') AS emailAddress,
+            COALESCE(p.city, '-') AS city,
+            COALESCE(p.state, '-') AS state,
+            COALESCE(p.place_of_birth, '-') AS placeOfBirth,
+            
+            -- Unit with area_type
+            (
+                SELECT jsonb_build_object('unit_name', os.name, 'area_type', COALESCE(os.area_type, '-'))
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS unit,
+            
+            -- Division
+            (
+                SELECT td.division_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_division td ON os.division_code = td.div_code
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS division,
+            
+            -- Establishment Type
+            (
+                SELECT fe.establishment_type
+                FROM posting_details pd
+                INNER JOIN formation_establishment fe ON pd.orbat_id = fe.orbat_id
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS establishmentType,
+            
+            -- Command
+            (
+                SELECT tc.command_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_command tc ON os.command_code = tc.command_code
+                WHERE pd.personnel_id = p.id
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS command,
+            
+            -- Corps
+            (
+                SELECT tcor.corps_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
+                WHERE pd.personnel_id = p.id
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS corps,
+            
+            -- Courses Completed
+            (
+                SELECT STRING_AGG(DISTINCT cm.course_name, ', ')
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN course_master cm ON cs.course_id = cm.srno
+                WHERE cpn.personnel_id = p.id
+            ) AS course,
+            
+            -- Civil Qualifications
+            (
+                SELECT STRING_AGG(DISTINCT pq.qualification, ', ')
+                FROM personnel_qualifications pq
+                WHERE pq.personnel_id = p.id
+            ) AS civilQual,
+            
+            -- Sports
+            (
+                SELECT STRING_AGG(DISTINCT ps.sport_name || ' (' || ps.level || ')', ', ')
+                FROM personnel_sports ps
+                WHERE ps.personnel_id = p.id
+            ) AS sports,
+            
+            -- TOTAL COURSES DONE OVERALL
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                WHERE cpn.personnel_id = p.id
+            ) AS totalCoursesOverall,
+            
+            -- TOTAL COURSES DONE IN CURRENT YEAR
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                WHERE cpn.personnel_id = p.id
+                    AND EXTRACT(YEAR FROM cs.start_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            ) AS totalCoursesCurrentYear,
+            
+            -- TOTAL COURSES DONE IN CURRENT UNIT
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN posting_details pd ON cpn.personnel_id = pd.personnel_id
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE cpn.personnel_id = p.id
+                    AND LOWER(os.formation_type) = 'unit'
+                    AND pd.to_date IS NULL
+            ) AS totalCoursesCurrentUnit,
+            
+            -- Total Courses Done (for panel status)
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                WHERE cpn.personnel_id = p.id
+            ) AS totalCoursesDone,
+            
+            -- Courses Training Year
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                WHERE cpn.personnel_id = p.id
+                    AND cs.course_id IN (SELECT srno FROM course_master WHERE course_name ILIKE '%training%')
+            ) AS coursesTrainingYr,
+            
+            -- Courses In Unit
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN posting_details pd ON cpn.personnel_id = pd.personnel_id
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE cpn.personnel_id = p.id
+                    AND pd.to_date IS NULL
+            ) AS coursesInUnit,
+            
+            -- TOS Date (latest)
+            (
+                SELECT TO_CHAR(pd.tos_updated_date, 'YYYY-MM-DD')
+                FROM posting_details pd
+                WHERE pd.personnel_id = p.id
+                    AND pd.tos_updated_date IS NOT NULL
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS tosDate
+            
+        FROM personnel p
+        WHERE 1=1
+        AND (:medicalCode IS NULL OR :medicalCode = '' OR p.medical_code = :medicalCode)
+        AND (:rank IS NULL OR :rank = '' OR p.rank = :rank)
+        AND (
+            :ageBand IS NULL OR 
+            :ageBand = '' OR
+            (
+                (:ageBand = '<30' AND p.date_of_birth > :date30) OR
+                (:ageBand = '31-35' AND p.date_of_birth <= :date30 AND p.date_of_birth > :date35) OR
+                (:ageBand = '36-40' AND p.date_of_birth <= :date35 AND p.date_of_birth > :date40) OR
+                (:ageBand = '41-45' AND p.date_of_birth <= :date40 AND p.date_of_birth > :date45) OR
+                (:ageBand = '46-50' AND p.date_of_birth <= :date45 AND p.date_of_birth > :date50) OR
+                (:ageBand = '50+' AND p.date_of_birth <= :date50)
+            )
+        )
+        AND (
+            :retirementYear IS NULL OR
+            EXTRACT(YEAR FROM (COALESCE(p.date_of_seniority, p.date_of_commission) + INTERVAL '10 years')) = :retirementYear
+        )
+        ORDER BY p.date_of_seniority DESC
+        OFFSET :offset LIMIT :limit
+    """, nativeQuery = true)
+    List<Object[]> findFilteredPersonnelWithDetails(
+            @Param("medicalCode") String medicalCode,
+            @Param("rank") String rank,
+            @Param("ageBand") String ageBand,
+            @Param("date30") LocalDate date30,
+            @Param("date35") LocalDate date35,
+            @Param("date40") LocalDate date40,
+            @Param("date45") LocalDate date45,
+            @Param("date50") LocalDate date50,
+            @Param("retirementYear") Integer retirementYear,
+            @Param("offset") int offset,
+            @Param("limit") int limit
+    );
+
+    // Count query for filtered results
+    @Query(value = """
+        SELECT COUNT(*)
+        FROM personnel p
+        WHERE 1=1
+        AND (:medicalCode IS NULL OR :medicalCode = '' OR p.medical_code = :medicalCode)
+        AND (:rank IS NULL OR :rank = '' OR p.rank = :rank)
+        AND (
+            :ageBand IS NULL OR 
+            :ageBand = '' OR
+            (
+                (:ageBand = '<30' AND p.date_of_birth > :date30) OR
+                (:ageBand = '31-35' AND p.date_of_birth <= :date30 AND p.date_of_birth > :date35) OR
+                (:ageBand = '36-40' AND p.date_of_birth <= :date35 AND p.date_of_birth > :date40) OR
+                (:ageBand = '41-45' AND p.date_of_birth <= :date40 AND p.date_of_birth > :date45) OR
+                (:ageBand = '46-50' AND p.date_of_birth <= :date45 AND p.date_of_birth > :date50) OR
+                (:ageBand = '50+' AND p.date_of_birth <= :date50)
+            )
+        )
+        AND (
+            :retirementYear IS NULL OR
+            EXTRACT(YEAR FROM (COALESCE(p.date_of_seniority, p.date_of_commission) + INTERVAL '10 years')) = :retirementYear
+        )
+    """, nativeQuery = true)
+    long countFilteredPersonnel(
+            @Param("medicalCode") String medicalCode,
+            @Param("rank") String rank,
+            @Param("ageBand") String ageBand,
+            @Param("date30") LocalDate date30,
+            @Param("date35") LocalDate date35,
+            @Param("date40") LocalDate date40,
+            @Param("date45") LocalDate date45,
+            @Param("date50") LocalDate date50,
+            @Param("retirementYear") Integer retirementYear
+    );
 
 }
 

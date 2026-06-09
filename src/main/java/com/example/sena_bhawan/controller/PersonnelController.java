@@ -6,6 +6,7 @@ import com.example.sena_bhawan.entity.CourseMaster;
 import com.example.sena_bhawan.entity.Personnel;
 import com.example.sena_bhawan.entity.PostingDetails;
 import com.example.sena_bhawan.projection.ArmyNumberOnly;
+import com.example.sena_bhawan.service.PersonnelFilterService;
 import com.example.sena_bhawan.service.PersonnelService;
 import com.example.sena_bhawan.service.PostingDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,13 @@ public class PersonnelController {
 
     private final PersonnelService personnelService;
     private final PostingDetailsService postingService;
+    private final PersonnelFilterService personnelFilterService;
 
 
-    public PersonnelController(PersonnelService personnelService, PostingDetailsService postingService) {
+    public PersonnelController(PersonnelService personnelService, PostingDetailsService postingService, PersonnelFilterService personnelFilterService) {
         this.personnelService = personnelService;
         this.postingService = postingService;
+        this.personnelFilterService = personnelFilterService;
     }
 
     @GetMapping("/army-numbers")
@@ -209,10 +212,22 @@ public class PersonnelController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/medical-distribution")
+    public ResponseEntity<MedicalCategoryResponse> getMedicalDistribution() {
+        MedicalCategoryResponse response = personnelService.getMedicalCategoryDistribution();
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/age-distribution")
     public ResponseEntity<AgeBandResponse> getAgeDistribution() {
         AgeBandResponse response = personnelService.getAgeBandDistribution();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/filter-data")
+    public ResponseEntity<Page<PersonnelListDTO>> filterPersonnel(@RequestBody PersonnelFilterDataRequest request) {
+        Page<PersonnelListDTO> filteredResults = personnelFilterService.filterPersonnel(request);
+        return ResponseEntity.ok(filteredResults);
     }
 
 //    @GetMapping("/medical-distribution")
