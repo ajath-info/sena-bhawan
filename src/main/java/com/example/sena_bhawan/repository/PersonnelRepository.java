@@ -647,6 +647,298 @@ public interface PersonnelRepository extends JpaRepository<Personnel, Long>, Jpa
             @Param("date50") LocalDate date50,
             @Param("retirementYear") Integer retirementYear
     );
+    // Query to get personnel by attendance status
+    @Query(value = """
+        SELECT 
+            p.id,
+            p.army_no,
+            p.rank,
+            p.full_name,
+            TO_CHAR(p.date_of_birth, 'YYYY-MM-DD') AS date_of_birth,
+            TO_CHAR(p.date_of_commission, 'YYYY-MM-DD') AS date_of_commission,
+            TO_CHAR(p.date_of_seniority, 'YYYY-MM-DD') AS date_of_seniority,
+            COALESCE(p.medical_code, '-') AS medical_code,
+            COALESCE(p.religion, '-') AS religion,
+            COALESCE(p.marital_status, '-') AS marital_status,
+            COALESCE(p.mobile_number, '-') AS mobile_number,
+            COALESCE(p.email_address, '-') AS email_address,
+            COALESCE(p.city, '-') AS city,
+            COALESCE(p.state, '-') AS state,
+            COALESCE(p.place_of_birth, '-') AS place_of_birth,
+            
+            (
+                SELECT jsonb_build_object('unit_name', os.name, 'area_type', COALESCE(os.area_type, '-'))
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS unit,
+            
+            (
+                SELECT td.division_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_division td ON os.division_code = td.div_code
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS division,
+            
+            (
+                SELECT fe.establishment_type
+                FROM posting_details pd
+                INNER JOIN formation_establishment fe ON pd.orbat_id = fe.orbat_id
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS establishment_type,
+            
+            (
+                SELECT tc.command_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_command tc ON os.command_code = tc.command_code
+                WHERE pd.personnel_id = p.id
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS command,
+            
+            (
+                SELECT tcor.corps_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_corps tcor ON os.corps_code = tcor.corps_code
+                WHERE pd.personnel_id = p.id
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS corps,
+            
+            (
+                SELECT STRING_AGG(DISTINCT cm.course_name, ', ')
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN course_master cm ON cs.course_id = cm.srno
+                WHERE cpn.personnel_id = p.id
+            ) AS course,
+            
+            (
+                SELECT STRING_AGG(DISTINCT pq.qualification, ', ')
+                FROM personnel_qualifications pq
+                WHERE pq.personnel_id = p.id
+            ) AS civil_qual,
+            
+            (
+                SELECT STRING_AGG(DISTINCT ps.sport_name || ' (' || ps.level || ')', ', ')
+                FROM personnel_sports ps
+                WHERE ps.personnel_id = p.id
+            ) AS sports,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                WHERE cpn.personnel_id = p.id
+            ) AS total_courses_overall,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                WHERE cpn.personnel_id = p.id
+                    AND EXTRACT(YEAR FROM cs.start_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+            ) AS total_courses_current_year,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN posting_details pd ON cpn.personnel_id = pd.personnel_id
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE cpn.personnel_id = p.id
+                    AND LOWER(os.formation_type) = 'unit'
+                    AND pd.to_date IS NULL
+            ) AS total_courses_current_unit,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                WHERE cpn.personnel_id = p.id
+            ) AS total_courses_done,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                WHERE cpn.personnel_id = p.id
+                    AND cs.course_id IN (SELECT srno FROM course_master WHERE course_name ILIKE '%training%')
+            ) AS courses_training_yr,
+            
+            (
+                SELECT COUNT(DISTINCT cpn.id)
+                FROM course_panel_nomination cpn
+                INNER JOIN course_schedule cs ON cpn.schedule_id = cs.schedule_id
+                INNER JOIN posting_details pd ON cpn.personnel_id = pd.personnel_id
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE cpn.personnel_id = p.id
+                    AND pd.to_date IS NULL
+            ) AS courses_in_unit,
+            
+            (
+                SELECT TO_CHAR(pd.tos_updated_date, 'YYYY-MM-DD')
+                FROM posting_details pd
+                WHERE pd.personnel_id = p.id
+                    AND pd.tos_updated_date IS NOT NULL
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS tos_date
+                
+        FROM personnel p
+        INNER JOIN course_panel_nomination cpn ON p.id = cpn.personnel_id
+        WHERE cpn.attendance_status = :attendanceStatus
+        ORDER BY p.id
+        OFFSET :offset LIMIT :limit
+    """, nativeQuery = true)
+    List<Object[]> findPersonnelByAttendanceStatus(
+            @Param("attendanceStatus") String attendanceStatus,
+            @Param("offset") int offset,
+            @Param("limit") int limit
+    );
+
+    // Count query
+    @Query(value = """
+        SELECT COUNT(DISTINCT p.id)
+        FROM personnel p
+        INNER JOIN course_panel_nomination cpn ON p.id = cpn.personnel_id
+        WHERE cpn.attendance_status = :attendanceStatus
+    """, nativeQuery = true)
+    long countPersonnelByAttendanceStatus(
+            @Param("attendanceStatus") String attendanceStatus
+    );
+
+
+    // Query to get nominations by course name
+    @Query(value = """
+        SELECT 
+            -- Course Details
+            cm.course_name,
+            cm.srno AS course_id,
+            cm.location AS course_location,
+            cm.duration AS course_duration,
+            
+            -- Schedule Details
+            cs.schedule_id,
+            cs.batch_number,
+            cs.year,
+            cs.start_date,
+            cs.end_date,
+            cs.venue,
+            cs.course_strength,
+            cs.remarks AS schedule_remarks,
+            
+            -- Nomination Details
+            cpn.id AS nomination_id,
+            cpn.status AS nomination_status,
+            cpn.attendance_status,
+            cpn.grade,
+            cpn.grade_status,
+            cpn.instructor_award,
+            cpn.serial_number,
+            cpn.created_at AS nomination_created_at,
+            cpn.updated_at AS nomination_updated_at,
+            
+            -- Personnel Details
+            p.id AS personnel_id,
+            p.army_no,
+            p.rank,
+            p.full_name,
+            p.first_name,
+            p.last_name,
+            p.gender,
+            p.commission_type,
+            TO_CHAR(p.date_of_birth, 'DD-MM-YYYY') AS date_of_birth,
+            TO_CHAR(p.date_of_commission, 'DD-MM-YYYY') AS date_of_commission,
+            TO_CHAR(p.date_of_seniority, 'DD-MM-YYYY') AS date_of_seniority,
+            p.medical_code,
+            p.religion,
+            p.marital_status,
+            p.mobile_number,
+            p.email_address,
+            p.city,
+            p.state,
+            p.district,
+            
+            -- Current Posting Details
+            (
+                SELECT jsonb_build_object('unit_name', os.name, 'area_type', COALESCE(os.area_type, '-'))
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS current_unit,
+            
+            (
+                SELECT td.division_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_division td ON os.division_code = td.div_code
+                WHERE pd.personnel_id = p.id
+                    AND LOWER(pd.formation_type) = 'unit'
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS division,
+            
+            (
+                SELECT tc.command_name
+                FROM posting_details pd
+                INNER JOIN orbat_structure os ON pd.orbat_id = os.id
+                INNER JOIN tb_command tc ON os.command_code = tc.command_code
+                WHERE pd.personnel_id = p.id
+                ORDER BY pd.from_date DESC
+                LIMIT 1
+            ) AS command
+
+        FROM 
+            course_panel_nomination cpn
+        INNER JOIN 
+            course_schedule cs ON cpn.schedule_id = cs.schedule_id
+        INNER JOIN 
+            course_master cm ON cs.course_id = cm.srno
+        INNER JOIN 
+            personnel p ON cpn.personnel_id = p.id
+        WHERE 
+            (:courseName IS NULL OR :courseName = '' OR cm.course_name ILIKE CONCAT('%', :courseName, '%'))
+        ORDER BY 
+            cm.course_name, 
+            cpn.status,
+            cs.start_date DESC
+        OFFSET :offset LIMIT :limit
+    """, nativeQuery = true)
+    List<Object[]> findNominationsByCourseName(
+            @Param("courseName") String courseName,
+            @Param("offset") int offset,
+            @Param("limit") int limit
+    );
+
+    // Count query
+    @Query(value = """
+        SELECT COUNT(*)
+        FROM 
+            course_panel_nomination cpn
+        INNER JOIN 
+            course_schedule cs ON cpn.schedule_id = cs.schedule_id
+        INNER JOIN 
+            course_master cm ON cs.course_id = cm.srno
+        WHERE 
+            (:courseName IS NULL OR :courseName = '' OR cm.course_name ILIKE CONCAT('%', :courseName, '%'))
+    """, nativeQuery = true)
+    long countNominationsByCourseName(
+            @Param("courseName") String courseName
+    );
 
 }
 
