@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Personnel Details - ARMY HRMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Inter", sans-serif; background: #f1f3f5; color: #1f2937; }
+        .container { display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1b4332 0%, #081c15 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 32px; height: 32px; background: #ffb703; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .logo-text h1 { font-size: 18px; font-weight: 700; }
+        .logo-text p { font-size: 11px; color: #52b788; }
+        .sidebar-nav { flex: 1; padding: 16px 0; }
+        .nav-section-title { padding: 16px 20px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #52b788; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: white; text-decoration: none; border-left: 4px solid transparent; transition: all 0.3s; cursor: pointer; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); border-left-color: #ffb703; }
+        .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2d6a4f; display: flex; align-items: center; justify-content: center; }
+
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { background: white; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { font-size: 22px; font-weight: 700; color: #1b4332; }
+        .content-area { flex: 1; overflow-y: auto; padding: 24px; }
+
+        /* Table Styles */
+        .table-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow-x: auto; }
+        .personnel-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .personnel-table th { background: #1b4332; color: white; padding: 12px 8px; text-align: left; font-weight: 600; border-bottom: 2px solid #2d6a4f; position: sticky; top: 0; white-space: nowrap; }
+        .personnel-table td { padding: 10px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        .personnel-table tr:hover { background: #f9fafb; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 24px; padding: 20px; }
+        .pagination button { padding: 8px 16px; background: #1b4332; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .pagination button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Export Buttons */
+        .export-buttons { display: flex; gap: 12px; margin-bottom: 20px; justify-content: flex-end; }
+        .btn-export { background: #1b4332; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-family: inherit; }
+        .btn-export:hover { background: #2d6a4f; }
+
+        .filter-info { background: #ecfdf5; padding: 8px 16px; border-radius: 8px; color: #065f46; font-size: 14px; }
+        .loading-state, .empty-state { text-align: center; padding: 60px; color: #6b7280; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- SIDEBAR CONTAINER -->
+    <aside class="sidebar" id="sidebarContainer">
+        <div style="color: white; padding: 20px; text-align: center;">
+            Loading menu...
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <h2>Personnel Directory</h2>
+                <p>View and manage all personnel records</p>
+            </div>
+            <div class="filter-info" id="filterInfo">Loading...</div>
+        </div>
+
+        <div class="content-area">
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportToCSV()">📄 Download CSV</button>
+                <button class="btn-export" onclick="goBack()">◀ Back to Dashboard</button>
+            </div>
+
+            <div class="table-container" id="tableContainer">
+                <div class="loading-state">Loading personnel data...</div>
+            </div>
+
+            <div class="pagination" id="pagination" style="display: none;">
+                <button id="prevBtn" onclick="loadPage(currentPage - 1)">Previous</button>
+                <span class="page-info" id="pageInfo">Page 1 of 1</span>
+                <button id="nextBtn" onclick="loadPage(currentPage + 1)">Next</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+    let currentPage = 0;
+    let pageSize = 10;
+    let totalPages = 0;
+    let totalElements = 0;
+    let currentApiUrl = '';
+    let currentParams = {};
+
+    // Get URL parameters
+    function getUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            rank: urlParams.get('rank'),
+            ageBand: urlParams.get('ageBand'),
+            medicalCode: urlParams.get('medicalCode'),
+            retirementYear: urlParams.get('retirementYear'),
+            attendanceStatus: urlParams.get('attendanceStatus'),
+            courseName: urlParams.get('courseName')
+        };
+    }
+
+    // Determine which API to call based on URL parameters
+    function determineApiCall() {
+        const params = getUrlParams();
+
+        if (params.attendanceStatus) {
+            currentApiUrl = `http://localhost:6060/api/personnel/attendance/${params.attendanceStatus}`;
+            currentParams = { page: currentPage, size: pageSize };
+            return { type: 'GET', url: currentApiUrl, params: currentParams };
+        }
+        else if (params.courseName) {
+            currentApiUrl = `http://localhost:6060/api/courses/nominations`;
+            currentParams = { courseName: params.courseName, page: currentPage, size: pageSize };
+            return { type: 'GET', url: currentApiUrl, params: currentParams };
+        }
+        else {
+            currentApiUrl = 'http://localhost:6060/api/personnel/filter-data';
+            currentParams = {
+                medicalCode: params.medicalCode || '',
+                rank: params.rank || '',
+                ageBand: params.ageBand || '',
+                retirementYear: params.retirementYear ? parseInt(params.retirementYear) : null,
+                page: currentPage,
+                size: pageSize
+            };
+            return { type: 'POST', url: currentApiUrl, params: currentParams };
+        }
+    }
+
+    // Fetch personnel data
+    async function fetchPersonnelData() {
+        const apiConfig = determineApiCall();
+
+        try {
+            let response;
+            if (apiConfig.type === 'GET') {
+                const queryParams = new URLSearchParams(apiConfig.params).toString();
+                const url = `${apiConfig.url}${queryParams ? '?' + queryParams : ''}`;
+                response = await fetch(url);
+            } else {
+                response = await fetch(apiConfig.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(apiConfig.params)
+                });
+            }
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+            totalElements = data.totalElements;
+            totalPages = data.totalPages;
+            currentPage = data.number || 0;
+
+            renderTable(data.content || []);
+            updatePagination();
+            updateFilterInfo();
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('tableContainer').innerHTML = '<div class="empty-state">❌ Error loading personnel data. Please try again.</div>';
+        }
+    }
+
+    // Render table with all fields
+    function renderTable(personnelList) {
+        const tableContainer = document.getElementById('tableContainer');
+
+        if (!personnelList || personnelList.length === 0) {
+            tableContainer.innerHTML = '<div class="empty-state">📋 No personnel records found.</div>';
+            return;
+        }
+
+        let tableHtml = `
+            <table class="personnel-table">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Army No</th>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>DOB</th>
+                        <th>Commission</th>
+                        <th>Seniority</th>
+                        <th>Unit</th>
+                        <th>Command</th>
+                        <th>Corps</th>
+                        <th>Division</th>
+                        <th>Est Type</th>
+                        <th>Medical</th>
+                        <th>TOS Date</th>
+                        <th>Course</th>
+                        <th>Civil Qual</th>
+                        <th>Sports</th>
+                        <th>POB</th>
+                        <th>Area Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        personnelList.forEach((person, index) => {
+            const serialNo = currentPage * pageSize + index + 1;
+            tableHtml += `
+                <tr>
+                    <td>${serialNo}</td>
+                    <td>${person.armyNo || '-'}</td>
+                    <td>${person.rank || '-'}</td>
+                    <td>${person.fullName || '-'}</td>
+                    <td>${person.dateOfBirth || '-'}</td>
+                    <td>${person.dateOfCommission || '-'}</td>
+                    <td>${person.dateOfSeniority || '-'}</td>
+                    <td>${person.unit || '-'}</td>
+                    <td>${person.command || '-'}</td>
+                    <td>${person.corps || '-'}</td>
+                    <td>${person.division || '-'}</td>
+                    <td>${person.establishmentType || '-'}</td>
+                    <td>${person.medicalCode || '-'}</td>
+                    <td>${person.tosDate || '-'}</td>
+                    <td>${person.course || '-'}</td>
+                    <td>${person.civilQual || '-'}</td>
+                    <td>${person.sports || '-'}</td>
+                    <td>${person.placeOfBirth || '-'}</td>
+                    <td>${person.areaType || '-'}</td>
+                </tr>
+            `;
+        });
+
+        tableHtml += `</tbody> </table>`;
+        tableContainer.innerHTML = tableHtml;
+    }
+
+    function updatePagination() {
+        const paginationDiv = document.getElementById('pagination');
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        if (totalPages <= 1) {
+            paginationDiv.style.display = 'none';
+            return;
+        }
+
+        paginationDiv.style.display = 'flex';
+        pageInfo.textContent = `Page ${currentPage + 1} of ${totalPages} (${totalElements} records)`;
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage + 1 >= totalPages;
+    }
+
+    function loadPage(page) {
+        if (page < 0 || page >= totalPages) return;
+        currentPage = page;
+        fetchPersonnelData();
+    }
+
+    function updateFilterInfo() {
+        const params = getUrlParams();
+        const filterInfo = document.getElementById('filterInfo');
+        let filterText = '';
+
+        if (params.rank) filterText = `Rank: ${params.rank}`;
+        else if (params.ageBand) filterText = `Age Group: ${params.ageBand}`;
+        else if (params.medicalCode) filterText = `Medical Code: ${params.medicalCode}`;
+        else if (params.retirementYear) filterText = `Retiring Year: ${params.retirementYear}`;
+        else if (params.attendanceStatus) filterText = `Status: ${params.attendanceStatus}`;
+        else if (params.courseName) filterText = `Course: ${params.courseName}`;
+        else filterText = 'All Personnel';
+
+        filterInfo.innerHTML = `🔍 ${filterText} | <strong>${totalElements}</strong> records found`;
+    }
+
+    function exportToCSV() {
+        const apiConfig = determineApiCall();
+        let exportParams = { ...apiConfig.params, page: 0, size: totalElements > 0 ? totalElements : 1000 };
+
+        let fetchPromise;
+        if (apiConfig.type === 'GET') {
+            const queryParams = new URLSearchParams(exportParams).toString();
+            fetchPromise = fetch(`${apiConfig.url}${queryParams ? '?' + queryParams : ''}`);
+        } else {
+            fetchPromise = fetch(apiConfig.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exportParams)
+            });
+        }
+
+        fetchPromise.then(response => response.json())
+            .then(data => {
+                if (data.content && data.content.length > 0) {
+                    const headers = ['Army No', 'Rank', 'Name', 'DOB', 'Commission', 'Seniority', 'Unit', 'Command', 'Corps', 'Division', 'Est Type', 'Medical', 'TOS Date', 'Course', 'Civil Qual', 'Sports', 'POB', 'Area Type'];
+                    const rows = data.content.map(person => [
+                        person.armyNo || '', person.rank || '', person.fullName || '', person.dateOfBirth || '',
+                        person.dateOfCommission || '', person.dateOfSeniority || '', person.unit || '', person.command || '',
+                        person.corps || '', person.division || '', person.establishmentType || '', person.medicalCode || '',
+                        person.tosDate || '', person.course || '', person.civilQual || '', person.sports || '',
+                        person.placeOfBirth || '', person.areaType || ''
+                    ]);
+
+                    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `personnel_data_${new Date().toISOString().split('T')[0]}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert('No data to export');
+                }
+            })
+            .catch(error => {
+                console.error('Error exporting to CSV:', error);
+                alert('Error exporting data');
+            });
+    }
+
+    function goBack() {
+        window.location.href = 'dashboard-new.html';
+    }
+
+    // Initialize
+    fetchPersonnelData();
+</script>
+</body>
+</html>
