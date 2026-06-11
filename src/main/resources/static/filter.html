@@ -906,7 +906,39 @@
 
         let html = '';
         officers.forEach(o => {
-            const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+            // WITH this:
+            const fmt = (dateStr) => {
+                if (!dateStr || dateStr === '-' || dateStr === '—') return '—';
+                try {
+                    // Handle DD-MM-YYYY format
+                    if (typeof dateStr === 'string' && dateStr.includes('-')) {
+                        const parts = dateStr.split('-');
+                        if (parts.length === 3) {
+                            // Check if it's DD-MM-YYYY (day first)
+                            const day = parseInt(parts[0]);
+                            const month = parseInt(parts[1]);
+                            const year = parseInt(parts[2]);
+
+                            if (!isNaN(day) && !isNaN(month) && !isNaN(year) &&
+                                day >= 1 && day <= 31 && month >= 1 && month <= 12 && year > 1900) {
+                                // Create date object (month is 0-indexed in JS)
+                                const date = new Date(year, month - 1, day);
+                                if (!isNaN(date.getTime())) {
+                                    return date.toLocaleDateString('en-GB');
+                                }
+                            }
+                        }
+                    }
+                    // Fallback to standard date parsing
+                    const date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.toLocaleDateString('en-GB');
+                    }
+                    return '—';
+                } catch (e) {
+                    return '—';
+                }
+            };
             const med = o.medicalCode || '—';
             const postingDue = (o.postingDueMonths !== null && o.postingDueMonths !== undefined)
                 ? o.postingDueMonths + ' M' : '—';
@@ -1033,7 +1065,34 @@
     }
 
     function showOfficerModal(officer) {
-        const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB') : '—';
+        const fmt = (dateStr) => {
+            if (!dateStr || dateStr === '-' || dateStr === '—') return '—';
+            try {
+                if (typeof dateStr === 'string' && dateStr.includes('-')) {
+                    const parts = dateStr.split('-');
+                    if (parts.length === 3) {
+                        const day = parseInt(parts[0]);
+                        const month = parseInt(parts[1]);
+                        const year = parseInt(parts[2]);
+
+                        if (!isNaN(day) && !isNaN(month) && !isNaN(year) &&
+                            day >= 1 && day <= 31 && month >= 1 && month <= 12 && year > 1900) {
+                            const date = new Date(year, month - 1, day);
+                            if (!isNaN(date.getTime())) {
+                                return date.toLocaleDateString('en-GB');
+                            }
+                        }
+                    }
+                }
+                const date = new Date(dateStr);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-GB');
+                }
+                return '—';
+            } catch (e) {
+                return '—';
+            }
+        };
         const initials = (name) => name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'O';
 
         const overlay = document.createElement('div');
@@ -1090,6 +1149,54 @@
 
     function editOfficer(id) {
         window.location.href = `/personnel-edit.html?id=${id}`;
+    }
+
+    // ADD this helper function to convert from DD-MM-YYYY to YYYY-MM-DD for input fields:
+    function formatDateForInput(dateStr) {
+        if (!dateStr || dateStr === '-' || dateStr === '—') return '';
+        try {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const day = parts[0];
+                const month = parts[1];
+                const year = parts[2];
+                // Validate if it looks like DD-MM-YYYY
+                if (day.length === 2 && month.length === 2 && year.length === 4) {
+                    return `${year}-${month}-${day}`;
+                }
+            }
+            return '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    // REPLACE the getDateValue function (around line 460-470):
+    const getDateValue = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const val = el.value;
+        if (!val || val === '') return null;
+
+        // Convert from YYYY-MM-DD to DD-MM-YYYY for API
+        try {
+            const parts = val.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+        } catch (e) {}
+        return val;
+    };
+
+    // Helper to set date input values from DD-MM-YYYY format
+    function setDateInputValue(elementId, dateStr) {
+        const input = document.getElementById(elementId);
+        if (input && dateStr && dateStr !== '-' && dateStr !== '—') {
+            const formatted = formatDateForInput(dateStr);
+            if (formatted) {
+                input.value = formatted;
+            }
+        }
     }
 
     async function exportResults() {
@@ -1163,6 +1270,8 @@
                     { header: 'Corps', dataKey: 'corps' },
                     { header: 'Command', dataKey: 'command' },
                     { header: 'Medical', dataKey: 'medicalCode' },
+                    { header: 'DOB', dataKey: 'dateOfBirth' },  // Add this if you want DOB in export
+                    { header: 'Commission Date', dataKey: 'dateOfCommission' },  // Add this
                 ],
                 body: officers.map(o => ({
                     armyNo: o.armyNo || '—',
@@ -1171,6 +1280,8 @@
                     corps: o.corps || '—',
                     command: o.command || '—',
                     medicalCode: o.medicalCode || '—',
+                    dateOfBirth: o.dateOfBirth || '—',  // Keep as is, already in DD-MM-YYYY
+                    dateOfCommission: o.dateOfCommission || '—',
                 })),
                 startY: activeFilters.length > 0 ? 30 : 25,
                 margin: { left: 5, right: 5 },
