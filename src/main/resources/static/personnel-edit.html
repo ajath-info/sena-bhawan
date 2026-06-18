@@ -99,25 +99,14 @@
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <div class="container">
+
   <aside class="sidebar" id="sidebarContainer">
-    <div class="sidebar-header">
-      <div class="logo-section">
-        <div class="logo-icon">A</div>
-        <div class="logo-text"><h1>ARMY HRMS</h1><p>Human Resource Management</p></div>
-      </div>
-    </div>
-    <div class="sidebar-nav">
-      <div class="nav-section-title">MAIN</div>
-      <a href="personnel-list.html" class="nav-item"><span class="nav-icon">👥</span><span>Personnel List</span></a>
-      <a href="#" class="nav-item active"><span class="nav-icon">✏️</span><span>Edit Personnel</span></a>
-    </div>
-    <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="user-avatar">A</div>
-        <div class="user-info"><div class="name">Admin User</div><div class="role">Administrator</div></div>
-      </div>
+    <!-- Loading indicator (optional) -->
+    <div style="color: white; padding: 20px; text-align: center;">
+      Loading menu...
     </div>
   </aside>
+
   <main class="main-content">
     <div class="header">
       <div>
@@ -1246,5 +1235,6 @@
     switchSection('basic');
   });
 </script>
+<script src="sidebar.js"></script>
 </body>
 </html>
