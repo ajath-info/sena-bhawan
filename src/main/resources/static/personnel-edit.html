@@ -1111,39 +1111,27 @@
     const imgFile = document.getElementById('officerImageFile').files[0];
     if(imgFile) await updateImage();
 
-    // Get the case type value from multiple sources
-    let caseTypeValue = document.getElementById('caseType').value;
+    // Get the case type name from display
+    let caseTypeValue = document.getElementById('selectedCaseTypeDisplay').textContent;
 
-    // If hidden select is empty, check data attribute
-    if (!caseTypeValue || caseTypeValue === '' || caseTypeValue === 'undefined') {
+    // If display shows default text, try to get from hidden select
+    if (caseTypeValue === 'Select Case Type') {
       const caseTypeSelect = document.getElementById('caseType');
-      caseTypeValue = caseTypeSelect.getAttribute('data-selected');
-    }
-
-    // If still empty, try to get from display text
-    if (!caseTypeValue || caseTypeValue === '' || caseTypeValue === 'undefined') {
-      const displayText = document.getElementById('selectedCaseTypeDisplay').textContent;
-      if (displayText && displayText !== 'Select Case Type') {
-        // Try to find by name in allCaseTypes
-        const found = allCaseTypes.find(c => c.name === displayText);
+      const selectedId = caseTypeSelect.value || caseTypeSelect.getAttribute('data-selected');
+      if (selectedId) {
+        const found = allCaseTypes.find(c => c.id == selectedId);
         if (found) {
-          caseTypeValue = found.id;
-        } else {
-          // If not found, use the display text as the value
-          caseTypeValue = displayText;
+          caseTypeValue = found.name;
         }
       }
     }
 
     // If still no value, set to empty string
-    if (!caseTypeValue || caseTypeValue === 'undefined') {
+    if (!caseTypeValue || caseTypeValue === 'Select Case Type') {
       caseTypeValue = '';
     }
 
-    console.log('Final Case Type Value being sent:', caseTypeValue);
-    console.log('Case Type display text:', document.getElementById('selectedCaseTypeDisplay').textContent);
-    console.log('Hidden select value:', document.getElementById('caseType').value);
-    console.log('Data-selected attribute:', document.getElementById('caseType').getAttribute('data-selected'));
+    console.log('Final Case Type being sent:', caseTypeValue);
 
     const payload = {
       commissionType: document.getElementById('commission').value,
