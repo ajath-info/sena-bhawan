@@ -364,12 +364,28 @@
 
   async function loadCaseTypes() {
     try {
-      allCaseTypes = await (await fetch('http://localhost:6060/api/dropdown/CASE_TYPE?code=1')).json();
+      const response = await fetch('http://localhost:6060/api/dropdown/CASE_TYPE?code=1');
+      allCaseTypes = await response.json();
       const c = document.getElementById('caseTypeItemsContainer');
       if(c) {
-        c.innerHTML = allCaseTypes.map(i => `<div class="dropdown-item" onclick="selectCaseType('${i.code}','${i.name.replace(/'/g, "\\'")}')"><div><span>${i.name}</span></div></div>`).join('');
+        c.innerHTML = allCaseTypes.map(i =>
+                `<div class="dropdown-item" onclick="selectCaseType('${i.id}','${i.name.replace(/'/g, "\\'")}')">
+                    <div><span>${i.name}</span></div>
+                </div>`
+        ).join('');
       }
-    } catch(e) { console.error('Error loading case types:', e); }
+
+      // After loading case types, check if we need to set the selected value
+      const savedCaseType = document.getElementById('caseType').value;
+      if (savedCaseType) {
+        const caseTypeItem = allCaseTypes.find(c => c.id == savedCaseType);
+        if (caseTypeItem) {
+          document.getElementById('selectedCaseTypeDisplay').textContent = caseTypeItem.name;
+        }
+      }
+    } catch(e) {
+      console.error('Error loading case types:', e);
+    }
   }
 
   function filterCaseTypes() {
@@ -377,14 +393,85 @@
     const filtered = allCaseTypes.filter(i => i.name.toUpperCase().includes(search));
     const c = document.getElementById('caseTypeItemsContainer');
     if(c) {
-      c.innerHTML = filtered.map(i => `<div class="dropdown-item" onclick="selectCaseType('${i.code}','${i.name.replace(/'/g, "\\'")}')"><div><span>${i.name}</span></div></div>`).join('');
+      c.innerHTML = filtered.map(i =>
+              `<div class="dropdown-item" onclick="selectCaseType('${i.id}','${i.name.replace(/'/g, "\\'")}')">
+                <div><span>${i.name}</span></div>
+            </div>`
+      ).join('');
     }
   }
 
   function selectCaseType(code, name) {
-    document.getElementById('caseType').value = code;
+    // Set the hidden select value
+    const caseTypeSelect = document.getElementById('caseType');
+    caseTypeSelect.value = code;
+
+    // Also store as data attribute for backup
+    caseTypeSelect.setAttribute('data-selected', code);
+    caseTypeSelect.setAttribute('data-name', name);
+
+    // Update the display
     document.getElementById('selectedCaseTypeDisplay').textContent = name;
+
+    // Close the dropdown
     document.getElementById('caseTypeDropdown').style.display = 'none';
+
+    console.log('Case Type selected - Code:', code, 'Name:', name);
+  }
+
+  // Enhanced selectState function to reset dependent fields
+  function selectState(name) {
+    document.getElementById('state').value = name;
+    document.getElementById('selectedStateDisplay').textContent = name;
+    document.getElementById('stateDropdown').style.display = 'none';
+
+    // Reset dependent fields
+    document.getElementById('district').value = '';
+    document.getElementById('selectedDistrictDisplay').textContent = 'Select District';
+    document.getElementById('city').value = '';
+    document.getElementById('selectedCityDisplay').textContent = 'Select City';
+    document.getElementById('pinCode').value = '';
+
+    const st = allStates.find(s => s.state === name);
+    currentStateDistricts = st ? st.districts || [] : [];
+    const dContainer = document.getElementById('districtItemsContainer');
+    if(dContainer) {
+      dContainer.innerHTML = currentStateDistricts.map(d =>
+              `<div class="dropdown-item" onclick="selectDistrict('${d.replace(/'/g, "\\'")}')"><span>${d}</span></div>`
+      ).join('');
+    }
+  }
+
+  function selectDistrict(name) {
+    document.getElementById('district').value = name;
+    document.getElementById('selectedDistrictDisplay').textContent = name;
+    document.getElementById('districtDropdown').style.display = 'none';
+
+    // Reset dependent fields
+    document.getElementById('city').value = '';
+    document.getElementById('selectedCityDisplay').textContent = 'Select City';
+    document.getElementById('pinCode').value = '';
+
+    // Update cities based on selected state and district
+    const state = document.getElementById('state').value;
+    if (state) {
+      currentCityList = allCities[state] || [];
+      const cContainer = document.getElementById('cityItemsContainer');
+      if(cContainer) {
+        cContainer.innerHTML = currentCityList.map(city =>
+                `<div class="dropdown-item" onclick="selectCity('${city.replace(/'/g, "\\'")}')"><span>${city}</span></div>`
+        ).join('');
+      }
+    }
+  }
+
+  function selectCity(name) {
+    document.getElementById('city').value = name;
+    document.getElementById('selectedCityDisplay').textContent = name;
+    document.getElementById('cityDropdown').style.display = 'none';
+
+    // Reset PIN code
+    document.getElementById('pinCode').value = '';
   }
 
   async function loadStates() {
@@ -394,7 +481,32 @@
       allStates = data.states || [];
       const c = document.getElementById('stateItemsContainer');
       if(c) {
-        c.innerHTML = allStates.map(s => `<div class="dropdown-item" onclick="selectState('${s.state.replace(/'/g, "\\'")}')"><span>${s.state}</span></div>`).join('');
+        c.innerHTML = allStates.map(s =>
+                `<div class="dropdown-item" onclick="selectState('${s.state.replace(/'/g, "\\'")}')"><span>${s.state}</span></div>`
+        ).join('');
+      }
+
+      // If state is already loaded in personnel data, set districts
+      const currentState = document.getElementById('state').value;
+      if (currentState) {
+        const st = allStates.find(s => s.state === currentState);
+        if (st) {
+          currentStateDistricts = st.districts || [];
+          const dContainer = document.getElementById('districtItemsContainer');
+          if(dContainer) {
+            dContainer.innerHTML = currentStateDistricts.map(d =>
+                    `<div class="dropdown-item" onclick="selectDistrict('${d.replace(/'/g, "\\'")}')"><span>${d}</span></div>`
+            ).join('');
+          }
+          // Load cities for the state
+          currentCityList = allCities[currentState] || [];
+          const cContainer = document.getElementById('cityItemsContainer');
+          if(cContainer) {
+            cContainer.innerHTML = currentCityList.map(city =>
+                    `<div class="dropdown-item" onclick="selectCity('${city.replace(/'/g, "\\'")}')"><span>${city}</span></div>`
+            ).join('');
+          }
+        }
       }
     } catch(e) { console.error('Error loading states:', e); }
   }
@@ -408,18 +520,6 @@
     }
   }
 
-  function selectState(name) {
-    document.getElementById('state').value = name;
-    document.getElementById('selectedStateDisplay').textContent = name;
-    document.getElementById('stateDropdown').style.display = 'none';
-    const st = allStates.find(s => s.state === name);
-    currentStateDistricts = st ? st.districts || [] : [];
-    const dContainer = document.getElementById('districtItemsContainer');
-    if(dContainer) {
-      dContainer.innerHTML = currentStateDistricts.map(d => `<div class="dropdown-item" onclick="selectDistrict('${d.replace(/'/g, "\\'")}')"><span>${d}</span></div>`).join('');
-    }
-  }
-
   function filterDistricts() {
     const search = document.getElementById('districtSearchInput').value.toUpperCase();
     const filtered = currentStateDistricts.filter(d => d.toUpperCase().includes(search));
@@ -427,12 +527,6 @@
     if(c) {
       c.innerHTML = filtered.map(d => `<div class="dropdown-item" onclick="selectDistrict('${d.replace(/'/g, "\\'")}')"><span>${d}</span></div>`).join('');
     }
-  }
-
-  function selectDistrict(name) {
-    document.getElementById('district').value = name;
-    document.getElementById('selectedDistrictDisplay').textContent = name;
-    document.getElementById('districtDropdown').style.display = 'none';
   }
 
   async function loadCities() {
@@ -449,12 +543,6 @@
     if(c) {
       c.innerHTML = filtered.map(city => `<div class="dropdown-item" onclick="selectCity('${city.replace(/'/g, "\\'")}')"><span>${city}</span></div>`).join('');
     }
-  }
-
-  function selectCity(name) {
-    document.getElementById('city').value = name;
-    document.getElementById('selectedCityDisplay').textContent = name;
-    document.getElementById('cityDropdown').style.display = 'none';
   }
 
   async function loadStations() {
@@ -659,8 +747,29 @@
       setVal('gender', d.gender);
       setVal('placeOfBirth', d.placeOfBirth);
       if(d.caseType && d.caseType !== 'undefined') {
-        document.getElementById('caseType').value = d.caseType;
-        document.getElementById('selectedCaseTypeDisplay').textContent = d.caseType;
+        const caseTypeSelect = document.getElementById('caseType');
+        caseTypeSelect.value = d.caseType;
+        caseTypeSelect.setAttribute('data-selected', d.caseType);
+
+        // Try to find by id first (since API returns id)
+        const caseTypeItem = allCaseTypes.find(c => c.id == d.caseType);
+        if (caseTypeItem) {
+          document.getElementById('selectedCaseTypeDisplay').textContent = caseTypeItem.name;
+          caseTypeSelect.setAttribute('data-name', caseTypeItem.name);
+        } else {
+          // If not found by id, try by name
+          const caseTypeByName = allCaseTypes.find(c => c.name === d.caseType);
+          if (caseTypeByName) {
+            document.getElementById('selectedCaseTypeDisplay').textContent = caseTypeByName.name;
+            caseTypeSelect.value = caseTypeByName.id;
+            caseTypeSelect.setAttribute('data-selected', caseTypeByName.id);
+            caseTypeSelect.setAttribute('data-name', caseTypeByName.name);
+          } else {
+            document.getElementById('selectedCaseTypeDisplay').textContent = d.caseType;
+            caseTypeSelect.setAttribute('data-name', d.caseType);
+          }
+        }
+        console.log('Loaded Case Type - Value:', caseTypeSelect.value, 'Display:', document.getElementById('selectedCaseTypeDisplay').textContent);
       }
 
       if(d.officerImage) {
@@ -1001,23 +1110,62 @@
     const ln = document.getElementById('lastName').value;
     const imgFile = document.getElementById('officerImageFile').files[0];
     if(imgFile) await updateImage();
+
+    // Get the case type value from multiple sources
+    let caseTypeValue = document.getElementById('caseType').value;
+
+    // If hidden select is empty, check data attribute
+    if (!caseTypeValue || caseTypeValue === '' || caseTypeValue === 'undefined') {
+      const caseTypeSelect = document.getElementById('caseType');
+      caseTypeValue = caseTypeSelect.getAttribute('data-selected');
+    }
+
+    // If still empty, try to get from display text
+    if (!caseTypeValue || caseTypeValue === '' || caseTypeValue === 'undefined') {
+      const displayText = document.getElementById('selectedCaseTypeDisplay').textContent;
+      if (displayText && displayText !== 'Select Case Type') {
+        // Try to find by name in allCaseTypes
+        const found = allCaseTypes.find(c => c.name === displayText);
+        if (found) {
+          caseTypeValue = found.id;
+        } else {
+          // If not found, use the display text as the value
+          caseTypeValue = displayText;
+        }
+      }
+    }
+
+    // If still no value, set to empty string
+    if (!caseTypeValue || caseTypeValue === 'undefined') {
+      caseTypeValue = '';
+    }
+
+    console.log('Final Case Type Value being sent:', caseTypeValue);
+    console.log('Case Type display text:', document.getElementById('selectedCaseTypeDisplay').textContent);
+    console.log('Hidden select value:', document.getElementById('caseType').value);
+    console.log('Data-selected attribute:', document.getElementById('caseType').getAttribute('data-selected'));
+
+    const payload = {
+      commissionType: document.getElementById('commission').value,
+      armyNo: document.getElementById('armyNo').value,
+      rank: document.getElementById('rank').value,
+      firstName: fn,
+      lastName: ln,
+      fullName: `${fn} ${ln}`.trim(),
+      gender: document.getElementById('gender').value,
+      caseType: caseTypeValue,
+      dateOfCommission: document.getElementById('dateOfCommission').value,
+      dateOfSeniority: document.getElementById('dateOfSeniority').value,
+      dateOfBirth: document.getElementById('dateOfBirth').value,
+      placeOfBirth: document.getElementById('placeOfBirth').value
+    };
+
+    console.log('Full Payload:', payload);
+
     return fetch(`http://localhost:6060/api/personnel/${personnelId}/basic-info`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        commissionType: document.getElementById('commission').value,
-        armyNo: document.getElementById('armyNo').value,
-        rank: document.getElementById('rank').value,
-        firstName: fn,
-        lastName: ln,
-        fullName: `${fn} ${ln}`.trim(),
-        gender: document.getElementById('gender').value,
-        caseType: document.getElementById('caseType').value,
-        dateOfCommission: document.getElementById('dateOfCommission').value,
-        dateOfSeniority: document.getElementById('dateOfSeniority').value,
-        dateOfBirth: document.getElementById('dateOfBirth').value,
-        placeOfBirth: document.getElementById('placeOfBirth').value
-      })
+      body: JSON.stringify(payload)
     });
   }
 
@@ -1207,6 +1355,7 @@
   }
 
   // Initialize
+  // Initialize - replace the existing DOMContentLoaded with this
   document.addEventListener('DOMContentLoaded', async () => {
     personnelId = getIdFromUrl();
     if(!personnelId) {
@@ -1215,18 +1364,18 @@
       return;
     }
 
-    await Promise.all([
-      loadDropdowns(),
-      loadCaseTypes(),
-      loadStates(),
-      loadCities(),
-      loadStations(),
-      loadAirports(),
-      loadCivilQualifications(),
-      loadArmyCourses(),
-      loadSportsTypes()
-    ]);
+    // Load all dropdown data first
+    await loadDropdowns();
+    await loadCaseTypes();
+    await loadStates();
+    await loadCities();
+    await loadStations();
+    await loadAirports();
+    await loadCivilQualifications();
+    await loadArmyCourses();
+    await loadSportsTypes();
 
+    // Then load personnel data (which will use the loaded case types)
     await loadPersonnelData();
     document.getElementById('loadingOverlay').style.display = 'none';
 
